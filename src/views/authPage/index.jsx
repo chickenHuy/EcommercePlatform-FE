@@ -81,11 +81,11 @@ const AuthPage = () => {
             <p className='font-regular text-[15px] text-center text-black-secondary'>{t('createFreeAccount')}</p>
 
             <div className='flex flex-row justify-between gap-4 my-4'>
-              <Button iconSrc={IconGoogle} borderWidth='border-[1px]' borderRadius='rounded-lg' width='w-full' height='h-[45px]' borderColor='border-black-tertiary' />
+              <Button iconSrc={IconGoogle} borderWidth='border-[1px]' borderRadius='rounded-lg' width='w-full' height='h-[45px]' borderColor='border-gray-primary' />
 
-              <Button iconSrc={IconFacebook} borderWidth='border-[1px]' borderRadius='rounded-lg' width='w-full' height='h-[45px]' borderColor='border-black-tertiary' />
+              <Button iconSrc={IconFacebook} borderWidth='border-[1px]' borderRadius='rounded-lg' width='w-full' height='h-[45px]' borderColor='border-gray-primary' />
 
-              <Button iconSrc={IconApple} borderWidth='border-[1px]' borderRadius='rounded-lg' width='w-full' height='h-[45px]' borderColor='border-black-tertiary' />
+              <Button iconSrc={IconApple} borderWidth='border-[1px]' borderRadius='rounded-lg' width='w-full' height='h-[45px]' borderColor='border-gray-primary' />
             </div>
 
             <div className='flex flex-row justify-evenly items-center mb-3'>
