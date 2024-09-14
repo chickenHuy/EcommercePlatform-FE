@@ -39,7 +39,7 @@ const AuthPage = () => {
 
             <div className='flex flex-row justify-evenly items-center mb-3'>
               <div className='w-[45%] h-[2px] bg-black-tertiary opacity-30'></div>
-              <p className='translate-y-2'>{t('or')}</p>
+              <p className='translate-y-2 mb-3'>{t('or')}</p>
               <div className='w-[45%] h-[2px] bg-black-tertiary opacity-30'></div>
             </div>
 
@@ -90,7 +90,7 @@ const AuthPage = () => {
 
             <div className='flex flex-row justify-evenly items-center mb-3'>
               <div className='w-[45%] h-[2px] bg-black-tertiary opacity-30'></div>
-              <p className='translate-y-2'>{t('or')}</p>
+              <p className='translate-y-2 mb-3'>{t('or')}</p>
               <div className='w-[45%] h-[2px] bg-black-tertiary opacity-30'></div>
             </div>
 
