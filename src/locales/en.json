@@ -1,0 +1,70 @@
+{
+  "Header": {
+    "appTitle": "Next.js Weather"
+  },
+  "VendorHeader": {
+    "vendorTitle": "Seller Center",
+    "userOptionsMenu": {
+      "shop-information": "Shop Information",
+      "shop-setting": "Shop Setting",
+      "language": "Language",
+      "logout": "Logout"
+    }
+  },
+  "VendorNagivate": {
+    "order": {
+      "title": "Order",
+      "my-orders": "My Orders",
+      "cancellation": "Cancellation",
+      "return-refund": "Return/Refund",
+      "shipping-setting": "Shipping Setting"
+    },
+    "product": {
+      "title": "Product",
+      "my-products": "My Products",
+      "add-new-product": "Add New Product"
+    },
+    "customerService": {
+      "title": "Customer Service",
+      "chat-management": "Chat Managerment",
+      "review-management": "Review Management"
+    },
+    "finance": {
+      "title": "Finance",
+      "my-income": "My Income",
+      "my-balance": "My Balance",
+      "bank-account": "Bank Account"
+    },
+    "data": {
+      "title": "Data",
+      "business-insight": "Business Insight",
+      "account-health": "Account Health"
+    },
+    "shop": {
+      "title": "Shop",
+      "shop-information": "Shop Information",
+      "shop-decoration": "Shop Decoration",
+      "shop-setting": "Shop Setting"
+    }
+  },
+  "AuthPage": {
+    "welcome": "Welcome Back!",
+    "enterDetails": "Please enter your details",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember me",
+    "dontHaveAccount": "Don't have an account?",
+    "signUpNow": "Sign up now.",
+    "createAccount": "Create Account",
+    "createFreeAccount": "Create your free account to get access to all uptech products",
+    "or": "or",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "alreadyHaveAccount": "Already have an account?",
+    "signInHere": "Sign in here."
+  }
+}

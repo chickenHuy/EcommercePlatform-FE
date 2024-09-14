@@ -1,0 +1,70 @@
+{
+  "Header": {
+    "appTitle": "Thời tiết Next.js"
+  },
+  "VendorHeader": {
+    "vendorTitle": "Kênh người bán",
+    "userOptionsMenu": {
+      "shop-information": "Hồ Sơ Shop",
+      "shop-setting": "Thiết Lập Shop",
+      "language": "Ngôn Ngữ",
+      "logout": "Đăng Xuất"
+    }
+  },
+  "VendorNagivate": {
+    "order": {
+      "title": "Quản Lý Đơn Hàng",
+      "my-orders": "Tất Cả",
+      "cancellation": "Đơn Hủy",
+      "return-refund": "Trả Hàng/Hoàn Tiền",
+      "shipping-setting": "Cài Đặt Vận Chuyển"
+    },
+    "product": {
+      "title": "Quản Lý Sản Phẩm",
+      "my-products": "Tất Cả Sản Phẩm",
+      "add-new-product": "Thêm Sản Phẩm"
+    },
+    "customerService": {
+      "title": "Chăm Sóc Khách Hàng",
+      "chat-management": "Quản lý Chat",
+      "review-management": "Quản lý Đánh Giá"
+    },
+    "finance": {
+      "title": "Tài Chính",
+      "my-income": "Doanh Thu",
+      "my-balance": "Số Dư",
+      "bank-account": "Tài Khoản Ngân Hàng"
+    },
+    "data": {
+      "title": "Dữ Liệu",
+      "business-insight": "Phân Tích Bán Hàng",
+      "account-health": "Hiệu Quả Hoạt Động"
+    },
+    "shop": {
+      "title": "Quản Lý Shop",
+      "shop-information": "Hồ Sơ Shop",
+      "shop-decoration": "Trang Trí Shop",
+      "shop-setting": "Thiết Lập Shop"
+    }
+  },
+  "AuthPage": {
+    "welcome": "Chào mừng trở lại!",
+    "enterDetails": "Vui lòng nhập thông tin của bạn",
+    "signIn": "Đăng Nhập",
+    "signUp": "Đăng Ký",
+    "forgotPassword": "Quên mật khẩu?",
+    "rememberMe": "Nhớ tôi",
+    "dontHaveAccount": "Chưa có tài khoản?",
+    "signUpNow": "Đăng ký ngay.",
+    "createAccount": "Tạo tài khoản",
+    "createFreeAccount": "Tạo tài khoản miễn phí để truy cập tất cả các sản phẩm của hkuptech",
+    "or": "hoặc",
+    "firstName": "Tên",
+    "lastName": "Họ",
+    "username": "Tên người dùng",
+    "password": "Mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "alreadyHaveAccount": "Đã có tài khoản?",
+    "signInHere": "Đăng nhập ở đây."
+  }
+}
