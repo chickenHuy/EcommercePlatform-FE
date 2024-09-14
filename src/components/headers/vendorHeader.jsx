@@ -15,7 +15,9 @@ import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
 import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
+import CheckIcon from '@mui/icons-material/Check';
 import { useTranslations } from 'next-intl';
+import { localeDetector } from '@/utils/commonUtils';
 
 function VendorHeader() {
   const [timeoutId, setTimeoutId] = useState(null);
@@ -24,6 +26,9 @@ function VendorHeader() {
 
   const [timeoutIdLanguage, setTimeoutIdLanguage] = useState(null);
   const [showMenuLanguage, setShowMenuLanguage] = useState(false);
+
+    // True if the current locale is 'en' and false otherwise.
+  const locale = localeDetector()
 
   const t = useTranslations("VendorHeader");
 
@@ -151,8 +156,8 @@ function VendorHeader() {
               <MenuItem menuIcon={<LanguageOutlinedIcon />} menuContext={t('userOptionsMenu.language')} otherComponent={showMenuLanguage ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />} />
               <div className={`${showMenuLanguage ? 'scale-100' : 'opacity-0 scale-0'} duration-300 absolute right-0 top-full`} onMouseEnter={handleLanguageMouseEnter} onMouseLeave={handleLanguageMouseLeave}>
                 <DropdownMenu width='w-[170px]' listMenuItems={[
-                  <MenuItem menuContext='Tiếng Việt' />,
-                  <MenuItem menuContext='English' />,
+                  <MenuItem menuContext='Tiếng Việt' otherComponent={locale ? '' : <CheckIcon />} />,
+                  <MenuItem menuContext='English' otherComponent={!locale ? '' : <CheckIcon />} />,
                 ]} />
 
               </div>
