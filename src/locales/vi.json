@@ -66,5 +66,14 @@
     "confirmPassword": "Xác nhận mật khẩu",
     "alreadyHaveAccount": "Đã có tài khoản?",
     "signInHere": "Đăng nhập ở đây."
+  },
+    "AdminHeader": {
+    "vendorTitle": "Trung Tâm Quản Trị",
+    "userOptionsMenu": {
+      "shop-information": "Shop Information",
+      "shop-setting": "Shop Setting",
+      "language": "Language",
+      "logout": "Logout"
+    }
   }
 }

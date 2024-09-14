@@ -66,5 +66,14 @@
     "confirmPassword": "Confirm Password",
     "alreadyHaveAccount": "Already have an account?",
     "signInHere": "Sign in here."
+  },
+  "AdminHeader": {
+    "vendorTitle": "Admin Center",
+    "userOptionsMenu": {
+      "shop-information": "Shop Information",
+      "shop-setting": "Shop Setting",
+      "language": "Language",
+      "logout": "Logout"
+    }
   }
 }
