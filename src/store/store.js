@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
-import exampleSlice from './features/exampleSlice';
+import loginSlice from './features/loginSlice';
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
-      exampleReducer: exampleSlice,
+      loginReducer: loginSlice,
     },
   });
 };
