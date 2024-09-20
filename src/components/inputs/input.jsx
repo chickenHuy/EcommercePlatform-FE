@@ -1,4 +1,5 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
 
 export const Input = ({
     width = 'w-full',
@@ -13,12 +14,20 @@ export const Input = ({
 
     type = 'text',
     placeholder = '',
+    reducer = null
 }) => {
+
+    const dispatch = useDispatch();
+
     return (
         <input
             type={type}
             placeholder={placeholder}
-            className={`${width} ${height} ${backgroundColor} ${borderColor} ${borderWidth} ${borderRadius} ${textColor} px-3 py-1 outline-none focus:border-[1px]`}
+            className={`${width} ${height} ${backgroundColor} ${borderColor} ${borderWidth} ${borderRadius} ${textColor} px-3 py-1 outline-none focus:border-[1px]`} onChange={(e) => {
+                if (reducer) {
+                    dispatch(reducer(e.target.value));
+                }
+            }}
         />
     );
 };

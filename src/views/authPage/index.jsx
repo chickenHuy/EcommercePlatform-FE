@@ -10,11 +10,37 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/buttons/iconImageButton';
 import Image from 'next/image';
+import { changePassword, changeUsername } from '@/store/features/loginSlice';
+import { useSelector } from 'react-redux';
+import axios from '../../configs/axiosConfig';
 
 const AuthPage = () => {
 
   const [isSignIn, setIsSignIn] = useState(true);
   const t = useTranslations("AuthPage");
+
+  const loginData = useSelector((state) => state.loginReducer);
+
+  const handleLogin = () => {
+    const data = {
+      username: loginData.username,
+      password: loginData.password
+    }
+    login(data).then(() => {
+      console.log('Login success');
+    }).catch((error) => {
+      console.error(error);
+    });
+  }
+
+  async function login(data) {
+    try {
+      const response = await axios.post('/api/v1/auths/log-in', data);
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <div className='w-full h-full min-h-screen flex justify-center items-center'>
@@ -45,9 +71,9 @@ const AuthPage = () => {
 
             <div>
               <span className='font-bold text-[16px] block my-2'>{t('username')}</span>
-              <Input type='email' placeholder={t('username')} />
+              <Input type='email' placeholder={t('username')} reducer={changeUsername} />
               <span className='font-bold text-[16px] block my-2'>{t('password')}</span>
-              <Input type='password' placeholder={t('password')} />
+              <Input type='password' placeholder={t('password')} reducer={changePassword} />
             </div>
 
             <div className='flex flex-row items-center justify-between my-3'>
@@ -58,7 +84,7 @@ const AuthPage = () => {
             </div>
 
             <div className='my-4'>
-              <Button text={t('signIn')} width='w-full' height='h-14' backgroundColor='bg-black-primary' textColor='text-white-primary' borderRadius='rounded-[70px]' />
+              <Button text={t('signIn')} width='w-full' height='h-14' backgroundColor='bg-black-primary' textColor='text-white-primary' borderRadius='rounded-[70px]' onClick={() => handleLogin()} />
             </div>
 
             <div className='flex flex-row justify-center items-center'>

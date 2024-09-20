@@ -2,6 +2,7 @@ import localFont from 'next/font/local';
 import './globals.css';
 import { getMessages } from 'next-intl/server';
 import { NextIntlClientProvider } from 'next-intl';
+import StoreProvider from '@/store/storeProvider';
 
 const helveticalNeue = localFont({
   src: [
@@ -34,11 +35,13 @@ export default async function RootLayout({ children, params }) {
 
   return (
     <html lang={locale}>
-      <NextIntlClientProvider locale={locale} messages={messages}>
-        <body className={helveticalNeue.className}>
-          {children}
-        </body>
-      </NextIntlClientProvider>
+      <StoreProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <body className={helveticalNeue.className}>
+            {children}
+          </body>
+        </NextIntlClientProvider>
+      </StoreProvider>
     </html>
   );
 }
