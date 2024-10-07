@@ -1,180 +1,269 @@
 "use client";
 
-import ChickenImage from '@/assets/chicken.png';
-import Image from 'next/image';
-import IconButton from '../buttons/iconMUIButton';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import WidgetsIcon from '@mui/icons-material/Widgets';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import MenuItem from '../menu/menuItem';
-import DropdownMenu from '../menu/dropdownMenu';
-import { useState } from 'react';
-import { Divider, Switch } from '@mui/material';
-import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
-import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
-import { useTranslations } from 'next-intl';
-import CheckIcon from '@mui/icons-material/Check';
-import { localeDetector } from '@/utils/commonUtils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import Link from "next/link"
+import { CircleUser, Menu, Package2, Search } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { ModeToggle } from "../themeToggles/toggle";
+import {
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuTrigger,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenu,
+} from "@/components/ui/navigation-menu"
+import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
+
 
 function AdminHeader() {
-  const [timeoutId, setTimeoutId] = useState(null);
-  const [activeButton, setActiveButton] = useState(null);
-  const [showMenu, setShowMenu] = useState(false);
+  const categories = [
+    {
+      title: "Danh mục",
+      href: "/admin/categories",
+      description:
+        "Quản lý danh mục sản phẩm và thêm mới danh mục.",
+    },
+    {
+      title: "Thành phần sản phẩm",
+      href: "/admin/components",
+      description:
+        "Đây là các thông tin như màu sắc, kích thước, chất liệu, hoặc bất kỳ chi tiết nào liên quan đến sản phẩm mà người bán cần cung cấp.",
+    },
+    {
+      title: "Thương hiệu",
+      href: "/admin/brands",
+      description:
+        "Quản lý và thêm mới các thương thiệu sản phẩm.",
+    },
+  ];
 
-  const [timeoutIdLanguage, setTimeoutIdLanguage] = useState(null);
-  const [showMenuLanguage, setShowMenuLanguage] = useState(false);
+  const users = [
+    {
+      title: "Khách hàng",
+      href: "/admin/users",
+      description:
+        "Quản lý thông tin khách hàng trên toàn hệ thống",
+    },
+    {
+      title: "Stores",
+      href: "/admin/stores",
+      description:
+        "Quản lý thông tin cửa hàng và người bán.",
+    },
+    {
+      title: "Quản trị viên",
+      href: "/admin/stores",
+      description:
+        "Quản lý thông tin và vai trò của quản trị viên.",
+    },
+  ];
 
-  // True if the current locale is 'en' and false otherwise.
-  const locale = localeDetector()
-
-  console.log(locale);
-
-  const t = useTranslations("AdminHeader");
-
-  const handleMouseEnter = (button) => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-    setActiveButton(button);
-    setShowMenu(true);
+  // ListItem component
+  const ListItem = ({ className, title, children, href }) => {
+    return (
+      <li>
+        <NavigationMenuLink asChild>
+          <Link
+            href={href} // Ensure href is passed correctly
+            className={cn(
+              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+              className
+            )}
+          >
+            <div className="text-sm font-medium leading-none">{title}</div>
+            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+              {children}
+            </p>
+          </Link>
+        </NavigationMenuLink>
+      </li>
+    );
   };
-
-  const handleMouseLeave = () => {
-    const newTimeoutId = setTimeout(() => {
-      setShowMenu(false);
-      setActiveButton(null);
-    }, 700);
-    setTimeoutId(newTimeoutId);
-  };
-
-  const handleMenuMouseEnter = () => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-  };
-
-  const handleMenuMouseLeave = () => {
-    handleMouseLeave();
-  };
-
-  const handleLanguageMouseEnter = () => {
-    if (timeoutIdLanguage) {
-      clearTimeout(timeoutIdLanguage);
-    }
-    setShowMenuLanguage(true);
-  };
-
-  const handleLanguageMouseLeave = () => {
-    const newTimeoutId = setTimeout(() => {
-      setShowMenuLanguage(false);
-    }, 700);
-    setTimeoutIdLanguage(newTimeoutId);
-  }
 
   return (
-    <header className='w-full h-[60px] flex flex-row items-center bg-black-primary'>
-      {/* Logo */}
-      <div className='flex flex-row justify-center items-center cursor-pointer ml-3'>
-        <Image src={ChickenImage} alt='Chicken' width={50} height={50} />
-        <span className='text-white-secondary text-[19px]'>{t('vendorTitle')}</span>
-      </div>
+    <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
+      <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+        <Link
+          href="#"
+          className="flex items-center gap-2 text-lg font-semibold md:text-base"
+        >
+          <Package2 className="h-6 w-6" />
+          <span className="sr-only">Acme Inc</span>
+        </Link>
+        <Link
+          href="#"
+          className="text-foreground transition-colors hover:text-foreground"
+        >
+          Dashboard
+        </Link>
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger>
+                <div className="text-muted-foreground transition-colors hover:text-foreground">
+                  Danh mục
+                </div>
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                  {categories.map((category) => (
+                    <ListItem
+                      key={category.title}
+                      title={category.title}
+                      href={category.href}
+                    >
+                      {category.description}
+                    </ListItem>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link href="/docs" legacyBehavior passHref>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  <div className="text-muted-foreground transition-colors hover:text-foreground">
+                    Đơn hàng
+                  </div>
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
+          </NavigationMenuList>
 
-      {/* Search bar */}
-      <div className='flex-grow'>
+        </NavigationMenu>
 
-      </div>
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger>
+                <div className="text-muted-foreground transition-colors hover:text-foreground">
+                  Người dùng
+                </div>
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                  {users.map((user) => (
+                    <ListItem
+                      key={user.title}
+                      title={user.title}
+                      href={user.href}
+                    >
+                      {user.description}
+                    </ListItem>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+      </nav>
 
-      {/* Function buttons  */}
-      <div className='w-fit h-full flex flex-row justify-center items-center' onMouseLeave={handleMouseLeave}>
-
-        {/* Notifications */}
-        <div className='w-fit h-full relative' onMouseEnter={() => handleMouseEnter('button_widgets')}
-          onLeave={handleMouseLeave}>
-          <IconButton IconComponent={WidgetsIcon} iconColor="text-white-secondary" width='w-[50px]' height='h-full' onHover='hover:bg-black-tertiary' />
-
-          <div className={`absolute top-full left-1/2 -translate-x-[50%] origin-top duration-300 ${showMenu && activeButton === 'button_widgets' ? 'scale-100' : 'opacity-0 scale-0'}`} onMouseEnter={handleMenuMouseEnter} onMouseLeave={handleMenuMouseLeave}>
-            <DropdownMenu width='w-[350px]' listMenuItems={[
-              <MenuItem menuIcon={<WidgetsIcon />} menuContext='Widget' />,
-              <MenuItem menuIcon={<WidgetsIcon />} menuContext='Widget' />,
-              <MenuItem menuIcon={<WidgetsIcon />} menuContext='Widget' />,
-              <MenuItem menuIcon={<WidgetsIcon />} menuContext='Widget' />,
-              <MenuItem menuIcon={<WidgetsIcon />} menuContext='Widget' />,
-              <MenuItem menuIcon={<WidgetsIcon />} menuContext='Widget' />,
-            ]} />
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            className="shrink-0 md:hidden"
+          >
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Toggle navigation menu</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left">
+          <nav className="grid gap-6 text-lg font-medium">
+            <Link
+              href="#"
+              className="flex items-center gap-2 text-lg font-semibold"
+            >
+              <Package2 className="h-6 w-6" />
+              <span className="sr-only">Acme Inc</span>
+            </Link>
+            <Link
+              href="#"
+              className="hover:text-foreground"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="#"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Danh mục
+            </Link>
+            <Link
+              href="#"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Thương hiệu
+            </Link>
+            <Link
+              href="#"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Thành phần SP
+            </Link>
+            <Link href="#" className="text-muted-foreground hover:text-foreground"
+            >
+              Đơn hàng
+            </Link>
+            <Link href="#" className="text-muted-foreground hover:text-foreground"
+            >
+              Khách hàng
+            </Link>
+            <Link href="#" className="text-muted-foreground hover:text-foreground"
+            >
+              Stores
+            </Link>
+            <Link href="#" className="text-muted-foreground hover:text-foreground"
+            >
+              Quản trị viên
+            </Link>
+          </nav>
+        </SheetContent>
+      </Sheet>
+      <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+        <form className="ml-auto flex-1 sm:flex-initial">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search products..."
+              className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
+            />
           </div>
-        </div>
-
-        {/* Widgets */}
-        <div className='w-fit h-full relative' onMouseEnter={() => handleMouseEnter('button_notifications')}
-          onLeave={handleMouseLeave}>
-          <IconButton IconComponent={NotificationsNoneIcon} iconColor="text-white-secondary" width='w-[50px]' height='h-full' onHover='hover:bg-black-tertiary' />
-
-          <div className={`absolute top-full left-1/2 -translate-x-[50%] origin-top duration-300 ${showMenu && activeButton === 'button_notifications' ? 'scale-100' : 'opacity-0 scale-0'}`} onMouseEnter={handleMenuMouseEnter} onMouseLeave={handleMenuMouseLeave}>
-            <DropdownMenu width='w-[430px]' listMenuItems={[
-              <MenuItem menuIcon={<NotificationsNoneIcon />} menuContext='Notification' />,
-              <MenuItem menuIcon={<NotificationsNoneIcon />} menuContext='Notification' />,
-              <MenuItem menuIcon={<NotificationsNoneIcon />} menuContext='Notification' />,
-              <MenuItem menuIcon={<NotificationsNoneIcon />} menuContext='Notification' />,
-              <MenuItem menuIcon={<NotificationsNoneIcon />} menuContext='Notification' />,
-              <MenuItem menuIcon={<NotificationsNoneIcon />} menuContext='Notification' />,
-              <MenuItem menuIcon={<NotificationsNoneIcon />} menuContext='Notification' />,
-              <MenuItem menuIcon={<NotificationsNoneIcon />} menuContext='Notification' />,
-              <MenuItem menuIcon={<NotificationsNoneIcon />} menuContext='Notification' />,
-              <MenuItem menuIcon={<NotificationsNoneIcon />} menuContext='Notification' />,
-            ]} />
-          </div>
-        </div>
-
+        </form>
+        <ModeToggle />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="secondary" size="icon" className="rounded-full">
+              <CircleUser className="h-5 w-5" />
+              <span className="sr-only">Toggle user menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem>Support</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Logout</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-
-      {/* User infor */}
-      <div className='w-fit h-full relative' onMouseLeave={handleMouseLeave} onMouseEnter={() => handleMouseEnter('button_user_options')}
-        onLeave={handleMouseLeave}>
-
-        <div className='h-full w-fit min-w-[200px] px-3 flex flex-row justify-end items-center gap-2 cursor-pointer hover:bg-black-tertiary' onMouseEnter={() => handleMouseEnter('button_user_options')}>
-          <Image src={ChickenImage} alt='Chicken' width={40} height={40} onMouseEnter={() => handleMouseEnter('button_user_options')} />
-          <span className='text-white-secondary' onMouseEnter={() => handleMouseEnter('button_user_options')}>Username</span>
-          <div className='text-white-secondary' onMouseEnter={() => handleMouseEnter('button_user_options')}>
-            {showMenu && activeButton === "button_user_options" ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </div>
-        </div>
-
-        <div className={`absolute top-full right-0 origin-top duration-300 ${showMenu && activeButton === 'button_user_options' ? 'scale-100' : 'scale-0'}`} onMouseEnter={handleMenuMouseEnter} onMouseLeave={handleMenuMouseLeave}>
-          <DropdownMenu width='w-[300px]' listMenuItems={[
-            <div className='flex flex-col justify-center items-center gap-1 my-5'>
-              <Image src={ChickenImage} alt='Chicken' width={40} height={40} />
-              <span>Username</span>
-            </div>,
-
-            <Divider sx={{ margin: '6px 0' }} />,
-
-            <MenuItem menuIcon={<StorefrontOutlinedIcon />} menuContext={t('userOptionsMenu.shop-information')} />,
-            <MenuItem menuIcon={<SettingsOutlinedIcon />} menuContext={t('userOptionsMenu.shop-setting')} />,
-
-            <div className='flex flex-row justify-center items-center relative' onMouseEnter={handleLanguageMouseEnter} onMouseLeave={handleLanguageMouseLeave}>
-              <MenuItem menuIcon={<LanguageOutlinedIcon />} menuContext={t('userOptionsMenu.language')} otherComponent={showMenuLanguage ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />} />
-              <div className={`${showMenuLanguage ? 'scale-100' : 'opacity-0 scale-0'} duration-300 absolute right-0 top-full`} onMouseEnter={handleLanguageMouseEnter} onMouseLeave={handleLanguageMouseLeave}>
-                <DropdownMenu width='w-[170px]' listMenuItems={[
-                  <MenuItem menuContext='Tiếng Việt' otherComponent={locale ? '' : <CheckIcon />} />,
-                  <MenuItem menuContext='English' otherComponent={!locale ? '' : <CheckIcon />} />,
-                ]} />
-
-              </div>
-            </div>,
-
-            <Divider sx={{ margin: '6px 0' }} />,
-
-            <MenuItem menuIcon={<ExitToAppOutlinedIcon />} menuContext={t('userOptionsMenu.logout')} />,
-          ]} />
-        </div>
-
-      </div>
-
-    </header>
+    </header >
   );
 }
+
+
 
 export default AdminHeader;
