@@ -28,7 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import DialogEditComponent from "@/components/dialogs/dialogEditComponent";
+import DialogEditComponent from "./dialogEditComponent";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
 
 export const description =

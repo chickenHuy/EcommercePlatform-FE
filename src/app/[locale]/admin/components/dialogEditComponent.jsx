@@ -6,7 +6,6 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogOverlay,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
@@ -17,22 +16,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useDispatch, useSelector } from "react-redux";
 import { changeName, changeRequired } from "@/store/features/componentSlice";
 export default function DialogEditComponent(props) {
-  const { edit, name, content, description } = props;
+  const { edit, name, content, description, nameButton} = props;
   const componentData = useSelector((state) => state.componentReducer);
-
-  const handleChange = (e) => {
-    // Kiểm tra xem e có phải là đối tượng sự kiện không
-    if (!e.target) return;
-
-    const { id, value, type, checked } = e.target;
-
-    if (id === "name") {
-      dispatch(changeName(value));
-    } else if (id === "required") {
-      dispatch(changeRequired(checked));
-    }
-  };
-
 
   const dispatch = useDispatch();
 
@@ -53,8 +38,12 @@ export default function DialogEditComponent(props) {
 
   async function editComponent(data) {
     try {
+      if (edit) {
+        // const response = await axios.put(`/api/v1/components/${props.id}`, data);
+
+        return;
+      }
       // const response = await axios.post("/api/v1/components", data);
-      // console.log(response);
       console.log(data);
     } catch (error) {
       console.error(error);
@@ -89,7 +78,7 @@ export default function DialogEditComponent(props) {
               className="col-span-3"
               id="name"
               value={componentData.name}
-              onChange={handleChange}
+              onChange={(e) => dispatch(changeName(e.target.value))}
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -110,7 +99,7 @@ export default function DialogEditComponent(props) {
         </div>
         <DialogFooter>
           <Button type="submit" onClick={handleSubmit}>
-            {props.nameButton}
+            {nameButton}
           </Button>
         </DialogFooter>
       </DialogContent>
