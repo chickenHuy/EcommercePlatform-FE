@@ -1,6 +1,5 @@
 "use client";
 import { File, ListFilter, MoreHorizontal } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -65,16 +64,13 @@ export default function ManageComponent() {
                       Mới nhất
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem>Cũ nhất</DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>
-                      A - Z
-                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem>A - Z</DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem>
                       Bắt buộc
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem>
                       Không bắt buộc
                     </DropdownMenuCheckboxItem>
-
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button size="sm" variant="outline" className="h-7 gap-1">
