@@ -15,6 +15,7 @@ import { PlusCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useDispatch, useSelector } from "react-redux";
 import { changeName, changeRequired } from "@/store/features/componentSlice";
+import axios from "@/configs/axiosConfig";
 export default function DialogEditComponent(props) {
   const { edit, name, content, description, nameButton} = props;
   const componentData = useSelector((state) => state.componentReducer);
@@ -25,7 +26,7 @@ export default function DialogEditComponent(props) {
     const data = {
       name: componentData.name,
       required: componentData.required,
-    };
+    };  
 
     editComponent(data)
       .then(() => {
@@ -37,14 +38,19 @@ export default function DialogEditComponent(props) {
   };
 
   async function editComponent(data) {
+    const config = {
+      headers: {
+        Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsInN1YiI6IkFETUlOIiwiZXhwIjoxNzI4MzgxNTMxLCJpYXQiOjE3MjgzNzc5MzEsImp0aSI6IjIyM2QxOGZiLWMxYmMtNGNmZi1hY2NlLWI4MjhkNjk5ZTAzNSIsInNjb3BlIjoiUk9MRV9BRE1JTiJ9.BvFIRbaNV8TtlmlqiqG8JNrqdetdvoaTURhDRyEQkfq0bcXzi8zTBIHkIbrY0cOJfAC4Q5WosIlcMmsxYfFqAw`,
+      },
+    };
     try {
       if (edit) {
-        // const response = await axios.put(`/api/v1/components/${props.id}`, data);
-
+        const response = await axios.put(`/api/v1/components/${props.id}`, data, config);
         return;
       }
-      // const response = await axios.post("/api/v1/components", data);
-      console.log(data);
+
+      const response = (await axios.post("/api/v1/components", data, config))
+      console.log(response);
     } catch (error) {
       console.error(error);
     }
