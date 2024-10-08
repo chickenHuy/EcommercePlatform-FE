@@ -139,7 +139,6 @@ function AdminHeader() {
               </Link>
             </NavigationMenuItem>
           </NavigationMenuList>
-
         </NavigationMenu>
 
         <NavigationMenu>
@@ -170,11 +169,7 @@ function AdminHeader() {
 
       <Sheet>
         <SheetTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            className="shrink-0 md:hidden"
-          >
+          <Button variant="outline" size="icon" className="shrink-0 md:hidden">
             <Menu className="h-5 w-5" />
             <span className="sr-only">Toggle navigation menu</span>
           </Button>
@@ -188,10 +183,7 @@ function AdminHeader() {
               <Package2 className="h-6 w-6" />
               <span className="sr-only">Acme Inc</span>
             </Link>
-            <Link
-              href="#"
-              className="hover:text-foreground"
-            >
+            <Link href="#" className="hover:text-foreground">
               Dashboard
             </Link>
             <Link
@@ -212,19 +204,27 @@ function AdminHeader() {
             >
               Thành phần SP
             </Link>
-            <Link href="#" className="text-muted-foreground hover:text-foreground"
+            <Link
+              href="#"
+              className="text-muted-foreground hover:text-foreground"
             >
               Đơn hàng
             </Link>
-            <Link href="#" className="text-muted-foreground hover:text-foreground"
+            <Link
+              href="#"
+              className="text-muted-foreground hover:text-foreground"
             >
               Khách hàng
             </Link>
-            <Link href="#" className="text-muted-foreground hover:text-foreground"
+            <Link
+              href="#"
+              className="text-muted-foreground hover:text-foreground"
             >
               Stores
             </Link>
-            <Link href="#" className="text-muted-foreground hover:text-foreground"
+            <Link
+              href="#"
+              className="text-muted-foreground hover:text-foreground"
             >
               Quản trị viên
             </Link>
@@ -260,7 +260,7 @@ function AdminHeader() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </header >
+    </header>
   );
 }
 
