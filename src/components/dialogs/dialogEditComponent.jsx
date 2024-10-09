@@ -17,7 +17,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PlusCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import axios from "@/configs/axiosConfig";
+import { useState } from "react";
+import { post } from "@/lib/httpClient";
+import { useToast } from "@/hooks/use-toast";
 
 const FormSchema = z.object({
   name: z.string().min(2, {
@@ -28,6 +30,8 @@ const FormSchema = z.object({
 
 export default function DialogEditComponent(props) {
   const { edit, content, description, nameButton } = props;
+  const [isOpen, setIsOpen] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -38,32 +42,22 @@ export default function DialogEditComponent(props) {
   });
 
   const handleSubmit = (data) => {
-    editComponent(data)
-      .then(() => {
-        console.log("Success ");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    editComponent(data);
   };
 
-  async function editComponent(data) {
-    const config = {
-      headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsInN1YiI6IkFETUlOIiwiZXhwIjoxNzI4MzgxNTMxLCJpYXQiOjE3MjgzNzc5MzEsImp0aSI6IjIyM2QxOGZiLWMxYmMtNGNmZi1hY2NlLWI4MjhkNjk5ZTAzNSIsInNjb3BlIjoiUk9MRV9BRE1JTiJ9.BvFIRbaNV8TtlmlqiqG8JNrqdetdvoaTURhDRyEQkfq0bcXzi8zTBIHkIbrY0cOJfAC4Q5WosIlcMmsxYfFqAw`,
-      },
-    };
-
-    try {
-      if (edit) {
-        await axios.put(`/api/v1/components/${props.id}`, data, config);
-      } else {
-        //await axios.post("/api/v1/components", data, config);
-        console.log(data);
-      }
-    } catch (error) {
-      console.error(error);
-    }
+  function editComponent(data) {
+    post("/api/v1/components", data).then((res) => {
+      toast({
+        title: "Thành công",
+        description: "Cập nhật thành phần thành công",
+      });
+    }).catch((error) => {
+      toast({
+        title: "Thất bại",
+        description: error.message,
+        variant: "destructive"
+      });
+    });
   }
 
   return (
