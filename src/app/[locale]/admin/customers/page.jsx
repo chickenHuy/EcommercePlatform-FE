@@ -1,6 +1,6 @@
 "use client";
-import { File, ListFilter, MoreHorizontal } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { File, ListFilter, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,7 +14,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -29,15 +28,26 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
-import { Toaster } from "@/components/ui/toaster";
-import DialogEditComponent from "@/components/dialogs/dialogEditComponent";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import DrawerUserDetail from "./drawerUserDetail";
 
-export const description =
-  "An products dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. It displays a list of products in a table with actions.";
-export default function ManageComponent() {
+export default function ManageCustomer() {
+  // State để điều khiển Drawer
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // Hàm mở Drawer
+  const handleRowClick = () => {
+    setIsDrawerOpen(true);
+  };
+
+  // Hàm đóng Drawer
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
+    console.log("Close Drawer");
+  };
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
-      <Toaster />
       <div className="flex flex-col sm:gap-4 sm:py-4">
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
           <Tabs defaultValue="all">
@@ -46,7 +56,7 @@ export default function ManageComponent() {
                 <TabsTrigger value="all">Tất cả</TabsTrigger>
                 <TabsTrigger value="active">Hoạt động</TabsTrigger>
                 <TabsTrigger value="delete" className="hidden sm:flex">
-                  Đã xoá
+                  Đã khoá
                 </TabsTrigger>
               </TabsList>
               <div className="ml-auto flex items-center gap-2">
@@ -65,14 +75,11 @@ export default function ManageComponent() {
                     <DropdownMenuCheckboxItem checked>
                       Mới nhất
                     </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>Cũ nhất</DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem>A - Z</DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem>
-                      Bắt buộc
+                      Lâu nhất
                     </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>
-                      Không bắt buộc
-                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem>Z - A</DropdownMenuCheckboxItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button size="sm" variant="outline" className="h-7 gap-1">
@@ -81,79 +88,59 @@ export default function ManageComponent() {
                     Export
                   </span>
                 </Button>
-                <DialogEditComponent
-                  name={"Thêm thành phần"}
-                  content={"Thêm thành phần mới"}
-                  description={
-                    "Sản phẩm thuộc danh mục có thành phần này sẽ có thể điền nội dung vào"
-                  }
-                  nameButton={"Thêm mới"}
-                />
               </div>
             </div>
             <TabsContent value="all">
               <Card x-chunk="dashboard-06-chunk-0">
                 <CardHeader>
-                  <CardTitle>Thành phần SP</CardTitle>
+                  <CardTitle>Danh sách người dùng</CardTitle>
                   <CardDescription>
-                    Quản lý các thành phần của sản phẩm (SP)
+                    Quản lý tất cả người dùng trong hệ thống
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Tên thành phần</TableHead>
-                        <TableHead>Bắt buộc</TableHead>
-                        <TableHead className="hidden md:table-cell">
-                          Ngày tạo
+                        <TableHead className="hidden w-[100px] sm:table-cell">
+                          <span className="sr-only">Image</span>
                         </TableHead>
+                        <TableHead>Username</TableHead>
+                        <TableHead>Tên</TableHead>
+                        <TableHead>Ngày tạo</TableHead>
+                        <TableHead className="hidden md:table-cell"></TableHead>
                         <TableHead>
                           <span className="sr-only">Hành động</span>
                         </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <TableRow>
-                        <TableCell className="font-medium">
-                          Kích thước màng hình
+                      <TableRow onClick={handleRowClick}>
+                        <TableCell className="hidden sm:table-cell">
+                          <Avatar>
+                            <AvatarImage
+                              src="https://github.com/shadcn.png"
+                              alt="@shadcn"
+                            />
+                            <AvatarFallback>CN</AvatarFallback>
+                          </Avatar>
                         </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">Yes</Badge>
+                        <TableCell className="font-medium">adminwibu</TableCell>
+                        <TableCell className="font-medium">
+                          Quải Cả Chưởng
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
                           2023-07-12 10:42 AM
                         </TableCell>
                         <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                aria-haspopup="true"
-                                size="icon"
-                                variant="ghost"
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Toggle menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Hành động</DropdownMenuLabel>
-                              <DropdownMenuItem
-                                onSelect={(e) => e.preventDefault()}
-                              >
-                                <DialogEditComponent
-                                  name={"Sửa"}
-                                  content={"Sửa thành phần"}
-                                  description={
-                                    "Sản phẩm thuộc danh mục có thành phần này sẽ có thể điền nội dung vào"
-                                  }
-                                  nameButton={"Lưu thay đổi"}
-                                  edit={true}
-                                />
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>Xoá</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <Lock className="h-4 w-4" />
+                            <span className="sr-only">Khoá tài khoản</span>
+                          </Button>
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -171,6 +158,10 @@ export default function ManageComponent() {
           </Tabs>
         </main>
       </div>
+      {/* DrawerUserDetail Component */}
+      {isDrawerOpen && (
+        <DrawerUserDetail isOpen={isDrawerOpen} onClose={handleCloseDrawer} />
+      )}
     </div>
   );
 }
