@@ -3,6 +3,7 @@ import './globals.css';
 import { getMessages } from 'next-intl/server';
 import { NextIntlClientProvider } from 'next-intl';
 import StoreProvider from '@/store/storeProvider';
+import { Toaster } from "@/components/ui/toaster"
 
 const helveticalNeue = localFont({
   src: [
@@ -39,6 +40,7 @@ export default async function RootLayout({ children, params }) {
         <NextIntlClientProvider locale={locale} messages={messages}>
           <body className={helveticalNeue.className}>
             {children}
+            <Toaster />
           </body>
         </NextIntlClientProvider>
       </StoreProvider>
