@@ -67,7 +67,7 @@ export default function DialogEditComponent(props) {
   }
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         {edit ? (
           <span className="block w-full">{props.name}</span>
