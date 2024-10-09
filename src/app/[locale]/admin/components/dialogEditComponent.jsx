@@ -15,48 +15,47 @@ import { PlusCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useDispatch, useSelector } from "react-redux";
 import { changeName, changeRequired } from "@/store/features/componentSlice";
-import axios from "@/configs/axiosConfig";
+import { post } from "@/lib/httpClient";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 export default function DialogEditComponent(props) {
-  const { edit, name, content, description, nameButton} = props;
+
+  const { edit, name, content, description, nameButton } = props;
   const componentData = useSelector((state) => state.componentReducer);
+  const [isOpen, setIsOpen] = useState(false);
 
   const dispatch = useDispatch();
+  const { toast } = useToast()
 
   const handleSubmit = () => {
     const data = {
       name: componentData.name,
       required: componentData.required,
-    };  
+    };
 
     editComponent(data)
-      .then(() => {
-        console.log("Success ");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
   };
 
-  async function editComponent(data) {
-    const config = {
-      headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsInN1YiI6IkFETUlOIiwiZXhwIjoxNzI4MzgxNTMxLCJpYXQiOjE3MjgzNzc5MzEsImp0aSI6IjIyM2QxOGZiLWMxYmMtNGNmZi1hY2NlLWI4MjhkNjk5ZTAzNSIsInNjb3BlIjoiUk9MRV9BRE1JTiJ9.BvFIRbaNV8TtlmlqiqG8JNrqdetdvoaTURhDRyEQkfq0bcXzi8zTBIHkIbrY0cOJfAC4Q5WosIlcMmsxYfFqAw`,
-      },
-    };
-    try {
-      if (edit) {
-        const response = await axios.put(`/api/v1/components/${props.id}`, data, config);
-        return;
-      }
+  function editComponent(data) {
 
-      const response = (await axios.post("/api/v1/components", data, config))
-      console.log(response);
-    } catch (error) {
-      console.error(error);
-    }
+    post("/api/v1/components", data).then((response) => {
+      toast({
+        title: "Thành công",
+        description: "Cập nhật thành phần thành công",
+      })
+      setIsOpen(false);
+
+    }).catch((error) => {
+      toast({
+        title: "Thất bại",
+        description: error.message,
+        variant: "destructive",
+      })
+      console.log(error.body);
+    });
   }
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         {edit ? (
           <span className="block w-full">{props.name}</span>
