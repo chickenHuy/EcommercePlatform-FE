@@ -1,4 +1,8 @@
 "use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,21 +17,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PlusCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useDispatch, useSelector } from "react-redux";
-import { changeName, changeRequired } from "@/store/features/componentSlice";
 import axios from "@/configs/axiosConfig";
+
+const FormSchema = z.object({
+  name: z.string().min(2, {
+    message: "Name must be at least 2 characters.",
+  }),
+  required: z.boolean(),
+});
+
 export default function DialogEditComponent(props) {
-  const { edit, name, content, description, nameButton} = props;
-  const componentData = useSelector((state) => state.componentReducer);
+  const { edit, content, description, nameButton } = props;
 
-  const dispatch = useDispatch();
+  const form = useForm({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      name: "",
+      required: false,
+    },
+  });
 
-  const handleSubmit = () => {
-    const data = {
-      name: componentData.name,
-      required: componentData.required,
-    };  
-
+  const handleSubmit = (data) => {
     editComponent(data)
       .then(() => {
         console.log("Success ");
@@ -43,18 +53,19 @@ export default function DialogEditComponent(props) {
         Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MCIsInN1YiI6IkFETUlOIiwiZXhwIjoxNzI4MzgxNTMxLCJpYXQiOjE3MjgzNzc5MzEsImp0aSI6IjIyM2QxOGZiLWMxYmMtNGNmZi1hY2NlLWI4MjhkNjk5ZTAzNSIsInNjb3BlIjoiUk9MRV9BRE1JTiJ9.BvFIRbaNV8TtlmlqiqG8JNrqdetdvoaTURhDRyEQkfq0bcXzi8zTBIHkIbrY0cOJfAC4Q5WosIlcMmsxYfFqAw`,
       },
     };
+
     try {
       if (edit) {
-        const response = await axios.put(`/api/v1/components/${props.id}`, data, config);
-        return;
+        await axios.put(`/api/v1/components/${props.id}`, data, config);
+      } else {
+        //await axios.post("/api/v1/components", data, config);
+        console.log(data);
       }
-
-      const response = (await axios.post("/api/v1/components", data, config))
-      console.log(response);
     } catch (error) {
       console.error(error);
     }
   }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -64,7 +75,7 @@ export default function DialogEditComponent(props) {
           <Button size="sm" className="h-7 gap-1">
             <PlusCircle className="h-3.5 w-3.5" />
             <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              {name}
+              {nameButton}
             </span>
           </Button>
         )}
@@ -74,7 +85,7 @@ export default function DialogEditComponent(props) {
           <DialogTitle>{content}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="text-right">
               Tên TP
@@ -82,17 +93,24 @@ export default function DialogEditComponent(props) {
             <Input
               placeholder="tên thành phần"
               className="col-span-3"
-              id="name"
-              value={componentData.name}
-              onChange={(e) => dispatch(changeName(e.target.value))}
+              {...form.register("name")}
             />
           </div>
+          {form.formState.errors.name && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <p className="text-sm text-error col-start-2 col-span-3">
+                {form.formState.errors.name.message}
+              </p>
+            </div>
+          )}
           <div className="grid grid-cols-4 items-center gap-4">
             <div className="col-span-4 flex items-center justify-center space-x-2">
               <Checkbox
                 id="required"
-                checked={componentData.required}
-                onCheckedChange={(checked) => dispatch(changeRequired(checked))}
+                checked={form.watch("required")}
+                onCheckedChange={(checked) =>
+                  form.setValue("required", checked)
+                }
               />
               <label
                 htmlFor="isMandatory"
@@ -102,12 +120,10 @@ export default function DialogEditComponent(props) {
               </label>
             </div>
           </div>
-        </div>
-        <DialogFooter>
-          <Button type="submit" onClick={handleSubmit}>
-            {nameButton}
-          </Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button type="submit">{nameButton}</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

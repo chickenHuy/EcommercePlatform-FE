@@ -53,7 +53,13 @@ module.exports = {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
-  			}
+  			},
+			error: {
+                    DEFAULT: '#f56565', // Màu đỏ mặc định
+                    light: '#feb2b2',   // Màu đỏ nhạt hơn
+                    dark: '#c53030',    // Màu đỏ đậm hơn
+                    foreground: '#fff'  // Màu chữ của báo lỗi
+                }
   		}
   	},
   	colors: {
