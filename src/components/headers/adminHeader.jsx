@@ -49,7 +49,8 @@ function AdminHeader() {
     {
       title: "Khách hàng",
       href: "/admin/users",
-      description: "Quản lý thông tin khách hàng trên toàn hệ thống",
+      description:
+        "Quản lý thông tin khách hàng trên toàn hệ thống",
     },
     {
       title: "Stores",
@@ -96,7 +97,7 @@ function AdminHeader() {
           <span className="sr-only">Acme Inc</span>
         </Link>
         <Link
-          href="#"
+          href="/admin"
           className="text-foreground transition-colors hover:text-foreground"
         >
           Dashboard

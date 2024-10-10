@@ -1,5 +1,5 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { useState } from "react";
 import { File, ListFilter, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,34 +29,22 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import DrawerUserDetail from "./drawerUserDetail";
-import { getAllUser } from "@/api/admin/customerRequest";
+import DrawerUserDetail from "./drawerStoreDetail";
+import { Rating } from "@mui/material";
 
-export default function ManageCustomer() {
+export default function ManageStores() {
+  // State để điều khiển Drawer
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [users, setUsers] = useState([]); // State for user data
 
+  // Hàm mở Drawer
   const handleRowClick = () => {
     setIsDrawerOpen(true);
   };
 
+  // Hàm đóng Drawer
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
     console.log("Close Drawer");
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const response = await getAllUser(1); // Assuming this returns a promise
-      setUsers(response.result.data); // Set the user data to state
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
   };
 
   return (
@@ -106,67 +94,58 @@ export default function ManageCustomer() {
             <TabsContent value="all">
               <Card x-chunk="dashboard-06-chunk-0">
                 <CardHeader>
-                  <CardTitle>Danh sách người dùng</CardTitle>
+                  <CardTitle>Danh sách cửa hàng</CardTitle>
                   <CardDescription>
-                    Quản lý tất cả người dùng trong hệ thống
+                    Quản lý tất cả cửa hàng trong hệ thống
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="hidden w-[100px] sm:table-cell">
-                          <span className="sr-only">Image</span>
-                        </TableHead>
-                        <TableHead>Username</TableHead>
-                        <TableHead>Tên</TableHead>
+                        <TableHead>Tên cửa hàng</TableHead>
+                        <TableHead>Người dùng</TableHead>
                         <TableHead>Ngày tạo</TableHead>
-                        <TableHead></TableHead>
                         <TableHead className="hidden md:table-cell">
+                          Đánh giá
+                        </TableHead>
+                        <TableHead className="hidden md:table-cell"></TableHead>
+                        <TableHead>
                           <span className="sr-only">Hành động</span>
                         </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {users.map((user) => (
-                        <TableRow key={user.id} onClick={handleRowClick}>
-                          <TableCell className="hidden sm:table-cell">
-                            <Avatar>
-                              <AvatarImage
-                                src={user.imageUrl}
-                                alt={user.username}
-                              />
-                              <AvatarFallback>
-                                {user.name.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {user.username}
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {user.name}
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {new Date(user.created_at).toLocaleString()}{" "}
-                            {/* Format date */}
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <Lock className="h-4 w-4" />
-                              <span className="sr-only">Khoá tài khoản</span>
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                      <TableRow onClick={handleRowClick}>
+                        <TableCell className="font-medium">adminwibu</TableCell>
+                        <TableCell className="font-medium">
+                          Quải Cả Chưởng
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          2023-07-12 10:42 AM
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          <Rating value={4.0} readOnly className="" />
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <Lock className="h-4 w-4" />
+                            <span className="sr-only">Khoá tài khoản</span>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
                     </TableBody>
                   </Table>
                 </CardContent>
                 <CardFooter>
+                  <div className="text-xs text-muted-foreground">
+                    Hiển thị <strong>1-10</strong> trong <strong>32</strong>{" "}
+                    cửa hàng
+                  </div>
                   <PaginationAdminTable />
                 </CardFooter>
               </Card>
