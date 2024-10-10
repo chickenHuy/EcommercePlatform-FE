@@ -1,7 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { authenticateWithGoogle } from "@/api/auth/oauthRequest";
+import Cookies from "js-cookie";
 
 export default function Authenticate() {
   useEffect(() => {
@@ -15,7 +16,14 @@ export default function Authenticate() {
 
       authenticateWithGoogle(authCode)
         .then((response) => {
-          console.log("Authentication success:", response);
+          const token = response.result.token;
+          Cookies.set(process.env.NEXT_PUBLIC_JWT_NAME, token, {
+            expires: 1,
+            secure: true,
+            path: "/",
+          });
+
+          window.location.href = "http://localhost:3000/admin"; 
         })
         .catch((error) => {
           console.error("Authentication failed:", error);

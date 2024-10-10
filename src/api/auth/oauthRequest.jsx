@@ -1,8 +1,8 @@
 import { post } from "@/lib/httpClient";
 
-export const authenticateWithGoogle = async (authCode) => {
+export const authenticateWithGoogle = (authCode) => {
   try {
-    const response = await post(
+    const response = post(
       `/api/v1/external-auths/authentication/google?code=${authCode}`
     );
     return response;

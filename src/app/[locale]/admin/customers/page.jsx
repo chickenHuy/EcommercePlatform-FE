@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { File, ListFilter, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,20 +30,33 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DrawerUserDetail from "./drawerUserDetail";
+import { getAllUser } from "@/api/admin/customerRequest";
 
 export default function ManageCustomer() {
-  // State để điều khiển Drawer
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [users, setUsers] = useState([]); // State for user data
 
-  // Hàm mở Drawer
   const handleRowClick = () => {
     setIsDrawerOpen(true);
   };
 
-  // Hàm đóng Drawer
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
     console.log("Close Drawer");
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await getAllUser(1); // Assuming this returns a promise
+      setUsers(response.result.data); // Set the user data to state
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
   };
 
   return (
@@ -115,42 +128,45 @@ export default function ManageCustomer() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <TableRow onClick={handleRowClick}>
-                        <TableCell className="hidden sm:table-cell">
-                          <Avatar>
-                            <AvatarImage
-                              src="https://github.com/shadcn.png"
-                              alt="@shadcn"
-                            />
-                            <AvatarFallback>CN</AvatarFallback>
-                          </Avatar>
-                        </TableCell>
-                        <TableCell className="font-medium">adminwibu</TableCell>
-                        <TableCell className="font-medium">
-                          Quải Cả Chưởng
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          2023-07-12 10:42 AM
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          <Button
-                            aria-haspopup="true"
-                            size="icon"
-                            variant="ghost"
-                          >
-                            <Lock className="h-4 w-4" />
-                            <span className="sr-only">Khoá tài khoản</span>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
+                      {users.map((user) => (
+                        <TableRow key={user.id} onClick={handleRowClick}>
+                          <TableCell className="hidden sm:table-cell">
+                            <Avatar>
+                              <AvatarImage
+                                src={user.imageUrl}
+                                alt={user.username}
+                              />
+                              <AvatarFallback>
+                                {user.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {user.username}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {user.name}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {new Date(user.created_at).toLocaleString()}{" "}
+                            {/* Format date */}
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell">
+                            <Button
+                              aria-haspopup="true"
+                              size="icon"
+                              variant="ghost"
+                            >
+                              <Lock className="h-4 w-4" />
+                              <span className="sr-only">Khoá tài khoản</span>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
                 </CardContent>
                 <CardFooter>
-                  <div className="text-xs text-muted-foreground">
-                    Hiển thị <strong>1-10</strong> trong <strong>32</strong>{" "}
-                    thành phần
-                  </div>
                   <PaginationAdminTable />
                 </CardFooter>
               </Card>
