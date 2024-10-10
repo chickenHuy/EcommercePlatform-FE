@@ -29,9 +29,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import DrawerUserDetail from "./drawerUserDetail";
+import DrawerUserDetail from "./drawerStoreDetail";
+import { Rating } from "@mui/material";
 
-export default function ManageCustomer() {
+export default function ManageStores() {
   // State để điều khiển Drawer
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -93,44 +94,38 @@ export default function ManageCustomer() {
             <TabsContent value="all">
               <Card x-chunk="dashboard-06-chunk-0">
                 <CardHeader>
-                  <CardTitle>Danh sách người dùng</CardTitle>
+                  <CardTitle>Danh sách cửa hàng</CardTitle>
                   <CardDescription>
-                    Quản lý tất cả người dùng trong hệ thống
+                    Quản lý tất cả cửa hàng trong hệ thống
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="hidden w-[100px] sm:table-cell">
-                          <span className="sr-only">Image</span>
-                        </TableHead>
-                        <TableHead>Username</TableHead>
-                        <TableHead>Tên</TableHead>
+                        <TableHead>Tên cửa hàng</TableHead>
+                        <TableHead>Người dùng</TableHead>
                         <TableHead>Ngày tạo</TableHead>
-                        <TableHead></TableHead>
                         <TableHead className="hidden md:table-cell">
+                          Đánh giá
+                        </TableHead>
+                        <TableHead className="hidden md:table-cell"></TableHead>
+                        <TableHead>
                           <span className="sr-only">Hành động</span>
                         </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       <TableRow onClick={handleRowClick}>
-                        <TableCell className="hidden sm:table-cell">
-                          <Avatar>
-                            <AvatarImage
-                              src="https://github.com/shadcn.png"
-                              alt="@shadcn"
-                            />
-                            <AvatarFallback>CN</AvatarFallback>
-                          </Avatar>
-                        </TableCell>
                         <TableCell className="font-medium">adminwibu</TableCell>
                         <TableCell className="font-medium">
                           Quải Cả Chưởng
                         </TableCell>
                         <TableCell className="font-medium">
                           2023-07-12 10:42 AM
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          <Rating value={4.0} readOnly className="" />
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
                           <Button
@@ -149,7 +144,7 @@ export default function ManageCustomer() {
                 <CardFooter>
                   <div className="text-xs text-muted-foreground">
                     Hiển thị <strong>1-10</strong> trong <strong>32</strong>{" "}
-                    thành phần
+                    cửa hàng
                   </div>
                   <PaginationAdminTable />
                 </CardFooter>
