@@ -51,7 +51,7 @@ function AdminHeader() {
   const users = [
     {
       title: "Khách hàng",
-      href: "/admin/users",
+      href: "/admin/customers",
       description:
         "Quản lý thông tin khách hàng trên toàn hệ thống",
     },
@@ -102,7 +102,7 @@ function AdminHeader() {
           <span className="sr-only">Acme Inc</span>
         </Link>
         <Link
-          href="#"
+          href="/admin"
           className="text-foreground transition-colors hover:text-foreground"
         >
           Dashboard
