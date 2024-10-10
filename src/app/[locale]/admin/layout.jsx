@@ -5,20 +5,18 @@ export const metadata = {
     title: "Admin Dashboard",
 };
 
-export default function RootLayout({ children }) {
+export default function AdminLayout({ children }) {
     return (
-        <html lang="en">
-            <body>
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <AdminHeader />
-                    {children}
-                </ThemeProvider>
-            </body>
-        </html>
+        <body>
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+            >
+                <AdminHeader />
+                {children}
+            </ThemeProvider>
+        </body>
     );
 }
