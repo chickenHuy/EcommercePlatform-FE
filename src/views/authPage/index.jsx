@@ -12,7 +12,8 @@ import { Button } from '@/components/buttons/iconImageButton';
 import Image from 'next/image';
 import { changePassword, changeUsername } from '@/store/features/loginSlice';
 import { useSelector } from 'react-redux';
-
+import { OAuthConfig } from '@/configs/oauthConfig';
+import { post } from '@/lib/httpClient';
 const AuthPage = () => {
 
   const [isSignIn, setIsSignIn] = useState(true);
@@ -36,6 +37,19 @@ const AuthPage = () => {
     });
   }
 
+  
+  const handleGoogleClick = () => {
+    const callbackUrl = OAuthConfig.redirectUri;
+    const authUrl = OAuthConfig.authUri;
+    const googleClientId = OAuthConfig.clientId;
+
+    const targetUrl = `${authUrl}?redirect_uri=${encodeURIComponent(
+      callbackUrl
+    )}&response_type=code&client_id=${googleClientId}&scope=openid%20email%20profile`;
+
+    window.location.href = targetUrl;
+  };
+
   return (
     <div className='w-full h-full min-h-screen flex justify-center items-center'>
       <div className='w-fit h-fit flex flex-col justify-center items-center lg:flex-row lg:gap-5'>
@@ -50,7 +64,7 @@ const AuthPage = () => {
             <p className='font-regular text-[15px] text-center text-black-secondary'>{t('enterDetails')}</p>
 
             <div className='flex flex-row justify-between gap-4 my-4'>
-              <Button iconSrc={IconGoogle} borderWidth='border-[1px]' borderRadius='rounded-lg' width='w-full' height='h-[45px]' borderColor='border-gray-primary' />
+              <Button iconSrc={IconGoogle} borderWidth='border-[1px]' borderRadius='rounded-lg' width='w-full' height='h-[45px]' borderColor='border-gray-primary' onClick={handleGoogleClick}/>
 
               <Button iconSrc={IconFacebook} borderWidth='border-[1px]' borderRadius='rounded-lg' width='w-full' height='h-[45px]' borderColor='border-gray-primary' />
 

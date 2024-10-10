@@ -1,6 +1,7 @@
-import { useNavigate } from "react-router-dom";
+"use client";
 import { useState, useEffect } from "react";
 import { Box, CircularProgress, Typography } from "@mui/material";
+import { authenticateWithGoogle } from "@/api/auth/oauthRequest";
 
 export default function Authenticate() {
   useEffect(() => {
@@ -12,21 +13,15 @@ export default function Authenticate() {
     if (isMatch) {
       const authCode = isMatch[1];
 
-      fetch(
-        `http://localhost:8080/api/v1/external-auths/authentication/google/authentication?code=${authCode}`,
-        {
-          method: "POST",
-        }
-      )
+      authenticateWithGoogle(authCode)
         .then((response) => {
-          return response.json();
+          console.log("Authentication success:", response);
         })
-        .then((data) => {
-          console.log(data);
+        .catch((error) => {
+          console.error("Authentication failed:", error);
         });
     }
   }, []);
-
 
   return (
     <>
