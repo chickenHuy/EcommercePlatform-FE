@@ -12,7 +12,6 @@ import { Button } from '@/components/buttons/iconImageButton';
 import Image from 'next/image';
 import { changePassword, changeUsername } from '@/store/features/loginSlice';
 import { useSelector } from 'react-redux';
-import axios from '../../configs/axiosConfig';
 
 const AuthPage = () => {
 
@@ -26,20 +25,15 @@ const AuthPage = () => {
       username: loginData.username,
       password: loginData.password
     }
-    login(data).then(() => {
-      console.log('Login success');
+    login(data);
+  }
+
+  function login(data) {
+    post('/api/v1/auths/log-in', data).then((response) => {
+      console.log(response);
     }).catch((error) => {
       console.error(error);
     });
-  }
-
-  async function login(data) {
-    try {
-      const response = await axios.post('/api/v1/auths/log-in', data);
-      console.log(response);
-    } catch (error) {
-      console.error(error);
-    }
   }
 
   return (
