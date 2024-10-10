@@ -1,12 +1,11 @@
 export const metadata = {
-    title: "Manage Brand",
-  };
-  
-  export default function RootLayout({ children }) {
-    return (
-      <html lang="en">
-        <body>{children}</body>
-      </html>
-    );
-  }
-  
+  title: "Manage Brand",
+};
+
+export default function BrandLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}

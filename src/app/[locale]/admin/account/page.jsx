@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import { CircleCheck } from "lucide-react";
 
 export const description =
   "A settings page. The settings page has a sidebar navigation and a main content area. The main content area has a form to update the store name and a form to update the plugins directory. The sidebar navigation has links to general, security, integrations, support, organizations, and advanced settings.";
@@ -79,6 +80,7 @@ export default function ManageAccount() {
                       className="mt-1 w-full border rounded-lg p-2"
                     />
                   </div>
+                  {isEmailConfirmed && <CircleCheck className="mt-6 w-5 h-5" />}
                   <Button className="mt-6 text-sm">Thay đổi</Button>
                 </div>
                 <div className="mt-2">
