@@ -29,34 +29,74 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { Toaster } from "@/components/ui/toaster";
+import { useEffect, useState } from "react";
+import { deleteBrand, getAllBrand } from "@/api/admin/brandRequest";
 import Image from "next/image";
-import DialogEditBrand from "@/components/dialogs/dialogEditBrand";
-import { useState } from "react";
-import DialogAddBrand from "@/components/dialogs/dialogAddBrand";
+import DialogAddEditBrand from "@/components/dialogs/dialogAddEditBrand";
+import iconNotFound from "../../../../../public/images/iconNotFound.png";
+import { useToast } from "@/hooks/use-toast";
+import { del } from "@/lib/httpClient";
 
 export const description =
   "An products dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. It displays a list of products in a table with actions.";
 export default function ManageBrand() {
-  // State để điều khiển Drawer
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState("Thêm mới thương hiệu");
+  const [brands, setBrands] = useState([]);
+  const [selectedBrand, setSelectedBrand] = useState(null);
+  const { toast } = useToast();
 
-  // Hàm mở Drawer
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await getAllBrand(1);
+      setBrands(response.result.data);
+      console.log(response.result.data);
+    } catch (error) {
+      console.error("Error fetching brands:", error);
+    }
+  };
+
+  const refreshData = () => {
+    fetchData();
+    setIsDialogOpen(false);
+  };
+
   const handleAddButtonClick = () => {
     setDialogContent("Thêm mới thương hiệu");
+    setSelectedBrand(null);
     setIsDialogOpen(true);
   };
 
-  // Hàm mở Dialog với content là "Sửa thương hiệu"
-  const handleEditButtonClick = () => {
+  const handleEditButtonClick = (brand) => {
     setDialogContent("Sửa thương hiệu");
+    setSelectedBrand(brand);
     setIsDialogOpen(true);
   };
 
-  // Hàm đóng Drawer
-  const handleCloseDialog = () => {
+  const isCloseDialog = () => {
     setIsDialogOpen(false);
     console.log("Close Dialog");
+  };
+
+  const handleDeleteButtonClick = async (id) => {
+    try {
+      await deleteBrand(id);
+      toast({
+        title: "Thành công",
+        description: "Thương hiệu đã được xóa.",
+      });
+      refreshData();
+    } catch (error) {
+      toast({
+        title: "Thất bại",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -115,14 +155,6 @@ export default function ManageBrand() {
                     Thêm mới
                   </span>
                 </Button>
-                {/* <DialogAddBrand
-                  name={"Thêm thương hiệu"}
-                  content={"Thêm thương hiệu mới"}
-                  description={
-                    "Sản phẩm thuộc danh mục có thương hiệu này sẽ có thể điền nội dung vào"
-                  }
-                  nameButton={"Thêm mới"}
-                /> */}
               </div>
             </div>
             <TabsContent value="all">
@@ -140,6 +172,7 @@ export default function ManageBrand() {
                         <TableHead></TableHead>
                         <TableHead>Tên thương hiệu</TableHead>
                         <TableHead>Mô tả</TableHead>
+                        <TableHead>Trạng thái</TableHead>
                         <TableHead className="hidden md:table-cell">
                           Ngày tạo
                         </TableHead>
@@ -149,63 +182,63 @@ export default function ManageBrand() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <TableRow>
-                        <TableCell className="hidden sm:table-cell">
-                          <Image
-                            alt="Ảnh thương hiệu"
-                            className="aspect-square rounded-md object-cover"
-                            height="64"
-                            src="/placeholder.svg"
-                            width="64"
-                          />
-                        </TableCell>
-                        <TableCell>Apple</TableCell>
-                        <TableCell>Mô tả về Apple</TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          2023-07-12 10:42 AM
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                aria-haspopup="true"
-                                size="icon"
-                                variant="ghost"
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Toggle menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Hành động</DropdownMenuLabel>
-                              <DropdownMenuItem
-                                onSelect={(e) => e.preventDefault()}
-                                onClick={handleEditButtonClick}
-                              >
-                                {/* <DialogAddBrand
-                                  name={"Sửa"}
-                                  content={"Sửa thương hiệu"}
-                                  description={
-                                    "Sản phẩm thuộc danh mục có thương hiệu này sẽ có thể điền nội dung vào"
+                      {brands.map((brand) => (
+                        <TableRow key={brand.id}>
+                          <TableCell className="hidden sm:table-cell">
+                            <Image
+                              alt="Ảnh thương hiệu"
+                              className="aspect-square rounded-md object-cover"
+                              src={brand.logoUrl ? brand.logoUrl : iconNotFound}
+                              width="64"
+                              height="64"
+                              unoptimized
+                            />
+                          </TableCell>
+                          <TableCell>{brand.name}</TableCell>
+                          <TableCell>{brand.description}</TableCell>
+                          <TableCell>
+                            {!brand.deleted ? "Hoạt động" : "Đã xóa"}
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell">
+                            {new Date(brand.createdAt).toLocaleString()}{" "}
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  aria-haspopup="true"
+                                  size="icon"
+                                  variant="ghost"
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                  <span className="sr-only">Toggle menu</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Hành động</DropdownMenuLabel>
+                                <DropdownMenuItem
+                                  onSelect={(e) => e.preventDefault()}
+                                  onClick={() => handleEditButtonClick(brand)}
+                                >
+                                  Sửa
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onSelect={(e) => e.preventDefault()}
+                                  onClick={() =>
+                                    handleDeleteButtonClick(brand.id)
                                   }
-                                  nameButton={"Lưu thay đổi"}
-                                  edit={true}
-                                /> */}
-                                Sửa
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>Xoá</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
+                                >
+                                  Xoá
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
                 </CardContent>
                 <CardFooter>
-                  <div className="text-xs text-muted-foreground">
-                    Hiển thị <strong>1-10</strong> trong <strong>32</strong>{" "}
-                    thành phần
-                  </div>
                   <PaginationAdminTable />
                 </CardFooter>
               </Card>
@@ -214,21 +247,20 @@ export default function ManageBrand() {
         </main>
       </div>
       {isDialogOpen && (
-        <DialogEditBrand
-          name={"Sửa"}
-          //content={"Sửa thương hiệu"}
+        <DialogAddEditBrand
           content={dialogContent}
           description={
             "Sản phẩm thuộc danh mục có thương hiệu này sẽ có thể điền nội dung vào"
           }
-          //nameButton={"Lưu thay đổi"}
           nameButton={
             dialogContent === "Thêm mới thương hiệu"
               ? "Thêm mới"
               : "Lưu thay đổi"
           }
           isOpen={isDialogOpen}
-          onClose={handleCloseDialog}
+          onClose={isCloseDialog}
+          onSuccess={refreshData}
+          brand={selectedBrand}
         />
       )}
     </div>

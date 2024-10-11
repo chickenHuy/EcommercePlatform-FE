@@ -11,24 +11,30 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PlusCircle } from "lucide-react";
-import { post } from "@/lib/httpClient";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useEffect } from "react";
+import { createBrand, updateBrand } from "@/api/admin/brandRequest";
 
 const FormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
+  name: z.string().trim().min(1, {
+    message: "Name must not be blank",
   }),
-  description: z.string(),
+  description: z.string().trim(),
 });
 
-export default function DialogEditBrand(props) {
-  const { content, description, nameButton, isOpen, onClose } = props;
+export default function DialogAddEditBrand(props) {
+  const {
+    content,
+    description,
+    nameButton,
+    isOpen,
+    onClose,
+    onSuccess,
+    brand,
+  } = props;
   const { toast } = useToast();
 
   const form = useForm({
@@ -39,26 +45,50 @@ export default function DialogEditBrand(props) {
     },
   });
 
-  const handleSubmit = (data) => {
-    editBrand(data);
-  };
+  useEffect(() => {
+    if (brand) {
+      form.reset({
+        name: brand.name || "",
+        description: brand.description || "",
+      });
+    } else {
+      form.reset({
+        name: "",
+        description: "",
+      });
+    }
+  }, [brand, form]);
 
-  function editBrand(data) {
-    post("/api/v1/brands", data)
-      .then((res) => {
+  const handleSubmit = async (data) => {
+    try {
+      const payload = {
+        ...data,
+        description: data.description.trim() === "" ? null : data.description,
+      };
+
+      if (brand && brand.id) {
+        await updateBrand(brand.id, payload);
         toast({
           title: "Thành công",
-          description: "Cập nhật thành phần thành công",
+          description: "Thương hiệu đã được cập nhật.",
         });
-      })
-      .catch((error) => {
+      } else {
+        await createBrand(payload);
         toast({
-          title: "Thất bại",
-          description: error.message,
-          variant: "destructive",
+          title: "Thành công",
+          description: "Thương hiệu mới đã được thêm.",
         });
+      }
+      onSuccess();
+      onClose();
+    } catch (error) {
+      toast({
+        title: "Thất bại",
+        description: error.message,
+        variant: "destructive",
       });
-  }
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
