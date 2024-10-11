@@ -14,6 +14,7 @@ import { changePassword, changeUsername } from '@/store/features/loginSlice';
 import { useSelector } from 'react-redux';
 import { OAuthConfig } from '@/configs/oauthConfig';
 import { post } from '@/lib/httpClient';
+import SignUpNow from '@/app/[locale]/auth/signUp';
 const AuthPage = () => {
 
   const [isSignIn, setIsSignIn] = useState(true);
@@ -128,34 +129,7 @@ const AuthPage = () => {
               <div className='w-[45%] h-[2px] bg-black-tertiary opacity-30'></div>
             </div>
 
-            <div>
-              <div className='w-full flex flex-row items-center justify-between'>
-                <div className='w-[48%]'>
-                  <span className='font-bold text-[16px] block my-2'>{t('firstName')}</span>
-                  <Input type='text' placeholder={t('firstName')} />
-                </div>
-                <div className='w-[48%]'>
-                  <span className='font-bold text-[16px] block my-2'>{t('lastName')}</span>
-                  <Input type='text' placeholder={t('lastName')} />
-                </div>
-              </div>
-              <span className='font-bold text-[16px] block my-2'>{t('username')}</span>
-              <Input type='email' placeholder={t('username')} />
-              <div className='w-full flex flex-row items-center justify-between'>
-                <div className='w-[48%]'>
-                  <span className='font-bold text-[16px] block my-2'>{t('password')}</span>
-                  <Input type='password' placeholder={t('password')} />
-                </div>
-                <div className='w-[48%]'>
-                  <span className='font-bold text-[16px] block my-2'>{t('confirmPassword')}</span>
-                  <Input type='password' placeholder={t('confirmPassword')} />
-                </div>
-              </div>
-            </div>
-
-            <div className='mt-5 mb-4'>
-              <Button text={t('signUp')} width='w-full' height='h-14' backgroundColor='bg-black-primary' textColor='text-white-primary' borderRadius='rounded-[70px]' />
-            </div>
+            <SignUpNow></SignUpNow>
 
             <div className='flex flex-row justify-center items-center'>
               <span>
