@@ -9,8 +9,28 @@ import {
 } from "@/components/ui/drawer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { use, useEffect, useState } from "react";
+import { get } from "@/lib/httpClient";
 
-export default function DrawerUserDetail({ isOpen, onClose }) {
+export default function DrawerUserDetail({ isOpen, onClose, userId }) {
+  const { toast } = useToast();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    get(`/api/v1/users/${userId}`)
+      .then((res) => {
+        console.log(res.result);
+        setUser(res.result);
+      })
+      .catch((error) => {
+        toast({
+          title: "Thất bại",
+          description: error.message,
+          variant: "destructive",
+        });
+      });
+  }, []);
   return (
     <Drawer open={isOpen} onClose={onClose}>
       <DrawerContent>
@@ -29,20 +49,21 @@ export default function DrawerUserDetail({ isOpen, onClose }) {
               <div className="mb-4">
                 {/* Avatar */}
                 <Avatar className="w-32 h-32 rounded-full mx-auto">
-                  <AvatarImage
-                    src="https://github.com/shadcn.png"
-                    alt="@shadcn"
-                  />
-                  <AvatarFallback>CN</AvatarFallback>
+                  <AvatarImage src={user?.imageUrl} alt="@shadcn" />
+                  <AvatarFallback>{user?.username}</AvatarFallback>
                 </Avatar>
               </div>
               {/* Tên */}
               <div className="text-center">
-                <h3 className="text-lg font-semibold">John Doe</h3>
+                <h3 className="text-lg font-semibold">
+                  {user?.name ? user.name : "Chưa đặt tên"}
+                </h3>
                 {/* Username */}
-                <p className="text-sm text-muted-foreground">@johndoe</p>
+                <p className="text-sm text-muted-foreground">
+                  @{user?.username}
+                </p>
                 {/* Bio */}
-                <p className="text-sm mt-2">Bio của người dùng...</p>
+                <p className="text-sm mt-2">{user?.bio ? user.bio : ""}</p>
               </div>
             </div>
             {/* Bên phải */}
@@ -50,32 +71,38 @@ export default function DrawerUserDetail({ isOpen, onClose }) {
               {/* Email */}
               <div className="mb-2">
                 <p className="font-medium">Email:</p>
-                <p>john.doe@example.com</p>
+                <p>{user?.email ? user.email : "Chưa có email"}</p>
               </div>
               {/* Số điện thoại */}
               <div className="mb-2">
                 <p className="font-medium">Số điện thoại:</p>
-                <p>+84 123 456 789</p>
+                <p>{user?.phone ? user.phone : "Chưa có SĐT"}</p>
               </div>
               {/* Ngày sinh */}
               <div className="mb-2">
                 <p className="font-medium">Ngày sinh:</p>
-                <p>01/01/1990</p>
+                <p>
+                  {user?.dateOfBirth ? user.dateOfBirth : "Chưa có ngày sinh"}
+                </p>
               </div>
               {/* Giới tính */}
               <div className="mb-2">
                 <p className="font-medium">Giới tính:</p>
-                <p>Nam</p>
+                <p>{user?.gender}</p>
               </div>
               {/* Trạng thái tài khoản */}
               <div className="mb-2">
                 <p className="font-medium">Trạng thái tài khoản:</p>
-                <p>Hoạt động</p>
+                <p>{user?.blocked ? "Đã khoá" : "Hoạt động"}</p>
               </div>
               {/* Ngày tạo */}
               <div className="mb-2">
                 <p className="font-medium">Ngày tạo:</p>
-                <p>2023-07-12</p>
+                <p>
+                  {user?.createdAt
+                    ? new Date(user.createdAt).toLocaleString()
+                    : ""}
+                </p>
               </div>
             </div>
           </div>
