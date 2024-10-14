@@ -1,8 +1,8 @@
 import { get } from "@/lib/httpClient";
 
-export const getAllUser = (page, tab, sortDate, sortName) => {
+export const getAllCategory = (page) => {
   try {
-    const response = get(`/api/v1/users/customers?page=${page}&size=8&tab=${tab}&date=${sortDate}&name=${sortName}`);
+    const response = get(`/api/v1/categories?page=${page}&size=8`);
     return response;
   } catch (error) {
     console.error("Error during authentication:", error);
@@ -10,13 +10,12 @@ export const getAllUser = (page, tab, sortDate, sortName) => {
   }
 };
 
-
-export const getUserById = (userId) => {
+export const getCategoryById = (categoryId) => {
   try {
-    const response = get(`/api/v1/users/${userId}`);
+    const response = get(`/api/v1/categories/${categoryId}`);
     return response;
   } catch (error) {
     console.error("Error during authentication:", error);
     throw error;
   }
-}
+};

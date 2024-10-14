@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Pagination,
   PaginationContent,
@@ -7,68 +9,92 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
-export function PaginationAdminTable({
-  currentPage,
-  totalPages,
-  onPageChange,
-}) {
-  let startPage, endPage;
-  if (totalPages <= 3) {
-    startPage = 1;
-    endPage = totalPages;
-  } else {
-    if (currentPage === 1) {
-      startPage = 1;
-      endPage = 2;
-    } else if (currentPage === totalPages) {
-      startPage = totalPages - 1;
-      endPage = totalPages;
-    } else {
-      startPage = currentPage - 1;
-      endPage = currentPage + 1;
-    }
-  }
+export function PaginationAdminTable(props) {
+  const {
+    handleNextPage,
+    handlePrevPage,
+    currentPage,
+    totalPage,
+    setCurrentPage,
+  } = props;
 
   return (
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              if (currentPage > 1) onPageChange(currentPage - 1);
-            }}
-            disabled={currentPage === 1}
-          />
+          <PaginationPrevious onClick={handlePrevPage} />
         </PaginationItem>
-        {Array.from({ length: endPage - startPage + 1 }, (_, index) => (
-          <PaginationItem key={index}>
-            <PaginationLink
-              href="#"
-              isActive={currentPage === startPage + index}
-              onClick={(e) => {
-                e.preventDefault();
-                onPageChange(startPage + index);
-              }}
-            >
-              {startPage + index}
-            </PaginationLink>
-          </PaginationItem>
-        ))}
+
+        {currentPage > 1
+          ? Array.from(Array(3).keys())
+              .map((i) => currentPage - (i + 1))
+              .filter((page) => page > 0)
+              .reverse()
+              .map((page, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink onClick={() => setCurrentPage(page)}>
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))
+          : null}
+
         <PaginationItem>
-          <PaginationEllipsis />
+          <PaginationLink isActive>{currentPage}</PaginationLink>
         </PaginationItem>
+
+        {currentPage < totalPage
+          ? Array.from(Array(3).keys())
+              .map((i) => currentPage + (i + 1))
+              .filter((page) => page <= totalPage)
+              .map((page, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink onClick={() => setCurrentPage(page)}>
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))
+          : null}
+
         <PaginationItem>
-          <PaginationNext
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              if (currentPage < totalPages) onPageChange(currentPage + 1);
-            }}
-            disabled={currentPage === totalPages}
-          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="link">
+                <PaginationEllipsis />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>Chọn trang</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {/* Tạo danh sách các số trang */}
+              {Array.from({ length: totalPage }, (_, index) => {
+                const page = index + 1;
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={index}
+                    checked={currentPage === page}
+                    onCheckedChange={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </PaginationItem>
+
+        <PaginationItem>
+          <PaginationNext onClick={handleNextPage} />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

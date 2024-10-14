@@ -38,7 +38,27 @@ export default function ManageCustomer() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [users, setUsers] = useState([]); // State for user data
   const [selectedUserId, setSelectedUserId] = useState(null); // State for selected user ID
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
   const { toast } = useToast();
+  const [tab, setTab] = useState("all");
+  const [sortDate, setSortDate] = useState("");
+  const [sortName, setSortName] = useState("");
+  const [totalElement, setTotalElement] = useState(0);
+
+  const handleNextPage = () => {
+    console.log("Current page:", currentPage, "Total page:", totalPage);
+    if (currentPage < totalPage) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+    console.log("Current page:", currentPage, "Total page:", totalPage);
+  };
 
   const handleRowClick = (userId) => {
     setSelectedUserId(userId);
@@ -51,15 +71,32 @@ export default function ManageCustomer() {
     console.log("Close Drawer");
   };
 
+  const handleSortDate = (sort) => {
+    if (sortDate === sort) {
+      setSortDate("");
+    } else {
+      setSortDate(sort);
+    }
+  };
+
+  const handleSortName = (sort) => {
+    if (sortName === sort) {
+      setSortName("");
+    } else {
+      setSortName(sort);
+    }
+  };
+
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [totalPage, currentPage, totalElement, tab, sortDate, sortName]);
 
   const fetchData = async () => {
     try {
-      const response = await getAllUser(1); // Assuming this returns a promise
+      const response = await getAllUser(currentPage, tab, sortDate, sortName); // Assuming this returns a promise
       setUsers(response.result.data); // Set the user data to state
-      console.log(response.data);
+      setTotalPage(response.result.totalPages);
+      setTotalElement(response.result.totalElements);
     } catch (error) {
       console.error("Error fetching users:", error);
       toast({
@@ -78,12 +115,20 @@ export default function ManageCustomer() {
       <Toaster />
       <div className="flex flex-col sm:gap-4 sm:py-4">
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-          <Tabs defaultValue="all">
+          <Tabs defaultValue="all" value={tab}>
             <div className="flex items-center">
               <TabsList>
-                <TabsTrigger value="all">Tất cả</TabsTrigger>
-                <TabsTrigger value="active">Hoạt động</TabsTrigger>
-                <TabsTrigger value="delete" className="hidden sm:flex">
+                <TabsTrigger value="all" onClick={() => setTab("all")}>
+                  Tất cả
+                </TabsTrigger>
+                <TabsTrigger value="active" onClick={() => setTab("active")}>
+                  Hoạt động
+                </TabsTrigger>
+                <TabsTrigger
+                  value="blocked"
+                  onClick={() => setTab("blocked")}
+                  className="hidden sm:flex"
+                >
                   Đã khoá
                 </TabsTrigger>
               </TabsList>
@@ -100,14 +145,32 @@ export default function ManageCustomer() {
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Lọc bởi</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuCheckboxItem checked>
+                    <DropdownMenuCheckboxItem
+                      onClick={() => handleSortDate("newest")}
+                      checked={sortDate === "newest" ? true : false}
+                    >
                       Mới nhất
                     </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>A - Z</DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      onClick={() => handleSortName("az")}
+                      checked={sortName === "az" ? true : false}
+                    >
+                      {" "}
+                      A - Z
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      onClick={() => handleSortDate("oldest")}
+                      checked={sortDate === "oldest" ? true : false}
+                    >
                       Lâu nhất
                     </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>Z - A</DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      onClick={() => handleSortName("za")}
+                      checked={sortName === "za" ? true : false}
+                    >
+                      {" "}
+                      Z - A
+                    </DropdownMenuCheckboxItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button size="sm" variant="outline" className="h-7 gap-1">
@@ -118,10 +181,10 @@ export default function ManageCustomer() {
                 </Button>
               </div>
             </div>
-            <TabsContent value="all">
+            <TabsContent value={tab}>
               <Card x-chunk="dashboard-06-chunk-0">
                 <CardHeader>
-                  <CardTitle>Danh sách người dùng</CardTitle>
+                  <CardTitle>Danh sách người dùng ({totalElement})</CardTitle>
                   <CardDescription>
                     Quản lý tất cả người dùng trong hệ thống
                   </CardDescription>
@@ -185,7 +248,13 @@ export default function ManageCustomer() {
                   </Table>
                 </CardContent>
                 <CardFooter>
-                  <PaginationAdminTable />
+                  <PaginationAdminTable
+                    currentPage={currentPage}
+                    handleNextPage={handleNextPage}
+                    handlePrevPage={handlePrevPage}
+                    totalPage={totalPage}
+                    setCurrentPage={setCurrentPage}
+                  />
                 </CardFooter>
               </Card>
             </TabsContent>
