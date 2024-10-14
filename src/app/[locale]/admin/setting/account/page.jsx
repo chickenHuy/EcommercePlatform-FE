@@ -1,13 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCallback, useEffect, useState } from "react";
@@ -19,33 +13,33 @@ import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import {
   getAccount,
+  sendMailValidation,
   updateEmail,
   updatePhone,
 } from "@/api/admin/accountRequest";
 
 const accountSchema = z.object({
-  username: z.string().trim().min(1, {
-    message: "Tên đăng nhập không được để trống",
+  email: z.string().trim().email({
+    message: "Email không hợp lệ",
   }),
-  email: z.string().trim().min(1, {
-    message: "Email không được để trống",
-  }),
-  phone: z.string().trim().min(1, {
-    message: "Số điện thoại không được để trống",
-  }),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^0\d{9}$/, {
+      message:
+        "Số điện thoại phải gồm 10 chữ số, không chứa ký tự đặc biệt và phải bắt đầu là số 0",
+    }),
 });
 
 export default function ManageAccount() {
   const [account, setAccount] = useState([]);
   const { toast } = useToast();
-  const [isEmailConfirmed, setIsEmailConfirmed] = useState(false);
 
   const formData = useForm({
     resolver: zodResolver(accountSchema),
     defaultValues: {
-      username: account.username || "",
-      email: account.email || "",
-      phone: account.phone || "",
+      email: "",
+      phone: "",
     },
   });
 
@@ -81,7 +75,7 @@ export default function ManageAccount() {
         await updateEmail(emailData);
         toast({
           title: "Thành công",
-          description: "Email đã được cập nhật.",
+          description: "Email đã được cập nhật",
         });
         setAccount({ ...account, email: emailData.email });
         fetchAccount();
@@ -107,7 +101,7 @@ export default function ManageAccount() {
         await updatePhone(phoneData);
         toast({
           title: "Thành công",
-          description: "Số điện thoại đã được cập nhật.",
+          description: "Số điện thoại đã được cập nhật",
         });
         setAccount({ ...account, phone: phoneData.phone });
         fetchAccount();
@@ -121,8 +115,22 @@ export default function ManageAccount() {
     }
   };
 
-  const handleEmailConfirmation = () => {
-    setIsEmailConfirmed(true);
+  const handleSendMailValidation = async () => {
+    try {
+      await sendMailValidation();
+      toast({
+        title: "Thành công",
+        description: "Vui lòng vào email của bạn để thực hiện xác thực",
+        variant: "success",
+      });
+      fetchAccount();
+    } catch (error) {
+      toast({
+        title: "Thất bại",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -157,10 +165,7 @@ export default function ManageAccount() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 flex flex-col items-center gap-6">
-              <form
-                //onSubmit={formData.handleSubmit}
-                className="w-full space-y-4"
-              >
+              <form className="w-full space-y-4">
                 <div>
                   <Label
                     htmlFor="username"
@@ -170,15 +175,11 @@ export default function ManageAccount() {
                   </Label>
                   <div className="w-full space-y-2">
                     <Input
-                      {...formData.register("username")}
+                      value={account.username || ""}
+                      readOnly
                       placeholder="tên đăng nhập"
                       className="mt-1 w-full border rounded-lg p-2"
                     />
-                    {formData.formState.errors.username && (
-                      <p className="text-sm text-error col-start-2 col-span-3">
-                        {formData.formState.errors.username.message}
-                      </p>
-                    )}
                   </div>
                 </div>
                 <div>
@@ -196,7 +197,7 @@ export default function ManageAccount() {
                         className="mt-1 w-full border rounded-lg p-2"
                       />
                     </div>
-                    {isEmailConfirmed && (
+                    {account.emailValidationStatus === "VERIFIED" && (
                       <CircleCheck className="mt-6 w-5 h-5" />
                     )}
                     <Button
@@ -214,15 +215,14 @@ export default function ManageAccount() {
                   )}
                 </div>
                 <div>
-                  {!isEmailConfirmed ? (
+                  {account.emailValidationStatus !== "VERIFIED" && (
                     <Button
+                      type="button"
+                      onClick={handleSendMailValidation}
                       className="text-sm"
-                      onClick={handleEmailConfirmation}
                     >
-                      Xác nhận email
+                      Xác thực email
                     </Button>
-                  ) : (
-                    <span className="text-sm">Email đã xác nhận</span>
                   )}
                 </div>
                 <div>

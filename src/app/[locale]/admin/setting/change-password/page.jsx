@@ -18,17 +18,27 @@ import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 
-const changePasswordSchema = z.object({
-  oldPassword: z.string().trim().min(1, {
-    message: "Mật khẩu cũ không được để trống",
-  }),
-  newPassword: z.string().trim().min(1, {
-    message: "Mật khẩu mới không được để trống",
-  }),
-  newPasswordConfirmation: z.string().trim().min(1, {
-    message: "Xác nhận mật khẩu mới không được để trống",
-  }),
-});
+const changePasswordSchema = z
+  .object({
+    oldPassword: z.string().trim(),
+    newPassword: z
+      .string()
+      .trim()
+      .min(8, { message: "Mật khẩu mới phải có trên 8 và dưới 20 ký tự" })
+      .max(20, { message: "Mật khẩu mới phải có trên 8 và dưới 20 ký tự" })
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/, {
+        message:
+          "Mật khẩu phải chứa ít nhất một chữ cái viết hoa, một chữ cái viết thường và một số",
+      }),
+    newPasswordConfirmation: z.string().trim(),
+  })
+  .refine(
+    (formData) => formData.newPassword === formData.newPasswordConfirmation,
+    {
+      message: "Mật khẩu mới và xác nhận mật khẩu mới không khớp",
+      path: ["newPasswordConfirmation"],
+    }
+  );
 
 export default function ManageChangePassword() {
   const { toast } = useToast();
@@ -42,6 +52,14 @@ export default function ManageChangePassword() {
     },
   });
 
+  const fetchChangePassword = () => {
+    formData.reset({
+      oldPassword: "",
+      newPassword: "",
+      newPasswordConfirmation: "",
+    });
+  };
+
   const onSubmit = async () => {
     const passwordData = {
       oldPassword: formData.getValues("oldPassword"),
@@ -53,8 +71,9 @@ export default function ManageChangePassword() {
       await updatePassword(passwordData);
       toast({
         title: "Thành công",
-        description: "Mật khẩu đã được cập nhật!",
+        description: "Mật khẩu đã được cập nhật",
       });
+      fetchChangePassword();
     } catch (error) {
       toast({
         title: "Thất bại",
@@ -107,7 +126,7 @@ export default function ManageChangePassword() {
                       Mật khẩu cũ
                     </Label>
                     <Input
-                      //type="password"
+                      type="password"
                       {...formData.register("oldPassword")}
                       placeholder="Mật khẩu cũ"
                       className="mt-1 w-full border rounded-lg p-2"
@@ -128,7 +147,7 @@ export default function ManageChangePassword() {
                       Mật khẩu mới
                     </Label>
                     <Input
-                      //type="password"
+                      type="password"
                       {...formData.register("newPassword")}
                       placeholder="Mật khẩu mới"
                       className="mt-1 w-full border rounded-lg p-2"
@@ -149,7 +168,7 @@ export default function ManageChangePassword() {
                       Xác nhận mật khẩu mới
                     </Label>
                     <Input
-                      //type="password"
+                      type="password"
                       {...formData.register("newPasswordConfirmation")}
                       placeholder="Xác nhận mật khẩu mới"
                       className="mt-1 w-full border rounded-lg p-2"

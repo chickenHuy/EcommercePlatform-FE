@@ -9,7 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import iconNotFound from "../../../../../../public/images/iconNotFound.png";
 import DatePicker from "./datePicker";
 import RadioGroupGender from "./radioGroupGender";
-import { getProfile, updateProfile } from "@/api/admin/profileRequest";
+import {
+  getProfile,
+  updateProfile,
+  uploadUserImage,
+} from "@/api/admin/profileRequest";
 import { useState, useEffect, useCallback } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -46,10 +50,10 @@ export default function ManageProfile() {
   const formData = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: profile.name || "",
-      bio: profile.bio || "",
-      dateOfBirth: profile.dateOfBirth || null,
-      gender: profile.gender || "MALE",
+      name: "",
+      bio: "",
+      dateOfBirth: null,
+      gender: "MALE",
     },
   });
 
@@ -73,25 +77,54 @@ export default function ManageProfile() {
     fetchFrofile();
   }, [fetchFrofile]);
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (profileData) => {
     const payload = {
-      ...data,
-      bio: data.bio.trim() === "" ? null : data.bio.trim(),
-      dateOfBirth: data.dateOfBirth
-        ? new Date(data.dateOfBirth).toLocaleDateString("sv-SE")
+      ...profileData,
+      bio: profileData.bio.trim() === "" ? null : profileData.bio.trim(),
+      dateOfBirth: profileData.dateOfBirth
+        ? new Date(profileData.dateOfBirth).toLocaleDateString("sv-SE")
         : null,
+      phone: profile.phone,
     };
-    console.log("Dữ liệu form:", payload);
+    console.log("Dữ liệu profileData: ", payload);
     try {
       const updated = await updateProfile(profile.id, payload);
       toast({
         title: "Thành công",
         description: "Thông tin hồ sơ đã được cập nhật.",
       });
+      console.log("Updated: ", updated.result);
       setProfile(updated.result);
       fetchFrofile();
     } catch (error) {
       console.log("Error updating profile:", error);
+      toast({
+        title: "Thất bại",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const response = await uploadUserImage(formData);
+      setProfile((prevState) => ({
+        ...prevState,
+        imageUrl: response.result.url,
+      }));
+      toast({
+        title: "Thành công",
+        description: "Ảnh đại diện đã được cập nhật",
+      });
+    } catch (error) {
+      console.error("Error uploading image:", error);
       toast({
         title: "Thất bại",
         description: error.message,
@@ -128,19 +161,36 @@ export default function ManageProfile() {
           <Card x-chunk="dashboard-04-chunk-1" className="shadow-lg rounded-lg">
             <CardHeader className="text-center border-b py-6">
               <CardTitle className="text-2xl font-bold">
-                Hồ sơ của bạn
+                Hồ sơ của tôi
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 flex flex-col items-center gap-6">
-              <Image
-                alt="Ảnh thương hiệu"
+              {/* <Image
+                alt="ảnh thương hiệu"
                 className="rounded-full border-2 border-black-tertiary shadow-md"
                 src={profile.imageUrl ? profile.imageUrl : iconNotFound}
                 width="200"
                 height="200"
                 unoptimized
                 priority
-              />
+              /> */}
+              <label htmlFor="profileImageUpload" className="cursor-pointer">
+                <Image
+                  alt="Ảnh đại diện"
+                  className="rounded-full border-2 border-black-tertiary shadow-md"
+                  src={profile.imageUrl ? profile.imageUrl : iconNotFound}
+                  width="200"
+                  height="200"
+                  unoptimized
+                  priority
+                />
+                <input
+                  type="file"
+                  id="profileImageUpload"
+                  style={{ display: "none" }}
+                  onChange={handleImageUpload}
+                />
+              </label>
               <form
                 onSubmit={formData.handleSubmit(onSubmit)}
                 className="w-full space-y-4"

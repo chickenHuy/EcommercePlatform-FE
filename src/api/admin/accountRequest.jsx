@@ -30,3 +30,13 @@ export const updatePhone = async (phoneData) => {
     throw error;
   }
 };
+
+export const sendMailValidation = () => {
+  try {
+    const response = post(`/api/v1/emails/send-verification`);
+    return response;
+  } catch (error) {
+    console.error("Error during send mail validation:", error);
+    throw error;
+  }
+};
