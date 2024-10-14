@@ -38,7 +38,26 @@ export default function ManageCustomer() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [users, setUsers] = useState([]); // State for user data
   const [selectedUserId, setSelectedUserId] = useState(null); // State for selected user ID
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
   const { toast } = useToast();
+
+  const handleNextPage = () => {
+    console.log("Current page:", currentPage, "Total page:", totalPage);
+    if (currentPage < totalPage) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+    console.log("Current page:", currentPage, "Total page:", totalPage);
+  }
+
+
 
   const handleRowClick = (userId) => {
     setSelectedUserId(userId);
@@ -53,13 +72,13 @@ export default function ManageCustomer() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [totalPage, currentPage]);
 
   const fetchData = async () => {
     try {
-      const response = await getAllUser(1); // Assuming this returns a promise
+      const response = await getAllUser(currentPage); // Assuming this returns a promise
       setUsers(response.result.data); // Set the user data to state
-      console.log(response.data);
+      setTotalPage(response.result.totalPages);
     } catch (error) {
       console.error("Error fetching users:", error);
       toast({
@@ -185,7 +204,7 @@ export default function ManageCustomer() {
                   </Table>
                 </CardContent>
                 <CardFooter>
-                  <PaginationAdminTable />
+                  <PaginationAdminTable currentPage = {currentPage} handleNextPage = {handleNextPage} handlePrevPage = {handlePrevPage} totalPage = {totalPage} setCurrentPage = {setCurrentPage}/>
                 </CardFooter>
               </Card>
             </TabsContent>

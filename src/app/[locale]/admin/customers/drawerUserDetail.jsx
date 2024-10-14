@@ -63,7 +63,7 @@ export default function DrawerUserDetail({ isOpen, onClose, userId }) {
                   @{user?.username}
                 </p>
                 {/* Bio */}
-                <p className="text-sm mt-2">{user?.bio ? user.bio : ""}</p>
+                <p className="text-sm mt-2">{user?.bio ? user.bio : "trống"}</p>
               </div>
             </div>
             {/* Bên phải */}
@@ -71,18 +71,18 @@ export default function DrawerUserDetail({ isOpen, onClose, userId }) {
               {/* Email */}
               <div className="mb-2">
                 <p className="font-medium">Email:</p>
-                <p>{user?.email ? user.email : "Chưa có email"}</p>
+                <p>{user?.email ? user.email : "trống"}</p>
               </div>
               {/* Số điện thoại */}
               <div className="mb-2">
                 <p className="font-medium">Số điện thoại:</p>
-                <p>{user?.phone ? user.phone : "Chưa có SĐT"}</p>
+                <p>{user?.phone ? user.phone : "trống"}</p>
               </div>
               {/* Ngày sinh */}
               <div className="mb-2">
                 <p className="font-medium">Ngày sinh:</p>
                 <p>
-                  {user?.dateOfBirth ? user.dateOfBirth : "Chưa có ngày sinh"}
+                  {user?.dateOfBirth ? user.dateOfBirth : "trống"}
                 </p>
               </div>
               {/* Giới tính */}
