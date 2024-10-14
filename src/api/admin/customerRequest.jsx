@@ -9,3 +9,14 @@ export const getAllUser = (page) => {
     throw error;
   }
 };
+
+
+export const getUserById = (userId) => {
+  try {
+    const response = get(`/api/v1/users/${userId}`);
+    return response;
+  } catch (error) {
+    console.error("Error during authentication:", error);
+    throw error;
+  }
+}

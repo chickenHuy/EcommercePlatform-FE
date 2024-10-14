@@ -12,25 +12,28 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { use, useEffect, useState } from "react";
 import { get } from "@/lib/httpClient";
+import { getUserById } from "@/api/admin/customerRequest";
 
 export default function DrawerUserDetail({ isOpen, onClose, userId }) {
   const { toast } = useToast();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    get(`/api/v1/users/${userId}`)
-      .then((res) => {
-        console.log(res.result);
-        setUser(res.result);
-      })
-      .catch((error) => {
-        toast({
-          title: "Thất bại",
-          description: error.message,
-          variant: "destructive",
-        });
-      });
+    fetchUser();
   }, []);
+
+  const fetchUser = async () => {
+    try {
+      const response = await getUserById(userId);
+      setUser(response.result);
+    } catch (error) {
+      toast({
+        title: "Lấy thông tin thất bại",
+        description: "Không thể lấy thông tin người dùng",
+        variant: "destructive",
+      });
+    }
+  }
   return (
     <Drawer open={isOpen} onClose={onClose}>
       <DrawerContent>
@@ -81,9 +84,7 @@ export default function DrawerUserDetail({ isOpen, onClose, userId }) {
               {/* Ngày sinh */}
               <div className="mb-2">
                 <p className="font-medium">Ngày sinh:</p>
-                <p>
-                  {user?.dateOfBirth ? user.dateOfBirth : "trống"}
-                </p>
+                <p>{user?.dateOfBirth ? user.dateOfBirth : "trống"}</p>
               </div>
               {/* Giới tính */}
               <div className="mb-2">
