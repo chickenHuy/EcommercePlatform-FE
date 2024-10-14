@@ -31,11 +31,11 @@ import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { Toaster } from "@/components/ui/toaster";
 import { useEffect, useState } from "react";
 import { deleteBrand, getAllBrand } from "@/api/admin/brandRequest";
+import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import DialogAddEditBrand from "@/components/dialogs/dialogAddEditBrand";
 import iconNotFound from "../../../../../public/images/iconNotFound.png";
-import { useToast } from "@/hooks/use-toast";
-import { del } from "@/lib/httpClient";
+import DialogImageBrand from "@/components/dialogs/dialogImageBrand";
 
 export const description =
   "An products dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. It displays a list of products in a table with actions.";
@@ -44,16 +44,24 @@ export default function ManageBrand() {
   const [dialogContent, setDialogContent] = useState("Thêm mới thương hiệu");
   const [brands, setBrands] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const { toast } = useToast();
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchData(currentPage);
+  }, [currentPage]);
 
-  const fetchData = async () => {
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const fetchData = async (page) => {
     try {
-      const response = await getAllBrand(1);
+      const response = await getAllBrand(page, 2);
       setBrands(response.result.data);
+      setTotalPages(response.result.totalPages);
       console.log(response.result.data);
     } catch (error) {
       console.error("Error fetching brands:", error);
@@ -61,7 +69,7 @@ export default function ManageBrand() {
   };
 
   const refreshData = () => {
-    fetchData();
+    fetchData(currentPage);
     setIsDialogOpen(false);
   };
 
@@ -77,9 +85,13 @@ export default function ManageBrand() {
     setIsDialogOpen(true);
   };
 
+  const handleUploadImageClick = (brand) => {
+    setSelectedBrand(brand);
+    setIsImageDialogOpen(true);
+  };
+
   const isCloseDialog = () => {
     setIsDialogOpen(false);
-    console.log("Close Dialog");
   };
 
   const handleDeleteButtonClick = async (id) => {
@@ -192,6 +204,7 @@ export default function ManageBrand() {
                               width="64"
                               height="64"
                               unoptimized
+                              priority
                             />
                           </TableCell>
                           <TableCell>{brand.name}</TableCell>
@@ -230,6 +243,12 @@ export default function ManageBrand() {
                                 >
                                   Xoá
                                 </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onSelect={(e) => e.preventDefault()}
+                                  onClick={() => handleUploadImageClick(brand)}
+                                >
+                                  Upload ảnh
+                                </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
@@ -239,7 +258,11 @@ export default function ManageBrand() {
                   </Table>
                 </CardContent>
                 <CardFooter>
-                  <PaginationAdminTable />
+                  <PaginationAdminTable
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
                 </CardFooter>
               </Card>
             </TabsContent>
@@ -261,6 +284,14 @@ export default function ManageBrand() {
           onClose={isCloseDialog}
           onSuccess={refreshData}
           brand={selectedBrand}
+        />
+      )}
+      {isImageDialogOpen && (
+        <DialogImageBrand
+          isOpen={isImageDialogOpen}
+          onClose={() => setIsImageDialogOpen(false)}
+          brand={selectedBrand}
+          //refreshData={refreshData}
         />
       )}
     </div>

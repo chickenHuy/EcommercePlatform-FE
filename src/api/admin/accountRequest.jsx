@@ -1,0 +1,32 @@
+import { get, post, put, del } from "@/lib/httpClient";
+
+export const getAccount = async () => {
+  try {
+    const response = await get(`/api/v1/users/me`);
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error("Error during get account:", error);
+    throw error;
+  }
+};
+
+export const updateEmail = async (emailData) => {
+  try {
+    const response = await put(`/api/v1/emails/user/email`, emailData);
+    return response;
+  } catch (error) {
+    console.error("Error during update email:", error);
+    throw error;
+  }
+};
+
+export const updatePhone = async (phoneData) => {
+  try {
+    const response = await put(`/api/v1/emails/user/phone`, phoneData);
+    return response;
+  } catch (error) {
+    console.error("Error during update phone:", error);
+    throw error;
+  }
+};

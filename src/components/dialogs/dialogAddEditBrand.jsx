@@ -62,9 +62,12 @@ export default function DialogAddEditBrand(props) {
   const handleSubmit = async (data) => {
     try {
       const payload = {
-        ...data,
-        description: data.description.trim() === "" ? null : data.description,
+        name: data.name.trim(),
+        description:
+          data.description.trim() === "" ? null : data.description.trim(),
       };
+
+      console.log("Payload gửi đi:", payload);
 
       if (brand && brand.id) {
         await updateBrand(brand.id, payload);
