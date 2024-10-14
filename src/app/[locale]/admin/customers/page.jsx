@@ -1,5 +1,5 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { File, ListFilter, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,17 +31,23 @@ import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DrawerUserDetail from "./drawerUserDetail";
 import { getAllUser } from "@/api/admin/customerRequest";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ManageCustomer() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [users, setUsers] = useState([]); // State for user data
+  const [selectedUserId, setSelectedUserId] = useState(null); // State for selected user ID
+  const { toast } = useToast();
 
-  const handleRowClick = () => {
+  const handleRowClick = (userId) => {
+    setSelectedUserId(userId);
     setIsDrawerOpen(true);
   };
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
+    setSelectedUserId(null);
     console.log("Close Drawer");
   };
 
@@ -56,11 +62,20 @@ export default function ManageCustomer() {
       console.log(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
+      toast({
+        title: "Thất bại",
+        description:
+          error.message === "Unauthenticated"
+            ? "Phiên làm việc hết hạn. Vui lòng đăng nhập lại!!!"
+            : error.message,
+        variant: "destructive",
+      });
     }
   };
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
+      <Toaster />
       <div className="flex flex-col sm:gap-4 sm:py-4">
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
           <Tabs defaultValue="all">
@@ -129,7 +144,10 @@ export default function ManageCustomer() {
                     </TableHeader>
                     <TableBody>
                       {users.map((user) => (
-                        <TableRow key={user.id} onClick={handleRowClick}>
+                        <TableRow
+                          key={user.id}
+                          onClick={() => handleRowClick(user.id)}
+                        >
                           <TableCell className="hidden sm:table-cell">
                             <Avatar>
                               <AvatarImage
@@ -176,7 +194,11 @@ export default function ManageCustomer() {
       </div>
       {/* DrawerUserDetail Component */}
       {isDrawerOpen && (
-        <DrawerUserDetail isOpen={isDrawerOpen} onClose={handleCloseDrawer} />
+        <DrawerUserDetail
+          isOpen={isDrawerOpen}
+          onClose={handleCloseDrawer}
+          userId={selectedUserId} // Truyền userId vào DrawerUserDetail
+        />
       )}
     </div>
   );

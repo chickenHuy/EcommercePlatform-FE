@@ -46,18 +46,20 @@ export default function DialogEditComponent(props) {
   };
 
   function editComponent(data) {
-    post("/api/v1/components", data).then((res) => {
-      toast({
-        title: "Thành công",
-        description: "Cập nhật thành phần thành công",
+    post("/api/v1/components", data)
+      .then((res) => {
+        toast({
+          title: "Thành công",
+          description: "Cập nhật thành phần thành công",
+        });
+      })
+      .catch((error) => {
+        toast({
+          title: "Thất bại",
+          description: error.message,
+          variant: "destructive",
+        });
       });
-    }).catch((error) => {
-      toast({
-        title: "Thất bại",
-        description: error.message,
-        variant: "destructive"
-      });
-    });
   }
 
   return (
