@@ -28,7 +28,6 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Rating } from "@mui/material";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
