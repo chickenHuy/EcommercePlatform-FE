@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { File, ListFilter, Lock } from "lucide-react";
+import { Eye, File, ListFilter, Lock, EyeClosed, LockOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,9 +30,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DrawerUserDetail from "./drawerUserDetail";
-import { getAllUser } from "@/api/admin/customerRequest";
+import { getAllUser, handleAccountCustomer } from "@/api/admin/customerRequest";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { post } from "@/lib/httpClient";
 
 export default function ManageCustomer() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -45,11 +58,34 @@ export default function ManageCustomer() {
   const [sortDate, setSortDate] = useState("");
   const [sortName, setSortName] = useState("");
   const [totalElement, setTotalElement] = useState(0);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [password, setPassword] = useState(null);
 
   const handleNextPage = () => {
     console.log("Current page:", currentPage, "Total page:", totalPage);
     if (currentPage < totalPage) {
       setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handleCustomerAccount = async (accountId) => {
+    try {
+      const result = await handleAccountCustomer(accountId, password);
+      toast({
+        tiltel: "Thành công",
+        description: "Thay đổi trạng thái tài khoản thành công",
+      });
+    } catch (error){
+      toast({
+        title: "Thất bại",
+        description:
+          error.message === "Unauthenticated"
+            ? "Phiên làm việc hết hạn. Vui lòng đăng nhập lại!!!"
+            : error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setPassword(null);
     }
   };
 
@@ -89,7 +125,7 @@ export default function ManageCustomer() {
 
   useEffect(() => {
     fetchData();
-  }, [totalPage, currentPage, totalElement, tab, sortDate, sortName]);
+  }, [totalPage, currentPage, totalElement, tab, sortDate, sortName, password]);
 
   const fetchData = async () => {
     try {
@@ -233,14 +269,94 @@ export default function ManageCustomer() {
                             {/* Format date */}
                           </TableCell>
                           <TableCell className="hidden md:table-cell">
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <Lock className="h-4 w-4" />
-                              <span className="sr-only">Khoá tài khoản</span>
-                            </Button>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button
+                                  aria-haspopup="true"
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                  }}
+                                >
+                                  {user.is_blocked ? (
+                                    <LockOpen className="h-4 w-4" />
+                                  ) : (
+                                    <Lock className="h-4 w-4" />
+                                  )}
+                                  <span className="sr-only">
+                                    Khoá tài khoản
+                                  </span>
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent
+                                className="sm:max-w-md"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
+                              >
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    {user.is_blocked
+                                      ? "Mở khoá tài khoản"
+                                      : "Khoá tài khoản"}
+                                    :{user.username}
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    Vui lòng nhập mật khẩu trước khi thực hiện
+                                    thao tác này
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="flex items-center space-x-2">
+                                  <div className="grid flex-1 gap-2">
+                                    <Label htmlFor="link" className="sr-only">
+                                      Link
+                                    </Label>
+                                    <Input
+                                      type={
+                                        isPasswordVisible ? "text" : "password"
+                                      }
+                                      id="password"
+                                      placeholder="Nhập mật khẩu"
+                                      value={password}
+                                      onChange={(e) =>
+                                        setPassword(e.target.value)
+                                      }
+                                    />
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    size="sm"
+                                    className="px-3"
+                                    onClick={() =>
+                                      setIsPasswordVisible(!isPasswordVisible)
+                                    }
+                                  >
+                                    {isPasswordVisible ? (
+                                      <EyeClosed className="h-5 w-4" />
+                                    ) : (
+                                      <Eye className="h-5 w-4" />
+                                    )}
+                                  </Button>
+                                </div>
+                                <DialogFooter className="sm:justify-start">
+                                  <DialogClose asChild>
+                                    <Button
+                                      type="button"
+                                      variant="secondary"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCustomerAccount(user.id);
+                                      }}
+                                    >
+                                      {user.is_blocked
+                                        ? "Mở khoá tài khoản"
+                                        : "Khoá tài khoản"}
+                                    </Button>
+                                  </DialogClose>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
                           </TableCell>
                         </TableRow>
                       ))}
