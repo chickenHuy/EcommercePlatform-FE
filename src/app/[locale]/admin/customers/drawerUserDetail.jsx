@@ -26,6 +26,7 @@ export default function DrawerUserDetail({ isOpen, onClose, userId }) {
     try {
       const response = await getUserById(userId);
       setUser(response.result);
+      console.log("user: ", response.result);
     } catch (error) {
       toast({
         title: "Lấy thông tin thất bại",
@@ -33,7 +34,7 @@ export default function DrawerUserDetail({ isOpen, onClose, userId }) {
         variant: "destructive",
       });
     }
-  }
+  };
   return (
     <Drawer open={isOpen} onClose={onClose}>
       <DrawerContent>
