@@ -23,14 +23,12 @@ export const updateProfile = async (userId, profileData) => {
 
 export const uploadUserImage = async (file) => {
   try {
+    console.log("file: ", file);
     const formData = new FormData();
     formData.append("image", file);
+    console.log("formData: ", formData);
 
-    const response = await post(`/api/v1/images/users`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await post(`/api/v1/images/users`, formData);
     console.log("Upload successful:", response);
     return response;
   } catch (error) {
