@@ -1,9 +1,11 @@
 import { get, post, put, del } from "@/lib/httpClient";
 
-export const getAllBrand = (page, size) => {
+export const getAllBrand = (page, tab, sortDate, sortName) => {
   try {
-    const response = get(`/api/v1/brands?page=${page}&size=${size}`);
-    console.log(response);
+    const response = get(
+      `/api/v1/brands?${page}&size=8&tab=${tab}&date=${sortDate}&name=${sortName}`
+    );
+    console.log("Brands response: ", response);
     return response;
   } catch (error) {
     console.error("Error during get all brand:", error);

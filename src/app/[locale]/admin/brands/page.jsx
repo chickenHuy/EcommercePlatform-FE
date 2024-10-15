@@ -37,39 +37,80 @@ import DialogAddEditBrand from "@/components/dialogs/dialogAddEditBrand";
 import iconNotFound from "../../../../../public/images/iconNotFound.png";
 import DialogImageBrand from "@/components/dialogs/dialogImageBrand";
 
-export const description =
-  "An products dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. It displays a list of products in a table with actions.";
 export default function ManageBrand() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState("Thêm mới thương hiệu");
   const [brands, setBrands] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
+  const [totalPage, setTotalPage] = useState(1);
+  const [tab, setTab] = useState("all");
+  const [sortDate, setSortDate] = useState("");
+  const [sortName, setSortName] = useState("");
+  const [totalElement, setTotalElement] = useState(0);
   const { toast } = useToast();
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
 
+  const handleNextPage = () => {
+    console.log("Current page:", currentPage, "Total page:", totalPage);
+    if (currentPage < totalPage) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+    console.log("Current page:", currentPage, "Total page:", totalPage);
+  };
+
+  const handleSortDate = (sort) => {
+    if (sortDate === sort) {
+      setSortDate("");
+    } else {
+      setSortDate(sort);
+    }
+  };
+
+  const handleSortName = (sort) => {
+    if (sortName === sort) {
+      setSortName("");
+    } else {
+      setSortName(sort);
+    }
+  };
+
   useEffect(() => {
-    fetchData(currentPage);
-  }, [currentPage]);
+    fetchData();
+  }, [totalPage, currentPage, totalElement, tab, sortDate, sortName]);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
 
-  const fetchData = async (page) => {
+  const fetchData = async () => {
     try {
-      const response = await getAllBrand(page, 2);
+      const response = await getAllBrand(currentPage, tab, sortDate, sortName);
       setBrands(response.result.data);
-      setTotalPages(response.result.totalPages);
+      setTotalPage(response.result.totalPages);
+      setTotalElement(response.result.totalElements);
       console.log(response.result.data);
     } catch (error) {
       console.error("Error fetching brands:", error);
+      toast({
+        title: "Thất bại",
+        description:
+          error.message === "Unauthenticated"
+            ? "Phiên làm việc hết hạn. Vui lòng đăng nhập lại!!!"
+            : error.message,
+        variant: "destructive",
+      });
     }
   };
 
   const refreshData = () => {
-    fetchData(currentPage);
+    fetchData();
     setIsDialogOpen(false);
   };
 
@@ -119,10 +160,8 @@ export default function ManageBrand() {
           <Tabs defaultValue="all">
             <div className="flex items-center">
               <TabsList>
-                <TabsTrigger value="all">Tất cả</TabsTrigger>
-                <TabsTrigger value="active">Hoạt động</TabsTrigger>
-                <TabsTrigger value="delete" className="hidden sm:flex">
-                  Đã xoá
+                <TabsTrigger value="all" onClick={() => setTab("all")}>
+                  Tất cả
                 </TabsTrigger>
               </TabsList>
               <div className="ml-auto flex items-center gap-2">
@@ -136,18 +175,38 @@ export default function ManageBrand() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Lọc bởi</DropdownMenuLabel>
+                    <DropdownMenuLabel
+                      onClick={() => handleSortDate("newest")}
+                      checked={sortDate === "newest" ? true : false}
+                    >
+                      Lọc bởi
+                    </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuCheckboxItem checked>
+                    <DropdownMenuCheckboxItem
+                      onClick={() => handleSortDate("newest")}
+                      checked={sortDate === "newest" ? true : false}
+                    >
                       Mới nhất
                     </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>Cũ nhất</DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>A - Z</DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>
-                      Bắt buộc
+                    <DropdownMenuCheckboxItem
+                      onClick={() => handleSortName("az")}
+                      checked={sortName === "az" ? true : false}
+                    >
+                      {" "}
+                      A - Z
                     </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>
-                      Không bắt buộc
+                    <DropdownMenuCheckboxItem
+                      onClick={() => handleSortDate("oldest")}
+                      checked={sortDate === "oldest" ? true : false}
+                    >
+                      Lâu nhất
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      onClick={() => handleSortName("za")}
+                      checked={sortName === "za" ? true : false}
+                    >
+                      {" "}
+                      Z - A
                     </DropdownMenuCheckboxItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -172,9 +231,11 @@ export default function ManageBrand() {
             <TabsContent value="all">
               <Card x-chunk="dashboard-06-chunk-0">
                 <CardHeader>
-                  <CardTitle>Thương hiệu</CardTitle>
+                  <CardTitle>
+                    Danh sách các thương hiệu ({totalElement})
+                  </CardTitle>
                   <CardDescription>
-                    Quản lý các thương hiệu của sản phẩm (SP)
+                    Quản lý các thương hiệu của sản phẩm trong hệ thống
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -184,7 +245,6 @@ export default function ManageBrand() {
                         <TableHead></TableHead>
                         <TableHead>Tên thương hiệu</TableHead>
                         <TableHead>Mô tả</TableHead>
-                        <TableHead>Trạng thái</TableHead>
                         <TableHead className="hidden md:table-cell">
                           Ngày tạo
                         </TableHead>
@@ -209,9 +269,6 @@ export default function ManageBrand() {
                           </TableCell>
                           <TableCell>{brand.name}</TableCell>
                           <TableCell>{brand.description}</TableCell>
-                          <TableCell>
-                            {!brand.deleted ? "Hoạt động" : "Đã xóa"}
-                          </TableCell>
                           <TableCell className="hidden md:table-cell">
                             {new Date(brand.createdAt).toLocaleString()}{" "}
                           </TableCell>
@@ -260,8 +317,10 @@ export default function ManageBrand() {
                 <CardFooter>
                   <PaginationAdminTable
                     currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
+                    handleNextPage={handleNextPage}
+                    handlePrevPage={handlePrevPage}
+                    totalPage={totalPage}
+                    setCurrentPage={setCurrentPage}
                   />
                 </CardFooter>
               </Card>
