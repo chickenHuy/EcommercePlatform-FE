@@ -48,7 +48,7 @@ function AdminHeader() {
   const users = [
     {
       title: "Khách hàng",
-      href: "/admin/users",
+      href: "/admin/customers",
       description: "Quản lý thông tin khách hàng trên toàn hệ thống",
     },
     {

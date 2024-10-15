@@ -9,8 +9,32 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Rating } from "@mui/material";
+import { useEffect, useState } from "react";
+import { getStoreById } from "@/api/admin/storeRequest";
+import { useToast } from "@/hooks/use-toast";
 
-export default function DrawerUserDetail({ isOpen, onClose }) {
+export default function DrawerStoreDetail({ isOpen, onClose, storeId }) {
+  const { toast } = useToast();
+  const [store, setStore] = useState(null);
+
+  useEffect(() => {
+    fetchStore();
+  }, []);
+
+  const fetchStore = async () => {
+    try {
+      const response = await getStoreById(storeId);
+      setStore(response.result);
+      console.log("store: ", response.result);
+    } catch (error) {
+      toast({
+        title: "Lấy thông tin thất bại",
+        description: "Không thể lấy thông tin cửa hàng",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Drawer open={isOpen} onClose={onClose}>
       <DrawerContent>
@@ -27,15 +51,21 @@ export default function DrawerUserDetail({ isOpen, onClose }) {
             {/* Bên trái */}
             <div className="w-1/3">
               <div className="mb-4">
-                <h3 className="text-lg font-semibold">Tên cửa hàng</h3>
+                <h3 className="text-lg font-semibold">
+                  {store?.name ? store?.name : "Chưa đặt tên"}
+                </h3>
               </div>
               {/* Tên */}
               <div className="text-center">
                 {/* Username */}
-                <p className="text-sm text-muted-foreground">@johndoe</p>
+                <p className="text-sm text-muted-foreground">
+                  {store?.username ? store?.username : "Chưa đặt username"}
+                </p>
                 {/* Bio */}
                 <p className="text-sm mt-2">Bio của cửa hàng...</p>
-                <div className="text-sm mt-2"><Rating value={4.0} readOnly></Rating></div>
+                <div className="text-sm mt-2">
+                  <Rating value={4.0} readOnly></Rating>
+                </div>
               </div>
             </div>
             {/* Bên phải */}
