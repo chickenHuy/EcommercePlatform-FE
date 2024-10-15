@@ -20,6 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const profileSchema = z.object({
   name: z.string().trim().min(1, {
@@ -27,12 +28,8 @@ const profileSchema = z.object({
   }),
   bio: z.string().trim(),
   dateOfBirth: z.preprocess(
-    (arg) => {
-      if (typeof arg === "string" || arg instanceof Date) {
-        return new Date(arg);
-      }
-      return arg;
-    },
+    (arg) =>
+      typeof arg === "string" || arg instanceof Date ? new Date(arg) : arg,
     z
       .date()
       .nullable()
@@ -45,6 +42,7 @@ const profileSchema = z.object({
 
 export default function ManageProfile() {
   const [profile, setProfile] = useState([]);
+  const [imgUrl, setImgUrl] = useState(null);
   const { toast } = useToast();
 
   const formData = useForm({
@@ -57,14 +55,13 @@ export default function ManageProfile() {
     },
   });
 
-  const fetchFrofile = useCallback(async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const response = await getProfile();
       setProfile(response.result);
-      console.log(response.result);
+      setImgUrl(response.result.imageUrl);
       formData.reset(response.result);
     } catch (error) {
-      console.error("Error fetching profile:", error);
       toast({
         title: "Thất bại",
         description: error.message,
@@ -74,8 +71,8 @@ export default function ManageProfile() {
   }, [toast, formData]);
 
   useEffect(() => {
-    fetchFrofile();
-  }, [fetchFrofile]);
+    fetchProfile();
+  }, [fetchProfile, imgUrl]);
 
   const onSubmit = async (profileData) => {
     const payload = {
@@ -86,18 +83,16 @@ export default function ManageProfile() {
         : null,
       phone: profile.phone,
     };
-    console.log("Dữ liệu profileData: ", payload);
+
     try {
       const updated = await updateProfile(profile.id, payload);
       toast({
         title: "Thành công",
         description: "Thông tin hồ sơ đã được cập nhật.",
       });
-      console.log("Updated: ", updated.result);
       setProfile(updated.result);
-      fetchFrofile();
+      fetchProfile();
     } catch (error) {
-      console.log("Error updating profile:", error);
       toast({
         title: "Thất bại",
         description: error.message,
@@ -110,21 +105,24 @@ export default function ManageProfile() {
     const file = event.target.files[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("image", file);
+    const validTypes = ["image/jpeg", "image/png"];
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: "Thất bại",
+        description: "Chỉ chấp nhận các tệp JPG hoặc PNG",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
-      const response = await uploadUserImage(formData);
-      setProfile((prevState) => ({
-        ...prevState,
-        imageUrl: response.result.url,
-      }));
+      const response = await uploadUserImage(file);
       toast({
         title: "Thành công",
-        description: "Ảnh đại diện đã được cập nhật",
+        description: "Thay đổi ảnh đại diện thành công",
       });
+      setImgUrl(response.result.imageUrl);
     } catch (error) {
-      console.error("Error uploading image:", error);
       toast({
         title: "Thất bại",
         description: error.message,
@@ -140,53 +138,36 @@ export default function ManageProfile() {
         <h1 className="text-3xl font-semibold">Cài đặt chung</h1>
       </div>
       <div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">
-        <nav
-          className="grid gap-4 text-sm text-muted-foreground"
-          x-chunk="dashboard-04-chunk-0"
-        >
+        <nav className="grid gap-4 text-sm text-muted-foreground">
           <Link
-            href="http://localhost:3000/en/admin/setting/profile"
+            href="/en/admin/setting/profile"
             className="font-semibold text-primary"
           >
             Hồ sơ
           </Link>
-          <Link href="http://localhost:3000/en/admin/setting/account">
-            Tài khoản
-          </Link>
-          <Link href="http://localhost:3000/en/admin/setting/change-password">
-            Đổi mật khẩu
-          </Link>
+          <Link href="/en/admin/setting/account">Tài khoản</Link>
+          <Link href="/en/admin/setting/change-password">Đổi mật khẩu</Link>
         </nav>
         <div className="grid gap-6">
-          <Card x-chunk="dashboard-04-chunk-1" className="shadow-lg rounded-lg">
+          <Card className="shadow-lg rounded-lg">
             <CardHeader className="text-center border-b py-6">
               <CardTitle className="text-2xl font-bold">
                 Hồ sơ của tôi
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 flex flex-col items-center gap-6">
-              {/* <Image
-                alt="ảnh thương hiệu"
-                className="rounded-full border-2 border-black-tertiary shadow-md"
-                src={profile.imageUrl ? profile.imageUrl : iconNotFound}
-                width="200"
-                height="200"
-                unoptimized
-                priority
-              /> */}
               <label htmlFor="profileImageUpload" className="cursor-pointer">
-                <Image
-                  alt="Ảnh đại diện"
-                  className="rounded-full border-2 border-black-tertiary shadow-md"
-                  src={profile.imageUrl ? profile.imageUrl : iconNotFound}
-                  width="200"
-                  height="200"
-                  unoptimized
-                  priority
-                />
+                <Avatar className="w-40 h-40 rounded-full mx-auto border-2">
+                  <AvatarImage
+                    src={imgUrl ? imgUrl : null}
+                    alt="Ảnh đại diện"
+                  />
+                  <AvatarFallback>{profile.username}</AvatarFallback>
+                </Avatar>
                 <input
                   type="file"
                   id="profileImageUpload"
+                  accept="image/jpeg, image/png"
                   style={{ display: "none" }}
                   onChange={handleImageUpload}
                 />
