@@ -16,16 +16,18 @@ export const Button = ({
     textSize = 'text-[16px]',
     textStyle = 'font-regular',
 
-    onClick
+    onClick,
+
+    type = '',
 }) => {
     return (
-        <div
+        <button
             className={`${width} ${height} ${backgroundColor} ${borderColor} ${borderWidth} ${borderRadius} flex flex-row justify-center items-center p-1 cursor-pointer`}
-            onClick={onClick} >
+            onClick={onClick} type = {type} >
             {iconSrc && (
                 <Image className="w-[24px] h-[24px] mr-1" src={iconSrc} alt="" />
             )}
             <span className={`${textColor} ${textSize} ${textStyle}`}>{text}</span>
-        </div>
+        </button>
     )
 }
