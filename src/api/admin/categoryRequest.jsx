@@ -9,6 +9,15 @@ export const getAllCategory = (page) => {
     throw error;
   }
 };
+export const getAll = () => {
+  try {
+    const response = get(`/api/v1/categories/all`);
+    return response;
+  } catch (error) {
+    console.error("Error during authentication:", error);
+    throw error;
+  }
+};
 
 export const getCategoryById = (categoryId) => {
   try {

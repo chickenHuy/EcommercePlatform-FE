@@ -31,11 +31,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { getAllCategory } from "@/api/admin/categoryRequest";
+import EditCategory from "./editCategories";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 
 export default function ManageCategories() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [selectCategoryId, setSelectedCategoryId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const { toast } = useToast();
@@ -55,13 +56,11 @@ export default function ManageCategories() {
   };
 
   const handleRowClick = (categoryId) => {
-    setSelectedcategoryId(categoryId);
     setIsDrawerOpen(true);
   };
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
-    setSelectedCategoryId(null);
     console.log("Close Drawer");
   };
 
@@ -198,6 +197,7 @@ export default function ManageCategories() {
           </Card>
         </main>
       </div>
+      <EditCategory isOpen={isDrawerOpen} onClose={handleCloseDrawer} />
     </div>
   );
 }
