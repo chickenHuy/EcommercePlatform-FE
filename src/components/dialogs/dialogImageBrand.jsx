@@ -14,6 +14,8 @@ import Image from "next/image";
 import iconNotFound from "../../../public/images/iconNotFound.png";
 import { uploadBrandLogo } from "@/api/admin/brandRequest";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
 
 export default function DialogImageBrand(props) {
   const { isOpen, onClose, brand, refreshData } = props;
@@ -21,35 +23,60 @@ export default function DialogImageBrand(props) {
   const [imagePreview, setImagePreview] = useState(
     brand.logoUrl || iconNotFound
   );
+  const { toast } = useToast();
+  const [logoUrl, setLogoUrl] = useState(brand ? brand.logoUrl : iconNotFound);
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setFile(file);
+    const temp = event.target.files[0];
+    if (temp) {
+      setFile(temp);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(temp);
     }
   };
 
-  const handleUploadBrandLogo = async (event) => {
-    event.preventDefault();
-    const formData = new FormData();
-    formData.append("logo", file);
+  const handleUploadBrandLogo = async () => {
+    console.log(file);
+    if (!file) {
+      toast({
+        title: "Thất bại",
+        description: "Vui lòng chọn một tệp để tải lên",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const validTypes = ["image/jpeg", "image/png"];
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: "Thất bại",
+        description: "Chỉ chấp nhận các tệp JPG hoặc PNG",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      console.log("Uploading brand logo with ID:", brand.id);
-      await uploadBrandLogo(brand.id, formData);
-      console.log("Upload success response:", response);
-      //refreshData();
+      console.log("Uploading brand logo with ID: ", brand.id);
+      const response = await uploadBrandLogo(brand.id, file);
+      setLogoUrl(response.result.logoUrl);
+      console.log("Upload success response: ", response);
+      toast({
+        title: "Thành công",
+        description: "Thay đổi ảnh thương hiệu thành công",
+      });
+      refreshData();
       onClose();
     } catch (error) {
       console.error("Failed to update brand logo:", error);
-      console.log(
-        "Error data:",
-        error.response ? error.response.formData : "No response formData"
-      );
+      toast({
+        title: "Thất bại",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -63,7 +90,8 @@ export default function DialogImageBrand(props) {
             cập nhật
           </DialogDescription>
         </DialogHeader>
-        <form className="space-y-4">
+        <div className="space-y-4">
+          <Label>Đang cập nhật logo cho thương hiệu : {brand.name}</Label>
           <div className="flex flex-col items-center space-y-4">
             <Image
               alt="Logo thương hiệu"
@@ -77,16 +105,16 @@ export default function DialogImageBrand(props) {
             <Input
               type="file"
               accept="image/*"
-              onChange={handleFileChange}
+              onChange={(e) => handleFileChange(e)}
               className="col-span-3"
             />
           </div>
           <DialogFooter>
-            <Button type="submit" onClick={handleUploadBrandLogo}>
+            <Button type="submit" onClick={() => handleUploadBrandLogo()}>
               Cập nhật
             </Button>
           </DialogFooter>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

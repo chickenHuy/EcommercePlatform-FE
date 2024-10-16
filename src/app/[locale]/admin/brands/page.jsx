@@ -45,8 +45,7 @@ export default function ManageBrand() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const [tab, setTab] = useState("all");
-  const [sortDate, setSortDate] = useState("");
-  const [sortName, setSortName] = useState("");
+  const [sortType, setSortType] = useState("");
   const [totalElement, setTotalElement] = useState(0);
   const { toast } = useToast();
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
@@ -65,33 +64,17 @@ export default function ManageBrand() {
     console.log("Current page:", currentPage, "Total page:", totalPage);
   };
 
-  const handleSortDate = (sort) => {
-    if (sortDate === sort) {
-      setSortDate("");
-    } else {
-      setSortDate(sort);
-    }
-  };
-
-  const handleSortName = (sort) => {
-    if (sortName === sort) {
-      setSortName("");
-    } else {
-      setSortName(sort);
-    }
+  const handleSortChange = (type) => {
+    setSortType(sortType === type ? "" : type);
   };
 
   useEffect(() => {
     fetchData();
-  }, [totalPage, currentPage, totalElement, tab, sortDate, sortName]);
-
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
+  }, [totalPage, currentPage, totalElement, tab, sortType]);
 
   const fetchData = async () => {
     try {
-      const response = await getAllBrand(currentPage, tab, sortDate, sortName);
+      const response = await getAllBrand(currentPage, tab, sortType);
       setBrands(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
@@ -170,42 +153,35 @@ export default function ManageBrand() {
                     <Button variant="outline" size="sm" className="h-7 gap-1">
                       <ListFilter className="h-3.5 w-3.5" />
                       <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        Lọc
+                        Sắp xếp
                       </span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuLabel
-                      onClick={() => handleSortDate("newest")}
-                      checked={sortDate === "newest" ? true : false}
-                    >
-                      Lọc bởi
-                    </DropdownMenuLabel>
+                    <DropdownMenuLabel>Sắp xếp theo</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortDate("newest")}
-                      checked={sortDate === "newest" ? true : false}
+                      onClick={() => handleSortChange("newest")}
+                      checked={sortType === "newest"}
                     >
                       Mới nhất
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortName("az")}
-                      checked={sortName === "az" ? true : false}
+                      onClick={() => handleSortChange("az")}
+                      checked={sortType === "az"}
                     >
-                      {" "}
                       A - Z
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortDate("oldest")}
-                      checked={sortDate === "oldest" ? true : false}
+                      onClick={() => handleSortChange("oldest")}
+                      checked={sortType === "oldest"}
                     >
                       Lâu nhất
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortName("za")}
-                      checked={sortName === "za" ? true : false}
+                      onClick={() => handleSortChange("za")}
+                      checked={sortType === "za"}
                     >
-                      {" "}
                       Z - A
                     </DropdownMenuCheckboxItem>
                   </DropdownMenuContent>
@@ -228,7 +204,7 @@ export default function ManageBrand() {
                 </Button>
               </div>
             </div>
-            <TabsContent value="all">
+            <TabsContent value={tab}>
               <Card x-chunk="dashboard-06-chunk-0">
                 <CardHeader>
                   <CardTitle>
@@ -289,6 +265,7 @@ export default function ManageBrand() {
                                 <DropdownMenuItem
                                   onSelect={(e) => e.preventDefault()}
                                   onClick={() => handleEditButtonClick(brand)}
+                                  className="cursor-pointer"
                                 >
                                   Sửa
                                 </DropdownMenuItem>
@@ -297,14 +274,16 @@ export default function ManageBrand() {
                                   onClick={() =>
                                     handleDeleteButtonClick(brand.id)
                                   }
+                                  className="cursor-pointer"
                                 >
                                   Xoá
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onSelect={(e) => e.preventDefault()}
                                   onClick={() => handleUploadImageClick(brand)}
+                                  className="cursor-pointer"
                                 >
-                                  Upload ảnh
+                                  Cập nhật Logo
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -350,7 +329,7 @@ export default function ManageBrand() {
           isOpen={isImageDialogOpen}
           onClose={() => setIsImageDialogOpen(false)}
           brand={selectedBrand}
-          //refreshData={refreshData}
+          refreshData={refreshData}
         />
       )}
     </div>
