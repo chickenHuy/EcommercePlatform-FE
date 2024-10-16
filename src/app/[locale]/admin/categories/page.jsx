@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Delete, File, ListFilter, Lock } from "lucide-react";
+import { Delete, File, ListFilter, Lock, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -73,6 +73,7 @@ export default function ManageCategories() {
     try {
       const response = await getAllCategory(currentPage);
       setCategories(response.result.data);
+      console.log("Categories: ", response.result.data);
       setTotalPage(response.result.totalPages);
     } catch (error) {
       toast({
@@ -113,9 +114,9 @@ export default function ManageCategories() {
               </DropdownMenuContent>
             </DropdownMenu>
             <Button size="sm" variant="outline" className="h-7 gap-1">
-              <File className="h-3.5 w-3.5" />
+              <PlusCircle className="h-4 w-4" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Export
+                Thêm mới
               </span>
             </Button>
           </div>
@@ -130,14 +131,11 @@ export default function ManageCategories() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="hidden w-[100px] sm:table-cell">
-                      <span className="sr-only">Image</span>
-                    </TableHead>
                     <TableHead>Icon</TableHead>
                     <TableHead>Tên</TableHead>
                     <TableHead>Slug</TableHead>
+                    <TableHead>Danh mục cha</TableHead>
                     <TableHead>Ngày tạo</TableHead>
-                    <TableHead></TableHead>
                     <TableHead className="hidden md:table-cell">
                       <span className="sr-only">Hành động</span>
                     </TableHead>
@@ -155,18 +153,25 @@ export default function ManageCategories() {
                             src={category.iconUrl}
                             alt={category.name}
                           />
-                          <AvatarFallback>{category.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback>
+                            {category.name.charAt(0)}
+                          </AvatarFallback>
                         </Avatar>
                       </TableCell>
                       <TableCell className="font-medium">
                         {category.name}
                       </TableCell>
-                      <TableCell className="font-medium">{category.slug}</TableCell>
+                      <TableCell className="font-medium">
+                        {category.slug}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {category.parent_name}
+                      </TableCell>
                       <TableCell className="font-medium">
                         {new Date(category.created_at).toLocaleString()}{" "}
                         {/* Format date */}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className=" md:table-cell">
                         <Button
                           aria-haspopup="true"
                           size="icon"

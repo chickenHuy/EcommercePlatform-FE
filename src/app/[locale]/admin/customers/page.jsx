@@ -93,8 +93,8 @@ export default function ManageCustomer() {
 
   const fetchData = async () => {
     try {
-      const response = await getAllUser(currentPage, tab, sortDate, sortName); // Assuming this returns a promise
-      setUsers(response.result.data); // Set the user data to state
+      const response = await getAllUser(currentPage, tab, sortDate, sortName);
+      setUsers(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
     } catch (error) {
