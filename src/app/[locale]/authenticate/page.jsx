@@ -1,12 +1,16 @@
 "use client";
+
 import { useEffect } from "react";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { authenticateWithGoogle } from "@/api/auth/oauthRequest";
-import Cookies from "js-cookie";
+import { handleLoginNavigation } from "@/utils/auth";
+import { useRouter } from "next/navigation";
 
 export default function Authenticate() {
+
+  const router = useRouter();
+
   useEffect(() => {
-    console.log(window.location.href);
 
     const authCodeRegex = /code=([^&]+)/;
     const isMatch = window.location.href.match(authCodeRegex);
@@ -16,14 +20,7 @@ export default function Authenticate() {
 
       authenticateWithGoogle(authCode)
         .then((response) => {
-          const token = response.result.token;
-          Cookies.set(process.env.NEXT_PUBLIC_JWT_NAME, token, {
-            expires: 1,
-            secure: true,
-            path: "/",
-          });
-
-          window.location.href = "http://localhost:3000/admin"; 
+          handleLoginNavigation(response.result.token, router);
         })
         .catch((error) => {
           console.error("Authentication failed:", error);
