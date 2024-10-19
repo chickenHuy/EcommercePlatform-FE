@@ -13,33 +13,37 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import iconNotFound from "../../../public/images/iconNotFound.png";
 import { uploadBrandLogo } from "@/api/admin/brandRequest";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 
 export default function DialogImageBrand(props) {
-  const { isOpen, onClose, brand, refreshData } = props;
+  const {
+    isOpen,
+    onClose,
+    brandImage,
+    refreshPage,
+    title,
+    description,
+    nameButton,
+  } = props;
   const [file, setFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(
-    brand.logoUrl || iconNotFound
+    brandImage.logoUrl || iconNotFound
   );
   const { toast } = useToast();
-  const [logoUrl, setLogoUrl] = useState(brand ? brand.logoUrl : iconNotFound);
+  const fileInputRef = useRef(null);
 
   const handleFileChange = (event) => {
-    const temp = event.target.files[0];
-    if (temp) {
-      setFile(temp);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(temp);
+    const tempFile = event.target.files[0];
+    if (tempFile) {
+      setFile(tempFile);
+      const objectUrl = URL.createObjectURL(tempFile);
+      setImagePreview(objectUrl);
     }
   };
 
   const handleUploadBrandLogo = async () => {
-    console.log(file);
     if (!file) {
       toast({
         title: "Thất bại",
@@ -49,26 +53,23 @@ export default function DialogImageBrand(props) {
       return;
     }
 
-    const validTypes = ["image/jpeg", "image/png"];
+    const validTypes = ["image/jpg", "image/jpeg", "image/png"];
     if (!validTypes.includes(file.type)) {
       toast({
         title: "Thất bại",
-        description: "Chỉ chấp nhận các tệp JPG hoặc PNG",
+        description: "Chỉ chấp nhận các tệp JPG, JPEG, PNG",
         variant: "destructive",
       });
       return;
     }
 
     try {
-      console.log("Uploading brand logo with ID: ", brand.id);
-      const response = await uploadBrandLogo(brand.id, file);
-      setLogoUrl(response.result.logoUrl);
-      console.log("Upload success response: ", response);
+      await uploadBrandLogo(brandImage.id, file);
       toast({
         title: "Thành công",
-        description: "Thay đổi ảnh thương hiệu thành công",
+        description: "Thay đổi logo thương hiệu thành công",
       });
-      refreshData();
+      refreshPage();
       onClose();
     } catch (error) {
       console.error("Failed to update brand logo:", error);
@@ -80,38 +81,49 @@ export default function DialogImageBrand(props) {
     }
   };
 
+  const handleFileInputClick = () => {
+    fileInputRef.current.click();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>Cập nhật logo thương hiệu</DialogTitle>
-          <DialogDescription>
-            Sản phẩm thuộc danh mục có thương hiệu này sẽ có thể chọn logo để
-            cập nhật
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <Label>Đang cập nhật logo cho thương hiệu : {brand.name}</Label>
+          <Label className="text-lg font-bold">{brandImage.name}</Label>
           <div className="flex flex-col items-center space-y-4">
             <Image
               alt="Logo thương hiệu"
               className="aspect-square rounded-md object-cover"
               src={imagePreview}
-              width="192"
-              height="192"
+              width="384"
+              height="384"
               unoptimized
               priority
             />
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleFileChange(e)}
-              className="col-span-3"
-            />
+            <div className="w-full">
+              <Input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileChange(e)}
+                style={{ display: "none" }}
+              />
+              <Button onClick={handleFileInputClick} className="w-full">
+                Chọn Ảnh
+              </Button>
+            </div>
           </div>
           <DialogFooter>
-            <Button type="submit" onClick={() => handleUploadBrandLogo()}>
-              Cập nhật
+            <Button
+              type="submit"
+              onClick={() => handleUploadBrandLogo()}
+              className="m-2 font-bold"
+            >
+              {nameButton}
             </Button>
           </DialogFooter>
         </div>

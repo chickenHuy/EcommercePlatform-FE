@@ -27,17 +27,18 @@ const brandSchema = z.object({
 
 export default function DialogAddEditBrand(props) {
   const {
-    content,
+    title,
     description,
     nameButton,
     isOpen,
     onClose,
     onSuccess,
-    brand,
+    brandDataEdit,
   } = props;
+
   const { toast } = useToast();
 
-  const form = useForm({
+  const brandForm = useForm({
     resolver: zodResolver(brandSchema),
     defaultValues: {
       name: "",
@@ -46,18 +47,18 @@ export default function DialogAddEditBrand(props) {
   });
 
   useEffect(() => {
-    if (brand) {
-      form.reset({
-        name: brand.name || "",
-        description: brand.description || "",
+    if (brandDataEdit) {
+      brandForm.reset({
+        name: brandDataEdit.name || "",
+        description: brandDataEdit.description || "",
       });
     } else {
-      form.reset({
+      brandForm.reset({
         name: "",
         description: "",
       });
     }
-  }, [brand, form]);
+  }, [brandDataEdit, brandForm]);
 
   const handleSubmit = async (brandData) => {
     try {
@@ -69,10 +70,8 @@ export default function DialogAddEditBrand(props) {
             : brandData.description.trim(),
       };
 
-      console.log("Payload gửi đi:", payload);
-
-      if (brand && brand.id) {
-        await updateBrand(brand.id, payload);
+      if (brandDataEdit && brandDataEdit.id) {
+        await updateBrand(brandDataEdit.id, payload);
         toast({
           title: "Thành công",
           description: "Thương hiệu đã được cập nhật",
@@ -84,6 +83,7 @@ export default function DialogAddEditBrand(props) {
           description: "Thương hiệu mới đã được thêm",
         });
       }
+
       onSuccess();
       onClose();
     } catch (error) {
@@ -99,10 +99,13 @@ export default function DialogAddEditBrand(props) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>{content}</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <form
+          onSubmit={brandForm.handleSubmit(handleSubmit)}
+          className="space-y-4"
+        >
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="text-right">
               Tên TH
@@ -110,13 +113,13 @@ export default function DialogAddEditBrand(props) {
             <Input
               placeholder="tên thương hiệu"
               className="col-span-3"
-              {...form.register("name")}
+              {...brandForm.register("name")}
             />
           </div>
-          {form.formState.errors.name && (
+          {brandForm.formState.errors.name && (
             <div className="grid grid-cols-4 items-center gap-4">
               <p className="text-sm text-error col-start-2 col-span-3">
-                {form.formState.errors.name.message}
+                {brandForm.formState.errors.name.message}
               </p>
             </div>
           )}
@@ -127,13 +130,13 @@ export default function DialogAddEditBrand(props) {
             <Input
               placeholder="mô tả"
               className="col-span-3"
-              {...form.register("description")}
+              {...brandForm.register("description")}
             />
           </div>
-          {form.formState.errors.description && (
+          {brandForm.formState.errors.description && (
             <div className="grid grid-cols-4 items-center gap-4">
               <p className="text-sm text-error col-start-2 col-span-3">
-                {form.formState.errors.description.message}
+                {brandForm.formState.errors.description.message}
               </p>
             </div>
           )}
