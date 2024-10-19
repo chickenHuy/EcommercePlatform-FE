@@ -40,6 +40,16 @@ export const createCategory = (data) => {
   }
 }
 
+export const updateCategory = (categoryId, data) => {
+  try {
+    const response = put(`/api/v1/categories/${categoryId}`, data);
+    return response;
+  } catch (error) {
+    console.error("Error during authentication:", error);
+    throw error;
+  }
+}
+
 
 export const addComponentByCategoryId = (categoryId, data) => {
   try {

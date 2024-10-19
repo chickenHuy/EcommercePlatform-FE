@@ -44,6 +44,7 @@ import {
   createCategory,
   getAll,
   getCategoryBySlug,
+  updateCategory,
   uploadCategoryIcon,
   uploadCategoryImage,
 } from "@/api/admin/categoryRequest";
@@ -82,6 +83,7 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
     formState: { errors },
     reset,
     setValue,
+    watch,
   } = useForm({
     resolver: zodResolver(categorySchema),
   });
@@ -160,47 +162,38 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
         description: data.description,
         parentId: data.parentId,
       };
+
+      var response = null;
       if (!categorySlug) {
-        try {
-          const response = await createCategory(newCategoryData);
-
-          const createdId = response.result.id;
-
-          if (selectedComponent.length > 0) {
-            const componentData = {
-              listComponent: selectedComponent.map((component) => component.id),
-            };
-
-            await addComponentByCategoryId(createdId, componentData);
-            console.log("Component data:", componentData);
-          }
-
-          if (imageCate) {
-            await uploadCategoryImage(createdId, imageCate);
-          }
-
-          if (iconCate) {
-            await uploadCategoryIcon(createdId, iconCate);
-          }
-
-          toast({
-            title: "Thành công",
-            description: "Danh mục đã được tạo",
-            variant: "success",
-          });
-        } catch (error) {
-          console.error("Error during authentication:", error);
-          throw error;
-        }
+        response = await createCategory(newCategoryData);
+      } else {
+        response = await updateCategory(category.id, newCategoryData);
       }
 
-      // if (categorySlug) {
-      //   // If editing, update the category
-      //   await createCategory(newCategoryData);
-      // } else {
-      //   // If adding, call your API to create a new category
-      //   await createCategory(newCategoryData);
-      // }
+      const createdId = response.result.id;
+
+      if (selectedComponent.length > 0) {
+        const componentData = {
+          listComponent: selectedComponent.map((component) => component.id),
+        };
+
+        await addComponentByCategoryId(createdId, componentData);
+        console.log("Component data:", componentData);
+      }
+
+      if (imageCate) {
+        await uploadCategoryImage(createdId, imageCate);
+      }
+
+      if (iconCate) {
+        await uploadCategoryIcon(createdId, iconCate);
+      }
+
+      toast({
+        title: "Thành công",
+        description: "Danh mục đã được tạo",
+        variant: "success",
+      });
       onClose();
     } catch (error) {
       toast({
@@ -436,6 +429,7 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                               onValueChange={(value) =>
                                 setValue("parentId", value)
                               }
+                              value={watch("parentId")}
                             >
                               <SelectTrigger
                                 id="status"
