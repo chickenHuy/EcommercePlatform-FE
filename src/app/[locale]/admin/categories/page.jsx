@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Delete, File, ListFilter, Lock } from "lucide-react";
+import { Delete, File, ListFilter, Lock, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -31,14 +31,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { getAllCategory } from "@/api/admin/categoryRequest";
+import EditCategory from "./editCategories";
 
 export default function ManageCategories() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [selectCategoryId, setSelectedCategoryId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const { toast } = useToast();
+  const [selectedCate, setSelectedCate] = useState(null);
 
   const handleNextPage = () => {
     console.log("Current page:", currentPage, "Total page:", totalPage);
@@ -54,25 +55,29 @@ export default function ManageCategories() {
     console.log("Current page:", currentPage, "Total page:", totalPage);
   };
 
-  const handleRowClick = (categoryId) => {
-    setSelectedcategoryId(categoryId);
+  const handleRowClick = (slug) => {
     setIsDrawerOpen(true);
+    setSelectedCate(slug);
   };
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
-    setSelectedCategoryId(null);
-    console.log("Close Drawer");
   };
 
   useEffect(() => {
     fetchData();
-  }, [totalPage, currentPage]);
+  }, [totalPage, currentPage, isDrawerOpen]);
+
+  const handleAddNewCategory = () => {
+    setIsDrawerOpen(true);
+    setSelectedCate(null);
+  };
 
   const fetchData = async () => {
     try {
       const response = await getAllCategory(currentPage);
       setCategories(response.result.data);
+      console.log("Categories: ", response.result.data);
       setTotalPage(response.result.totalPages);
     } catch (error) {
       toast({
@@ -112,10 +117,10 @@ export default function ManageCategories() {
                 <DropdownMenuCheckboxItem>Z - A</DropdownMenuCheckboxItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button size="sm" variant="outline" className="h-7 gap-1">
-              <File className="h-3.5 w-3.5" />
+            <Button size="sm" variant="outline" className="h-7 gap-1" onClick={()=>{handleAddNewCategory()}}>
+              <PlusCircle className="h-4 w-4" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Export
+                Thêm mới
               </span>
             </Button>
           </div>
@@ -130,14 +135,11 @@ export default function ManageCategories() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="hidden w-[100px] sm:table-cell">
-                      <span className="sr-only">Image</span>
-                    </TableHead>
                     <TableHead>Icon</TableHead>
                     <TableHead>Tên</TableHead>
                     <TableHead>Slug</TableHead>
+                    <TableHead>Danh mục cha</TableHead>
                     <TableHead>Ngày tạo</TableHead>
-                    <TableHead></TableHead>
                     <TableHead className="hidden md:table-cell">
                       <span className="sr-only">Hành động</span>
                     </TableHead>
@@ -147,7 +149,7 @@ export default function ManageCategories() {
                   {categories.map((category) => (
                     <TableRow
                       key={category.id}
-                      onClick={() => handleRowClick(category.id)}
+                      onClick={() => handleRowClick(category.slug)}
                     >
                       <TableCell className="hidden sm:table-cell">
                         <Avatar>
@@ -155,18 +157,25 @@ export default function ManageCategories() {
                             src={category.iconUrl}
                             alt={category.name}
                           />
-                          <AvatarFallback>{category.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback>
+                            {category.name.charAt(0)}
+                          </AvatarFallback>
                         </Avatar>
                       </TableCell>
                       <TableCell className="font-medium">
                         {category.name}
                       </TableCell>
-                      <TableCell className="font-medium">{category.slug}</TableCell>
                       <TableCell className="font-medium">
-                        {new Date(category.created_at).toLocaleString()}{" "}
+                        {category.slug}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {category.parentName ? category.parentName : "Không"}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {new Date(category.createdAt).toLocaleString()}{" "}
                         {/* Format date */}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className=" md:table-cell">
                         <Button
                           aria-haspopup="true"
                           size="icon"
@@ -193,6 +202,7 @@ export default function ManageCategories() {
           </Card>
         </main>
       </div>
+      <EditCategory isOpen={isDrawerOpen} onClose={() => handleCloseDrawer()} categorySlug={selectedCate} />
     </div>
   );
 }

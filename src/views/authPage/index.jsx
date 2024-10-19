@@ -14,6 +14,8 @@ import { changePassword, changeUsername } from '@/store/features/loginSlice';
 import { useSelector } from 'react-redux';
 import { OAuthConfig } from '@/configs/oauthConfig';
 import { post } from '@/lib/httpClient';
+import { handleLoginNavigation } from '@/utils/auth';
+import { useRouter } from 'next/navigation';
 import SignUpNow from '@/app/[locale]/auth/signUp';
 const AuthPage = () => {
 
@@ -21,6 +23,7 @@ const AuthPage = () => {
   const t = useTranslations("AuthPage");
 
   const loginData = useSelector((state) => state.loginReducer);
+  const router = useRouter();
 
   const handleLogin = () => {
     const data = {
@@ -32,13 +35,13 @@ const AuthPage = () => {
 
   function login(data) {
     post('/api/v1/auths/log-in', data).then((response) => {
-      console.log(response);
+      handleLoginNavigation(response.result.token, router);
     }).catch((error) => {
       console.error(error);
     });
   }
 
-  
+
   const handleGoogleClick = () => {
     const callbackUrl = OAuthConfig.redirectUri;
     const authUrl = OAuthConfig.authUri;
@@ -65,7 +68,7 @@ const AuthPage = () => {
             <p className='font-regular text-[15px] text-center text-black-secondary'>{t('enterDetails')}</p>
 
             <div className='flex flex-row justify-between gap-4 my-4'>
-              <Button iconSrc={IconGoogle} borderWidth='border-[1px]' borderRadius='rounded-lg' width='w-full' height='h-[45px]' borderColor='border-gray-primary' onClick={handleGoogleClick}/>
+              <Button iconSrc={IconGoogle} borderWidth='border-[1px]' borderRadius='rounded-lg' width='w-full' height='h-[45px]' borderColor='border-gray-primary' onClick={handleGoogleClick} />
 
               <Button iconSrc={IconFacebook} borderWidth='border-[1px]' borderRadius='rounded-lg' width='w-full' height='h-[45px]' borderColor='border-gray-primary' />
 
