@@ -1,9 +1,11 @@
 import { get, post, put, del } from "@/lib/httpClient";
 
-export const getAllBrand = (page, size) => {
+export const getAllBrand = (page, tab, sortType) => {
   try {
-    const response = get(`/api/v1/brands?page=${page}&size=${size}`);
-    console.log(response);
+    const response = get(
+      `/api/v1/brands?page=${page}&size=8&tab=${tab}&sort=${sortType}`
+    );
+    console.log("Brands response: ", response);
     return response;
   } catch (error) {
     console.error("Error during get all brand:", error);
@@ -41,13 +43,15 @@ export const deleteBrand = async (id) => {
   }
 };
 
-export const uploadBrandLogo = async (id, formData) => {
+export const uploadBrandLogo = async (brandId, file) => {
+  console.log("file: ", file);
   try {
-    const response = await post(`/api/v1/images/brands/${id}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    console.log("file: ", file);
+    const formData = new FormData();
+    formData.append("logoUrl", file);
+    console.log("formData: ", formData);
+
+    const response = await post(`/api/v1/images/brands/${brandId}`, formData);
     return response;
   } catch (error) {
     console.error("Error during uploading brand logo:", error);

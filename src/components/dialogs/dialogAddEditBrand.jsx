@@ -18,9 +18,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { createBrand, updateBrand } from "@/api/admin/brandRequest";
 
-const FormSchema = z.object({
+const brandSchema = z.object({
   name: z.string().trim().min(1, {
-    message: "Name must not be blank",
+    message: "Tên thương hiệu không được để trống",
   }),
   description: z.string().trim(),
 });
@@ -38,7 +38,7 @@ export default function DialogAddEditBrand(props) {
   const { toast } = useToast();
 
   const form = useForm({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(brandSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -59,12 +59,14 @@ export default function DialogAddEditBrand(props) {
     }
   }, [brand, form]);
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async (brandData) => {
     try {
       const payload = {
-        name: data.name.trim(),
+        name: brandData.name.trim(),
         description:
-          data.description.trim() === "" ? null : data.description.trim(),
+          brandData.description.trim() === ""
+            ? null
+            : brandData.description.trim(),
       };
 
       console.log("Payload gửi đi:", payload);
@@ -73,13 +75,13 @@ export default function DialogAddEditBrand(props) {
         await updateBrand(brand.id, payload);
         toast({
           title: "Thành công",
-          description: "Thương hiệu đã được cập nhật.",
+          description: "Thương hiệu đã được cập nhật",
         });
       } else {
         await createBrand(payload);
         toast({
           title: "Thành công",
-          description: "Thương hiệu mới đã được thêm.",
+          description: "Thương hiệu mới đã được thêm",
         });
       }
       onSuccess();

@@ -29,10 +29,10 @@ export const uploadUserImage = async (file) => {
     console.log("formData: ", formData);
 
     const response = await post(`/api/v1/images/users`, formData);
-    console.log("Upload successful:", response);
+    console.log("Upload successful: ", response);
     return response;
   } catch (error) {
-    console.error("Error during image upload:", error);
+    console.error("Error during image upload: ", error);
     throw error;
   }
 };

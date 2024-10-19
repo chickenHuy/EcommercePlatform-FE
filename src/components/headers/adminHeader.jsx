@@ -58,7 +58,7 @@ function AdminHeader() {
     },
     {
       title: "Quản trị viên",
-      href: "/admin/stores",
+      href: "/admin/manages",
       description: "Quản lý thông tin và vai trò của quản trị viên.",
     },
   ];
@@ -248,7 +248,7 @@ function AdminHeader() {
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href="http://localhost:3000/en/admin/setting/profile">
+              <Link href="/admin/setting/profile">
                 Settings
               </Link>
             </DropdownMenuItem>

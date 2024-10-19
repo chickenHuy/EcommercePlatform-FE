@@ -37,39 +37,63 @@ import DialogAddEditBrand from "@/components/dialogs/dialogAddEditBrand";
 import iconNotFound from "../../../../../public/images/iconNotFound.png";
 import DialogImageBrand from "@/components/dialogs/dialogImageBrand";
 
-export const description =
-  "An products dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. It displays a list of products in a table with actions.";
 export default function ManageBrand() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState("Thêm mới thương hiệu");
   const [brands, setBrands] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
+  const [totalPage, setTotalPage] = useState(1);
+  const [tab, setTab] = useState("all");
+  const [sortType, setSortType] = useState("");
+  const [totalElement, setTotalElement] = useState(0);
   const { toast } = useToast();
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
 
-  useEffect(() => {
-    fetchData(currentPage);
-  }, [currentPage]);
-
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
+  const handleNextPage = () => {
+    console.log("Current page:", currentPage, "Total page:", totalPage);
+    if (currentPage < totalPage) {
+      setCurrentPage(currentPage + 1);
+    }
   };
 
-  const fetchData = async (page) => {
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+    console.log("Current page:", currentPage, "Total page:", totalPage);
+  };
+
+  const handleSortChange = (type) => {
+    setSortType(sortType === type ? "" : type);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [totalPage, currentPage, totalElement, tab, sortType]);
+
+  const fetchData = async () => {
     try {
-      const response = await getAllBrand(page, 2);
+      const response = await getAllBrand(currentPage, tab, sortType);
       setBrands(response.result.data);
-      setTotalPages(response.result.totalPages);
+      setTotalPage(response.result.totalPages);
+      setTotalElement(response.result.totalElements);
       console.log(response.result.data);
     } catch (error) {
       console.error("Error fetching brands:", error);
+      toast({
+        title: "Thất bại",
+        description:
+          error.message === "Unauthenticated"
+            ? "Phiên làm việc hết hạn. Vui lòng đăng nhập lại!!!"
+            : error.message,
+        variant: "destructive",
+      });
     }
   };
 
   const refreshData = () => {
-    fetchData(currentPage);
+    fetchData();
     setIsDialogOpen(false);
   };
 
@@ -119,10 +143,8 @@ export default function ManageBrand() {
           <Tabs defaultValue="all">
             <div className="flex items-center">
               <TabsList>
-                <TabsTrigger value="all">Tất cả</TabsTrigger>
-                <TabsTrigger value="active">Hoạt động</TabsTrigger>
-                <TabsTrigger value="delete" className="hidden sm:flex">
-                  Đã xoá
+                <TabsTrigger value="all" onClick={() => setTab("all")}>
+                  Tất cả
                 </TabsTrigger>
               </TabsList>
               <div className="ml-auto flex items-center gap-2">
@@ -131,23 +153,36 @@ export default function ManageBrand() {
                     <Button variant="outline" size="sm" className="h-7 gap-1">
                       <ListFilter className="h-3.5 w-3.5" />
                       <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        Lọc
+                        Sắp xếp
                       </span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Lọc bởi</DropdownMenuLabel>
+                    <DropdownMenuLabel>Sắp xếp theo</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuCheckboxItem checked>
+                    <DropdownMenuCheckboxItem
+                      onClick={() => handleSortChange("newest")}
+                      checked={sortType === "newest"}
+                    >
                       Mới nhất
                     </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>Cũ nhất</DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>A - Z</DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>
-                      Bắt buộc
+                    <DropdownMenuCheckboxItem
+                      onClick={() => handleSortChange("az")}
+                      checked={sortType === "az"}
+                    >
+                      A - Z
                     </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>
-                      Không bắt buộc
+                    <DropdownMenuCheckboxItem
+                      onClick={() => handleSortChange("oldest")}
+                      checked={sortType === "oldest"}
+                    >
+                      Lâu nhất
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      onClick={() => handleSortChange("za")}
+                      checked={sortType === "za"}
+                    >
+                      Z - A
                     </DropdownMenuCheckboxItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -169,12 +204,14 @@ export default function ManageBrand() {
                 </Button>
               </div>
             </div>
-            <TabsContent value="all">
+            <TabsContent value={tab}>
               <Card x-chunk="dashboard-06-chunk-0">
                 <CardHeader>
-                  <CardTitle>Thương hiệu</CardTitle>
+                  <CardTitle>
+                    Danh sách các thương hiệu ({totalElement})
+                  </CardTitle>
                   <CardDescription>
-                    Quản lý các thương hiệu của sản phẩm (SP)
+                    Quản lý các thương hiệu của sản phẩm trong hệ thống
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -184,7 +221,6 @@ export default function ManageBrand() {
                         <TableHead></TableHead>
                         <TableHead>Tên thương hiệu</TableHead>
                         <TableHead>Mô tả</TableHead>
-                        <TableHead>Trạng thái</TableHead>
                         <TableHead className="hidden md:table-cell">
                           Ngày tạo
                         </TableHead>
@@ -209,9 +245,6 @@ export default function ManageBrand() {
                           </TableCell>
                           <TableCell>{brand.name}</TableCell>
                           <TableCell>{brand.description}</TableCell>
-                          <TableCell>
-                            {!brand.deleted ? "Hoạt động" : "Đã xóa"}
-                          </TableCell>
                           <TableCell className="hidden md:table-cell">
                             {new Date(brand.createdAt).toLocaleString()}{" "}
                           </TableCell>
@@ -232,6 +265,7 @@ export default function ManageBrand() {
                                 <DropdownMenuItem
                                   onSelect={(e) => e.preventDefault()}
                                   onClick={() => handleEditButtonClick(brand)}
+                                  className="cursor-pointer"
                                 >
                                   Sửa
                                 </DropdownMenuItem>
@@ -240,14 +274,16 @@ export default function ManageBrand() {
                                   onClick={() =>
                                     handleDeleteButtonClick(brand.id)
                                   }
+                                  className="cursor-pointer"
                                 >
                                   Xoá
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onSelect={(e) => e.preventDefault()}
                                   onClick={() => handleUploadImageClick(brand)}
+                                  className="cursor-pointer"
                                 >
-                                  Upload ảnh
+                                  Cập nhật Logo
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -260,8 +296,10 @@ export default function ManageBrand() {
                 <CardFooter>
                   <PaginationAdminTable
                     currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
+                    handleNextPage={handleNextPage}
+                    handlePrevPage={handlePrevPage}
+                    totalPage={totalPage}
+                    setCurrentPage={setCurrentPage}
                   />
                 </CardFooter>
               </Card>
@@ -291,7 +329,7 @@ export default function ManageBrand() {
           isOpen={isImageDialogOpen}
           onClose={() => setIsImageDialogOpen(false)}
           brand={selectedBrand}
-          //refreshData={refreshData}
+          refreshData={refreshData}
         />
       )}
     </div>
