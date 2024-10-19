@@ -66,7 +66,7 @@ export default function ManageCategories() {
 
   useEffect(() => {
     fetchData();
-  }, [totalPage, currentPage]);
+  }, [totalPage, currentPage, isDrawerOpen]);
 
   const handleAddNewCategory = () => {
     setIsDrawerOpen(true);
@@ -172,7 +172,7 @@ export default function ManageCategories() {
                         {category.parentName ? category.parentName : "Không"}
                       </TableCell>
                       <TableCell className="font-medium">
-                        {new Date(category.created_at).toLocaleString()}{" "}
+                        {new Date(category.createdAt).toLocaleString()}{" "}
                         {/* Format date */}
                       </TableCell>
                       <TableCell className=" md:table-cell">

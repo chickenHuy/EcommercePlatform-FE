@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import { ChevronLeft, DeleteIcon, PlusCircle } from "lucide-react";
-
 import placeholder from "@/assets/placeholder.svg";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,7 +39,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { getAll, getCategoryBySlug } from "@/api/admin/categoryRequest";
+import {
+  addComponentByCategoryId,
+  createCategory,
+  getAll,
+  getCategoryBySlug,
+} from "@/api/admin/categoryRequest";
 import { useEffect, useState } from "react";
 import {
   Drawer,
@@ -50,26 +54,60 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { getAllComponent } from "@/api/admin/componentRequest";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "@/hooks/use-toast";
+
+const categorySchema = z.object({
+  name: z.string().min(1, "Tên danh mục không được để trống"),
+  description: z.string().nullable(),
+  parentId: z.number().nullable(),
+});
+
 export default function EditCategory({ isOpen, onClose, categorySlug }) {
   const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState(null);
-  const [componentPage, setComponentPage] = useState(1);
   const [components, setComponents] = useState([]);
   const [selectedComponent, setSelectedComponent] = useState([]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+  } = useForm({
+    resolver: zodResolver(categorySchema),
+  });
 
   useEffect(() => {
     const fetchCategory = async () => {
       try {
-        const response = await getCategoryBySlug(categorySlug);
-        setCategory(response.result);
-        setSelectedComponent(response.result.listComponent);
+        if (categorySlug) {
+          const response = await getCategoryBySlug(categorySlug);
+          setCategory(response.result);
+          setSelectedComponent(response.result.listComponent);
+          reset({
+            name: response.result.name,
+            description: response.result.description,
+            parentId: response.result.parentId,
+          });
+        } else {
+          setCategory(null);
+          setSelectedComponent([]);
+          reset({
+            name: "",
+            description: "",
+            parentId: null,
+          });
+        }
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
 
     fetchCategory();
-  }, [categorySlug]);
+  }, [categorySlug, reset]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -88,32 +126,79 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
   useEffect(() => {
     const fetchComponents = async () => {
       try {
-        const response = await getAllComponent(componentPage);
-        setComponents((prevComponents) => [
-          ...prevComponents,
-          ...response.result.data,
-        ]);
-        console.log("Components:", response.result.data);
+        const response = await getAllComponent();
+        setComponents(response.result);
+        console.log("Components:", response.result);
       } catch (error) {
         console.error("Error fetching components:", error);
       }
     };
 
     fetchComponents();
-  }, [componentPage]);
+  }, []);
 
   const handleDeleteComponent = (id) => {
+    setSelectedComponent((prev) =>
+      prev.filter((selectedComponent) => selectedComponent.id !== id)
+    );
+  };
 
-    setSelectedComponent((prev) => prev.filter((selectedComponent) => selectedComponent.id !== id));
-  }
+  const onSubmit = async (data) => {
+    try {
+      const newCategoryData = {
+        name: data.name,
+        description: data.description,
+        parentId: data.parentId,
+      };
+      if (!categorySlug) {
+        try {
+          const response = await createCategory(newCategoryData);
 
+          const createdId = response.result.id;
+
+          if (selectedComponent.length > 0) {
+            const componentData = {
+              listComponent: selectedComponent.map((component) => component.id),
+            };
+
+            await addComponentByCategoryId(createdId, componentData);
+            console.log("Component data:", componentData);
+          }
+
+          toast({
+            title: "Thành công",
+            description: "Danh mục đã được tạo",
+            variant: "success",
+          });
+        } catch (error) {
+          console.error("Error during authentication:", error);
+          throw error;
+        }
+      }
+
+      // if (categorySlug) {
+      //   // If editing, update the category
+      //   await createCategory(newCategoryData);
+      // } else {
+      //   // If adding, call your API to create a new category
+      //   await createCategory(newCategoryData);
+      // }
+      onClose();
+    } catch (error) {
+      toast({
+        title: "Thất bại",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
   return (
     <Drawer open={isOpen} onClose={onClose}>
       <DrawerTitle></DrawerTitle>
       <DrawerDescription></DrawerDescription>
       <DrawerContent className="">
         <ScrollArea className="p-4 max-h-screen overflow-auto">
-          <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14 h-full">
+          <div className="flex flex-col sm:gap-4 sm:py-4 h-full">
             <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
               <div className="mx-auto grid max-w-[59rem] flex-1 auto-rows-max gap-4">
                 <div className="flex items-center gap-4">
@@ -132,7 +217,9 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                         Huỷ bỏ
                       </Button>
                     </DrawerClose>
-                    <Button size="sm">Lưu</Button>
+                    <Button size="sm" onClick={handleSubmit(onSubmit)}>
+                      Lưu
+                    </Button>
                   </div>
                 </div>
                 {/* Ensure all components are rendered upfront */}
@@ -153,12 +240,18 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                           <div className="grid gap-3">
                             <Label htmlFor="name">Tên</Label>
                             <Input
+                              {...register("name")}
                               id="name"
                               type="text"
                               className="w-full"
                               placeholder="Tên danh mục"
                               value={category?.name}
                             />
+                            {errors.name && (
+                              <p className="text-error text-sm">
+                                {errors.name.message}
+                              </p>
+                            )}
                           </div>
                           <div className="grid gap-3">
                             <Label htmlFor="description">Mô tả</Label>
@@ -167,6 +260,7 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                               placeholder="Nhập mô tả danh mục"
                               className="min-h-32"
                               defaultValue=""
+                              {...register("description")}
                               value={category?.description}
                             />
                           </div>
@@ -207,8 +301,14 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                                   </Badge>
                                 </TableCell>
                                 <TableCell>
-                                  <Button variant="ghost" className="gap-1" onClick= {() => handleDeleteComponent(component.id)}>
-                                    <DeleteIcon className="h-3.5 w-3.5"/>
+                                  <Button
+                                    variant="ghost"
+                                    className="gap-1"
+                                    onClick={() =>
+                                      handleDeleteComponent(component.id)
+                                    }
+                                  >
+                                    <DeleteIcon className="h-3.5 w-3.5" />
                                   </Button>
                                 </TableCell>
                               </TableRow>
@@ -268,7 +368,6 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                     </Card>
                   </div>
 
-                  {/* Other cards */}
                   <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
                     {/* Parent category selection */}
                     <Card x-chunk="dashboard-07-chunk-3">
@@ -278,7 +377,12 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                       <CardContent>
                         <div className="grid gap-6">
                           <div className="grid gap-3">
-                            <Select>
+                            <Select
+                              {...register("parentId")}
+                              onValueChange={(value) =>
+                                setValue("parentId", value)
+                              }
+                            >
                               <SelectTrigger
                                 id="status"
                                 aria-label="Chọn danh mục cha"
@@ -293,6 +397,11 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                                 ))}
                               </SelectContent>
                             </Select>
+                            {errors.parentId && (
+                              <p className="text-error text-sm">
+                                {errors.parentId.message}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </CardContent>
