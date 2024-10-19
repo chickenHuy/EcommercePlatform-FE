@@ -32,7 +32,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { getAllCategory } from "@/api/admin/categoryRequest";
 import EditCategory from "./editCategories";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
 
 export default function ManageCategories() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -40,6 +39,7 @@ export default function ManageCategories() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const { toast } = useToast();
+  const [selectedCate, setSelectedCate] = useState(null);
 
   const handleNextPage = () => {
     console.log("Current page:", currentPage, "Total page:", totalPage);
@@ -55,18 +55,23 @@ export default function ManageCategories() {
     console.log("Current page:", currentPage, "Total page:", totalPage);
   };
 
-  const handleRowClick = (categoryId) => {
+  const handleRowClick = (slug) => {
     setIsDrawerOpen(true);
+    setSelectedCate(slug);
   };
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
-    console.log("Close Drawer");
   };
 
   useEffect(() => {
     fetchData();
   }, [totalPage, currentPage]);
+
+  const handleAddNewCategory = () => {
+    setIsDrawerOpen(true);
+    setSelectedCate(null);
+  };
 
   const fetchData = async () => {
     try {
@@ -112,7 +117,7 @@ export default function ManageCategories() {
                 <DropdownMenuCheckboxItem>Z - A</DropdownMenuCheckboxItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button size="sm" variant="outline" className="h-7 gap-1">
+            <Button size="sm" variant="outline" className="h-7 gap-1" onClick={()=>{handleAddNewCategory()}}>
               <PlusCircle className="h-4 w-4" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Thêm mới
@@ -144,7 +149,7 @@ export default function ManageCategories() {
                   {categories.map((category) => (
                     <TableRow
                       key={category.id}
-                      onClick={() => handleRowClick(category.id)}
+                      onClick={() => handleRowClick(category.slug)}
                     >
                       <TableCell className="hidden sm:table-cell">
                         <Avatar>
@@ -164,7 +169,7 @@ export default function ManageCategories() {
                         {category.slug}
                       </TableCell>
                       <TableCell className="font-medium">
-                        {category.parent_name}
+                        {category.parentName ? category.parentName : "Không"}
                       </TableCell>
                       <TableCell className="font-medium">
                         {new Date(category.created_at).toLocaleString()}{" "}
@@ -197,7 +202,7 @@ export default function ManageCategories() {
           </Card>
         </main>
       </div>
-      <EditCategory isOpen={isDrawerOpen} onClose={handleCloseDrawer} />
+      <EditCategory isOpen={isDrawerOpen} onClose={() => handleCloseDrawer()} categorySlug={selectedCate} />
     </div>
   );
 }

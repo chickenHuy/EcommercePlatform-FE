@@ -1,7 +1,8 @@
 "use client";
 import Image from "next/image";
-import { ChevronLeft, DeleteIcon, Package2, PlusCircle } from "lucide-react";
+import { ChevronLeft, DeleteIcon, PlusCircle } from "lucide-react";
 
+import placeholder from "@/assets/placeholder.svg";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -15,6 +16,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -31,31 +40,44 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { getAll, getAllCategory, getCategoryById } from "@/api/admin/categoryRequest";
+import { getAll, getCategoryBySlug } from "@/api/admin/categoryRequest";
 import { useEffect, useState } from "react";
-import { Drawer, DrawerClose, DrawerContent } from "@/components/ui/drawer";
-export default function EditCategory({ isOpen, onClose, categoryId }) {
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import { getAllComponent } from "@/api/admin/componentRequest";
+export default function EditCategory({ isOpen, onClose, categorySlug }) {
   const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState(null);
+  const [componentPage, setComponentPage] = useState(1);
+  const [components, setComponents] = useState([]);
+  const [selectedComponent, setSelectedComponent] = useState([]);
 
   useEffect(() => {
     const fetchCategory = async () => {
       try {
-        const response = await getCategoryById(categoryId);
+        const response = await getCategoryBySlug(categorySlug);
         setCategory(response.result);
+        setSelectedComponent(response.result.listComponent);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
 
     fetchCategory();
-  },[]);
+  }, [categorySlug]);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await getAll();
+        console.log("Categories:", response.result);
         setCategories(response.result);
+        console.log("Selected component:", selectedComponent);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
@@ -63,30 +85,56 @@ export default function EditCategory({ isOpen, onClose, categoryId }) {
     fetchCategories();
   }, []);
 
+  useEffect(() => {
+    const fetchComponents = async () => {
+      try {
+        const response = await getAllComponent(componentPage);
+        setComponents((prevComponents) => [
+          ...prevComponents,
+          ...response.result.data,
+        ]);
+        console.log("Components:", response.result.data);
+      } catch (error) {
+        console.error("Error fetching components:", error);
+      }
+    };
+
+    fetchComponents();
+  }, [componentPage]);
+
+  const handleDeleteComponent = (id) => {
+
+    setSelectedComponent((prev) => prev.filter((selectedComponent) => selectedComponent.id !== id));
+  }
+
   return (
     <Drawer open={isOpen} onClose={onClose}>
+      <DrawerTitle></DrawerTitle>
+      <DrawerDescription></DrawerDescription>
       <DrawerContent className="">
         <ScrollArea className="p-4 max-h-screen overflow-auto">
-        <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14 h-full">
-          <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-            <div className="mx-auto grid max-w-[59rem] flex-1 auto-rows-max gap-4">
-              <div className="flex items-center gap-4">
-                <DrawerClose>
-                  <Button variant="outline" size="icon" className="h-7 w-7">
-                    <ChevronLeft className="h-4 w-4" />
-                    <span className="sr-only">Back</span>
-                  </Button>
-                </DrawerClose>
-                <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
-                  Cate Controller
-                </h1>
-                <div className="hidden items-center gap-2 md:ml-auto md:flex">
-                  <Button variant="outline" size="sm">
-                    Huỷ bỏ
-                  </Button>
-                  <Button size="sm">Lưu</Button>
+          <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14 h-full">
+            <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+              <div className="mx-auto grid max-w-[59rem] flex-1 auto-rows-max gap-4">
+                <div className="flex items-center gap-4">
+                  <DrawerClose>
+                    <Button variant="outline" size="icon" className="h-7 w-7">
+                      <ChevronLeft className="h-4 w-4" />
+                      <span className="sr-only">Back</span>
+                    </Button>
+                  </DrawerClose>
+                  <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
+                    {categorySlug ? "Chỉnh sửa danh mục" : "Thêm danh mục"}
+                  </h1>
+                  <div className="hidden items-center gap-2 md:ml-auto md:flex">
+                    <DrawerClose>
+                      <Button variant="outline" size="sm">
+                        Huỷ bỏ
+                      </Button>
+                    </DrawerClose>
+                    <Button size="sm">Lưu</Button>
+                  </div>
                 </div>
-              </div>
                 {/* Ensure all components are rendered upfront */}
                 <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
                   {/* Content and cards */}
@@ -109,6 +157,7 @@ export default function EditCategory({ isOpen, onClose, categoryId }) {
                               type="text"
                               className="w-full"
                               placeholder="Tên danh mục"
+                              value={category?.name}
                             />
                           </div>
                           <div className="grid gap-3">
@@ -117,13 +166,15 @@ export default function EditCategory({ isOpen, onClose, categoryId }) {
                               id="description"
                               placeholder="Nhập mô tả danh mục"
                               className="min-h-32"
+                              defaultValue=""
+                              value={category?.description}
                             />
                           </div>
                         </div>
                       </CardContent>
                     </Card>
 
-                    {/* Product components */}
+                    {/* Cate components */}
                     <Card x-chunk="dashboard-07-chunk-1">
                       <CardHeader>
                         <CardTitle>Thành phần sản phẩm</CardTitle>
@@ -145,27 +196,74 @@ export default function EditCategory({ isOpen, onClose, categoryId }) {
                           </TableHeader>
                           <TableBody>
                             {/* Table data */}
-                            <TableRow>
-                              <TableCell className="font-semibold">
-                                GGPC-001
-                              </TableCell>
-                              <TableCell>
-                                <Badge variant="success">Có</Badge>
-                              </TableCell>
-                              <TableCell>
-                                <Button variant="ghost" className="gap-1">
-                                  <DeleteIcon className="h-3.5 w-3.5" />
-                                </Button>
-                              </TableCell>
-                            </TableRow>
+                            {selectedComponent.map((component) => (
+                              <TableRow>
+                                <TableCell className="font-semibold">
+                                  {component.name}
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="success">
+                                    {component.required ? "Có" : "Không"}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  <Button variant="ghost" className="gap-1" onClick= {() => handleDeleteComponent(component.id)}>
+                                    <DeleteIcon className="h-3.5 w-3.5"/>
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
                           </TableBody>
                         </Table>
                       </CardContent>
                       <CardFooter className="justify-center border-t p-4">
-                        <Button size="sm" variant="ghost" className="gap-1">
-                          <PlusCircle className="h-3.5 w-3.5" />
-                          Thêm
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="sm" variant="ghost" className="gap-1">
+                              <PlusCircle className="h-3.5 w-3.5" />
+                              Thêm
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="overflow-y-auto max-h-60"
+                          >
+                            <DropdownMenuLabel>
+                              Danh sách thông số
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {components.map((component) => (
+                              <DropdownMenuCheckboxItem
+                                key={component.id}
+                                checked={
+                                  selectedComponent
+                                    ? selectedComponent.some(
+                                        (selected) =>
+                                          selected.id === component.id
+                                      )
+                                    : false
+                                }
+                                onCheckedChange={(isChecked) => {
+                                  if (isChecked) {
+                                    setSelectedComponent((prev) => [
+                                      ...prev,
+                                      component,
+                                    ]);
+                                  } else {
+                                    setSelectedComponent((prev) =>
+                                      prev.filter(
+                                        (selected) =>
+                                          selected.id !== component.id
+                                      )
+                                    );
+                                  }
+                                }}
+                              >
+                                {component.name}
+                              </DropdownMenuCheckboxItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </CardFooter>
                     </Card>
                   </div>
@@ -217,7 +315,7 @@ export default function EditCategory({ isOpen, onClose, categoryId }) {
                             alt="Cate image"
                             className="aspect-square w-full rounded-md object-cover"
                             height="200"
-                            src="/placeholder.svg"
+                            src={placeholder}
                             width="200"
                           />
                         </div>
@@ -235,7 +333,7 @@ export default function EditCategory({ isOpen, onClose, categoryId }) {
                             alt="Icon"
                             className="aspect-square w-full rounded-md object-cover"
                             height="200"
-                            src="/placeholder.svg"
+                            src={placeholder}
                             width="200"
                           />
                         </div>
@@ -243,9 +341,9 @@ export default function EditCategory({ isOpen, onClose, categoryId }) {
                     </Card>
                   </div>
                 </div>
-            </div>
-          </main>
-        </div>
+              </div>
+            </main>
+          </div>
         </ScrollArea>
       </DrawerContent>
     </Drawer>

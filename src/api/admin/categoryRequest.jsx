@@ -19,9 +19,10 @@ export const getAll = () => {
   }
 };
 
-export const getCategoryById = (categoryId) => {
+export const getCategoryBySlug = (categorySlug) => {
   try {
-    const response = get(`/api/v1/categories/${categoryId}`);
+    const response = get(`/api/v1/categories/${categorySlug}`);
+    console.log("Category by ID:", response);
     return response;
   } catch (error) {
     console.error("Error during authentication:", error);
