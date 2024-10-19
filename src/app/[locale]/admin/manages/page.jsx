@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Eye, File, ListFilter, Lock, EyeClosed, LockOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,13 +26,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PaginationAdminTable } from "@/components/paginations/pagination";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import DrawerUserDetail from "./drawerUserDetail";
-import { getAllUser, handleAccountCustomer } from "@/api/admin/customerRequest";
-import { Toaster } from "@/components/ui/toaster";
-import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -43,20 +36,25 @@ import {
   DialogClose,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PaginationAdminTable } from "@/components/paginations/pagination";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
+import { getAllAdmin, handleAccountAdmin } from "@/api/admin/manageRequest";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { post } from "@/lib/httpClient";
+import DrawerAdminDetail from "./drawerAdminDetail";
 
-export default function ManageCustomer() {
+export default function ManageAdmin() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [users, setUsers] = useState([]); // State for user data
-  const [selectedUserId, setSelectedUserId] = useState(null); // State for selected user ID
+  const [admins, setAdmins] = useState([]);
+  const [selectedAdminId, setSelectedAdminId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const { toast } = useToast();
   const [tab, setTab] = useState("all");
-  const [sortDate, setSortDate] = useState("");
-  const [sortName, setSortName] = useState("");
+  const [sortType, setSortType] = useState("");
   const [totalElement, setTotalElement] = useState(0);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [password, setPassword] = useState(null);
@@ -68,14 +66,14 @@ export default function ManageCustomer() {
     }
   };
 
-  const handleCustomerAccount = async (accountId) => {
+  const handleAdminAccount = async (accountId) => {
     try {
-      const result = await handleAccountCustomer(accountId, password);
+      await handleAccountAdmin(accountId, password);
       toast({
         tiltel: "Thành công",
         description: "Thay đổi trạng thái tài khoản thành công",
       });
-    } catch (error){
+    } catch (error) {
       toast({
         title: "Thất bại",
         description:
@@ -96,45 +94,29 @@ export default function ManageCustomer() {
     console.log("Current page:", currentPage, "Total page:", totalPage);
   };
 
-  const handleRowClick = (userId) => {
-    setSelectedUserId(userId);
+  const handleRowClick = (adminId) => {
+    setSelectedAdminId(adminId);
     setIsDrawerOpen(true);
   };
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
-    setSelectedUserId(null);
+    setSelectedAdminId(null);
     console.log("Close Drawer");
   };
 
-  const handleSortDate = (sort) => {
-    if (sortDate === sort) {
-      setSortDate("");
-    } else {
-      setSortDate(sort);
-    }
+  const handleSortChange = (type) => {
+    setSortType(sortType === type ? "" : type);
   };
 
-  const handleSortName = (sort) => {
-    if (sortName === sort) {
-      setSortName("");
-    } else {
-      setSortName(sort);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [totalPage, currentPage, totalElement, tab, sortDate, sortName, password]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const response = await getAllUser(currentPage, tab, sortDate, sortName);
-      setUsers(response.result.data);
+      const response = await getAllAdmin(currentPage, tab, sortType);
+      setAdmins(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("Error fetching stores:", error);
       toast({
         title: "Thất bại",
         description:
@@ -144,7 +126,11 @@ export default function ManageCustomer() {
         variant: "destructive",
       });
     }
-  };
+  }, [toast, currentPage, tab, sortType]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData, totalPage, totalElement, password]);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -174,37 +160,35 @@ export default function ManageCustomer() {
                     <Button variant="outline" size="sm" className="h-7 gap-1">
                       <ListFilter className="h-3.5 w-3.5" />
                       <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        Lọc
+                        Sắp xếp
                       </span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Lọc bởi</DropdownMenuLabel>
+                    <DropdownMenuLabel>Sắp xếp theo</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortDate("newest")}
-                      checked={sortDate === "newest" ? true : false}
+                      onClick={() => handleSortChange("newest")}
+                      checked={sortType === "newest"}
                     >
                       Mới nhất
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortName("az")}
-                      checked={sortName === "az" ? true : false}
+                      onClick={() => handleSortChange("az")}
+                      checked={sortType === "az"}
                     >
-                      {" "}
                       A - Z
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortDate("oldest")}
-                      checked={sortDate === "oldest" ? true : false}
+                      onClick={() => handleSortChange("oldest")}
+                      checked={sortType === "oldest"}
                     >
                       Lâu nhất
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortName("za")}
-                      checked={sortName === "za" ? true : false}
+                      onClick={() => handleSortChange("za")}
+                      checked={sortType === "za"}
                     >
-                      {" "}
                       Z - A
                     </DropdownMenuCheckboxItem>
                   </DropdownMenuContent>
@@ -220,9 +204,11 @@ export default function ManageCustomer() {
             <TabsContent value={tab}>
               <Card x-chunk="dashboard-06-chunk-0">
                 <CardHeader>
-                  <CardTitle>Danh sách người dùng ({totalElement})</CardTitle>
+                  <CardTitle>
+                    Danh sách quản trị viên ({totalElement})
+                  </CardTitle>
                   <CardDescription>
-                    Quản lý tất cả người dùng trong hệ thống
+                    Quản lý tất cả quản trị viên trong hệ thống
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -242,31 +228,30 @@ export default function ManageCustomer() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {users.map((user) => (
+                      {admins.map((admin) => (
                         <TableRow
-                          key={user.id}
-                          onClick={() => handleRowClick(user.id)}
+                          key={admin.id}
+                          onClick={() => handleRowClick(admin.id)}
                         >
                           <TableCell className="hidden sm:table-cell">
                             <Avatar>
                               <AvatarImage
-                                src={user.imageUrl}
-                                alt={user.username}
+                                src={admin.imageUrl}
+                                alt={admin.username}
                               />
                               <AvatarFallback>
-                                {user.name.charAt(0)}
+                                {admin.name.charAt(0)}
                               </AvatarFallback>
                             </Avatar>
                           </TableCell>
                           <TableCell className="font-medium">
-                            {user.username}
+                            {admin.username}
                           </TableCell>
                           <TableCell className="font-medium">
-                            {user.name}
+                            {admin.name}
                           </TableCell>
                           <TableCell className="font-medium">
-                            {new Date(user.created_at).toLocaleString()}{" "}
-                            {/* Format date */}
+                            {new Date(admin.created_at).toLocaleString()}{" "}
                           </TableCell>
                           <TableCell className="hidden md:table-cell">
                             <Dialog>
@@ -279,7 +264,7 @@ export default function ManageCustomer() {
                                     e.stopPropagation();
                                   }}
                                 >
-                                  {user.is_blocked ? (
+                                  {admin.is_blocked ? (
                                     <LockOpen className="h-4 w-4" />
                                   ) : (
                                     <Lock className="h-4 w-4" />
@@ -297,10 +282,10 @@ export default function ManageCustomer() {
                               >
                                 <DialogHeader>
                                   <DialogTitle>
-                                    {user.is_blocked
+                                    {admin.is_blocked
                                       ? "Mở khoá tài khoản"
                                       : "Khoá tài khoản"}
-                                    :{user.username}
+                                    :{admin.username}
                                   </DialogTitle>
                                   <DialogDescription>
                                     Vui lòng nhập mật khẩu trước khi thực hiện
@@ -346,10 +331,10 @@ export default function ManageCustomer() {
                                       variant="secondary"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleCustomerAccount(user.id);
+                                        handleAdminAccount(admin.id);
                                       }}
                                     >
-                                      {user.is_blocked
+                                      {admin.is_blocked
                                         ? "Mở khoá tài khoản"
                                         : "Khoá tài khoản"}
                                     </Button>
@@ -377,12 +362,11 @@ export default function ManageCustomer() {
           </Tabs>
         </main>
       </div>
-      {/* DrawerUserDetail Component */}
       {isDrawerOpen && (
-        <DrawerUserDetail
+        <DrawerAdminDetail
           isOpen={isDrawerOpen}
           onClose={handleCloseDrawer}
-          userId={selectedUserId} // Truyền userId vào DrawerUserDetail
+          adminId={selectedAdminId}
         />
       )}
     </div>

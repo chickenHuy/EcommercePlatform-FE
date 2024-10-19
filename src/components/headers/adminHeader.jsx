@@ -7,13 +7,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import Link from "next/link"
-import { CircleUser, Menu, Package2, Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import Link from "next/link";
+import { CircleUser, Menu, Package2, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ModeToggle } from "../themeToggles/toggle";
 import {
   NavigationMenuContent,
@@ -22,17 +22,15 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenu,
-} from "@/components/ui/navigation-menu"
-import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
-
+} from "@/components/ui/navigation-menu";
+import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 
 function AdminHeader() {
   const categories = [
     {
       title: "Danh mục",
       href: "/admin/categories",
-      description:
-        "Quản lý danh mục sản phẩm và thêm mới danh mục.",
+      description: "Quản lý danh mục sản phẩm và thêm mới danh mục.",
     },
     {
       title: "Thành phần sản phẩm",
@@ -43,8 +41,7 @@ function AdminHeader() {
     {
       title: "Thương hiệu",
       href: "/admin/brands",
-      description:
-        "Quản lý và thêm mới các thương thiệu sản phẩm.",
+      description: "Quản lý và thêm mới các thương thiệu sản phẩm.",
     },
   ];
 
@@ -52,20 +49,17 @@ function AdminHeader() {
     {
       title: "Khách hàng",
       href: "/admin/customers",
-      description:
-        "Quản lý thông tin khách hàng trên toàn hệ thống",
+      description: "Quản lý thông tin khách hàng trên toàn hệ thống",
     },
     {
       title: "Stores",
       href: "/admin/stores",
-      description:
-        "Quản lý thông tin cửa hàng và người bán.",
+      description: "Quản lý thông tin cửa hàng và người bán.",
     },
     {
       title: "Quản trị viên",
-      href: "/admin/stores",
-      description:
-        "Quản lý thông tin và vai trò của quản trị viên.",
+      href: "/admin/manages",
+      description: "Quản lý thông tin và vai trò của quản trị viên.",
     },
   ];
 
@@ -253,7 +247,11 @@ function AdminHeader() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href="/admin/setting/profile">
+                Settings
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Logout</DropdownMenuItem>
@@ -263,7 +261,5 @@ function AdminHeader() {
     </header>
   );
 }
-
-
 
 export default AdminHeader;
