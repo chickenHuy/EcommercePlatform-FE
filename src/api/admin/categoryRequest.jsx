@@ -60,3 +60,35 @@ export const getAllComponent = () => {
     throw error;
   }
 }
+
+export const uploadCategoryImage = async (id, file) => {
+  try {
+    console.log("file: ", file);
+    const formData = new FormData();
+    formData.append("image", file);
+    console.log("formData: ", formData);
+
+    const response = await post(`/api/v1/images/categories/${id}`, formData);
+    console.log("Upload successful: ", response);
+    return response;
+  } catch (error) {
+    console.error("Error during image upload: ", error);
+    throw error;
+  }
+};
+
+export const uploadCategoryIcon = async (id, file) => {
+  try {
+    console.log("file: ", file);
+    const formData = new FormData();
+    formData.append("image", file);
+    console.log("formData: ", formData);
+
+    const response = await post(`/api/v1/images/category-icons/${id}`, formData);
+    console.log("Upload successful: ", response);
+    return response;
+  } catch (error) {
+    console.error("Error during image upload: ", error);
+    throw error;
+  }
+};

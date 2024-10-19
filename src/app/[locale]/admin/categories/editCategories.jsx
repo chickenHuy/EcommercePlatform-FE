@@ -44,6 +44,8 @@ import {
   createCategory,
   getAll,
   getCategoryBySlug,
+  uploadCategoryIcon,
+  uploadCategoryImage,
 } from "@/api/admin/categoryRequest";
 import { useEffect, useState } from "react";
 import {
@@ -70,6 +72,10 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
   const [category, setCategory] = useState(null);
   const [components, setComponents] = useState([]);
   const [selectedComponent, setSelectedComponent] = useState([]);
+  const [imageCate, setImageCate] = useState(null);
+  const [imageCateUrl, setImageCateUrl] = useState(null);
+  const [iconCate, setIconCate] = useState(null);
+  const [iconCateUrl, setIconCateUrl] = useState(null);
   const {
     register,
     handleSubmit,
@@ -82,6 +88,10 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
 
   useEffect(() => {
     const fetchCategory = async () => {
+      setImageCate(null);
+      setImageCateUrl(null);
+      setIconCate(null);
+      setIconCateUrl(null);
       try {
         if (categorySlug) {
           const response = await getCategoryBySlug(categorySlug);
@@ -107,7 +117,7 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
     };
 
     fetchCategory();
-  }, [categorySlug, reset]);
+  }, [categorySlug, reset, isOpen]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -165,6 +175,14 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
             console.log("Component data:", componentData);
           }
 
+          if (imageCate) {
+            await uploadCategoryImage(createdId, imageCate);
+          }
+
+          if (iconCate) {
+            await uploadCategoryIcon(createdId, iconCate);
+          }
+
           toast({
             title: "Thành công",
             description: "Danh mục đã được tạo",
@@ -191,6 +209,42 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
         variant: "destructive",
       });
     }
+  };
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const validTypes = ["image/jpeg", "image/png"];
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: "Thất bại",
+        description: "Chỉ chấp nhận các tệp JPG hoặc PNG",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setImageCate(file);
+    setImageCateUrl(URL.createObjectURL(file));
+  };
+
+  const handleIconUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const validTypes = ["image/jpeg", "image/png"];
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: "Thất bại",
+        description: "Chỉ chấp nhận các tệp JPG hoặc PNG",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIconCate(file);
+    setIconCateUrl(URL.createObjectURL(file));
   };
   return (
     <Drawer open={isOpen} onClose={onClose}>
@@ -420,13 +474,31 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                       </CardHeader>
                       <CardContent>
                         <div className="grid gap-2">
-                          <Image
-                            alt="Cate image"
-                            className="aspect-square w-full rounded-md object-cover"
-                            height="200"
-                            src={placeholder}
-                            width="200"
-                          />
+                          <label
+                            htmlFor="categoryImageUpload"
+                            className="cursor-pointer"
+                          >
+                            <Image
+                              alt="Cate image"
+                              className="aspect-square w-full rounded-md object-cover"
+                              height="200"
+                              src={
+                                imageCate
+                                  ? imageCateUrl
+                                  : categorySlug
+                                  ? category?.imageUrl || placeholder
+                                  : placeholder
+                              }
+                              width="200"
+                            />
+                            <input
+                              type="file"
+                              id="categoryImageUpload"
+                              accept="image/jpeg, image/png"
+                              style={{ display: "none" }}
+                              onChange={(e) => handleImageUpload(e)}
+                            />
+                          </label>
                         </div>
                       </CardContent>
                     </Card>
@@ -438,13 +510,31 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                       </CardHeader>
                       <CardContent>
                         <div className="grid gap-2">
-                          <Image
-                            alt="Icon"
-                            className="aspect-square w-full rounded-md object-cover"
-                            height="200"
-                            src={placeholder}
-                            width="200"
-                          />
+                          <label
+                            htmlFor="categoryIconUpload"
+                            className="cursor-pointer"
+                          >
+                            <Image
+                              alt="Icon Cate"
+                              className="aspect-square w-full rounded-md object-cover"
+                              height="200"
+                              src={
+                                iconCate
+                                  ? iconCateUrl
+                                  : categorySlug
+                                  ? category?.iconUrl || placeholder
+                                  : placeholder
+                              }
+                              width="200"
+                            />
+                            <input
+                              type="file"
+                              id="categoryIconUpload"
+                              accept="image/jpeg, image/png"
+                              style={{ display: "none" }}
+                              onChange={(e) => handleIconUpload(e)}
+                            />
+                          </label>
                         </div>
                       </CardContent>
                     </Card>
