@@ -29,7 +29,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { Toaster } from "@/components/ui/toaster";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { deleteBrand, getAllBrand } from "@/api/admin/brandRequest";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -38,10 +38,8 @@ import iconNotFound from "../../../../../public/images/iconNotFound.png";
 import DialogImageBrand from "@/components/dialogs/dialogImageBrand";
 
 export default function ManageBrand() {
-  const [isDialogAddEditOpen, setIsDialogAddEditOpen] = useState(false);
-  const [dialogAddEditTitle, setDialogAddEditTitle] = useState("");
-  const [dialogAddEditDescription, setDialogAddEditDescription] = useState("");
-  const [dialogAddEditNameButton, setDialogAddEditNameButton] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogContent, setDialogContent] = useState("Thêm mới thương hiệu");
   const [brands, setBrands] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,10 +48,7 @@ export default function ManageBrand() {
   const [sortType, setSortType] = useState("");
   const [totalElement, setTotalElement] = useState(0);
   const { toast } = useToast();
-  const [isDialogImageOpen, setIsDialogImageOpen] = useState(false);
-  const [dialogImageTitle, setDiaLogImageTitle] = useState("");
-  const [dialogImageDescription, setDiaLogImageDescription] = useState("");
-  const [dialogImageNameButton, setDiaLogImageNameButton] = useState("");
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
 
   const handleNextPage = () => {
     console.log("Current page:", currentPage, "Total page:", totalPage);
@@ -73,13 +68,19 @@ export default function ManageBrand() {
     setSortType(sortType === type ? "" : type);
   };
 
-  const fetchBrand = useCallback(async () => {
+  useEffect(() => {
+    fetchData();
+  }, [totalPage, currentPage, totalElement, tab, sortType]);
+
+  const fetchData = async () => {
     try {
       const response = await getAllBrand(currentPage, tab, sortType);
       setBrands(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
+      console.log(response.result.data);
     } catch (error) {
+      console.error("Error fetching brands:", error);
       toast({
         title: "Thất bại",
         description:
@@ -89,62 +90,42 @@ export default function ManageBrand() {
         variant: "destructive",
       });
     }
-  }, [toast, currentPage, tab, sortType]);
+  };
 
-  useEffect(() => {
-    fetchBrand();
-  }, [fetchBrand, totalPage, totalElement]);
-
-  const refreshPage = () => {
-    fetchBrand();
-    setIsDialogAddEditOpen(false);
-    setIsDialogImageOpen(false);
+  const refreshData = () => {
+    fetchData();
+    setIsDialogOpen(false);
   };
 
   const handleAddButtonClick = () => {
+    setDialogContent("Thêm mới thương hiệu");
     setSelectedBrand(null);
-    setIsDialogAddEditOpen(true);
-    setDialogAddEditTitle("Thêm mới thương hiệu");
-    setDialogAddEditDescription(
-      "Nhập đầy đủ thông tin để thêm thương hiệu mới"
-    );
-    setDialogAddEditNameButton("Thêm mới");
+    setIsDialogOpen(true);
   };
 
   const handleEditButtonClick = (brand) => {
+    setDialogContent("Sửa thương hiệu");
     setSelectedBrand(brand);
-    setIsDialogAddEditOpen(true);
-    setDialogAddEditTitle("Sửa thương hiệu");
-    setDialogAddEditDescription(
-      "Nhập đầy đủ thông tin để chỉnh sửa thương hiệu"
-    );
-    setDialogAddEditNameButton("Lưu thay đổi");
+    setIsDialogOpen(true);
   };
 
   const handleUploadImageClick = (brand) => {
     setSelectedBrand(brand);
-    setIsDialogImageOpen(true);
-    setDiaLogImageTitle("Cập nhật logo thương hiệu");
-    setDiaLogImageDescription("Chọn ảnh logo thương hiệu phù hợp để cập nhật");
-    setDiaLogImageNameButton("Cập nhật");
+    setIsImageDialogOpen(true);
   };
 
-  const isCloseDialogAddEdit = () => {
-    setIsDialogAddEditOpen(false);
+  const isCloseDialog = () => {
+    setIsDialogOpen(false);
   };
 
-  const isCloseDialogImage = () => {
-    setIsDialogImageOpen(false);
-  };
-
-  const handleDeleteButtonClick = async (brandId) => {
+  const handleDeleteButtonClick = async (id) => {
     try {
-      await deleteBrand(brandId);
+      await deleteBrand(id);
       toast({
         title: "Thành công",
-        description: "Thương hiệu đã được xóa",
+        description: "Thương hiệu đã được xóa.",
       });
-      refreshPage();
+      refreshData();
     } catch (error) {
       toast({
         title: "Thất bại",
@@ -326,26 +307,29 @@ export default function ManageBrand() {
           </Tabs>
         </main>
       </div>
-      {isDialogAddEditOpen && (
+      {isDialogOpen && (
         <DialogAddEditBrand
-          title={dialogAddEditTitle}
-          description={dialogAddEditDescription}
-          nameButton={dialogAddEditNameButton}
-          isOpen={isDialogAddEditOpen}
-          onClose={isCloseDialogAddEdit}
-          onSuccess={refreshPage}
-          brandDataEdit={selectedBrand}
+          content={dialogContent}
+          description={
+            "Sản phẩm thuộc danh mục có thương hiệu này sẽ có thể điền nội dung vào"
+          }
+          nameButton={
+            dialogContent === "Thêm mới thương hiệu"
+              ? "Thêm mới"
+              : "Lưu thay đổi"
+          }
+          isOpen={isDialogOpen}
+          onClose={isCloseDialog}
+          onSuccess={refreshData}
+          brand={selectedBrand}
         />
       )}
-      {isDialogImageOpen && (
+      {isImageDialogOpen && (
         <DialogImageBrand
-          title={dialogImageTitle}
-          description={dialogImageDescription}
-          nameButton={dialogImageNameButton}
-          isOpen={isDialogImageOpen}
-          onClose={isCloseDialogImage}
-          brandImage={selectedBrand}
-          refreshPage={refreshPage}
+          isOpen={isImageDialogOpen}
+          onClose={() => setIsImageDialogOpen(false)}
+          brand={selectedBrand}
+          refreshData={refreshData}
         />
       )}
     </div>

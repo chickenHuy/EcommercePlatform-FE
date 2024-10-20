@@ -159,7 +159,8 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
     try {
       const newCategoryData = {
         name: data.name,
-        description: data.description,
+        description:
+          data.description.trim() === "" ? null : data.description.trim(),
         parentId: data.parentId,
       };
 
@@ -338,7 +339,7 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                           <TableBody>
                             {/* Table data */}
                             {selectedComponent.map((component) => (
-                              <TableRow>
+                              <TableRow key={component.id}>
                                 <TableCell className="font-semibold">
                                   {component.name}
                                 </TableCell>
