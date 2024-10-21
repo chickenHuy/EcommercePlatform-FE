@@ -45,6 +45,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import DrawerAdminDetail from "./drawerAdminDetail";
+import { useSelector } from "react-redux";
 
 export default function ManageAdmin() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -58,6 +59,9 @@ export default function ManageAdmin() {
   const [totalElement, setTotalElement] = useState(0);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [password, setPassword] = useState(null);
+
+  var searchTerm  = useSelector((state) => state.searchReducer.searchTerm);  
+
 
   const handleNextPage = () => {
     console.log("Current page:", currentPage, "Total page:", totalPage);
@@ -111,7 +115,7 @@ export default function ManageAdmin() {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await getAllAdmin(currentPage, tab, sortType);
+      const response = await getAllAdmin(currentPage, tab, sortType, searchTerm);
       setAdmins(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
@@ -126,7 +130,7 @@ export default function ManageAdmin() {
         variant: "destructive",
       });
     }
-  }, [toast, currentPage, tab, sortType]);
+  }, [toast, currentPage, tab, sortType, searchTerm]);
 
   useEffect(() => {
     fetchData();
