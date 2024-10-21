@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { File, ListFilter, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +33,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { getAllStore } from "@/api/admin/storeRequest";
 import DrawerStoreDetail from "./drawerStoreDetail";
+import { useSelector } from "react-redux";
 
 export default function ManageStores() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -42,9 +43,9 @@ export default function ManageStores() {
   const [totalPage, setTotalPage] = useState(1);
   const { toast } = useToast();
   const [tab, setTab] = useState("all");
-  const [sortDate, setSortDate] = useState("");
-  const [sortName, setSortName] = useState("");
+  const [sortType, setSortType] = useState("");
   const [totalElement, setTotalElement] = useState(0);
+  var searchTerm = useSelector((state) => state.searchReducer.searchTerm);
 
   const handleNextPage = () => {
     console.log("Current page:", currentPage, "Total page:", totalPage);
@@ -71,29 +72,18 @@ export default function ManageStores() {
     console.log("Close Drawer");
   };
 
-  const handleSortDate = (sort) => {
-    if (sortDate === sort) {
-      setSortDate("");
-    } else {
-      setSortDate(sort);
-    }
+  const handleSortChange = (type) => {
+    setSortType(sortType === type ? "" : type);
   };
 
-  const handleSortName = (sort) => {
-    if (sortName === sort) {
-      setSortName("");
-    } else {
-      setSortName(sort);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [totalPage, currentPage, totalElement, tab, sortDate, sortName]);
-
-  const fetchData = async () => {
+  const fetchStore = useCallback(async () => {
     try {
-      const response = await getAllStore(currentPage, tab, sortDate, sortName);
+      const response = await getAllStore(
+        currentPage,
+        tab,
+        sortType,
+        searchTerm
+      );
       setStores(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
@@ -108,7 +98,11 @@ export default function ManageStores() {
         variant: "destructive",
       });
     }
-  };
+  }, [toast, currentPage, tab, sortType, searchTerm]);
+
+  useEffect(() => {
+    fetchStore();
+  }, [fetchStore, totalPage, totalElement]);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -138,37 +132,35 @@ export default function ManageStores() {
                     <Button variant="outline" size="sm" className="h-7 gap-1">
                       <ListFilter className="h-3.5 w-3.5" />
                       <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        Lọc
+                        Sắp xếp
                       </span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Lọc bởi</DropdownMenuLabel>
+                    <DropdownMenuLabel>Sắp xếp theo</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortDate("newest")}
-                      checked={sortDate === "newest" ? true : false}
+                      onClick={() => handleSortChange("newest")}
+                      checked={sortType === "newest"}
                     >
                       Mới nhất
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortName("az")}
-                      checked={sortName === "az" ? true : false}
+                      onClick={() => handleSortChange("az")}
+                      checked={sortType === "az"}
                     >
-                      {" "}
                       A - Z
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortDate("oldest")}
-                      checked={sortDate === "oldest" ? true : false}
+                      onClick={() => handleSortChange("oldest")}
+                      checked={sortType === "oldest"}
                     >
                       Lâu nhất
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortName("za")}
-                      checked={sortName === "za" ? true : false}
+                      onClick={() => handleSortChange("za")}
+                      checked={sortType === "za"}
                     >
-                      {" "}
                       Z - A
                     </DropdownMenuCheckboxItem>
                   </DropdownMenuContent>
@@ -256,7 +248,7 @@ export default function ManageStores() {
           </Tabs>
         </main>
       </div>
-      {/* DrawerUserDetail Component */}
+      {/* DrawerStoreDetail Component */}
       {isDrawerOpen && (
         <DrawerStoreDetail
           isOpen={isDrawerOpen}
