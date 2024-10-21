@@ -58,17 +58,19 @@ export default function DrawerStoreDetail({ isOpen, onClose, storeId }) {
               <div className="text-center">
                 {/* Username */}
                 <p className="text-sm text-muted-foreground">
-                  {store?.username ? store?.username : "Chưa có username"}
+                  {store?.username ? store?.username : "trống"}
                 </p>
                 {/* Bio */}
                 <p className="text-sm mt-2">
-                  {store?.bio ? store?.bio : "Chưa có bio"}
+                  {store?.bio ? store?.bio : "trống"}
                 </p>
-                <div className="text-sm mt-2">
+                <div className="flex items-center space-x-1">
                   <Rating
                     value={store?.rating ? store?.rating : 0}
+                    precision={0.1}
                     readOnly
                   ></Rating>
+                  <span>({store?.rating ? store?.rating : 0})</span>
                 </div>
               </div>
             </div>
@@ -76,19 +78,11 @@ export default function DrawerStoreDetail({ isOpen, onClose, storeId }) {
             <div className="w-1/2">
               <div className="mb-2">
                 <p className="font-medium">Tổng số người theo dõi</p>
-                <p>
-                  {store?.totalFollower
-                    ? store?.totalFollower
-                    : "Chưa có người theo"}
-                </p>
+                <p>{store?.totalFollower ? store?.totalFollower : "trống"}</p>
               </div>
               <div className="mb-2">
                 <p className="font-medium">Tổng số sản phẩm</p>
-                <p>
-                  {store?.totalProduct
-                    ? store?.totalProduct
-                    : "Chưa có sản phẩm"}
-                </p>
+                <p>{store?.totalProduct ? store?.totalProduct : "trống"}</p>
               </div>
               <div className="mb-2">
                 <p className="font-medium">Trạng thái cửa hàng:</p>

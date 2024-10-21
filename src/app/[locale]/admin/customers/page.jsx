@@ -29,8 +29,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import DrawerUserDetail from "./drawerUserDetail";
-import { getAllUser, handleAccountCustomer } from "@/api/admin/customerRequest";
+import {
+  getAllCustomer,
+  handleAccountCustomer,
+} from "@/api/admin/customerRequest";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -45,21 +47,22 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { post } from "@/lib/httpClient";
+import { useSelector } from "react-redux";
+import DrawerCustomerDetail from "./drawerUserDetail";
 
 export default function ManageCustomer() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [users, setUsers] = useState([]); // State for user data
+  const [customers, setCustomers] = useState([]); // State for user data
   const [selectedUserId, setSelectedUserId] = useState(null); // State for selected user ID
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const { toast } = useToast();
   const [tab, setTab] = useState("all");
-  const [sortDate, setSortDate] = useState("");
-  const [sortName, setSortName] = useState("");
+  const [sortType, setSortType] = useState("");
   const [totalElement, setTotalElement] = useState(0);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [password, setPassword] = useState(null);
+  var searchTerm = useSelector((state) => state.searchReducer.searchTerm);
 
   const handleNextPage = () => {
     console.log("Current page:", currentPage, "Total page:", totalPage);
@@ -75,7 +78,7 @@ export default function ManageCustomer() {
         tiltel: "Thành công",
         description: "Thay đổi trạng thái tài khoản thành công",
       });
-    } catch (error){
+    } catch (error) {
       toast({
         title: "Thất bại",
         description:
@@ -107,34 +110,35 @@ export default function ManageCustomer() {
     console.log("Close Drawer");
   };
 
-  const handleSortDate = (sort) => {
-    if (sortDate === sort) {
-      setSortDate("");
-    } else {
-      setSortDate(sort);
-    }
-  };
-
-  const handleSortName = (sort) => {
-    if (sortName === sort) {
-      setSortName("");
-    } else {
-      setSortName(sort);
-    }
+  const handleSortChange = (type) => {
+    setSortType(sortType === type ? "" : type);
   };
 
   useEffect(() => {
-    fetchData();
-  }, [totalPage, currentPage, totalElement, tab, sortDate, sortName, password]);
+    fetchCustomer();
+  }, [
+    totalPage,
+    currentPage,
+    totalElement,
+    tab,
+    sortType,
+    searchTerm,
+    password,
+  ]);
 
-  const fetchData = async () => {
+  const fetchCustomer = async () => {
     try {
-      const response = await getAllUser(currentPage, tab, sortDate, sortName);
-      setUsers(response.result.data);
+      const response = await getAllCustomer(
+        currentPage,
+        tab,
+        sortType,
+        searchTerm
+      );
+      setCustomers(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("Error fetching customers:", error);
       toast({
         title: "Thất bại",
         description:
@@ -174,37 +178,35 @@ export default function ManageCustomer() {
                     <Button variant="outline" size="sm" className="h-7 gap-1">
                       <ListFilter className="h-3.5 w-3.5" />
                       <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        Lọc
+                        Sắp xếp
                       </span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Lọc bởi</DropdownMenuLabel>
+                    <DropdownMenuLabel>Sắp xếp theo</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortDate("newest")}
-                      checked={sortDate === "newest" ? true : false}
+                      onClick={() => handleSortChange("newest")}
+                      checked={sortType === "newest"}
                     >
                       Mới nhất
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortName("az")}
-                      checked={sortName === "az" ? true : false}
+                      onClick={() => handleSortChange("az")}
+                      checked={sortType === "az"}
                     >
-                      {" "}
                       A - Z
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortDate("oldest")}
-                      checked={sortDate === "oldest" ? true : false}
+                      onClick={() => handleSortChange("oldest")}
+                      checked={sortType === "oldest"}
                     >
                       Lâu nhất
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
-                      onClick={() => handleSortName("za")}
-                      checked={sortName === "za" ? true : false}
+                      onClick={() => handleSortChange("za")}
+                      checked={sortType === "za"}
                     >
-                      {" "}
                       Z - A
                     </DropdownMenuCheckboxItem>
                   </DropdownMenuContent>
@@ -220,9 +222,9 @@ export default function ManageCustomer() {
             <TabsContent value={tab}>
               <Card x-chunk="dashboard-06-chunk-0">
                 <CardHeader>
-                  <CardTitle>Danh sách người dùng ({totalElement})</CardTitle>
+                  <CardTitle>Danh sách khách hàng ({totalElement})</CardTitle>
                   <CardDescription>
-                    Quản lý tất cả người dùng trong hệ thống
+                    Quản lý tất cả khách hàng trong hệ thống
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -242,30 +244,30 @@ export default function ManageCustomer() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {users.map((user) => (
+                      {customers.map((customer) => (
                         <TableRow
-                          key={user.id}
-                          onClick={() => handleRowClick(user.id)}
+                          key={customer.id}
+                          onClick={() => handleRowClick(customer.id)}
                         >
                           <TableCell className="hidden sm:table-cell">
                             <Avatar>
                               <AvatarImage
-                                src={user.imageUrl}
-                                alt={user.username}
+                                src={customer.imageUrl}
+                                alt={customer.username}
                               />
                               <AvatarFallback>
-                                {user.name.charAt(0)}
+                                {customer.name.charAt(0)}
                               </AvatarFallback>
                             </Avatar>
                           </TableCell>
                           <TableCell className="font-medium">
-                            {user.username}
+                            {customer.customername}
                           </TableCell>
                           <TableCell className="font-medium">
-                            {user.name}
+                            {customer.name}
                           </TableCell>
                           <TableCell className="font-medium">
-                            {new Date(user.created_at).toLocaleString()}{" "}
+                            {new Date(customer.created_at).toLocaleString()}{" "}
                             {/* Format date */}
                           </TableCell>
                           <TableCell className="hidden md:table-cell">
@@ -279,7 +281,7 @@ export default function ManageCustomer() {
                                     e.stopPropagation();
                                   }}
                                 >
-                                  {user.is_blocked ? (
+                                  {customer.is_blocked ? (
                                     <LockOpen className="h-4 w-4" />
                                   ) : (
                                     <Lock className="h-4 w-4" />
@@ -297,10 +299,10 @@ export default function ManageCustomer() {
                               >
                                 <DialogHeader>
                                   <DialogTitle>
-                                    {user.is_blocked
+                                    {customer.is_blocked
                                       ? "Mở khoá tài khoản"
                                       : "Khoá tài khoản"}
-                                    :{user.username}
+                                    :{customer.username}
                                   </DialogTitle>
                                   <DialogDescription>
                                     Vui lòng nhập mật khẩu trước khi thực hiện
@@ -346,10 +348,10 @@ export default function ManageCustomer() {
                                       variant="secondary"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleCustomerAccount(user.id);
+                                        handleCustomerAccount(customer.id);
                                       }}
                                     >
-                                      {user.is_blocked
+                                      {customer.is_blocked
                                         ? "Mở khoá tài khoản"
                                         : "Khoá tài khoản"}
                                     </Button>
@@ -379,7 +381,7 @@ export default function ManageCustomer() {
       </div>
       {/* DrawerUserDetail Component */}
       {isDrawerOpen && (
-        <DrawerUserDetail
+        <DrawerCustomerDetail
           isOpen={isDrawerOpen}
           onClose={handleCloseDrawer}
           userId={selectedUserId} // Truyền userId vào DrawerUserDetail
