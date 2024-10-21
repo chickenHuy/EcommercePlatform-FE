@@ -37,6 +37,7 @@ import DialogAddEditBrand from "@/components/dialogs/dialogAddEditBrand";
 import iconNotFound from "../../../../../public/images/iconNotFound.png";
 import DialogImageBrand from "@/components/dialogs/dialogImageBrand";
 import DialogConfirm from "@/components/dialogs/dialogConfirm";
+import { useSelector } from "react-redux";
 
 export default function ManageBrand() {
   const [isDialogAddEditOpen, setIsDialogAddEditOpen] = useState(false);
@@ -57,6 +58,7 @@ export default function ManageBrand() {
   const [isDialogConfirmOpen, setIsDialogConfirmOpen] = useState(false);
   const [brandToDelete, setBrandToDelete] = useState(null);
   const [brandTableName, setBrandTableName] = useState(null);
+  var searchTerm  = useSelector((state) => state.searchReducer.searchTerm); 
 
   const handleNextPage = () => {
     console.log("Current page:", currentPage, "Total page:", totalPage);
@@ -78,7 +80,7 @@ export default function ManageBrand() {
 
   const fetchBrand = useCallback(async () => {
     try {
-      const response = await getAllBrand(currentPage, sortType);
+      const response = await getAllBrand(currentPage, sortType, searchTerm);
       setBrands(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
@@ -93,7 +95,7 @@ export default function ManageBrand() {
         variant: "destructive",
       });
     }
-  }, [toast, currentPage, sortType]);
+  }, [toast, currentPage, sortType, searchTerm]);
 
   useEffect(() => {
     fetchBrand();
