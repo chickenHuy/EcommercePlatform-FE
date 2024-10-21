@@ -1,14 +1,17 @@
-import { get, post, put } from "@/lib/httpClient";
+import { del, get, post, put } from "@/lib/httpClient";
 
-export const getAllCategory = (page) => {
+export const getAllCategory = (page, sortType) => {
   try {
-    const response = get(`/api/v1/categories?page=${page}&size=8`);
+    const response = get(
+      `/api/v1/categories?page=${page}&size=8&sort=${sortType}`
+    );
     return response;
   } catch (error) {
     console.error("Error during authentication:", error);
     throw error;
   }
 };
+
 export const getAll = () => {
   try {
     const response = get(`/api/v1/categories/all`);
@@ -38,7 +41,7 @@ export const createCategory = (data) => {
     console.error("Error during authentication:", error);
     throw error;
   }
-}
+};
 
 export const updateCategory = (categoryId, data) => {
   try {
@@ -48,8 +51,17 @@ export const updateCategory = (categoryId, data) => {
     console.error("Error during authentication:", error);
     throw error;
   }
-}
+};
 
+export const deleteCategory = async (categoryId) => {
+  try {
+    const response = await del(`/api/v1/categories/${categoryId}`);
+    return response;
+  } catch (error) {
+    console.error("Error during deleting categories:", error);
+    throw error;
+  }
+};
 
 export const addComponentByCategoryId = (categoryId, data) => {
   try {
@@ -59,7 +71,7 @@ export const addComponentByCategoryId = (categoryId, data) => {
     console.error("Error during authentication:", error);
     throw error;
   }
-}
+};
 
 export const getAllComponent = () => {
   try {
@@ -69,7 +81,7 @@ export const getAllComponent = () => {
     console.error("Error during authentication:", error);
     throw error;
   }
-}
+};
 
 export const uploadCategoryImage = async (id, file) => {
   try {
@@ -94,7 +106,10 @@ export const uploadCategoryIcon = async (id, file) => {
     formData.append("image", file);
     console.log("formData: ", formData);
 
-    const response = await post(`/api/v1/images/category-icons/${id}`, formData);
+    const response = await post(
+      `/api/v1/images/category-icons/${id}`,
+      formData
+    );
     console.log("Upload successful: ", response);
     return response;
   } catch (error) {

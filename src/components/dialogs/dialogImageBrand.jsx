@@ -26,6 +26,7 @@ export default function DialogImageBrand(props) {
     title,
     description,
     nameButton,
+    tableName,
   } = props;
   const [file, setFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(
@@ -93,7 +94,9 @@ export default function DialogImageBrand(props) {
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <Label className="text-lg font-bold">{brandImage.name}</Label>
+          <Label className="font-semibold">
+            {tableName} : <strong>{brandImage.name}</strong>
+          </Label>
           <div className="flex flex-col items-center space-y-4">
             <Image
               alt="Logo thương hiệu"
@@ -112,7 +115,11 @@ export default function DialogImageBrand(props) {
                 onChange={(e) => handleFileChange(e)}
                 style={{ display: "none" }}
               />
-              <Button onClick={handleFileInputClick} className="w-full">
+              <Button
+                onClick={handleFileInputClick}
+                variant="outline"
+                className="w-full text-sm font-bold"
+              >
                 Chọn Ảnh
               </Button>
             </div>

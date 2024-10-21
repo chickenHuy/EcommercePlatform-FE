@@ -127,13 +127,12 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
         const response = await getAll();
         console.log("Categories:", response.result);
         setCategories(response.result);
-        console.log("Selected component:", selectedComponent);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
     fetchCategories();
-  }, []);
+  }, [onClose]);
 
   useEffect(() => {
     const fetchComponents = async () => {
