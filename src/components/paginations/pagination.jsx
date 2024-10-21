@@ -32,7 +32,7 @@ export function PaginationAdminTable(props) {
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious onClick={handlePrevPage} />
+          {currentPage > 1 && <PaginationPrevious onClick={handlePrevPage} />}
         </PaginationItem>
 
         {currentPage > 1
@@ -94,7 +94,9 @@ export function PaginationAdminTable(props) {
         </PaginationItem>
 
         <PaginationItem>
-          <PaginationNext onClick={handleNextPage} />
+          {currentPage < totalPage && (
+            <PaginationNext onClick={handleNextPage} />
+          )}
         </PaginationItem>
       </PaginationContent>
     </Pagination>

@@ -240,7 +240,7 @@ export default function ManageAdmin() {
                                 alt={admin.username}
                               />
                               <AvatarFallback>
-                                {admin.name.charAt(0)}
+                                {admin.name?.charAt(0)}
                               </AvatarFallback>
                             </Avatar>
                           </TableCell>
