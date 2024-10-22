@@ -4,16 +4,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import Link from "next/link"
-import { CircleUser, Menu, Package2, Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import Link from "next/link";
+import { CircleUser, Menu, Package2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ModeToggle } from "../themeToggles/toggle";
 import {
   NavigationMenuContent,
@@ -22,29 +20,27 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenu,
-} from "@/components/ui/navigation-menu"
-import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
-
+} from "@/components/ui/navigation-menu";
+import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
+import { AdminSearch } from "../searchBars/adminSearch";
 
 function AdminHeader() {
   const categories = [
     {
       title: "Danh mục",
       href: "/admin/categories",
-      description:
-        "Quản lý danh mục sản phẩm và thêm mới danh mục.",
+      description: "Quản lý danh mục sản phẩm và thêm mới danh mục",
     },
     {
       title: "Thành phần sản phẩm",
       href: "/admin/components",
       description:
-        "Đây là các thông tin như màu sắc, kích thước, chất liệu, hoặc bất kỳ chi tiết nào liên quan đến sản phẩm mà người bán cần cung cấp.",
+        "Đây là các thông tin như màu sắc, kích thước, chất liệu, hoặc bất kỳ chi tiết nào liên quan đến sản phẩm mà người bán cần cung cấp",
     },
     {
       title: "Thương hiệu",
       href: "/admin/brands",
-      description:
-        "Quản lý và thêm mới các thương thiệu sản phẩm.",
+      description: "Quản lý và thêm mới các thương thiệu sản phẩm",
     },
   ];
 
@@ -52,20 +48,17 @@ function AdminHeader() {
     {
       title: "Khách hàng",
       href: "/admin/customers",
-      description:
-        "Quản lý thông tin khách hàng trên toàn hệ thống",
+      description: "Quản lý thông tin khách hàng trên toàn hệ thống",
     },
     {
       title: "Stores",
       href: "/admin/stores",
-      description:
-        "Quản lý thông tin cửa hàng và người bán.",
+      description: "Quản lý thông tin cửa hàng và người bán",
     },
     {
       title: "Quản trị viên",
-      href: "/admin/stores",
-      description:
-        "Quản lý thông tin và vai trò của quản trị viên.",
+      href: "/admin/manages",
+      description: "Quản lý thông tin và vai trò của quản trị viên",
     },
   ];
 
@@ -183,47 +176,47 @@ function AdminHeader() {
               <Package2 className="h-6 w-6" />
               <span className="sr-only">Acme Inc</span>
             </Link>
-            <Link href="#" className="hover:text-foreground">
+            <Link href="/admin" className="hover:text-foreground">
               Dashboard
             </Link>
             <Link
-              href="#"
+              href="/admin/categories"
               className="text-muted-foreground hover:text-foreground"
             >
               Danh mục
             </Link>
             <Link
-              href="#"
+              href="/admin/brands"
               className="text-muted-foreground hover:text-foreground"
             >
               Thương hiệu
             </Link>
             <Link
-              href="#"
+              href="/admin/components"
               className="text-muted-foreground hover:text-foreground"
             >
               Thành phần SP
             </Link>
             <Link
-              href="#"
+              href="/admin/orders"
               className="text-muted-foreground hover:text-foreground"
             >
               Đơn hàng
             </Link>
             <Link
-              href="#"
+              href="/admin/customers"
               className="text-muted-foreground hover:text-foreground"
             >
               Khách hàng
             </Link>
             <Link
-              href="#"
+              href="/admin/stores"
               className="text-muted-foreground hover:text-foreground"
             >
               Stores
             </Link>
             <Link
-              href="#"
+              href="/admin/manages"
               className="text-muted-foreground hover:text-foreground"
             >
               Quản trị viên
@@ -232,16 +225,7 @@ function AdminHeader() {
         </SheetContent>
       </Sheet>
       <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-        <form className="ml-auto flex-1 sm:flex-initial">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search products..."
-              className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-            />
-          </div>
-        </form>
+        <AdminSearch></AdminSearch>
         <ModeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -251,19 +235,18 @@ function AdminHeader() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuItem>
+              <Link href="/admin/setting/profile">Tài khoản của tôi</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Support</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Logout</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href="/auth">Đăng xuất</Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
     </header>
   );
 }
-
-
 
 export default AdminHeader;

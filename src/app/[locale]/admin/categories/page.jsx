@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
-import { Delete, File, ListFilter, Lock } from "lucide-react";
+
+import { useCallback, useEffect, useState } from "react";
+import { Delete, File, ListFilter, Lock, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,15 +31,24 @@ import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
-import { getAllCategory } from "@/api/admin/categoryRequest";
+import { deleteCategory, getAllCategory } from "@/api/admin/categoryRequest";
+import EditCategory from "./editCategories";
+import DialogConfirm from "@/components/dialogs/dialogConfirm";
+import { useSelector } from "react-redux";
 
 export default function ManageCategories() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [selectCategoryId, setSelectedCategoryId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
+  const [sortType, setSortType] = useState("");
+  const [totalElement, setTotalElement] = useState(0);
   const { toast } = useToast();
+  const [selectedCate, setSelectedCate] = useState(null);
+  const [isDialogConfirmOpen, setIsDialogConfirmOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [categoryTableName, setCategoryTableName] = useState(null);
+  var searchTerm = useSelector((state) => state.searchReducer.searchTerm);
 
   const handleNextPage = () => {
     console.log("Current page:", currentPage, "Total page:", totalPage);
@@ -54,26 +64,31 @@ export default function ManageCategories() {
     console.log("Current page:", currentPage, "Total page:", totalPage);
   };
 
-  const handleRowClick = (categoryId) => {
-    setSelectedcategoryId(categoryId);
+  const handleSortChange = (type) => {
+    setSortType(sortType === type ? "" : type);
+  };
+
+  const handleRowClick = (slug) => {
     setIsDrawerOpen(true);
+    setSelectedCate(slug);
   };
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
-    setSelectedCategoryId(null);
-    console.log("Close Drawer");
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [totalPage, currentPage]);
+  const handleAddNewCategory = () => {
+    setIsDrawerOpen(true);
+    setSelectedCate(null);
+  };
 
-  const fetchData = async () => {
+  const fetchCategory = useCallback(async () => {
     try {
-      const response = await getAllCategory(currentPage);
+      const response = await getAllCategory(currentPage, sortType, searchTerm);
       setCategories(response.result.data);
+      console.log("Categories: ", response.result.data);
       setTotalPage(response.result.totalPages);
+      setTotalElement(response.result.totalElements);
     } catch (error) {
       toast({
         title: "Thất bại",
@@ -83,6 +98,37 @@ export default function ManageCategories() {
             : error.message,
         variant: "destructive",
       });
+    }
+  }, [toast, currentPage, sortType, searchTerm]);
+
+  useEffect(() => {
+    fetchCategory();
+  }, [fetchCategory, totalPage, totalElement, isDrawerOpen]);
+
+  const handleDeleteButtonClick = (category) => {
+    setCategoryToDelete(category);
+    setIsDialogConfirmOpen(true);
+    setCategoryTableName("danh mục");
+  };
+
+  const confirmDelete = async () => {
+    if (categoryToDelete) {
+      try {
+        await deleteCategory(categoryToDelete.id);
+        toast({
+          title: "Thành công",
+          description: `Danh mục "${categoryToDelete.name}" đã được xóa`,
+        });
+        fetchCategory();
+        setIsDialogConfirmOpen(false);
+        setCategoryTableName(null);
+      } catch (error) {
+        toast({
+          title: "Thất bại",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -97,31 +143,56 @@ export default function ManageCategories() {
                 <Button variant="outline" size="sm" className="h-7 gap-1">
                   <ListFilter className="h-3.5 w-3.5" />
                   <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Lọc
+                    Sắp xếp
                   </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Lọc bởi</DropdownMenuLabel>
+                <DropdownMenuLabel>Sắp xếp theo</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem checked>
+                <DropdownMenuCheckboxItem
+                  onClick={() => handleSortChange("newest")}
+                  checked={sortType === "newest"}
+                >
                   Mới nhất
                 </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>A - Z</DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Lâu nhất</DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Z - A</DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  onClick={() => handleSortChange("az")}
+                  checked={sortType === "az"}
+                >
+                  A - Z
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  onClick={() => handleSortChange("oldest")}
+                  checked={sortType === "oldest"}
+                >
+                  Lâu nhất
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  onClick={() => handleSortChange("za")}
+                  checked={sortType === "za"}
+                >
+                  Z - A
+                </DropdownMenuCheckboxItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button size="sm" variant="outline" className="h-7 gap-1">
-              <File className="h-3.5 w-3.5" />
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 gap-1"
+              onClick={() => {
+                handleAddNewCategory();
+              }}
+            >
+              <PlusCircle className="h-4 w-4" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Export
+                Thêm mới
               </span>
             </Button>
           </div>
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
-              <CardTitle>Danh sách danh mục</CardTitle>
+              <CardTitle>Danh sách danh mục ({totalElement})</CardTitle>
               <CardDescription>
                 Quản lý tất cả danh mục trong hệ thống
               </CardDescription>
@@ -130,14 +201,11 @@ export default function ManageCategories() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="hidden w-[100px] sm:table-cell">
-                      <span className="sr-only">Image</span>
-                    </TableHead>
                     <TableHead>Icon</TableHead>
                     <TableHead>Tên</TableHead>
                     <TableHead>Slug</TableHead>
+                    <TableHead>Danh mục cha</TableHead>
                     <TableHead>Ngày tạo</TableHead>
-                    <TableHead></TableHead>
                     <TableHead className="hidden md:table-cell">
                       <span className="sr-only">Hành động</span>
                     </TableHead>
@@ -147,7 +215,7 @@ export default function ManageCategories() {
                   {categories.map((category) => (
                     <TableRow
                       key={category.id}
-                      onClick={() => handleRowClick(category.id)}
+                      onClick={() => handleRowClick(category.slug)}
                     >
                       <TableCell className="hidden sm:table-cell">
                         <Avatar>
@@ -155,22 +223,33 @@ export default function ManageCategories() {
                             src={category.iconUrl}
                             alt={category.name}
                           />
-                          <AvatarFallback>{category.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback>
+                            {category.name.charAt(0)}
+                          </AvatarFallback>
                         </Avatar>
                       </TableCell>
                       <TableCell className="font-medium">
                         {category.name}
                       </TableCell>
-                      <TableCell className="font-medium">{category.slug}</TableCell>
                       <TableCell className="font-medium">
-                        {new Date(category.created_at).toLocaleString()}{" "}
+                        {category.slug}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {category.parentName ? category.parentName : "Không"}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {new Date(category.createdAt).toLocaleString()}{" "}
                         {/* Format date */}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className=" md:table-cell">
                         <Button
                           aria-haspopup="true"
                           size="icon"
                           variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteButtonClick(category);
+                          }}
                         >
                           <Delete className="h-4 w-4" />
                           <span className="sr-only">Xoá</span>
@@ -193,6 +272,18 @@ export default function ManageCategories() {
           </Card>
         </main>
       </div>
+      <EditCategory
+        isOpen={isDrawerOpen}
+        onClose={() => handleCloseDrawer()}
+        categorySlug={selectedCate}
+      />
+      <DialogConfirm
+        isOpen={isDialogConfirmOpen}
+        onClose={() => setIsDialogConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        tableName={categoryTableName}
+        objectName={categoryToDelete?.name}
+      />
     </div>
   );
 }

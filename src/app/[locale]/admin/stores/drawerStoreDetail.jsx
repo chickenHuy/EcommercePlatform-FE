@@ -9,8 +9,32 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Rating } from "@mui/material";
+import { useEffect, useState } from "react";
+import { getStoreById } from "@/api/admin/storeRequest";
+import { useToast } from "@/hooks/use-toast";
 
-export default function DrawerUserDetail({ isOpen, onClose }) {
+export default function DrawerStoreDetail({ isOpen, onClose, storeId }) {
+  const { toast } = useToast();
+  const [store, setStore] = useState(null);
+
+  useEffect(() => {
+    fetchStore();
+  }, []);
+
+  const fetchStore = async () => {
+    try {
+      const response = await getStoreById(storeId);
+      setStore(response.result);
+      console.log("store: ", response.result);
+    } catch (error) {
+      toast({
+        title: "Lấy thông tin thất bại",
+        description: "Không thể lấy thông tin cửa hàng",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Drawer open={isOpen} onClose={onClose}>
       <DrawerContent>
@@ -22,31 +46,43 @@ export default function DrawerUserDetail({ isOpen, onClose }) {
             </DrawerDescription>
           </DrawerHeader>
           <div className="flex gap-10">
-            {" "}
             {/* Sử dụng Flex để chia bố cục */}
             {/* Bên trái */}
             <div className="w-1/3">
               <div className="mb-4">
-                <h3 className="text-lg font-semibold">Tên cửa hàng</h3>
+                <h3 className="text-lg font-semibold">
+                  {store?.name ? store?.name : "Chưa đặt tên"}
+                </h3>
               </div>
               {/* Tên */}
               <div className="text-center">
                 {/* Username */}
-                <p className="text-sm text-muted-foreground">@johndoe</p>
+                <p className="text-sm text-muted-foreground">
+                  {store?.username ? store?.username : "trống"}
+                </p>
                 {/* Bio */}
-                <p className="text-sm mt-2">Bio của cửa hàng...</p>
-                <div className="text-sm mt-2"><Rating value={4.0} readOnly></Rating></div>
+                <p className="text-sm mt-2">
+                  {store?.bio ? store?.bio : "trống"}
+                </p>
+                <div className="flex items-center space-x-1">
+                  <Rating
+                    value={store?.rating ? store?.rating : 0}
+                    precision={0.1}
+                    readOnly
+                  ></Rating>
+                  <span>({store?.rating ? store?.rating : 0})</span>
+                </div>
               </div>
             </div>
             {/* Bên phải */}
             <div className="w-1/2">
               <div className="mb-2">
-                <p className="font-medium">Người theo dõi:</p>
-                <p>1</p>
+                <p className="font-medium">Tổng số người theo dõi</p>
+                <p>{store?.totalFollower ? store?.totalFollower : "trống"}</p>
               </div>
               <div className="mb-2">
-                <p className="font-medium">Số sản phẩm:</p>
-                <p>0</p>
+                <p className="font-medium">Tổng số sản phẩm</p>
+                <p>{store?.totalProduct ? store?.totalProduct : "trống"}</p>
               </div>
               <div className="mb-2">
                 <p className="font-medium">Trạng thái cửa hàng:</p>
@@ -55,7 +91,11 @@ export default function DrawerUserDetail({ isOpen, onClose }) {
               {/* Ngày tạo */}
               <div className="mb-2">
                 <p className="font-medium">Ngày tạo:</p>
-                <p>2023-07-12</p>
+                <p>
+                  {store?.createdAt
+                    ? new Date(store.createdAt).toLocaleString()
+                    : ""}
+                </p>
               </div>
             </div>
           </div>

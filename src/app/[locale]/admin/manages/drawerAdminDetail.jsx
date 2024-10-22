@@ -10,26 +10,26 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { use, useEffect, useState } from "react";
-import { getUserById } from "@/api/admin/customerRequest";
+import { useEffect, useState } from "react";
+import { getAdminById } from "@/api/admin/manageRequest";
 
-export default function DrawerCustomerDetail({ isOpen, onClose, userId }) {
+export default function DrawerAdminDetail({ isOpen, onClose, adminId }) {
   const { toast } = useToast();
-  const [user, setUser] = useState(null);
+  const [admin, setAdmin] = useState(null);
 
   useEffect(() => {
-    fetchCustomer();
+    fetchAdmin();
   }, []);
 
-  const fetchCustomer = async () => {
+  const fetchAdmin = async () => {
     try {
-      const response = await getUserById(userId);
-      setUser(response.result);
-      console.log("user: ", response.result);
+      const response = await getAdminById(adminId);
+      setAdmin(response.result);
+      console.log("admin: ", response.result);
     } catch (error) {
       toast({
         title: "Lấy thông tin thất bại",
-        description: "Không thể lấy thông tin khách hàng",
+        description: "Không thể lấy thông tin quản trị viên",
         variant: "destructive",
       });
     }
@@ -39,9 +39,9 @@ export default function DrawerCustomerDetail({ isOpen, onClose, userId }) {
       <DrawerContent>
         <div className="mx-auto w-full max-w-sm">
           <DrawerHeader>
-            <DrawerTitle>Khách hàng</DrawerTitle>
+            <DrawerTitle>Quản trị viên</DrawerTitle>
             <DrawerDescription>
-              Thông tin chi tiết về khách hàng
+              Thông tin chi tiết về quản trị viên
             </DrawerDescription>
           </DrawerHeader>
           <div className="flex gap-10">
@@ -52,21 +52,23 @@ export default function DrawerCustomerDetail({ isOpen, onClose, userId }) {
               <div className="mb-4">
                 {/* Avatar */}
                 <Avatar className="w-32 h-32 rounded-full mx-auto">
-                  <AvatarImage src={user?.imageUrl} alt="@shadcn" />
-                  <AvatarFallback>{user?.username}</AvatarFallback>
+                  <AvatarImage src={admin?.imageUrl} alt="@shadcn" />
+                  <AvatarFallback>{admin?.username}</AvatarFallback>
                 </Avatar>
               </div>
               {/* Tên */}
               <div className="text-center">
                 <h3 className="text-lg font-semibold">
-                  {user?.name ? user.name : "Chưa có tên"}
+                  {admin?.name ? admin.name : "Chưa đặt tên"}
                 </h3>
                 {/* Username */}
                 <p className="text-sm text-muted-foreground">
-                  @{user?.username}
+                  @{admin?.username}
                 </p>
                 {/* Bio */}
-                <p className="text-sm mt-2">{user?.bio ? user.bio : "trống"}</p>
+                <p className="text-sm mt-2">
+                  {admin?.bio ? admin.bio : "trống"}
+                </p>
               </div>
             </div>
             {/* Bên phải */}
@@ -74,34 +76,34 @@ export default function DrawerCustomerDetail({ isOpen, onClose, userId }) {
               {/* Email */}
               <div className="mb-2">
                 <p className="font-medium">Email:</p>
-                <p>{user?.email ? user.email : "trống"}</p>
+                <p>{admin?.email ? admin.email : "trống"}</p>
               </div>
               {/* Số điện thoại */}
               <div className="mb-2">
                 <p className="font-medium">Số điện thoại:</p>
-                <p>{user?.phone ? user.phone : "trống"}</p>
+                <p>{admin?.phone ? admin.phone : "trống"}</p>
               </div>
               {/* Ngày sinh */}
               <div className="mb-2">
                 <p className="font-medium">Ngày sinh:</p>
-                <p>{user?.dateOfBirth ? user.dateOfBirth : "trống"}</p>
+                <p>{admin?.dateOfBirth ? admin.dateOfBirth : "trống"}</p>
               </div>
               {/* Giới tính */}
               <div className="mb-2">
                 <p className="font-medium">Giới tính:</p>
-                <p>{user?.gender ? user.gender : "trống"}</p>
+                <p>{admin?.gender ? admin.gender : "trống"}</p>
               </div>
               {/* Trạng thái tài khoản */}
               <div className="mb-2">
                 <p className="font-medium">Trạng thái tài khoản:</p>
-                <p>{user?.blocked ? "Đã khoá" : "Hoạt động"}</p>
+                <p>{admin?.blocked ? "Đã khoá" : "Hoạt động"}</p>
               </div>
               {/* Ngày tạo */}
               <div className="mb-2">
                 <p className="font-medium">Ngày tạo:</p>
                 <p>
-                  {user?.createdAt
-                    ? new Date(user.createdAt).toLocaleString()
+                  {admin?.createdAt
+                    ? new Date(admin.createdAt).toLocaleString()
                     : ""}
                 </p>
               </div>

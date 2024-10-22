@@ -1,20 +1,10 @@
-import { get, post, put } from "@/lib/httpClient";
+import { get, put } from "@/lib/httpClient";
 
-export const getAllCustomer = (page, tab, sortType, search = "") => {
+export const getAllAdmin = (page, tab, sortType, search = "") => {
   try {
     const response = get(
-      `/api/v1/users/customers?page=${page}&size=8&tab=${tab}&sort=${sortType}&search=${search}`
+      `/api/v1/users/manages?page=${page}&size=8&tab=${tab}&sort=${sortType}&search=${search}`
     );
-    return response;
-  } catch (error) {
-    console.error("Error during get all customer:", error);
-    throw error;
-  }
-};
-
-export const getUserById = (userId) => {
-  try {
-    const response = get(`/api/v1/users/${userId}`);
     return response;
   } catch (error) {
     console.error("Error during authentication:", error);
@@ -22,7 +12,17 @@ export const getUserById = (userId) => {
   }
 };
 
-export const handleAccountCustomer = (accountId, password) => {
+export const getAdminById = (adminId) => {
+  try {
+    const response = get(`/api/v1/users/${adminId}`);
+    return response;
+  } catch (error) {
+    console.error("Error during authentication:", error);
+    throw error;
+  }
+};
+
+export const handleAccountAdmin = (accountId, password) => {
   try {
     const data = { password: password, id: accountId };
     console.log(data);

@@ -26,15 +26,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PaginationAdminTable } from "@/components/paginations/pagination";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  getAllCustomer,
-  handleAccountCustomer,
-} from "@/api/admin/customerRequest";
-import { Toaster } from "@/components/ui/toaster";
-import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -45,15 +36,21 @@ import {
   DialogClose,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PaginationAdminTable } from "@/components/paginations/pagination";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
+import { getAllAdmin, handleAccountAdmin } from "@/api/admin/manageRequest";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import DrawerAdminDetail from "./drawerAdminDetail";
 import { useSelector } from "react-redux";
-import DrawerCustomerDetail from "./drawerUserDetail";
 
-export default function ManageCustomer() {
+export default function ManageAdmin() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [customers, setCustomers] = useState([]); // State for user data
-  const [selectedUserId, setSelectedUserId] = useState(null); // State for selected user ID
+  const [admins, setAdmins] = useState([]);
+  const [selectedAdminId, setSelectedAdminId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const { toast } = useToast();
@@ -62,6 +59,7 @@ export default function ManageCustomer() {
   const [totalElement, setTotalElement] = useState(0);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [password, setPassword] = useState(null);
+
   var searchTerm = useSelector((state) => state.searchReducer.searchTerm);
 
   const handleNextPage = () => {
@@ -71,9 +69,9 @@ export default function ManageCustomer() {
     }
   };
 
-  const handleCustomerAccount = async (accountId) => {
+  const handleAdminAccount = async (accountId) => {
     try {
-      const result = await handleAccountCustomer(accountId, password);
+      await handleAccountAdmin(accountId, password);
       toast({
         tiltel: "Thành công",
         description: "Thay đổi trạng thái tài khoản thành công",
@@ -99,14 +97,14 @@ export default function ManageCustomer() {
     console.log("Current page:", currentPage, "Total page:", totalPage);
   };
 
-  const handleRowClick = (userId) => {
-    setSelectedUserId(userId);
+  const handleRowClick = (adminId) => {
+    setSelectedAdminId(adminId);
     setIsDrawerOpen(true);
   };
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
-    setSelectedUserId(null);
+    setSelectedAdminId(null);
     console.log("Close Drawer");
   };
 
@@ -114,19 +112,19 @@ export default function ManageCustomer() {
     setSortType(sortType === type ? "" : type);
   };
 
-  const fetchCustomer = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const response = await getAllCustomer(
+      const response = await getAllAdmin(
         currentPage,
         tab,
         sortType,
         searchTerm
       );
-      setCustomers(response.result.data);
+      setAdmins(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
     } catch (error) {
-      console.error("Error fetching customers:", error);
+      console.error("Error fetching stores:", error);
       toast({
         title: "Thất bại",
         description:
@@ -139,8 +137,8 @@ export default function ManageCustomer() {
   }, [toast, currentPage, tab, sortType, searchTerm]);
 
   useEffect(() => {
-    fetchCustomer();
-  }, [fetchCustomer, totalPage, totalElement, password]);
+    fetchData();
+  }, [fetchData, totalPage, totalElement, password]);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -208,9 +206,11 @@ export default function ManageCustomer() {
             <TabsContent value={tab}>
               <Card x-chunk="dashboard-06-chunk-0">
                 <CardHeader>
-                  <CardTitle>Danh sách khách hàng ({totalElement})</CardTitle>
+                  <CardTitle>
+                    Danh sách quản trị viên ({totalElement})
+                  </CardTitle>
                   <CardDescription>
-                    Quản lý tất cả khách hàng trong hệ thống
+                    Quản lý tất cả quản trị viên trong hệ thống
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -230,31 +230,30 @@ export default function ManageCustomer() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {customers.map((customer) => (
+                      {admins.map((admin) => (
                         <TableRow
-                          key={customer.id}
-                          onClick={() => handleRowClick(customer.id)}
+                          key={admin.id}
+                          onClick={() => handleRowClick(admin.id)}
                         >
                           <TableCell className="hidden sm:table-cell">
                             <Avatar>
                               <AvatarImage
-                                src={customer.imageUrl}
-                                alt={customer.username}
+                                src={admin.imageUrl}
+                                alt={admin.username}
                               />
                               <AvatarFallback>
-                                {customer.name.charAt(0)}
+                                {admin.name?.charAt(0)}
                               </AvatarFallback>
                             </Avatar>
                           </TableCell>
                           <TableCell className="font-medium">
-                            {customer.customername}
+                            {admin.username}
                           </TableCell>
                           <TableCell className="font-medium">
-                            {customer.name}
+                            {admin.name}
                           </TableCell>
                           <TableCell className="font-medium">
-                            {new Date(customer.created_at).toLocaleString()}{" "}
-                            {/* Format date */}
+                            {new Date(admin.created_at).toLocaleString()}{" "}
                           </TableCell>
                           <TableCell className="hidden md:table-cell">
                             <Dialog>
@@ -267,7 +266,7 @@ export default function ManageCustomer() {
                                     e.stopPropagation();
                                   }}
                                 >
-                                  {customer.is_blocked ? (
+                                  {admin.is_blocked ? (
                                     <LockOpen className="h-4 w-4" />
                                   ) : (
                                     <Lock className="h-4 w-4" />
@@ -285,10 +284,10 @@ export default function ManageCustomer() {
                               >
                                 <DialogHeader>
                                   <DialogTitle>
-                                    {customer.is_blocked
+                                    {admin.is_blocked
                                       ? "Mở khoá tài khoản"
                                       : "Khoá tài khoản"}
-                                    :{customer.username}
+                                    :{admin.username}
                                   </DialogTitle>
                                   <DialogDescription>
                                     Vui lòng nhập mật khẩu trước khi thực hiện
@@ -334,10 +333,10 @@ export default function ManageCustomer() {
                                       variant="secondary"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleCustomerAccount(customer.id);
+                                        handleAdminAccount(admin.id);
                                       }}
                                     >
-                                      {customer.is_blocked
+                                      {admin.is_blocked
                                         ? "Mở khoá tài khoản"
                                         : "Khoá tài khoản"}
                                     </Button>
@@ -365,12 +364,11 @@ export default function ManageCustomer() {
           </Tabs>
         </main>
       </div>
-      {/* DrawerUserDetail Component */}
       {isDrawerOpen && (
-        <DrawerCustomerDetail
+        <DrawerAdminDetail
           isOpen={isDrawerOpen}
           onClose={handleCloseDrawer}
-          userId={selectedUserId} // Truyền userId vào DrawerUserDetail
+          adminId={selectedAdminId}
         />
       )}
     </div>
