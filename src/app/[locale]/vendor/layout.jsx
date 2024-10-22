@@ -1,4 +1,4 @@
-import VendorHeader from "@/components/headers/vendorHeader";
+import VendorNavigate from "@/components/navigates/vendorNavigate";
 
 export const metadata = {
     title: "Vendor Dashboard",
@@ -7,9 +7,8 @@ export const metadata = {
 
 export default function VendorLayout({ children }) {
     return (
-        <body className="w-full h-fit min-h-screen bg-white-secondary">
-            <VendorHeader />
-            {children}
-        </body>
+      <body className="w-full h-fit min-h-screen bg-white-secondary">
+        <VendorNavigate vendorContent={children}></VendorNavigate>
+      </body>
     );
 }

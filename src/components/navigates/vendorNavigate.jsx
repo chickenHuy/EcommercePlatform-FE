@@ -1,124 +1,207 @@
 "use client";
 
-import React from 'react'
-import { useTranslations } from 'next-intl';
-import CommonNavigate from './commonNavigate';
-import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
-import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
-import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined';
-import SignalCellularAltOutlinedIcon from '@mui/icons-material/SignalCellularAltOutlined';
-import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
+import {
+  BookOpen,
+  Bot,
+  ChevronRight,
+  Map,
+  PieChart,
+  Frame,
+  Box,
+  SquareTerminal,
+  Store,
+  MapPinHouse,
+  Star,
+  ShoppingBag,
+} from "lucide-react";
 
-const VendorNavigate = () => {
-    const t = useTranslations("VendorNagivate");
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import VendorHeader from "../headers/vendorHeader";
+const data = {
+  navMain: [
+    {
+      title: "Đơn đặt hàng",
+      url: "#",
+      icon: ShoppingBag,
+      isActive: true,
+      items: [
+        {
+          title: "Tất cả",
+          url: "#",
+        },
+        {
+          title: "Chờ xác nhận",
+          url: "#",
+        },
+        {
+          title: "Chờ vận chuyển",
+          url: "#",
+        },
+        {
+          title: "Đang vận chuyển",
+          url: "#",
+        },
+        {
+          title: "Hoàn thành",
+          url: "#",
+        },
+        {
+          title: "Đã huỷ",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Sản phẩm",
+      url: "#",
+      icon: Box,
+      items: [
+        {
+          title: "Thêm sản phẩm",
+          url: "#",
+        },
+        {
+          title: "Danh sách sản phẩm",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Khác",
+      url: "#",
+      icon: BookOpen,
+      items: [
+        {
+          title: "Doanh thu",
+          url: "#",
+        },
+        {
+          title: "Hiệu quả hoạt động",
+          url: "#",
+        },
+      ],
+    },
+  ],
+  projects: [
+    {
+      name: "Đánh giá & bình luận",
+      url: "#",
+      icon: Star,
+    },
+    {
+      name: "Địa chỉ lấy hàng",
+      url: "#",
+      icon: MapPinHouse,
+    },
+    {
+      name: "Hồ sơ cửa hàng",
+      url: "#",
+      icon: Store,
+    },
+  ],
+};
 
-    const navigateContext = [
-        {
-            icon: <ListAltOutlinedIcon />,
-            content: t('order.title'),
-            onClick: () => console.log('Order clicked'),
-            children: [
-                {
-                    icon: null,
-                    content: t('order.my-orders'),
-                    onClick: () => console.log('Order child clicked'),
-                },
-                {
-                    icon: null,
-                    content: t('order.cancellation'),
-                    onClick: () => console.log('Order child clicked'),
-                },
-                {
-                    icon: null,
-                    content: t('order.return-refund'),
-                    onClick: () => console.log('Order child clicked'),
-                },
-                {
-                    icon: null,
-                    content: t('order.shipping-setting'),
-                    onClick: () => console.log('Order child clicked'),
-                },
-            ],
-        },
-        {
-            icon: <Inventory2OutlinedIcon />,
-            content: t('product.title'),
-            onClick: () => console.log('Product clicked'),
-            children: [
-                {
-                    icon: null,
-                    content: t('product.my-products'),
-                    onClick: () => console.log('Product child clicked'),
-                },
-                {
-                    icon: null,
-                    content: t('product.add-new-product'),
-                    onClick: () => console.log('Product child clicked'),
-                },
-            ],
-        },
-        {
-            icon: <SupportAgentOutlinedIcon />,
-            content: t('customerService.title'),
-            onClick: () => console.log('Customer service clicked'),
-            children: [
-                {
-                    icon: null,
-                    content: t('customerService.chat-management'),
-                    onClick: () => console.log('Customer service child clicked'),
-                },
-                {
-                    icon: null,
-                    content: t('customerService.review-management'),
-                    onClick: () => console.log('Customer service child clicked'),
-                },
-            ],
-        },
-        {
-            icon: <SignalCellularAltOutlinedIcon />,
-            content: t('data.title'),
-            onClick: () => console.log('Data clicked'),
-            children: [
-                {
-                    icon: null,
-                    content: t('data.business-insight'),
-                    onClick: () => console.log('Data child clicked'),
-                },
-                {
-                    icon: null,
-                    content: t('data.account-health'),
-                    onClick: () => console.log('Data child clicked'),
-                },
-            ],
-        },
-        {
-            icon: <StorefrontOutlinedIcon />,
-            content: t('shop.title'),
-            onClick: () => console.log('Shop clicked'),
-            children: [
-                {
-                    icon: null,
-                    content: t('shop.shop-information'),
-                    onClick: () => console.log('Shop child clicked'),
-                },
-                {
-                    icon: null,
-                    content: t('shop.shop-decoration'),
-                    onClick: () => console.log('Shop child clicked'),
-                },
-                {
-                    icon: null,
-                    content: t('shop.shop-setting'),
-                    onClick: () => console.log('Shop child clicked'),
-                },
-            ],
-        },
-    ];
-    return (
-        <div className='w-fit h-fit'>
-            <CommonNavigate navigateContext={navigateContext} />
-        </div>
-    )
+export default function VendorNavigate({ vendorContent }) {
+  return (
+    <SidebarProvider>
+      <Sidebar collapsible="icon">
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Quản lý</SidebarGroupLabel>
+            <SidebarMenu>
+              {data.navMain.map((item) => (
+                <Collapsible
+                  key={item.title}
+                  asChild
+                  defaultOpen={item.isActive}
+                  className="group/collapsible"
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton tooltip={item.title}>
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {item.items?.map((subItem) => (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton asChild>
+                              <a href={subItem.url}>
+                                <span>{subItem.title}</span>
+                              </a>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+          <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+            <SidebarGroupLabel>Cửa hàng của tôi</SidebarGroupLabel>
+            <SidebarMenu>
+              {data.projects.map((item) => (
+                <SidebarMenuItem key={item.name}>
+                  <SidebarMenuButton asChild>
+                    <a href={item.url}>
+                      <item.icon />
+                      <span>{item.name}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <div
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              >
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <SidebarTrigger className="size-4" />
+                </div>
+              </div>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
+      {
+        <SidebarInset>
+          <VendorHeader></VendorHeader>
+          {vendorContent}
+        </SidebarInset>
+      }
+    </SidebarProvider>
+  );
 }
-
-export default VendorNavigate;
