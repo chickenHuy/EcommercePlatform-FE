@@ -69,7 +69,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {["Số lượng thêm", "Đơn hàng hoàn thành", "Đơn hàng"].map(
+            {["Doanh thu ngày", "Đơn hàng hoàn thành", "Đơn hàng mới"].map(
               (item) => (
                 <Card
                   key={item}
