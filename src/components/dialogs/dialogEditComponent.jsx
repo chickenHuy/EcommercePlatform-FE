@@ -15,11 +15,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PlusCircle } from "lucide-react";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { post } from "@/lib/httpClient";
-import { useToast } from "@/hooks/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const FormSchema = z.object({
   name: z.string().min(2, {
@@ -29,69 +33,65 @@ const FormSchema = z.object({
 });
 
 export default function DialogEditComponent(props) {
-  const { edit, content, description, nameButton } = props;
+  const {
+    id,
+    name,
+    icon,
+    content,
+    nameButton,
+    typeDisplay,
+    initValue,
+    handleSaveChange,
+  } = props;
+  const [value, setValue] = useState(initValue);
   const [isOpen, setIsOpen] = useState(false);
-  const { toast } = useToast();
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: "",
+      name: value,
       required: false,
     },
   });
 
   const handleSubmit = (data) => {
-    editComponent(data);
+    handleSaveChange(data, id);
   };
-
-  function editComponent(data) {
-    post("/api/v1/components", data)
-      .then((res) => {
-        toast({
-          title: "Thành công",
-          description: "Cập nhật thành phần thành công",
-        });
-      })
-      .catch((error) => {
-        toast({
-          title: "Thất bại",
-          description: error.message,
-          variant: "destructive",
-        });
-      });
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {edit ? (
-          <span className="block w-full">{props.name}</span>
-        ) : (
-          <Button size="sm" className="h-7 gap-1">
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              {nameButton}
-            </span>
+        {typeDisplay === "button" ? (
+          <Button className="w-full h-fit flex flex-row justify-between items-center">
+            <span className="block w-full">{name}</span>
+            <span className="scale-75">{icon}</span>
           </Button>
+        ) : (
+          <div className="w-full h-fit flex flex-row justify-between items-center">
+            <span className="block w-full">{name}</span>
+            <span className="scale-75">{icon}</span>
+          </div>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>{content}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogTitle className="text-center font-extrabold pb-2">
+            {content}
+          </DialogTitle>
+          <DialogDescription>
+            {
+              "Các sản phẩm trong danh mục này có khả năng bổ sung thành phần vào thông số kỹ thuật."
+            }
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Tên TP
-            </Label>
-            <Input
-              placeholder="tên thành phần"
-              className="col-span-3"
-              {...form.register("name")}
-            />
-          </div>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-1">
+          <Label className="font-semibold">Tên Thành Phần</Label>
+          <Input
+            value={value}
+            placeholder="Tên thành phần"
+            {...form.register("name")}
+            onChange={(e) => setValue(e.target.value)}
+          />
           {form.formState.errors.name && (
             <div className="grid grid-cols-4 items-center gap-4">
               <p className="text-sm text-error col-start-2 col-span-3">
@@ -99,22 +99,29 @@ export default function DialogEditComponent(props) {
               </p>
             </div>
           )}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <div className="col-span-4 flex items-center justify-center space-x-2">
-              <Checkbox
-                id="required"
-                checked={form.watch("required")}
-                onCheckedChange={(checked) =>
-                  form.setValue("required", checked)
-                }
-              />
-              <label
-                htmlFor="isMandatory"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Bắt buộc người bán nhập mục này
-              </label>
-            </div>
+          <div className="flex items-center justify-start gap-2 py-3">
+            <Checkbox
+              id="required"
+              checked={form.watch("required")}
+              onCheckedChange={(checked) => form.setValue("required", checked)}
+            />
+            <label className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Bắt buộc
+            </label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger className="scale-75">
+                  <HelpOutlineIcon />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    {
+                      "Khi người bán thêm thông số kỹ thuật này vào sản phẩm của mình, họ bắt buộc phải nhập giá trị hợp lệ cho nó."
+                    }
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <DialogFooter>
             <Button type="submit">{nameButton}</Button>
