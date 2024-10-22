@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Eye, File, ListFilter, Lock, EyeClosed, LockOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -114,19 +114,7 @@ export default function ManageCustomer() {
     setSortType(sortType === type ? "" : type);
   };
 
-  useEffect(() => {
-    fetchCustomer();
-  }, [
-    totalPage,
-    currentPage,
-    totalElement,
-    tab,
-    sortType,
-    searchTerm,
-    password,
-  ]);
-
-  const fetchCustomer = async () => {
+  const fetchCustomer = useCallback(async () => {
     try {
       const response = await getAllCustomer(
         currentPage,
@@ -148,7 +136,11 @@ export default function ManageCustomer() {
         variant: "destructive",
       });
     }
-  };
+  }, [toast, currentPage, tab, sortType, searchTerm]);
+
+  useEffect(() => {
+    fetchCustomer();
+  }, [fetchCustomer, totalPage, totalElement, password]);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -211,12 +203,6 @@ export default function ManageCustomer() {
                     </DropdownMenuCheckboxItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button size="sm" variant="outline" className="h-7 gap-1">
-                  <File className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Export
-                  </span>
-                </Button>
               </div>
             </div>
             <TabsContent value={tab}>

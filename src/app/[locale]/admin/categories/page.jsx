@@ -34,7 +34,7 @@ import { useToast } from "@/hooks/use-toast";
 import { deleteCategory, getAllCategory } from "@/api/admin/categoryRequest";
 import EditCategory from "./editCategories";
 import DialogConfirm from "@/components/dialogs/dialogConfirm";
-import { set } from "react-hook-form";
+import { useSelector } from "react-redux";
 
 export default function ManageCategories() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -48,6 +48,7 @@ export default function ManageCategories() {
   const [isDialogConfirmOpen, setIsDialogConfirmOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [categoryTableName, setCategoryTableName] = useState(null);
+  var searchTerm = useSelector((state) => state.searchReducer.searchTerm);
 
   const handleNextPage = () => {
     console.log("Current page:", currentPage, "Total page:", totalPage);
@@ -83,7 +84,7 @@ export default function ManageCategories() {
 
   const fetchCategory = useCallback(async () => {
     try {
-      const response = await getAllCategory(currentPage, sortType);
+      const response = await getAllCategory(currentPage, sortType, searchTerm);
       setCategories(response.result.data);
       console.log("Categories: ", response.result.data);
       setTotalPage(response.result.totalPages);
@@ -98,7 +99,7 @@ export default function ManageCategories() {
         variant: "destructive",
       });
     }
-  }, [toast, currentPage, sortType]);
+  }, [toast, currentPage, sortType, searchTerm]);
 
   useEffect(() => {
     fetchCategory();

@@ -58,7 +58,7 @@ export default function ManageBrand() {
   const [isDialogConfirmOpen, setIsDialogConfirmOpen] = useState(false);
   const [brandToDelete, setBrandToDelete] = useState(null);
   const [brandTableName, setBrandTableName] = useState(null);
-  var searchTerm  = useSelector((state) => state.searchReducer.searchTerm); 
+  var searchTerm = useSelector((state) => state.searchReducer.searchTerm);
 
   const handleNextPage = () => {
     console.log("Current page:", currentPage, "Total page:", totalPage);
@@ -220,12 +220,6 @@ export default function ManageBrand() {
                 </DropdownMenuCheckboxItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button size="sm" variant="outline" className="h-7 gap-1">
-              <File className="h-3.5 w-3.5" />
-              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Export
-              </span>
-            </Button>
             <Button
               variant="outline"
               size="sm"
