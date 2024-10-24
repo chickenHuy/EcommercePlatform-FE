@@ -236,7 +236,7 @@ function AdminHeader() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem>
-              <Link href="/admin/setting/profile">Tài khoản của tôi</Link>
+              <Link href="/user">Tài khoản của tôi</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
