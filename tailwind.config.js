@@ -54,12 +54,22 @@ module.exports = {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			},
-			error: {
-                    DEFAULT: '#f56565', // Màu đỏ mặc định
-                    light: '#feb2b2',   // Màu đỏ nhạt hơn
-                    dark: '#c53030',    // Màu đỏ đậm hơn
-                    foreground: '#fff'  // Màu chữ của báo lỗi
-                }
+  			error: {
+  				DEFAULT: '#f56565',
+  				light: '#feb2b2',
+  				dark: '#c53030',
+  				foreground: '#fff'
+  			},
+  			sidebar: {
+  				DEFAULT: 'hsl(var(--sidebar-background))',
+  				foreground: 'hsl(var(--sidebar-foreground))',
+  				primary: 'hsl(var(--sidebar-primary))',
+  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+  				accent: 'hsl(var(--sidebar-accent))',
+  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+  				border: 'hsl(var(--sidebar-border))',
+  				ring: 'hsl(var(--sidebar-ring))'
+  			}
   		}
   	},
   	colors: {
