@@ -60,8 +60,7 @@ export default function ManageAdmin() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [password, setPassword] = useState(null);
 
-  var searchTerm  = useSelector((state) => state.searchReducer.searchTerm);  
-
+  var searchTerm = useSelector((state) => state.searchReducer.searchTerm);
 
   const handleNextPage = () => {
     console.log("Current page:", currentPage, "Total page:", totalPage);
@@ -115,7 +114,12 @@ export default function ManageAdmin() {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await getAllAdmin(currentPage, tab, sortType, searchTerm);
+      const response = await getAllAdmin(
+        currentPage,
+        tab,
+        sortType,
+        searchTerm
+      );
       setAdmins(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
@@ -197,12 +201,6 @@ export default function ManageAdmin() {
                     </DropdownMenuCheckboxItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button size="sm" variant="outline" className="h-7 gap-1">
-                  <File className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Export
-                  </span>
-                </Button>
               </div>
             </div>
             <TabsContent value={tab}>

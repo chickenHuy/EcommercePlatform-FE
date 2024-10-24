@@ -91,7 +91,7 @@ export default function DrawerAdminDetail({ isOpen, onClose, adminId }) {
               {/* Giới tính */}
               <div className="mb-2">
                 <p className="font-medium">Giới tính:</p>
-                <p>{admin?.gender}</p>
+                <p>{admin?.gender ? admin.gender : "trống"}</p>
               </div>
               {/* Trạng thái tài khoản */}
               <div className="mb-2">

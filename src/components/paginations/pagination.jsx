@@ -21,6 +21,8 @@ import { Button } from "@/components/ui/button";
 
 export function PaginationAdminTable(props) {
   const {
+    hasNext,
+    hasPrevious,
     handleNextPage,
     handlePrevPage,
     currentPage,
@@ -32,7 +34,16 @@ export function PaginationAdminTable(props) {
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          {currentPage > 1 && <PaginationPrevious onClick={handlePrevPage} />}
+          <PaginationPrevious
+            className={`${
+              hasPrevious ? "cursor-pointer" : "cursor-not-allowed"
+            }`}
+            onClick={() => {
+              if (hasPrevious) {
+                handlePrevPage();
+              }
+            }}
+          />
         </PaginationItem>
 
         {currentPage > 1
@@ -94,9 +105,14 @@ export function PaginationAdminTable(props) {
         </PaginationItem>
 
         <PaginationItem>
-          {currentPage < totalPage && (
-            <PaginationNext onClick={handleNextPage} />
-          )}
+          <PaginationNext
+            className={`${hasNext ? "cursor-pointer" : "cursor-not-allowed"}`}
+            onClick={() => {
+              if (hasNext) {
+                handleNextPage();
+              }
+            }}
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

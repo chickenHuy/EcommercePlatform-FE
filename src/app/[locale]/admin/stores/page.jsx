@@ -165,12 +165,6 @@ export default function ManageStores() {
                     </DropdownMenuCheckboxItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button size="sm" variant="outline" className="h-7 gap-1">
-                  <File className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Export
-                  </span>
-                </Button>
               </div>
             </div>
             <TabsContent value="all">
@@ -212,13 +206,15 @@ export default function ManageStores() {
                           <TableCell className="font-medium">
                             {new Date(store.created_at).toLocaleString()}{" "}
                           </TableCell>
-                          <TableCell className="hidden md:table-cell">
+                          <TableCell className="flex items-center space-x-2">
                             <Rating
-                              value={store.rating}
+                              value={store?.rating ? store?.rating : 0}
+                              precision={0.1}
                               readOnly
-                              className=""
                             />
+                            <span>({store?.rating ? store?.rating : 0})</span>
                           </TableCell>
+
                           <TableCell className="hidden md:table-cell">
                             <Button
                               aria-haspopup="true"

@@ -11,18 +11,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { use, useEffect, useState } from "react";
-import { get } from "@/lib/httpClient";
 import { getUserById } from "@/api/admin/customerRequest";
 
-export default function DrawerUserDetail({ isOpen, onClose, userId }) {
+export default function DrawerCustomerDetail({ isOpen, onClose, userId }) {
   const { toast } = useToast();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetchUser();
+    fetchCustomer();
   }, []);
 
-  const fetchUser = async () => {
+  const fetchCustomer = async () => {
     try {
       const response = await getUserById(userId);
       setUser(response.result);
@@ -30,7 +29,7 @@ export default function DrawerUserDetail({ isOpen, onClose, userId }) {
     } catch (error) {
       toast({
         title: "Lấy thông tin thất bại",
-        description: "Không thể lấy thông tin người dùng",
+        description: "Không thể lấy thông tin khách hàng",
         variant: "destructive",
       });
     }
@@ -40,7 +39,7 @@ export default function DrawerUserDetail({ isOpen, onClose, userId }) {
       <DrawerContent>
         <div className="mx-auto w-full max-w-sm">
           <DrawerHeader>
-            <DrawerTitle>Người dùng</DrawerTitle>
+            <DrawerTitle>Khách hàng</DrawerTitle>
             <DrawerDescription>
               Thông tin chi tiết về khách hàng
             </DrawerDescription>
@@ -60,7 +59,7 @@ export default function DrawerUserDetail({ isOpen, onClose, userId }) {
               {/* Tên */}
               <div className="text-center">
                 <h3 className="text-lg font-semibold">
-                  {user?.name ? user.name : "Chưa đặt tên"}
+                  {user?.name ? user.name : "Chưa có tên"}
                 </h3>
                 {/* Username */}
                 <p className="text-sm text-muted-foreground">
@@ -90,7 +89,7 @@ export default function DrawerUserDetail({ isOpen, onClose, userId }) {
               {/* Giới tính */}
               <div className="mb-2">
                 <p className="font-medium">Giới tính:</p>
-                <p>{user?.gender}</p>
+                <p>{user?.gender ? user.gender : "trống"}</p>
               </div>
               {/* Trạng thái tài khoản */}
               <div className="mb-2">
