@@ -101,6 +101,10 @@ export default function ManageStores() {
   }, [toast, currentPage, tab, sortType, searchTerm]);
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
     fetchStore();
   }, [fetchStore, totalPage, totalElement]);
 

@@ -98,6 +98,10 @@ export default function ManageBrand() {
   }, [toast, currentPage, sortType, searchTerm]);
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
     fetchBrand();
   }, [fetchBrand, totalPage, totalElement]);
 

@@ -102,6 +102,10 @@ export default function ManageCategories() {
   }, [toast, currentPage, sortType, searchTerm]);
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
     fetchCategory();
   }, [fetchCategory, totalPage, totalElement, isDrawerOpen]);
 

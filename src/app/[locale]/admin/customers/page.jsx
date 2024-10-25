@@ -73,7 +73,7 @@ export default function ManageCustomer() {
 
   const handleCustomerAccount = async (accountId) => {
     try {
-      const result = await handleAccountCustomer(accountId, password);
+      await handleAccountCustomer(accountId, password);
       toast({
         tiltel: "Thành công",
         description: "Thay đổi trạng thái tài khoản thành công",
@@ -137,6 +137,10 @@ export default function ManageCustomer() {
       });
     }
   }, [toast, currentPage, tab, sortType, searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   useEffect(() => {
     fetchCustomer();

@@ -137,6 +137,10 @@ export default function ManageAdmin() {
   }, [toast, currentPage, tab, sortType, searchTerm]);
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
     fetchData();
   }, [fetchData, totalPage, totalElement, password]);
 
