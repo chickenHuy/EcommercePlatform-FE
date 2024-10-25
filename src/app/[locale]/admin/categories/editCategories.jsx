@@ -56,7 +56,7 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { getAllComponent } from "@/api/admin/componentRequest";
+import { getAllComponent } from "@/api/admin/componentRequest.jsx";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -159,7 +159,7 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
       const newCategoryData = {
         name: data.name,
         description:
-          data.description.trim() === "" ? null : data.description.trim(),
+          data.description?.trim() === "" ? null : data.description.trim(),
         parentId: data.parentId,
       };
 
