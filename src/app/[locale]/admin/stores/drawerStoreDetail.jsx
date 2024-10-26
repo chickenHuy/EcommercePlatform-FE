@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Rating } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getStoreById } from "@/api/admin/storeRequest";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,15 +17,10 @@ export default function DrawerStoreDetail({ isOpen, onClose, storeId }) {
   const { toast } = useToast();
   const [store, setStore] = useState(null);
 
-  useEffect(() => {
-    fetchStore();
-  }, []);
-
-  const fetchStore = async () => {
+  const fetchStore = useCallback(async () => {
     try {
       const response = await getStoreById(storeId);
       setStore(response.result);
-      console.log("store: ", response.result);
     } catch (error) {
       toast({
         title: "Lấy thông tin thất bại",
@@ -33,7 +28,11 @@ export default function DrawerStoreDetail({ isOpen, onClose, storeId }) {
         variant: "destructive",
       });
     }
-  };
+  }, [storeId, toast]);
+
+  useEffect(() => {
+    fetchStore();
+  }, [fetchStore]);
 
   return (
     <Drawer open={isOpen} onClose={onClose}>
@@ -77,12 +76,8 @@ export default function DrawerStoreDetail({ isOpen, onClose, storeId }) {
             {/* Bên phải */}
             <div className="w-1/2">
               <div className="mb-2">
-                <p className="font-medium">Tổng số người theo dõi</p>
-                <p>{store?.totalFollower ? store?.totalFollower : "trống"}</p>
-              </div>
-              <div className="mb-2">
                 <p className="font-medium">Tổng số sản phẩm</p>
-                <p>{store?.totalProduct ? store?.totalProduct : "trống"}</p>
+                <p>{store?.totalProduct ? store?.totalProduct : 0}</p>
               </div>
               <div className="mb-2">
                 <p className="font-medium">Trạng thái cửa hàng:</p>
