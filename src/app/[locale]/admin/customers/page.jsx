@@ -107,7 +107,6 @@ export default function ManageCustomer() {
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
     setSelectedUserId(null);
-    console.log("Close Drawer");
   };
 
   const handleSortChange = (type) => {
