@@ -22,9 +22,9 @@ export const getAddressStore = async (userId) => {
   }
 };
 
-export const updateStore = async (userId, storeData) => {
+export const updateStore = async (storeData) => {
   try {
-    const response = await put(`/api/v1/stores/${userId}`, storeData);
+    const response = await put(`/api/v1/stores/update-store`, storeData);
     return response;
   } catch (error) {
     console.error("Error during update store:", error);

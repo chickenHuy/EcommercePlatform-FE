@@ -14,6 +14,7 @@ import { Rating } from "@mui/material";
 import { getStore, updateStore } from "@/api/vendor/storeRequest";
 import CbbAddresses from "./cbbDefaultAddress";
 import { Toaster } from "@/components/ui/toaster";
+import Cookies from "js-cookie";
 
 const storeSchema = z.object({
   name: z.string().trim().min(1, {
@@ -73,8 +74,7 @@ export default function ManageStoreInfo() {
     };
     console.log("Payload: ", payload);
     try {
-      const userId = "acc3420c-5db5-481e-b2e7-761cad8263d5";
-      const updated = await updateStore(userId, payload);
+      const updated = await updateStore(payload);
       toast({
         title: "Thành công",
         description: "Thông tin cửa hàng đã được cập nhật",
