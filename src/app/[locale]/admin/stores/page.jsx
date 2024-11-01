@@ -69,7 +69,6 @@ export default function ManageStores() {
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
     setSelectedStoreId(null);
-    console.log("Close Drawer");
   };
 
   const handleSortChange = (type) => {

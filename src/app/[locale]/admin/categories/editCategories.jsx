@@ -292,7 +292,6 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                               type="text"
                               className="w-full"
                               placeholder="Tên danh mục"
-                              value={category?.name}
                             />
                             {errors.name && (
                               <p className="text-error text-sm">
@@ -308,7 +307,6 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                               className="min-h-32"
                               defaultValue=""
                               {...register("description")}
-                              value={category?.description}
                             />
                           </div>
                         </div>

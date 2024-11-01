@@ -19,7 +19,7 @@ const storeSchema = z.object({
   name: z.string().trim().min(1, {
     message: "Họ và tên không được để trống",
   }),
-  bio: z.string().trim(),
+  bio: z.string().nullable(),
 });
 
 export default function ManageStoreInfo() {
@@ -65,7 +65,10 @@ export default function ManageStoreInfo() {
   const handleUpdate = async (storeData) => {
     const payload = {
       ...storeData,
-      bio: storeData.bio.trim() === "" ? null : storeData.bio.trim(),
+      bio:
+        storeData.bio && storeData.bio.trim() === ""
+          ? null
+          : storeData.bio?.trim(),
       defaultAddressId: selectedAddress?.defaultAddressId,
     };
     console.log("Payload: ", payload);
