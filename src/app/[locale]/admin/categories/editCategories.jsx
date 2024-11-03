@@ -101,7 +101,7 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
           setSelectedComponent(response.result.listComponent);
           reset({
             name: response.result.name,
-            description: response.result.description,
+            description: (response.result.description )  ? response.result.description : null,
             parentId: response.result.parentId,
           });
         } else {
@@ -159,7 +159,8 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
       const newCategoryData = {
         name: data.name,
         description:
-          data.description?.trim() === "" ? null : data.description.trim(),
+          data.description ? data.description.trim()
+           : null,
         parentId: data.parentId,
       };
 
