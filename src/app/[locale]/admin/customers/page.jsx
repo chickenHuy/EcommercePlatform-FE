@@ -62,6 +62,9 @@ export default function ManageCustomer() {
   const [totalElement, setTotalElement] = useState(0);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [password, setPassword] = useState(null);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrevious, setHasPrevious] = useState(false);
+
   var searchTerm = useSelector((state) => state.searchReducer.searchTerm);
 
   const handleNextPage = () => {
@@ -124,6 +127,8 @@ export default function ManageCustomer() {
       setCustomers(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
+      setHasNext(response.result.hasNext);
+      setHasPrevious(response.result.hasPrevious);
     } catch (error) {
       console.error("Error fetching customers:", error);
       toast({
@@ -361,6 +366,8 @@ export default function ManageCustomer() {
                     handlePrevPage={handlePrevPage}
                     totalPage={totalPage}
                     setCurrentPage={setCurrentPage}
+                    hasNext={hasNext}
+                    hasPrevious={hasPrevious}
                   />
                 </CardFooter>
               </Card>
