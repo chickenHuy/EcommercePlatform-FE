@@ -80,11 +80,11 @@ const data = {
       items: [
         {
           title: "Thêm sản phẩm",
-          url: "#",
+          url: "/vendor/products/create",
         },
         {
           title: "Danh sách sản phẩm",
-          url: "#",
+          url: "/vendor/products",
         },
       ],
     },
