@@ -39,6 +39,10 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import VendorHeader from "../headers/vendorHeader";
+import { useDispatch } from "react-redux";
+import { setSearch } from "@/store/features/orderSearchSlice";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 const data = {
   navMain: [
     {
@@ -49,27 +53,33 @@ const data = {
       items: [
         {
           title: "Tất cả",
-          url: "#",
+          url: "/vendor/orders",
+          searchKey: "",
         },
         {
           title: "Chờ xác nhận",
-          url: "#",
+          url: "/vendor/orders",
+          searchKey: "CONFIRMING",
         },
         {
           title: "Chờ vận chuyển",
-          url: "#",
+          url: "/vendor/orders",
+          searchKey: "WAITING",
         },
         {
           title: "Đang vận chuyển",
-          url: "#",
+          url: "/vendor/orders",
+          searchKey: "SHIPPING",
         },
         {
           title: "Hoàn thành",
-          url: "#",
+          url: "/vendor/orders",
+          searchKey: "COMPLETED",
         },
         {
           title: "Đã huỷ",
-          url: "#",
+          url: "/vendor/orders",
+          searchKey: "CANCELED",
         },
       ],
     },
@@ -124,6 +134,27 @@ const data = {
 };
 
 export default function VendorNavigate({ vendorContent }) {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const [activeItem, setActiveItem] = useState("");
+
+  const handleSetSearch = (searchKey, url) => {
+    dispatch(setSearch(searchKey));
+    setActiveItem(searchKey);
+    router.push(url);
+  };
+
+  useEffect(() => {
+    if (router && router.asPath) {
+      const path = router.asPath;
+      if (path.includes("/vendor/orders")) {
+        setActiveItem("");
+      } else {
+        setActiveItem(null);
+      }
+    }
+  }, [router, router.asPath]);
+
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
@@ -151,9 +182,21 @@ export default function VendorNavigate({ vendorContent }) {
                         {item.items?.map((subItem) => (
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton asChild>
-                              <a href={subItem.url}>
-                                <span>{subItem.title}</span>
-                              </a>
+                              <button
+                                className={`block px-4 py-2 rounded-md text-left ${
+                                  activeItem === subItem.searchKey
+                                    ? "font-bold bg-gray-200"
+                                    : "font-normal"
+                                }`}
+                                onClick={() =>
+                                  handleSetSearch(
+                                    subItem.searchKey,
+                                    subItem.url
+                                  )
+                                }
+                              >
+                                {subItem.title}
+                              </button>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         ))}
