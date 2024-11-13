@@ -58,6 +58,8 @@ export default function ManageBrand() {
   const [isDialogConfirmOpen, setIsDialogConfirmOpen] = useState(false);
   const [brandToDelete, setBrandToDelete] = useState(null);
   const [brandTableName, setBrandTableName] = useState(null);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrevious, setHasPrevious] = useState(false);
   var searchTerm = useSelector((state) => state.searchReducer.searchTerm);
 
   const handleNextPage = () => {
@@ -84,6 +86,8 @@ export default function ManageBrand() {
       setBrands(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
+      setHasNext(response.result.hasNext);
+      setHasPrevious(response.result.hasPrevious);
     } catch (error) {
       console.error("Error fetching brands:", error);
       toast({
@@ -96,6 +100,10 @@ export default function ManageBrand() {
       });
     }
   }, [toast, currentPage, sortType, searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   useEffect(() => {
     fetchBrand();
@@ -323,6 +331,8 @@ export default function ManageBrand() {
                 handlePrevPage={handlePrevPage}
                 totalPage={totalPage}
                 setCurrentPage={setCurrentPage}
+                hasNext={hasNext}
+                hasPrevious={hasPrevious}
               />
             </CardFooter>
           </Card>

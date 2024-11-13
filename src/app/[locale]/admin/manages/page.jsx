@@ -59,6 +59,8 @@ export default function ManageAdmin() {
   const [totalElement, setTotalElement] = useState(0);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [password, setPassword] = useState(null);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrevious, setHasPrevious] = useState(false);
 
   var searchTerm = useSelector((state) => state.searchReducer.searchTerm);
 
@@ -123,6 +125,8 @@ export default function ManageAdmin() {
       setAdmins(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
+      setHasNext(response.result.hasNext);
+      setHasPrevious(response.result.hasPrevious);
     } catch (error) {
       console.error("Error fetching stores:", error);
       toast({
@@ -135,6 +139,10 @@ export default function ManageAdmin() {
       });
     }
   }, [toast, currentPage, tab, sortType, searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   useEffect(() => {
     fetchData();
@@ -357,6 +365,8 @@ export default function ManageAdmin() {
                     handlePrevPage={handlePrevPage}
                     totalPage={totalPage}
                     setCurrentPage={setCurrentPage}
+                    hasNext={hasNext}
+                    hasPrevious={hasPrevious}
                   />
                 </CardFooter>
               </Card>

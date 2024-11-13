@@ -56,7 +56,7 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { getAllComponent } from "@/api/admin/componentRequest";
+import { getAllComponent } from "@/api/admin/componentRequest.jsx";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -101,7 +101,7 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
           setSelectedComponent(response.result.listComponent);
           reset({
             name: response.result.name,
-            description: response.result.description,
+            description: (response.result.description )  ? response.result.description : null,
             parentId: response.result.parentId,
           });
         } else {
@@ -158,7 +158,8 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
       const newCategoryData = {
         name: data.name,
         description:
-          data.description,
+          data.description ? data.description.trim()
+           : null,
         parentId: data.parentId,
       };
 
@@ -289,7 +290,6 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                               type="text"
                               className="w-full"
                               placeholder="Tên danh mục"
-                              value={category?.name}
                             />
                             {errors.name && (
                               <p className="text-error text-sm">
@@ -305,7 +305,6 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
                               className="min-h-32"
                               defaultValue=""
                               {...register("description")}
-                              value={category?.description}
                             />
                           </div>
                         </div>

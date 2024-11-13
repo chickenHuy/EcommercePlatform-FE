@@ -61,4 +61,8 @@ const del = (endpoint, options = {}) => {
   return request(endpoint, { method: "DELETE", ...options });
 };
 
-export { get, post, put, del };
+const patch = (endpoint, body, options = {}) => {
+  return request(endpoint, { method: "PATCH", body, ...options });
+}
+
+export { get, post, put, del, patch };

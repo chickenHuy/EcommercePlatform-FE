@@ -45,6 +45,8 @@ export default function ManageStores() {
   const [tab, setTab] = useState("all");
   const [sortType, setSortType] = useState("");
   const [totalElement, setTotalElement] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrevious, setHasPrevious] = useState(false);
   var searchTerm = useSelector((state) => state.searchReducer.searchTerm);
 
   const handleNextPage = () => {
@@ -69,7 +71,6 @@ export default function ManageStores() {
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
     setSelectedStoreId(null);
-    console.log("Close Drawer");
   };
 
   const handleSortChange = (type) => {
@@ -87,6 +88,8 @@ export default function ManageStores() {
       setStores(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
+      setHasNext(response.result.hasNext);
+      setHasPrevious(response.result.hasPrevious);
     } catch (error) {
       console.error("Error fetching stores:", error);
       toast({
@@ -99,6 +102,10 @@ export default function ManageStores() {
       });
     }
   }, [toast, currentPage, tab, sortType, searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   useEffect(() => {
     fetchStore();
@@ -237,6 +244,8 @@ export default function ManageStores() {
                     handlePrevPage={handlePrevPage}
                     totalPage={totalPage}
                     setCurrentPage={setCurrentPage}
+                    hasNext={hasNext}
+                    hasPrevious={hasPrevious}
                   />
                 </CardFooter>
               </Card>

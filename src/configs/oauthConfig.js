@@ -3,3 +3,9 @@ export const OAuthConfig = {
   redirectUri: "http://localhost:3000/authenticate",
   authUri: "https://accounts.google.com/o/oauth2/auth",
 };
+
+export const FacebookOAuthConfig = {
+  clientId: "1699360190637263",
+  redirectUri: "http://localhost:3000/facebook-authenticate",
+  authUri: "https://facebook.com/v21.0/dialog/oauth",
+};
