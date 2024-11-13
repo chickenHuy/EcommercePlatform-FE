@@ -276,6 +276,7 @@ function VendorHeader() {
               <MenuItem
                 menuIcon={<StorefrontOutlinedIcon />}
                 menuContext={t("userOptionsMenu.shop-information")}
+                onClick={() => router.push("/vendor/store")}
               />,
               <MenuItem
                 menuIcon={<SettingsOutlinedIcon />}

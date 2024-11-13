@@ -48,6 +48,7 @@ export default function ManageOrders() {
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
   const search = useSelector((state) => state.orderSearch.value);
+  const showFilter = useSelector((state) => state.orderSearch.showFilter);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isDialogUpdateOrderStatusOpen, setIsDialogUpdateOrderStatusOpen] =
@@ -228,29 +229,31 @@ export default function ManageOrders() {
                 </DropdownMenuCheckboxItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-7 gap-1">
-                  <ListFilter className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Lọc
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Lọc theo trạng thái</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {dropdownItems.map((item) => (
-                  <DropdownMenuCheckboxItem
-                    key={item.key}
-                    onClick={() => handleSearchChange(item.key)}
-                    checked={search === item.key}
-                  >
-                    {item.label}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {showFilter && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-7 gap-1">
+                    <ListFilter className="h-3.5 w-3.5" />
+                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                      Lọc
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Lọc theo trạng thái</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {dropdownItems.map((item) => (
+                    <DropdownMenuCheckboxItem
+                      key={item.key}
+                      onClick={() => handleSearchChange(item.key)}
+                      checked={search === item.key}
+                    >
+                      {item.label}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>

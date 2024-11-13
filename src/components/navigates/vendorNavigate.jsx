@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/sidebar";
 import VendorHeader from "../headers/vendorHeader";
 import { useDispatch } from "react-redux";
-import { setSearch } from "@/store/features/orderSearchSlice";
+import { setSearch, setShowFilter } from "@/store/features/orderSearchSlice";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 const data = {
@@ -138,8 +138,9 @@ export default function VendorNavigate({ vendorContent }) {
   const router = useRouter();
   const [activeItem, setActiveItem] = useState("");
 
-  const handleSetSearch = (searchKey, url) => {
+  const handleSetSearch = (searchKey, url, showFilter) => {
     dispatch(setSearch(searchKey));
+    dispatch(setShowFilter(showFilter));
     setActiveItem(searchKey);
     router.push(url);
   };
@@ -183,15 +184,16 @@ export default function VendorNavigate({ vendorContent }) {
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton asChild>
                               <button
-                                className={`block px-4 py-2 rounded-md text-left ${
+                                className={`w-full hover:cursor-pointer ${
                                   activeItem === subItem.searchKey
-                                    ? "font-bold bg-gray-200"
+                                    ? "font-bold"
                                     : "font-normal"
                                 }`}
                                 onClick={() =>
                                   handleSetSearch(
                                     subItem.searchKey,
-                                    subItem.url
+                                    subItem.url,
+                                    subItem.searchKey === ""
                                   )
                                 }
                               >
