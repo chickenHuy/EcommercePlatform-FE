@@ -22,6 +22,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 
 export default function ViewOrderDetail(props) {
@@ -61,18 +62,24 @@ export default function ViewOrderDetail(props) {
 
   function getStatusOrder(status) {
     switch (status) {
-      case "CONFIRMING":
+      case "ON_HOLD":
+        return "Chờ thanh toán";
+      case "PENDING":
         return "Chờ xác nhận";
-      case "WAITING":
-        return "Chờ vận chuyển";
-      case "SHIPPING":
-        return "Đang vận chuyển";
-      case "COMPLETED":
+      case "CONFIRMED":
+        return "Đã xác nhận";
+      case "PREPARING":
+        return "Chuẩn bị hàng";
+      case "WAITING_FOR_SHIPPING":
+        return "Chờ giao cho ĐVVC";
+      case "PICKED_UP":
+        return "Đã giao cho ĐVVC";
+      case "OUT_FOR_DELIVERY":
+        return "Đang giao hàng";
+      case "DELIVERED":
         return "Hoàn thành";
-      case "CANCELED":
+      case "CANCELLED":
         return "Đã hủy";
-      case "NA":
-        return "N/A";
       default:
         return "N/A";
     }
@@ -124,13 +131,12 @@ export default function ViewOrderDetail(props) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <h2 className="text-2xl font-semibold">
-                        Mã đơn hàng: {order?.code}
+                        Mã đơn hàng: #{order?.id}
                       </h2>
                       <div className="flex items-center space-x-2">
                         <Badge variant="outline">
-                          {getStatusOrder(order ? order.currentStatus : "NA")}
+                          {getStatusOrder(order?.currentStatus)}
                         </Badge>
-                        <Badge variant="outline">Chưa thanh toán</Badge>
                       </div>
                     </div>
                   </div>
@@ -199,7 +205,7 @@ export default function ViewOrderDetail(props) {
                           Tóm tắt đơn hàng
                         </CardTitle>
                         <CardDescription>
-                          Tóm tắt chi tiết về đơn hàng của bạn
+                          Tóm tắt chi tiết về đơn hàng #{order?.id}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -241,12 +247,12 @@ export default function ViewOrderDetail(props) {
                       </CardContent>
                       <CardFooter className="flex justify-between items-center p-4 border-t">
                         <p className="text-sm text-muted-foreground">
-                          Xem lại đơn hàng của bạn một cách nhanh chóng trên
-                          trang Đơn hàng
+                          Xem lại đơn hàng của một cách nhanh chóng trên trang
+                          Đơn hàng
                         </p>
-                        <div className="flex gap-2">
+                        <a href="/vendor/orders" className="flex gap-2">
                           <Button variant="outline">Xem tất cả đơn hàng</Button>
-                        </div>
+                        </a>
                       </CardFooter>
                     </Card>
                   </div>

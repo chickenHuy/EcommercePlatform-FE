@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpDown, CalendarCog, ListFilter } from "lucide-react";
+import { ArrowUpDown, CalendarCog, ListFilter, SquareX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,7 +14,10 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -29,7 +32,11 @@ import {
 import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { Toaster } from "@/components/ui/toaster";
 import { useCallback, useEffect, useState } from "react";
-import { getAllOrder, updateOrderStatus } from "@/api/vendor/orderRequest";
+import {
+  cancelOrderBySeller,
+  getAllOrderBySeller,
+  updateOrderStatusBySeller,
+} from "@/api/vendor/orderRequest";
 import { Input } from "@/components/ui/input";
 import { Search } from "@mui/icons-material";
 import { useToast } from "@/hooks/use-toast";
@@ -43,7 +50,8 @@ export default function ManageOrders() {
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const [sortType, setSortType] = useState("newest");
+  const [sortType, setSortType] = useState("");
+  const [orderType, setOrderType] = useState("");
   const [totalElement, setTotalElement] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
@@ -54,7 +62,8 @@ export default function ManageOrders() {
   const [isDialogUpdateOrderStatusOpen, setIsDialogUpdateOrderStatusOpen] =
     useState(false);
   const [orderToUpdate, setOrderToUpdate] = useState(null);
-  const [orderCode, setOrderCode] = useState(null);
+  const [orderToCancel, setOrderToCancel] = useState(null);
+  const [actionType, setActionType] = useState("");
   const dispatch = useDispatch();
   const { toast } = useToast();
 
@@ -70,8 +79,12 @@ export default function ManageOrders() {
     }
   };
 
-  const handleSortChange = (type) => {
-    setSortType(sortType === type ? "" : type);
+  const handleSortChange = (value) => {
+    setSortType(value);
+  };
+
+  const handleOrderChange = (value) => {
+    setOrderType(value);
   };
 
   const handleSearchChange = (searchKey) => {
@@ -79,19 +92,23 @@ export default function ManageOrders() {
     setCurrentPage(1);
   };
 
-  const dropdownItems = [
-    { label: "Tất cả", key: "" },
-    { label: "Chờ xác nhận", key: "CONFIRMING" },
-    { label: "Chờ vận chuyển", key: "WAITING" },
-    { label: "Đang vận chuyển", key: "SHIPPING" },
-    { label: "Hoàn thành", key: "COMPLETED" },
-    { label: "Đã hủy", key: "CANCELED" },
-  ];
-
   const handleOnChange = (value) => {
-    setSearch(value);
+    dispatch(setSearch(value));
     setCurrentPage(1);
   };
+
+  const dropdownItems = [
+    { label: "Tất cả", key: "" },
+    { label: "Chờ thanh toán", key: "ON_HOLD" },
+    { label: "Chờ xác nhận", key: "PENDING" },
+    { label: "Đã xác nhận", key: "CONFIRMED" },
+    { label: "Chuẩn bị hàng", key: "PREPARING" },
+    { label: "Chờ vận chuyển", key: "WAITING_FOR_SHIPPING" },
+    { label: "Đã giao cho ĐVVC", key: "PICKED_UP" },
+    { label: "Đang giao hàng", key: "OUT_FOR_DELIVERY" },
+    { label: "Hoàn thành", key: "DELIVERED" },
+    { label: "Đã hủy", key: "CANCELLED" },
+  ];
 
   const handleRowClick = (orderId) => {
     setIsDrawerOpen(true);
@@ -102,37 +119,68 @@ export default function ManageOrders() {
     setIsDrawerOpen(false);
   };
 
-  const handleUpdateButtonClick = (order, orderId, orderCode) => {
+  const handleUpdateButtonClick = (order, orderId) => {
     setIsDialogUpdateOrderStatusOpen(true);
     setOrderToUpdate(order);
     setSelectedOrder(orderId);
-    setOrderCode(orderCode);
+    setActionType("update");
+  };
+
+  const handleCancelButtonClick = (order, orderId) => {
+    setIsDialogUpdateOrderStatusOpen(true);
+    setOrderToCancel(order);
+    setSelectedOrder(orderId);
+    setActionType("cancel");
   };
 
   const confirmUpdateOrderStatus = async () => {
     if (orderToUpdate) {
       try {
-        await updateOrderStatus(orderToUpdate.id);
+        await updateOrderStatusBySeller(orderToUpdate.id);
         toast({
           title: "Thành công",
-          description: `Đơn hàng "${orderToUpdate.code}" đã được cập nhật trạng thái thành công`,
+          description: `Đơn hàng "${orderToUpdate.id}" đã được cập nhật trạng thái`,
         });
-        fetchAllOrder();
+        fetchAllOrderBySeller();
         setIsDialogUpdateOrderStatusOpen(false);
       } catch (error) {
         toast({
           title: "Thất bại",
-          description: `Đơn hàng "${orderToUpdate.code}" đã được cập nhật trạng thái thất bại`,
+          description: error.message,
           variant: "destructive",
         });
       }
     }
   };
 
-  const fetchAllOrder = useCallback(async () => {
+  const confirmCancelOrder = async () => {
+    if (orderToCancel) {
+      try {
+        await cancelOrderBySeller(orderToCancel.id);
+        toast({
+          title: "Thành công",
+          description: `Đơn hàng "${orderToCancel.id}" đã được hủy`,
+        });
+        fetchAllOrderBySeller();
+        setIsDialogUpdateOrderStatusOpen(false);
+      } catch (error) {
+        toast({
+          title: "Thất bại",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const fetchAllOrderBySeller = useCallback(async () => {
     try {
-      const response = await getAllOrder(currentPage, sortType, search);
-      console.log("All order of store: ", response);
+      const response = await getAllOrderBySeller(
+        currentPage,
+        sortType,
+        orderType,
+        search
+      );
       setOrders(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
@@ -148,11 +196,15 @@ export default function ManageOrders() {
         variant: "destructive",
       });
     }
-  }, [toast, currentPage, sortType, search]);
+  }, [toast, currentPage, sortType, orderType, search]);
 
   useEffect(() => {
-    fetchAllOrder();
-  }, [fetchAllOrder, totalPage, totalElement]);
+    setCurrentPage(1);
+  }, [search]);
+
+  useEffect(() => {
+    fetchAllOrderBySeller();
+  }, [fetchAllOrderBySeller, totalPage, totalElement]);
 
   function formatCurrency(value) {
     return Number(value).toLocaleString("vi-VN", {
@@ -165,18 +217,24 @@ export default function ManageOrders() {
 
   function getStatusOrder(status) {
     switch (status) {
-      case "CONFIRMING":
+      case "ON_HOLD":
+        return "Chờ thanh toán";
+      case "PENDING":
         return "Chờ xác nhận";
-      case "WAITING":
+      case "CONFIRMED":
+        return "Đã xác nhận";
+      case "PREPARING":
+        return "Chuẩn bị hàng";
+      case "WAITING_FOR_SHIPPING":
         return "Chờ vận chuyển";
-      case "SHIPPING":
-        return "Đang vận chuyển";
-      case "COMPLETED":
+      case "PICKED_UP":
+        return "Đã giao cho ĐVVC";
+      case "OUT_FOR_DELIVERY":
+        return "Đang giao hàng";
+      case "DELIVERED":
         return "Hoàn thành";
-      case "CANCELED":
+      case "CANCELLED":
         return "Đã hủy";
-      case "NA":
-        return "N/A";
       default:
         return "N/A";
     }
@@ -213,20 +271,37 @@ export default function ManageOrders() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Sắp xếp theo</DropdownMenuLabel>
+                <DropdownMenuLabel>Sắp xếp</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem
-                  onClick={() => handleSortChange("newest")}
-                  checked={sortType === "newest"}
+                <DropdownMenuRadioGroup
+                  value={orderType}
+                  onValueChange={(value) => handleOrderChange(value)}
                 >
-                  Mới nhất
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  onClick={() => handleSortChange("oldest")}
-                  checked={sortType === "oldest"}
+                  <DropdownMenuRadioItem value="asc">
+                    Tăng dần
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="desc">
+                    Giảm dần
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuRadioGroup
+                  value={sortType}
+                  onValueChange={(value) => handleSortChange(value)}
                 >
-                  Cũ nhất
-                </DropdownMenuCheckboxItem>
+                  <DropdownMenuRadioItem value="createdAt">
+                    Ngày tạo
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortType("");
+                    setOrderType("");
+                  }}
+                >
+                  Không sắp xếp
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             {showFilter && (
@@ -255,7 +330,7 @@ export default function ManageOrders() {
               </DropdownMenu>
             )}
           </div>
-          <Card x-chunk="dashboard-06-chunk-0">
+          <Card>
             <CardHeader>
               <CardTitle>Danh sách đơn hàng ({totalElement})</CardTitle>
               <CardDescription>
@@ -272,7 +347,6 @@ export default function ManageOrders() {
                   <TableRow>
                     <TableHead>Đơn hàng</TableHead>
                     <TableHead>Ngày đặt hàng</TableHead>
-                    <TableHead>Thanh toán</TableHead>
                     <TableHead>Trạng thái</TableHead>
                     <TableHead>Tổng tiền</TableHead>
                     <TableHead className="hidden md:table-cell">
@@ -286,41 +360,46 @@ export default function ManageOrders() {
                       key={order.id}
                       onClick={() => handleRowClick(order.id)}
                     >
-                      <TableCell className="font-medium">
-                        {order.code}
-                      </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="text-center">#{order.id}</TableCell>
+                      <TableCell className="text-center">
                         {formatDate(order.lastUpdatedAt)}
                       </TableCell>
-                      <TableCell className="font-medium">
-                        <Badge variant="outline">Chưa thanh toán</Badge>
-                      </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="text-center">
                         <Badge variant="outline">
-                          {getStatusOrder(order ? order.currentStatus : "NA")}
+                          {getStatusOrder(order.currentStatus)}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-medium">
-                        {formatCurrency(order.grandTotal)}
+                      <TableCell className="text-center">
+                        {formatCurrency(order.total)}
                       </TableCell>
-                      <TableCell className="md:table-cell">
-                        {order.currentStatus === "CONFIRMING" ||
-                        order.currentStatus === "WAITING" ? (
-                          <Button
-                            aria-haspopup="true"
-                            size="icon"
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleUpdateButtonClick(
-                                order,
-                                order.id,
-                                order.code
-                              );
-                            }}
-                          >
-                            <CalendarCog className="h-4 w-4" />
-                          </Button>
+                      <TableCell className="md:table-cell text-center">
+                        {order.currentStatus === "PENDING" ||
+                        order.currentStatus === "CONFIRMED" ||
+                        order.currentStatus === "PREPARING" ? (
+                          <div>
+                            <Button
+                              aria-haspopup="true"
+                              size="icon"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUpdateButtonClick(order, order.id);
+                              }}
+                            >
+                              <CalendarCog className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              aria-haspopup="true"
+                              size="icon"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCancelButtonClick(order, order.id);
+                              }}
+                            >
+                              <SquareX className="h-4 w-4" />
+                            </Button>
+                          </div>
                         ) : (
                           ""
                         )}
@@ -358,7 +437,9 @@ export default function ManageOrders() {
           isOpen={isDialogUpdateOrderStatusOpen}
           onClose={() => setIsDialogUpdateOrderStatusOpen(false)}
           onUpdateOrderStatus={confirmUpdateOrderStatus}
-          orderCode={orderCode}
+          onCancelOrder={confirmCancelOrder}
+          orderId={selectedOrder}
+          actionType={actionType}
         />
       )}
     </div>

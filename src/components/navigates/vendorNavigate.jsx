@@ -39,8 +39,14 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import VendorHeader from "../headers/vendorHeader";
-import { useDispatch } from "react-redux";
-import { setSearch, setShowFilter } from "@/store/features/orderSearchSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setActiveItem,
+  setCurrentPage,
+  setSearch,
+  setShowFilter,
+  setTotalPage,
+} from "@/store/features/orderSearchSlice";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 const data = {
@@ -57,29 +63,49 @@ const data = {
           searchKey: "",
         },
         {
+          title: "Chờ thanh toán",
+          url: "/vendor/orders",
+          searchKey: "ON_HOLD",
+        },
+        {
           title: "Chờ xác nhận",
           url: "/vendor/orders",
-          searchKey: "CONFIRMING",
+          searchKey: "PENDING",
+        },
+        {
+          title: "Đã xác nhận",
+          url: "/vendor/orders",
+          searchKey: "CONFIRMED",
+        },
+        {
+          title: "Chuẩn bị hàng",
+          url: "/vendor/orders",
+          searchKey: "PREPARING",
         },
         {
           title: "Chờ vận chuyển",
           url: "/vendor/orders",
-          searchKey: "WAITING",
+          searchKey: "WAITING_FOR_SHIPPING",
         },
         {
-          title: "Đang vận chuyển",
+          title: "Đã giao cho ĐVVC",
           url: "/vendor/orders",
-          searchKey: "SHIPPING",
+          searchKey: "PICKED_UP",
+        },
+        {
+          title: "Đang giao hàng",
+          url: "/vendor/orders",
+          searchKey: "OUT_FOR_DELIVERY",
         },
         {
           title: "Hoàn thành",
           url: "/vendor/orders",
-          searchKey: "COMPLETED",
+          searchKey: "DELIVERED",
         },
         {
-          title: "Đã huỷ",
+          title: "Đã hủy",
           url: "/vendor/orders",
-          searchKey: "CANCELED",
+          searchKey: "CANCELLED",
         },
       ],
     },
@@ -136,12 +162,13 @@ const data = {
 export default function VendorNavigate({ vendorContent }) {
   const dispatch = useDispatch();
   const router = useRouter();
-  const [activeItem, setActiveItem] = useState("");
+  const activeItem = useSelector((state) => state.orderSearch.activeItem);
 
   const handleSetSearch = (searchKey, url, showFilter) => {
     dispatch(setSearch(searchKey));
+    console.log("searchKey ở VendorNavigate: ", searchKey);
     dispatch(setShowFilter(showFilter));
-    setActiveItem(searchKey);
+    dispatch(setActiveItem(searchKey));
     router.push(url);
   };
 
