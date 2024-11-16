@@ -44,7 +44,7 @@ import DialogUpdateOrderStatus from "./dialogUpdateOrderStatus";
 import ViewOrderDetail from "./viewOrderDetail";
 import { Badge } from "@/components/ui/badge";
 import { useDispatch, useSelector } from "react-redux";
-import { setSearch } from "@/store/features/orderSearchSlice";
+import { setFilter } from "@/store/features/orderSearchSlice";
 
 export default function ManageOrders() {
   const [orders, setOrders] = useState([]);
@@ -55,7 +55,8 @@ export default function ManageOrders() {
   const [totalElement, setTotalElement] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
-  const search = useSelector((state) => state.orderSearch.value);
+  const [search, setSearch] = useState("");
+  const filter = useSelector((state) => state.orderSearch.value);
   const showFilter = useSelector((state) => state.orderSearch.showFilter);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -87,27 +88,26 @@ export default function ManageOrders() {
     setOrderType(value);
   };
 
-  const handleSearchChange = (searchKey) => {
-    dispatch(setSearch(searchKey));
-    setCurrentPage(1);
+  const handleFilterChange = (value) => {
+    dispatch(setFilter(value));
   };
 
   const handleOnChange = (value) => {
-    dispatch(setSearch(value));
+    setSearch(value);
     setCurrentPage(1);
   };
 
   const dropdownItems = [
-    { label: "Tất cả", key: "" },
-    { label: "Chờ thanh toán", key: "ON_HOLD" },
-    { label: "Chờ xác nhận", key: "PENDING" },
-    { label: "Đã xác nhận", key: "CONFIRMED" },
-    { label: "Chuẩn bị hàng", key: "PREPARING" },
-    { label: "Chờ vận chuyển", key: "WAITING_FOR_SHIPPING" },
-    { label: "Đã giao cho ĐVVC", key: "PICKED_UP" },
-    { label: "Đang giao hàng", key: "OUT_FOR_DELIVERY" },
-    { label: "Hoàn thành", key: "DELIVERED" },
-    { label: "Đã hủy", key: "CANCELLED" },
+    { label: "Tất cả", filterKey: "" },
+    { label: "Chờ thanh toán", filterKey: "ON_HOLD" },
+    { label: "Chờ xác nhận", filterKey: "PENDING" },
+    { label: "Đã xác nhận", filterKey: "CONFIRMED" },
+    { label: "Chuẩn bị hàng", filterKey: "PREPARING" },
+    { label: "Chờ vận chuyển", filterKey: "WAITING_FOR_SHIPPING" },
+    { label: "Đã giao cho ĐVVC", filterKey: "PICKED_UP" },
+    { label: "Đang giao hàng", filterKey: "OUT_FOR_DELIVERY" },
+    { label: "Hoàn thành", filterKey: "DELIVERED" },
+    { label: "Đã hủy", filterKey: "CANCELLED" },
   ];
 
   const handleRowClick = (orderId) => {
@@ -179,7 +179,8 @@ export default function ManageOrders() {
         currentPage,
         sortType,
         orderType,
-        search
+        search,
+        filter
       );
       setOrders(response.result.data);
       setTotalPage(response.result.totalPages);
@@ -196,11 +197,11 @@ export default function ManageOrders() {
         variant: "destructive",
       });
     }
-  }, [toast, currentPage, sortType, orderType, search]);
+  }, [toast, currentPage, sortType, orderType, search, filter]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [search]);
+  }, [filter]);
 
   useEffect(() => {
     fetchAllOrderBySeller();
@@ -319,9 +320,9 @@ export default function ManageOrders() {
                   <DropdownMenuSeparator />
                   {dropdownItems.map((item) => (
                     <DropdownMenuCheckboxItem
-                      key={item.key}
-                      onClick={() => handleSearchChange(item.key)}
-                      checked={search === item.key}
+                      key={item.filterKey}
+                      onClick={() => handleFilterChange(item.filterKey)}
+                      checked={filter === item.filterKey}
                     >
                       {item.label}
                     </DropdownMenuCheckboxItem>

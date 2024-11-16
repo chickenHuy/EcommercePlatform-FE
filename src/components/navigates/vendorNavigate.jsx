@@ -42,12 +42,10 @@ import VendorHeader from "../headers/vendorHeader";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setActiveItem,
-  setCurrentPage,
-  setSearch,
+  setFilter,
   setShowFilter,
-  setTotalPage,
 } from "@/store/features/orderSearchSlice";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 const data = {
   navMain: [
@@ -60,52 +58,52 @@ const data = {
         {
           title: "Tất cả",
           url: "/vendor/orders",
-          searchKey: "",
+          filterKey: "",
         },
         {
           title: "Chờ thanh toán",
           url: "/vendor/orders",
-          searchKey: "ON_HOLD",
+          filterKey: "ON_HOLD",
         },
         {
           title: "Chờ xác nhận",
           url: "/vendor/orders",
-          searchKey: "PENDING",
+          filterKey: "PENDING",
         },
         {
           title: "Đã xác nhận",
           url: "/vendor/orders",
-          searchKey: "CONFIRMED",
+          filterKey: "CONFIRMED",
         },
         {
           title: "Chuẩn bị hàng",
           url: "/vendor/orders",
-          searchKey: "PREPARING",
+          filterKey: "PREPARING",
         },
         {
           title: "Chờ vận chuyển",
           url: "/vendor/orders",
-          searchKey: "WAITING_FOR_SHIPPING",
+          filterKey: "WAITING_FOR_SHIPPING",
         },
         {
           title: "Đã giao cho ĐVVC",
           url: "/vendor/orders",
-          searchKey: "PICKED_UP",
+          filterKey: "PICKED_UP",
         },
         {
           title: "Đang giao hàng",
           url: "/vendor/orders",
-          searchKey: "OUT_FOR_DELIVERY",
+          filterKey: "OUT_FOR_DELIVERY",
         },
         {
           title: "Hoàn thành",
           url: "/vendor/orders",
-          searchKey: "DELIVERED",
+          filterKey: "DELIVERED",
         },
         {
           title: "Đã hủy",
           url: "/vendor/orders",
-          searchKey: "CANCELLED",
+          filterKey: "CANCELLED",
         },
       ],
     },
@@ -164,11 +162,11 @@ export default function VendorNavigate({ vendorContent }) {
   const router = useRouter();
   const activeItem = useSelector((state) => state.orderSearch.activeItem);
 
-  const handleSetSearch = (searchKey, url, showFilter) => {
-    dispatch(setSearch(searchKey));
-    console.log("searchKey ở VendorNavigate: ", searchKey);
+  const handleSetFilter = (filterKey, url, showFilter) => {
+    dispatch(setFilter(filterKey));
+    console.log("filterKey ở VendorNavigate: ", filterKey);
     dispatch(setShowFilter(showFilter));
-    dispatch(setActiveItem(searchKey));
+    dispatch(setActiveItem(filterKey));
     router.push(url);
   };
 
@@ -212,15 +210,15 @@ export default function VendorNavigate({ vendorContent }) {
                             <SidebarMenuSubButton asChild>
                               <button
                                 className={`w-full hover:cursor-pointer ${
-                                  activeItem === subItem.searchKey
+                                  activeItem === subItem.filterKey
                                     ? "font-bold"
                                     : "font-normal"
                                 }`}
                                 onClick={() =>
-                                  handleSetSearch(
-                                    subItem.searchKey,
+                                  handleSetFilter(
+                                    subItem.filterKey,
                                     subItem.url,
-                                    subItem.searchKey === ""
+                                    subItem.filterKey === ""
                                   )
                                 }
                               >

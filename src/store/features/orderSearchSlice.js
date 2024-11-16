@@ -13,27 +13,23 @@ export const orderSearchSlice = createSlice({
     setSearch: (state, action) => {
       state.value = action.payload;
     },
+    setFilter: (state, action) => {
+      state.value = action.payload;
+    },
     setShowFilter: (state, action) => {
       state.showFilter = action.payload;
     },
     setActiveItem: (state, action) => {
       state.activeItem = action.payload;
     },
-    setCurrentPage: (state, action) => {
-      state.currentPage = action.payload;
-    },
-    setTotalPage: (state, action) => {
-      state.totalPage = action.payload;
-    },
   },
 });
 
 export const {
   setSearch,
+  setFilter,
   setShowFilter,
   setActiveItem,
-  setCurrentPage,
-  setTotalPage,
 } = orderSearchSlice.actions;
 
 export default orderSearchSlice.reducer;

@@ -1,9 +1,15 @@
 import { get, put } from "@/lib/httpClient";
 
-export const getAllOrderBySeller = (page, sortType, orderType, search) => {
+export const getAllOrderBySeller = (
+  page,
+  sortType,
+  orderType,
+  search,
+  filter
+) => {
   try {
     const response = get(
-      `/api/v1/orders/seller?sortBy=${sortType}&orderBy=${orderType}&page=${page}&size=8&search=${search}`
+      `/api/v1/orders/seller?sort=${sortType}&order=${orderType}&page=${page}&size=8&search=${search}&filter=${filter}`
     );
     return response;
   } catch (error) {
