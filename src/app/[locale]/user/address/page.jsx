@@ -14,6 +14,7 @@ import {
   setDefaultAddress,
 } from "@/api/user/addressRequest";
 import { toast } from "@/hooks/use-toast";
+import Loading from "@/components/loading";
 
 export default function Component() {
   const [addresses, setAddresses] = useState([]);
@@ -90,19 +91,7 @@ export default function Component() {
       </div>
       <div className="grid gap-4">
         {addresses.length === 0 ? (
-          <div className="flex items-center justify-center w-full h-48 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg text-center">
-            <div className="space-y-2">
-              <Plus className="mx-auto h-10 w-10 text-gray-500" />
-              <p className="text-lg text-gray-600">Chưa có địa chỉ nào</p>
-              <Button
-                variant="outline"
-                onClick={() => setShowAddressForm(true)}
-                className="mt-4"
-              >
-                Thêm địa chỉ mới
-              </Button>
-            </div>
-          </div>
+          <Loading />
         ) : (
           addresses.map((address) => (
             <Card key={address.id}>
