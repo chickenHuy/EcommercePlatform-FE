@@ -109,7 +109,7 @@ export default function Component() {
                   >
                     Cập nhật
                   </Button>
-                  {!address.isDefault && (
+                  {!address.is_default && (
                     <Button
                       variant="link"
                       onClick={() => {
