@@ -40,13 +40,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Search } from "@mui/icons-material";
 import { useToast } from "@/hooks/use-toast";
-import DialogUpdateOrderStatus from "./dialogUpdateOrderStatus";
-import ViewOrderDetail from "./viewOrderDetail";
+import DialogUpdateOrCancelOrderSeller from "./dialogUpdateOrCancelOrderSeller";
+import ViewOrderDetailSeller from "./viewOrderDetailSeller";
 import { Badge } from "@/components/ui/badge";
 import { useDispatch, useSelector } from "react-redux";
-import { setFilter } from "@/store/features/orderSearchSlice";
+import { setFilter } from "@/store/features/orderFilterSlice";
 
-export default function ManageOrders() {
+export default function ManageOrderSeller() {
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
@@ -56,8 +56,10 @@ export default function ManageOrders() {
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
   const [search, setSearch] = useState("");
-  const filter = useSelector((state) => state.orderSearch.value);
-  const showFilter = useSelector((state) => state.orderSearch.showFilter);
+  const filter = useSelector((state) => state.orderFilterReducer.filter);
+  const showFilter = useSelector(
+    (state) => state.orderFilterReducer.showFilter
+  );
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isDialogUpdateOrderStatusOpen, setIsDialogUpdateOrderStatusOpen] =
@@ -139,7 +141,7 @@ export default function ManageOrders() {
         await updateOrderStatusBySeller(orderToUpdate.id);
         toast({
           title: "Thành công",
-          description: `Đơn hàng "${orderToUpdate.id}" đã được cập nhật trạng thái`,
+          description: `Đơn hàng "#${orderToUpdate.id}" đã được cập nhật trạng thái`,
         });
         fetchAllOrderBySeller();
         setIsDialogUpdateOrderStatusOpen(false);
@@ -159,7 +161,7 @@ export default function ManageOrders() {
         await cancelOrderBySeller(orderToCancel.id);
         toast({
           title: "Thành công",
-          description: `Đơn hàng "${orderToCancel.id}" đã được hủy`,
+          description: `Đơn hàng "#${orderToCancel.id}" đã được hủy`,
         });
         fetchAllOrderBySeller();
         setIsDialogUpdateOrderStatusOpen(false);
@@ -260,7 +262,7 @@ export default function ManageOrders() {
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <Toaster />
       <div className="flex flex-col sm:gap-4 sm:py-4">
-        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-4">
           <div className="ml-auto flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -291,7 +293,7 @@ export default function ManageOrders() {
                   onValueChange={(value) => handleSortChange(value)}
                 >
                   <DropdownMenuRadioItem value="createdAt">
-                    Ngày tạo
+                    Ngày đặt hàng
                   </DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
                 <DropdownMenuSeparator />
@@ -363,7 +365,7 @@ export default function ManageOrders() {
                     >
                       <TableCell className="text-center">#{order.id}</TableCell>
                       <TableCell className="text-center">
-                        {formatDate(order.lastUpdatedAt)}
+                        {formatDate(order.createdAt)}
                       </TableCell>
                       <TableCell className="text-center">
                         <Badge variant="outline">
@@ -390,9 +392,7 @@ export default function ManageOrders() {
                               <CalendarCog className="h-4 w-4" />
                             </Button>
                             <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
+                              variant="outline"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleCancelButtonClick(order, order.id);
@@ -427,14 +427,14 @@ export default function ManageOrders() {
         </main>
       </div>
       {isDrawerOpen && (
-        <ViewOrderDetail
+        <ViewOrderDetailSeller
           isOpen={isDrawerOpen}
           onClose={() => handleCloseDrawer()}
           orderId={selectedOrder}
         />
       )}
       {isDialogUpdateOrderStatusOpen && (
-        <DialogUpdateOrderStatus
+        <DialogUpdateOrCancelOrderSeller
           isOpen={isDialogUpdateOrderStatusOpen}
           onClose={() => setIsDialogUpdateOrderStatusOpen(false)}
           onUpdateOrderStatus={confirmUpdateOrderStatus}

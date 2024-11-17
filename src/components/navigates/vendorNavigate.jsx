@@ -44,7 +44,7 @@ import {
   setActiveItem,
   setFilter,
   setShowFilter,
-} from "@/store/features/orderSearchSlice";
+} from "@/store/features/orderFilterSlice";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 const data = {
@@ -160,7 +160,9 @@ const data = {
 export default function VendorNavigate({ vendorContent }) {
   const dispatch = useDispatch();
   const router = useRouter();
-  const activeItem = useSelector((state) => state.orderSearch.activeItem);
+  const activeItem = useSelector(
+    (state) => state.orderFilterReducer.activeItem
+  );
 
   const handleSetFilter = (filterKey, url, showFilter) => {
     dispatch(setFilter(filterKey));

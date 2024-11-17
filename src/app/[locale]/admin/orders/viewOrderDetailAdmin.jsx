@@ -1,6 +1,10 @@
 "use client";
 
-import { getOrderById } from "@/api/vendor/orderRequest";
+import {
+  cancelOrderByAdmin,
+  getOneOrderByAdmin,
+  updateOrderStatusByAdmin,
+} from "@/api/admin/orderRequest";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,22 +24,36 @@ import {
 } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft } from "lucide-react";
+import {
+  ChevronLeft,
+  Mail,
+  Pencil,
+  Phone,
+  UserRound,
+  UserRoundCog,
+  X,
+} from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
+import DialogUpdateOrCancelOrderAdmin from "./dialogUpdateOrCancelOrderAdmin";
 
-export default function ViewOrderDetail(props) {
+export default function ViewOrderDetailAdmin(props) {
   const { isOpen, onClose, orderId } = props;
   const [order, setOrder] = useState(null);
+  const [isDialogUpdateOrderStatusOpen, setIsDialogUpdateOrderStatusOpen] =
+    useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderToUpdate, setOrderToUpdate] = useState(null);
+  const [orderToCancel, setOrderToCancel] = useState(null);
+  const [actionType, setActionType] = useState("");
   const { toast } = useToast();
 
-  const fetchOneOrder = useCallback(async () => {
+  const fetchOneOrderByAdmin = useCallback(async () => {
     if (!orderId) {
       return;
     }
     try {
-      const response = await getOrderById(orderId);
+      const response = await getOneOrderByAdmin(orderId);
       console.log("Order: ", response.result);
       setOrder(response.result);
     } catch (error) {
@@ -48,8 +66,62 @@ export default function ViewOrderDetail(props) {
   }, [orderId, toast]);
 
   useEffect(() => {
-    fetchOneOrder();
-  }, [fetchOneOrder]);
+    fetchOneOrderByAdmin();
+  }, [fetchOneOrderByAdmin]);
+
+  const handleUpdateButtonClick = (order, orderId) => {
+    setIsDialogUpdateOrderStatusOpen(true);
+    setOrderToUpdate(order);
+    setSelectedOrder(orderId);
+    setActionType("update");
+  };
+
+  const handleCancelButtonClick = (order, orderId) => {
+    setIsDialogUpdateOrderStatusOpen(true);
+    setOrderToCancel(order);
+    setSelectedOrder(orderId);
+    setActionType("cancel");
+  };
+
+  const confirmUpdateOrderStatus = async () => {
+    if (orderToUpdate) {
+      try {
+        await updateOrderStatusByAdmin(orderToUpdate.id);
+        toast({
+          title: "Thành công",
+          description: `Đơn hàng "#${orderToUpdate.id}" đã được cập nhật trạng thái`,
+        });
+        fetchOneOrderByAdmin();
+        setIsDialogUpdateOrderStatusOpen(false);
+      } catch (error) {
+        toast({
+          title: "Thất bại",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const confirmCancelOrder = async () => {
+    if (orderToCancel) {
+      try {
+        await cancelOrderByAdmin(orderToCancel.id);
+        toast({
+          title: "Thành công",
+          description: `Đơn hàng "#${orderToCancel.id}" đã được hủy`,
+        });
+        fetchOneOrderByAdmin();
+        setIsDialogUpdateOrderStatusOpen(false);
+      } catch (error) {
+        toast({
+          title: "Thất bại",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    }
+  };
 
   function formatCurrency(value) {
     return Number(value).toLocaleString("vi-VN", {
@@ -108,7 +180,7 @@ export default function ViewOrderDetail(props) {
         <ScrollArea className="p-4 max-h-screen overflow-auto">
           <div className="flex flex-col sm:gap-4 sm:py-4 h-full">
             <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-              <div className="mx-auto grid max-w-[59rem] flex-1 auto-rows-max gap-4">
+              <div className="mx-auto grid flex-1 auto-rows-max gap-4">
                 <div className="flex items-center gap-4 border-b pb-4">
                   <DrawerClose>
                     <Button variant="outline" size="icon" className="h-7 w-7">
@@ -127,52 +199,86 @@ export default function ViewOrderDetail(props) {
                     </DrawerClose>
                   </div>
                 </div>
-                <div className="mb-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <h2 className="text-2xl font-semibold">
-                        Mã đơn hàng: #{order?.id}
-                      </h2>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant="outline">
-                          {getStatusOrder(order?.currentStatus)}
-                        </Badge>
+                <div className="flex justify-between items-center w-full">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <h2 className="text-2xl font-semibold">
+                          Mã đơn hàng: #{order?.id}
+                        </h2>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="outline">
+                            {getStatusOrder(order?.currentStatus)}
+                          </Badge>
+                          <Badge variant="outline">Chưa thanh toán</Badge>
+                        </div>
                       </div>
                     </div>
+                    <div className="text-sm mt-2">
+                      Ngày đặt hàng: {formatDate(order?.lastUpdatedAt)}
+                    </div>
                   </div>
-                  <p className="text-sm mt-2">
-                    Ngày đặt hàng: {formatDate(order?.lastUpdatedAt)}
-                  </p>
+                  <div className="space-x-4">
+                    {order?.currentStatus === "DELIVERED" ||
+                    order?.currentStatus === "CANCELLED" ? (
+                      ""
+                    ) : (
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          handleCancelButtonClick(order, order.id);
+                        }}
+                      >
+                        <X className="h-4 x-4 mr-2" />
+                        Hủy đơn hàng
+                      </Button>
+                    )}
+                    {order?.currentStatus === "WAITING_FOR_SHIPPING" ||
+                    order?.currentStatus === "PICKED_UP" ||
+                    order?.currentStatus === "OUT_FOR_DELIVERY" ? (
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          handleUpdateButtonClick(order, order.id);
+                        }}
+                      >
+                        <Pencil className="h-4 x-4 mr-2" />
+                        Cập nhật trạng thái
+                      </Button>
+                    ) : (
+                      ""
+                    )}
+                  </div>
                 </div>
-                <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
+                <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3 lg:gap-8">
                   <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
-                    <div className="grid gap-4">
+                    <Card className="grid gap-4 p-6">
+                      <p className="text-2xl font-bold">Sản phẩm</p>
                       {order &&
                         order.orderItems.map((item, index) => (
                           <Card key={index}>
                             <CardContent>
-                              <div className="flex items-start gap-4 mt-4">
+                              <div className="flex items-start gap-4 mt-6">
                                 <a
-                                  href="/vendor/orders"
+                                  href="/admin/orders"
                                   target="_blank"
                                   rel="noopener noreferrer"
                                 >
                                   <Image
                                     alt={item.product.name}
-                                    className="rounded-md"
-                                    height={60}
                                     src={item.product.mainImageUrl}
-                                    width={60}
+                                    height={100}
+                                    width={100}
+                                    className="rounded-md transition-transform duration-300 hover:scale-125 hover:mr-2"
                                   />
                                 </a>
-
-                                <div className="flex-1">
-                                  <p className="font-bold">
+                                <div className="flex-1 space-y-2">
+                                  <p className="text-xl font-bold">
                                     <a
                                       href="/vendor/orders"
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="hover:underline hover:text-xl"
+                                      className="hover:underline hover:text-2xl"
                                     >
                                       {item.product.name}
                                     </a>
@@ -197,8 +303,7 @@ export default function ViewOrderDetail(props) {
                             </CardContent>
                           </Card>
                         ))}
-                    </div>
-
+                    </Card>
                     <Card className="lg:col-span-1">
                       <CardHeader>
                         <CardTitle className="text-2xl font-bold">
@@ -216,73 +321,122 @@ export default function ViewOrderDetail(props) {
                               {`${order?.orderItems.length} item(s)`}
                             </span>
                             <span className="col-span-1 text-right">
-                              {order ? formatCurrency(order?.total) : 0}
+                              {formatCurrency(order?.total)}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-x-2 items-center">
+                            <span className="col-span-1">Phí Vận chuyển</span>
+                            <span className="col-span-1 text-right">
+                              {`${formatCurrency(order?.shippingFee)}`}
                             </span>
                           </div>
                           <div className="grid grid-cols-3 gap-x-2 items-center">
-                            <span className="col-span-1">Giảm giá</span>
+                            <span className="col-span-1">Shop giảm giá</span>
                             <span className="col-span-1 text-center">
-                              Khách hàng mới
+                              {`${order?.discount * 100} %`}
                             </span>
                             <span className="col-span-1 text-right">
-                              {order ? formatCurrency(order?.discount) : 0}
+                              {`- ${formatCurrency(
+                                order?.discount * order?.total
+                              )}`}
                             </span>
                           </div>
                           <div className="grid grid-cols-3 gap-x-2 items-center">
-                            <span className="col-span-1">Vận chuyển</span>
+                            <span className="col-span-1">
+                              Giảm giá vận chuyển
+                            </span>
                             <span className="col-span-1 text-center">
-                              Miễn phí
+                              {`${order?.shippingDiscount * 100} %`}
                             </span>
                             <span className="col-span-1 text-right">
-                              {order ? formatCurrency(order.shippingTotal) : 0}
+                              {`- ${formatCurrency(
+                                order?.shippingDiscount * order?.shippingFee
+                              )}`}
                             </span>
                           </div>
                           <div className="grid grid-cols-3 gap-x-2 items-center font-bold">
                             <span className="col-span-2">Tổng thanh toán</span>
                             <span className="col-span-1 text-right">
-                              {order ? formatCurrency(order.grandTotal) : "N/A"}
+                              {formatCurrency(order?.grandTotal)}
                             </span>
                           </div>
                         </div>
                       </CardContent>
                       <CardFooter className="flex justify-between items-center p-4 border-t">
                         <p className="text-sm text-muted-foreground">
-                          Xem lại đơn hàng của một cách nhanh chóng trên trang
-                          Đơn hàng
+                          Xem lại đơn hàng nhanh chóng trên trang Đơn hàng
                         </p>
-                        <a href="/vendor/orders" className="flex gap-2">
+                        <a href="/admin/orders" className="flex gap-2">
                           <Button variant="outline">Xem tất cả đơn hàng</Button>
                         </a>
                       </CardFooter>
                     </Card>
                   </div>
-                  <div className="space-y-4">
-                    <Card>
+                  <div className="flex flex-col space-y-8">
+                    <Card className="w-full md:w-96 overflow-hidden">
                       <CardHeader>
                         <CardTitle className="text-2xl font-bold">
                           Khách hàng
                         </CardTitle>
                       </CardHeader>
-                      <CardContent>
-                        <p>{order?.accountName}</p>
-                        <p>{order?.userEmail}</p>
-                        <p>{order?.userPhone}</p>
+                      <CardContent className="space-y-2">
+                        <div className="flex space-x-2">
+                          <UserRoundCog />
+                          <p>{order?.accountName}</p>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Mail />
+                          <p>{order?.userEmail}</p>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Phone />
+                          <p>{order?.userPhone}</p>
+                        </div>
                       </CardContent>
                     </Card>
-                    <Card>
+                    <Card className="w-full md:w-96 overflow-hidden">
+                      <CardHeader>
+                        <CardTitle className="text-2xl font-bold">
+                          Địa chỉ giao hàng
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <div className="flex space-x-2">
+                          <UserRound />
+                          <p>{order?.recipientName}</p>
+                        </div>
+                        <p>{`${order?.detailLocate}, ${order?.detailAddress}`}</p>
+                        <p>{order?.subDistrict}</p>
+                        <p>{order?.district}</p>
+                        <p>{order?.province}</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="w-full md:w-96 overflow-hidden">
                       <CardHeader>
                         <CardTitle className="text-2xl font-bold">
                           Ghi chú
                         </CardTitle>
                       </CardHeader>
-                      <CardContent>
-                        <p>{order ? order.note : "N/A"}</p>
+                      <CardContent className="space-y-2">
+                        <p className="whitespace-normal">
+                          {order ? order.note : "N/A"}
+                        </p>
                       </CardContent>
                     </Card>
                   </div>
                 </div>
               </div>
             </main>
+            {isDialogUpdateOrderStatusOpen && (
+              <DialogUpdateOrCancelOrderAdmin
+                isOpen={isDialogUpdateOrderStatusOpen}
+                onClose={() => setIsDialogUpdateOrderStatusOpen(false)}
+                onUpdateOrderStatus={confirmUpdateOrderStatus}
+                onCancelOrder={confirmCancelOrder}
+                orderId={selectedOrder}
+                actionType={actionType}
+              />
+            )}
           </div>
         </ScrollArea>
       </DrawerContent>

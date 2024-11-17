@@ -1,20 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export const orderSearchSlice = createSlice({
+export const orderFilter = createSlice({
   name: "orderSearch",
   initialState: {
-    value: "",
+    filter: "",
     showFilter: true,
     activeItem: "",
-    currentPage: 1,
-    totalPage: 1,
   },
   reducers: {
-    setSearch: (state, action) => {
-      state.value = action.payload;
-    },
     setFilter: (state, action) => {
-      state.value = action.payload;
+      state.filter = action.payload;
     },
     setShowFilter: (state, action) => {
       state.showFilter = action.payload;
@@ -25,11 +20,6 @@ export const orderSearchSlice = createSlice({
   },
 });
 
-export const {
-  setSearch,
-  setFilter,
-  setShowFilter,
-  setActiveItem,
-} = orderSearchSlice.actions;
+export const { setFilter, setShowFilter, setActiveItem } = orderFilter.actions;
 
-export default orderSearchSlice.reducer;
+export default orderFilter.reducer;

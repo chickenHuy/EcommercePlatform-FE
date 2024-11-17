@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-export default function DialogUpdateOrderStatus(props) {
+export default function DialogUpdateOrCancelOrderAdmin(props) {
   const {
     isOpen,
     onClose,
@@ -21,13 +21,13 @@ export default function DialogUpdateOrderStatus(props) {
   } = props;
   const performAction =
     actionType === "update" ? onUpdateOrderStatus : onCancelOrder;
-  const actionText = actionType === "update" ? "Cập nhật" : "Hủy bỏ";
+  const actionText = actionType === "update" ? "Cập nhật" : "Đồng ý";
   const title =
     actionType === "update" ? "Cập nhật trạng thái đơn hàng" : "Hủy đơn hàng";
   const description =
     actionType === "update"
-      ? `Bạn có chắc chắn muốn cập nhật trạng thái đơn hàng ${orderId}?`
-      : `Bạn có chắc chắn muốn hủy đơn hàng ${orderId}?`;
+      ? `Bạn có chắc chắn muốn cập nhật trạng thái đơn hàng #${orderId}?`
+      : `Bạn có chắc chắn muốn hủy đơn hàng #${orderId}?`;
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[400px]">

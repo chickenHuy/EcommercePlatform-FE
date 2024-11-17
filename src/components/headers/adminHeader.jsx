@@ -123,7 +123,7 @@ function AdminHeader() {
               </NavigationMenuContent>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="/docs" legacyBehavior passHref>
+              <Link href="/admin/orders" legacyBehavior passHref>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                   <div className="text-muted-foreground transition-colors hover:text-foreground">
                     Đơn hàng

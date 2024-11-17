@@ -33,11 +33,12 @@ export const AdminSearch = () => {
       dispatch(setPlaceholder("Tìm kiếm thương hiệu..."));
     } else if (pathName.includes("/admin/components")) {
       dispatch(setPlaceholder("Tìm kiếm thông số..."));
+    } else if (pathName.includes("/admin/orders")) {
+      dispatch(setPlaceholder("Tìm kiếm đơn hàng..."));
     } else {
       dispatch(toggleSearchVisibility(false));
     }
   }, [pathName, dispatch]);
-
 
   return (
     <form className="ml-auto flex-1 sm:flex-initial">
