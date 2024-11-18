@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { X } from "lucide-react";
 
 const ImageDropzone = ({
+  multiple = true,
   onImageUpload,
   isPopup = false,
   maxFileSize = 10 * 1024 * 1024,
@@ -18,7 +19,7 @@ const ImageDropzone = ({
 
   const onDrop = useCallback(
     (acceptedFiles) => {
-      if (images.length + acceptedFiles.length > maxFiles) {
+      if (multiple && images.length + acceptedFiles.length > maxFiles) {
         setError(`You can only upload up to ${maxFiles} images.`);
         return;
       }
@@ -27,20 +28,32 @@ const ImageDropzone = ({
         (file) => file.size <= maxFileSize
       );
 
+      if (validImages.length === 0) {
+        setError("All selected files exceed the maximum size limit.");
+        return;
+      }
+
       const newImages = validImages.map((file) =>
         Object.assign(file, {
           preview: URL.createObjectURL(file),
         })
       );
 
-      setImages((prevImages) => [...prevImages, ...newImages]);
-      setError("");
-
-      if (onImageUpload) {
-        onImageUpload(newImages);
+      if (!multiple) {
+        setImages([newImages[0]]);
+        setError("");
+        if (onImageUpload) {
+          onImageUpload(newImages[0]);
+        }
+      } else {
+        setImages((prevImages) => [...prevImages, ...newImages]);
+        setError("");
+        if (onImageUpload) {
+          onImageUpload(newImages);
+        }
       }
     },
-    [onImageUpload, maxFileSize, maxFiles, images]
+    [onImageUpload, maxFileSize, maxFiles, images, multiple]
   );
 
   const handleRemoveImage = (index) => {
@@ -110,7 +123,11 @@ const ImageDropzone = ({
         </p>
       )}
 
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 mt-4">
+      <div
+        className={`${
+          multiple ? "grid grid-cols-2 lg:grid-cols-3" : "grid grid-cols-1"
+        } gap-2 mt-4`}
+      >
         {images.map((image, index) => (
           <div key={index} className="h-32 border relative">
             <X
