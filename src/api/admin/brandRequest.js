@@ -12,6 +12,18 @@ export const getAllBrand = (page, sortType, search = "") => {
   }
 };
 
+export const getListAllBrand = () => {
+  try {
+    const response = get(
+      `/api/v1/brands/all`
+    );
+    return response;
+  } catch (error) {
+    console.error("Error during get all brand:", error);
+    throw error;
+  }
+};
+
 export const createBrand = async (data) => {
   try {
     const response = await post("/api/v1/brands", data);

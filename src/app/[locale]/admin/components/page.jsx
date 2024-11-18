@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/card";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -36,7 +35,7 @@ import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { Toaster } from "@/components/ui/toaster";
 import DialogEditComponent from "@/components/dialogs/dialogEditComponent";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   createComponent,
   getComponent,

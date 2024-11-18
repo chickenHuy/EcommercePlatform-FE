@@ -10,14 +10,17 @@ const handleLoginNavigation = (token, router) => {
     });
 
     const role = jwtDecode(token).scope;
-    if (role === 'ROLE_USER') {
-        router.push('/');
-    }
-    else if (role === 'ROLE_SELLER') {
-        router.push('/vendor');
-    }
-    else if (role === 'ROLE_ADMIN') {
+    if (role.includes('ROLE_ADMIN')) {
         router.push('/admin');
+        return;
+    }
+    if (role.includes('ROLE_SELLER')) {
+        router.push('/vendor');
+        return;
+    }
+    if (role.includes('ROLE_USER')) {
+        router.push('/');
+        return;
     }
 }
 
