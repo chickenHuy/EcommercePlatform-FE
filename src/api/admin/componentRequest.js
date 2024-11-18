@@ -36,4 +36,24 @@ const removeComponent = async (id, data) => {
   }
 }
 
-export { getComponent, createComponent , updateComponent, removeComponent};
+const getAllComponent = () => {
+  try {
+    const response = get(`/api/v1/components/all`);
+    return response;
+  } catch (error) {
+    console.error("Error during authentication:", error);
+    throw error;
+  }
+};
+
+const getComponentOfCategory = (id) => {
+  try {
+    const response = get(`/api/v1/components/category/${id}`);
+    return response;
+  } catch (error) {
+    console.error("Error during authentication:", error);
+    throw error;
+  }
+};
+
+export { getComponent, createComponent, updateComponent, removeComponent, getAllComponent, getComponentOfCategory };
