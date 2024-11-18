@@ -15,28 +15,35 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useState, useEffect } from "react";
-import { getAddressStore } from "@/api/vendor/storeRequest";
+import { getAddressOfStore } from "@/api/vendor/storeRequest";
 
-export default function CbbAddresses({ onAddressSelect, selectedAddress }) {
+export default function CbbAddresses({
+  onAddressSelect,
+  defaultAddressToUpdate,
+}) {
   const [open, setOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
 
   useEffect(() => {
-    const userId = "acc3420c-5db5-481e-b2e7-761cad8263d5";
     const fetchAddresses = async () => {
       try {
-        const response = await getAddressStore(userId);
+        const response = await getAddressOfStore();
         setAddresses(response.result);
-        if (!selectedAddress && response.result.length > 0) {
+        if (!defaultAddressToUpdate && response.result.length > 0) {
           const defaultAddress = response.result[0];
           onAddressSelect(defaultAddress);
         }
       } catch (error) {
         console.error("Failed to fetch addresses:", error);
+        toast({
+          title: "Thất bại",
+          description: error.message,
+          variant: "destructive",
+        });
       }
     };
     fetchAddresses();
-  }, [onAddressSelect, selectedAddress]);
+  }, [onAddressSelect, defaultAddressToUpdate]);
 
   const handleSelect = (address) => {
     onAddressSelect(address);
@@ -53,8 +60,8 @@ export default function CbbAddresses({ onAddressSelect, selectedAddress }) {
           className="w-[300px] justify-between"
         >
           <span className="truncate">
-            {selectedAddress
-              ? selectedAddress.defaultAddressStr
+            {defaultAddressToUpdate
+              ? defaultAddressToUpdate.defaultAddressStr
               : "Chọn địa chỉ mặc định..."}
           </span>
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />

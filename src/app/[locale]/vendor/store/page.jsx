@@ -11,21 +11,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Rating } from "@mui/material";
-import { getStore, updateStore } from "@/api/vendor/storeRequest";
+import { getStoreByUserId, updateStore } from "@/api/vendor/storeRequest";
 import CbbAddresses from "./cbbDefaultAddress";
 import { Toaster } from "@/components/ui/toaster";
-import Cookies from "js-cookie";
 
 const storeSchema = z.object({
   name: z.string().trim().min(1, {
-    message: "Họ và tên không được để trống",
+    message: "Tên cửa hàng không được để trống",
   }),
   bio: z.string().nullable(),
 });
 
 export default function ManageStoreInfo() {
   const [store, setStore] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [defaultAddressToUpdate, setDefaultAddressToUpdate] = useState(null);
 
   const { toast } = useToast();
 
@@ -37,31 +36,30 @@ export default function ManageStoreInfo() {
     },
   });
 
-  const fetchStore = useCallback(async () => {
+  const fetchStoreByUserId = useCallback(async () => {
     try {
-      const response = await getStore();
+      const response = await getStoreByUserId();
       setStore(response.result);
       formData.reset(response.result);
       if (response.result.defaultAddress) {
-        const defaultAddress = response.result.defaultAddress;
-        setSelectedAddress({
-          defaultAddressStr: defaultAddress,
+        setDefaultAddressToUpdate({
+          defaultAddressStr: response.result.defaultAddress,
           defaultAddressId: response.result.defaultAddressId,
         });
       }
     } catch (error) {
-      console.error("fetchStore thất bại: ", error);
+      console.error("fetchStoreByUserId thất bại: ", error);
       toast({
         title: "Thất bại",
-        description: "Xảy ra lỗi khi lấy thông tin cửa hàng",
+        description: error.message,
         variant: "destructive",
       });
     }
   }, [toast, formData]);
 
   useEffect(() => {
-    fetchStore();
-  }, [fetchStore]);
+    fetchStoreByUserId();
+  }, [fetchStoreByUserId]);
 
   const handleUpdate = async (storeData) => {
     const payload = {
@@ -70,9 +68,8 @@ export default function ManageStoreInfo() {
         storeData.bio && storeData.bio.trim() === ""
           ? null
           : storeData.bio?.trim(),
-      defaultAddressId: selectedAddress?.defaultAddressId,
+      defaultAddressId: defaultAddressToUpdate?.defaultAddressId,
     };
-    console.log("Payload: ", payload);
     try {
       const updated = await updateStore(payload);
       toast({
@@ -80,7 +77,7 @@ export default function ManageStoreInfo() {
         description: "Thông tin cửa hàng đã được cập nhật",
       });
       setStore(updated.result);
-      fetchStore();
+      fetchStoreByUserId();
     } catch (error) {
       toast({
         title: "Thất bại",
@@ -108,7 +105,7 @@ export default function ManageStoreInfo() {
             <div className="w-full space-y-2">
               <Input
                 {...formData.register("name")}
-                placeholder="họ và tên"
+                placeholder="tên cửa hàng"
                 className="mt-1 w-full border rounded-lg p-2"
               />
               {formData.formState.errors.name && (
@@ -161,8 +158,8 @@ export default function ManageStoreInfo() {
               Địa chỉ mặc định
             </Label>
             <CbbAddresses
-              selectedAddress={selectedAddress}
-              onAddressSelect={setSelectedAddress}
+              defaultAddressToUpdate={defaultAddressToUpdate}
+              onAddressSelect={setDefaultAddressToUpdate}
             />
           </div>
 
