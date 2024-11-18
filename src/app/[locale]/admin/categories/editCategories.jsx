@@ -139,7 +139,6 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
       try {
         const response = await getAllComponent();
         setComponents(response.result);
-        console.log("Components:", response.result);
       } catch (error) {
         console.error("Error fetching components:", error);
       }
@@ -173,14 +172,12 @@ export default function EditCategory({ isOpen, onClose, categorySlug }) {
 
       const createdId = response.result.id;
 
-      if (selectedComponent.length > 0) {
-        const componentData = {
-          listComponent: selectedComponent.map((component) => component.id),
-        };
+      const componentData = {
+        listComponent: selectedComponent.map((component) => component.id),
+      };
 
-        await addComponentByCategoryId(createdId, componentData);
-        console.log("Component data:", componentData);
-      }
+      await addComponentByCategoryId(createdId, componentData);
+    
 
       if (imageCate) {
         await uploadCategoryImage(createdId, imageCate);

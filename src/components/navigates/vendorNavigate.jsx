@@ -185,7 +185,8 @@ export default function VendorNavigate({ vendorContent }) {
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="icon">
+      <VendorHeader></VendorHeader>
+      <Sidebar collapsible="icon" className="mt-16">
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel>Quản lý</SidebarGroupLabel>
@@ -268,12 +269,7 @@ export default function VendorNavigate({ vendorContent }) {
         </SidebarFooter>
         <SidebarRail />
       </Sidebar>
-      {
-        <SidebarInset>
-          <VendorHeader></VendorHeader>
-          {vendorContent}
-        </SidebarInset>
-      }
+      {<SidebarInset>{vendorContent}</SidebarInset>}
     </SidebarProvider>
   );
 }

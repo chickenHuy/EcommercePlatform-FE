@@ -53,6 +53,17 @@ export default function UserLayout({ children }) {
                   Tài khoản
                 </Link>
                 <Link
+                  href="/user/address"
+                  onClick={() => handleLinkClick("/user/address")}
+                  className={`${
+                    activeLink === "/user/address"
+                      ? "text-primary font-semibold"
+                      : ""
+                  } hover:text-primary transition-colors`}
+                >
+                  Địa chỉ
+                </Link>
+                <Link
                   href="/user/change-password"
                   onClick={() => handleLinkClick("/user/change-password")}
                   className={`${
