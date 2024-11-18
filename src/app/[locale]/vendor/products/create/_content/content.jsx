@@ -265,7 +265,7 @@ export default function Content() {
   };
 
   return (
-    <div>
+    <div className='bg-white-primary'>
       <Toaster />
       <header className="sticky top-16 z-10 h-10 shadow bg-white-primary">
         {isLoading && (
@@ -336,7 +336,7 @@ export default function Content() {
       </header>
       <section
         id="basic"
-        className="h-fit min-h-screen flex flex-col items-start justify-center bg-gray-200 mt-16"
+        className="h-fit min-h-screen flex flex-col items-start justify-center bg-white-primary mt-16"
       >
         <span className="px-5 py-3 font-[900]">
           Thông tin cơ bản của sản phẩm
@@ -371,7 +371,7 @@ export default function Content() {
       <div className="w-[97%] h-[1px] mt-5 mx-auto bg-white-secondary"></div>
       <section
         id="detail"
-        className="h-fit min-h-screen flex flex-col items-start justify-start bg-gray-200"
+        className="h-fit min-h-screen flex flex-col items-start justify-start bg-white-primary"
       >
         <span className="px-5 py-3 font-[900]">
           Thông tin chi tiết của sản phẩm
@@ -404,7 +404,7 @@ export default function Content() {
       <div className="w-[97%] h-[1px] mt-5 mx-auto bg-white-secondary"></div>
       <section
         id="seller"
-        className="h-fit min-h-screen flex flex-col items-start justify-start bg-gray-200"
+        className="h-fit min-h-screen flex flex-col items-start justify-start bg-white-primary"
       >
         <span className="px-5 my-3 font-[900]">Thông tin bán hàng</span>
         <SellerInformation
@@ -433,7 +433,7 @@ export default function Content() {
       <div className="w-[97%] h-[1px] mt-5 mx-auto bg-white-secondary"></div>
       <section
         id="other"
-        className="h-fit min-h-screen flex flex-col items-start justify-start bg-gray-500"
+        className="h-fit min-h-screen flex flex-col items-start justify-start bg-white-primary"
       >
         <span className="px-5 my-3 font-[900]">Thông tin khác</span>
         <OtherImformation
