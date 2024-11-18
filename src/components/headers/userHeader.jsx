@@ -10,7 +10,7 @@ const UserHeader = () => {
       <div className="container mx-auto px-12 py-5">
         <header className="w-full bg-black-primary text-white rounded-lg">
           <div className="flex h-16 items-center justify-between px-8">
-            <nav className="hidden md:flex items-center font-bold">
+            <div className="hidden md:flex items-center font-bold">
               {[{ name: "HKUptech", path: "/" }].map((item) => (
                 <Link
                   key={item.name}
@@ -20,7 +20,7 @@ const UserHeader = () => {
                   {item.name}
                 </Link>
               ))}
-            </nav>
+            </div>
             <div className="w-full max-w-[480px] m-10 h-8 bg-black-secondary outline-2 outline-black-secondary  relative rounded-lg">
               <Input className="bg-black-secondary outline-1 outline-black-secondary text-white-primary w-full h-full pr-2 pl-2 rounded-lg font-light" />
               <button className="absolute top-0 right-0 h-full pd-2 text-white-primary rounded-r-md hover:text-gray-tertiary">
