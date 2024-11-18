@@ -1,9 +1,8 @@
-import { get, post, put } from "@/lib/httpClient";
+import { get, put } from "@/lib/httpClient";
 
-export const getStore = async () => {
+export const getStoreByUserId = async () => {
   try {
     const response = await get(`/api/v1/stores/information`);
-    console.log(response);
     return response;
   } catch (error) {
     console.error("Error during get store:", error);
@@ -11,10 +10,9 @@ export const getStore = async () => {
   }
 };
 
-export const getAddressStore = async (userId) => {
+export const getAddressOfStore = async () => {
   try {
-    const response = await get(`/api/v1/stores/${userId}/addresses`);
-    console.log(response);
+    const response = await get(`/api/v1/stores/addresses/seller`);
     return response;
   } catch (error) {
     console.error("Error during get store:", error);
