@@ -17,6 +17,7 @@ import { post } from "@/lib/httpClient";
 import { handleLoginNavigation } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import SignUpNow from "@/app/[locale]/auth/signUp";
+import Cookies from "js-cookie";
 const AuthPage = () => {
   const [isSignIn, setIsSignIn] = useState(true);
   const t = useTranslations("AuthPage");
@@ -33,6 +34,11 @@ const AuthPage = () => {
   };
 
   function login(data) {
+    Cookies.remove(process.env.NEXT_PUBLIC_JWT_NAME, {
+      path: "/",
+      secure: true,
+    });
+
     post("/api/v1/auths/log-in", data)
       .then((response) => {
         handleLoginNavigation(response.result.token, router);
