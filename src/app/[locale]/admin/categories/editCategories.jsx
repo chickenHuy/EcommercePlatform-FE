@@ -56,7 +56,7 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { getAllComponent } from "@/api/admin/componentRequest.jsx";
+import { getAllComponent } from "@/api/admin/componentRequest.js";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
