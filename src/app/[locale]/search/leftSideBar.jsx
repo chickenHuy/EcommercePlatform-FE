@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronDown, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
   Accordion,
@@ -13,9 +13,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import BrandEmpty from "@/assets/images/brandEmpty.jpg";
 import { Label } from "@/components/ui/label";
-import { motion } from "framer-motion";
+import RenderCategories from "./renderCategories";
+import Image from "next/image";
 
 export default function ModernLeftSideBar() {
   const categories = [
@@ -23,8 +24,23 @@ export default function ModernLeftSideBar() {
       id: "electronics",
       name: "Electronics",
       children: [
-        { id: "smartphones", name: "Smartphones" },
-        { id: "laptops", name: "Laptops" },
+        {
+          id: "computers",
+          name: "Computers",
+          children: [
+            { id: "laptops", name: "Laptops" },
+            { id: "desktops", name: "Desktops" },
+            { id: "tablets", name: "Tablets" },
+          ],
+        },
+        {
+          id: "smartphones",
+          name: "Smartphones",
+          children: [
+            { id: "android", name: "Android" },
+            { id: "ios", name: "iOS" },
+          ],
+        },
         { id: "accessories", name: "Accessories" },
       ],
     },
@@ -32,25 +48,47 @@ export default function ModernLeftSideBar() {
       id: "clothing",
       name: "Clothing",
       children: [
-        { id: "mens", name: "Men's" },
-        { id: "womens", name: "Women's" },
+        {
+          id: "mens",
+          name: "Men's",
+          children: [
+            { id: "shirts", name: "Shirts" },
+            { id: "pants", name: "Pants" },
+            { id: "shoes", name: "Shoes" },
+          ],
+        },
+        {
+          id: "womens",
+          name: "Women's",
+          children: [
+            { id: "dresses", name: "Dresses" },
+            { id: "tops", name: "Tops" },
+            { id: "shoes", name: "Shoes" },
+          ],
+        },
         { id: "kids", name: "Kids" },
       ],
     },
   ];
 
   const brands = [
-    { id: "hyperx", label: "HyperX" },
-    { id: "razer", label: "Razer" },
-    { id: "logitech", label: "Logitech" },
-    { id: "shure", label: "Shure" },
-    { id: "singing-machine", label: "The singing machine" },
-    { id: "singing-machine", label: "The singing machine" },
-    { id: "singing-machine", label: "The singing machine" },
-    { id: "singing-machine", label: "The singing machine" },
-    { id: "singing-machine", label: "The singing machine" },
-    { id: "singing-machine", label: "The singing machine" },
-    { id: "singing-machine", label: "The singing machine" },
+    {
+      id: "hyperx",
+      label: "HyperX",
+      logo: "",
+    },
+    { id: "razer", label: "Razer", logo: "" },
+    {
+      id: "logitech",
+      label: "Logitech",
+      logo: "",
+    },
+    { id: "shure", label: "Shure", logo: "" },
+    {
+      id: "singing-machine",
+      label: "The singing machine",
+      logo: "",
+    },
   ];
 
   const [priceRange, setPriceRange] = React.useState([0, 999999999]);
@@ -77,13 +115,8 @@ export default function ModernLeftSideBar() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="space-y-8 m-4 max-w-sm"
-    >
-      <div className="bg-blue-primary rounded-xl p-6 space-y-6">
+    <div className="space-y-8 m-4 max-w-sm">
+      <div className="bg-blue-primary rounded-xl p-4 space-y-6">
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="categories">
             <AccordionTrigger className="text-lg font-semibold text-gray-700">
@@ -91,35 +124,12 @@ export default function ModernLeftSideBar() {
             </AccordionTrigger>
             <AccordionContent>
               <ScrollArea className="h-72 w-full pr-4">
-                <RadioGroup
-                  value={selectedCategory}
-                  onValueChange={handleCategoryChange}
-                >
-                  {categories.map((category) => (
-                    <div key={category.id} className="mb-4">
-                      <h3 className="text-md font-medium text-gray-600 mb-2">
-                        {category.name}
-                      </h3>
-                      {category.children.map((subCategory) => (
-                        <div
-                          key={subCategory.id}
-                          className="flex items-center space-x-2 ml-4 mb-2"
-                        >
-                          <RadioGroupItem
-                            value={subCategory.id}
-                            id={subCategory.id}
-                          />
-                          <Label
-                            htmlFor={subCategory.id}
-                            className="text-sm text-gray-500"
-                          >
-                            {subCategory.name}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </RadioGroup>
+                {RenderCategories(
+                  categories,
+                  0,
+                  handleCategoryChange,
+                  selectedCategory
+                )}
               </ScrollArea>
             </AccordionContent>
           </AccordionItem>
@@ -132,12 +142,21 @@ export default function ModernLeftSideBar() {
               {brands.map((brand) => (
                 <div key={brand.id} className="flex items-center space-x-2">
                   <Checkbox id={brand.id} />
-                  <label
-                    htmlFor={brand.id}
-                    className="text-sm text-gray-500 cursor-pointer"
-                  >
-                    {brand.label}
-                  </label>
+                  <div className="flex justify-between space-x-2 w-full">
+                    <Label
+                      htmlFor={brand.id}
+                      className="text-sm text-gray-500 cursor-pointer"
+                    >
+                      {brand.label}
+                    </Label>
+                    <Image
+                      src={brand.logo || BrandEmpty}
+                      alt={`${brand.label} logo`}
+                      width={24}
+                      height={24}
+                      className="object-contain left-0"
+                    />
+                  </div>
                 </div>
               ))}
             </div>
@@ -173,10 +192,8 @@ export default function ModernLeftSideBar() {
           <h3 className="text-lg font-semibold text-gray-700">Đánh giá</h3>
           <div className="flex space-x-1">
             {[1, 2, 3, 4, 5].map((star) => (
-              <motion.div
+              <div
                 key={star}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
                 onClick={() => handleStarClick(star)}
                 className="cursor-pointer"
               >
@@ -186,7 +203,7 @@ export default function ModernLeftSideBar() {
                   }
                   size={24}
                 />
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -197,6 +214,6 @@ export default function ModernLeftSideBar() {
           Áp dụng bộ lọc
         </Button>
       </div>
-    </motion.div>
+    </div>
   );
 }
