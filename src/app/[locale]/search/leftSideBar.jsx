@@ -114,12 +114,16 @@ export default function ModernLeftSideBar() {
     }).format(value);
   };
 
+  const [selectedRating, setSelectedRating] = React.useState(0);
+
+  const ratings = [5, 4, 3, 2, 1];
+
   return (
     <div className="space-y-8 m-4 max-w-sm">
       <div className="bg-blue-primary rounded-xl p-4 space-y-6">
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="categories">
-            <AccordionTrigger className="text-lg font-semibold text-gray-700">
+            <AccordionTrigger className="text-lg font-semibold text-black-primary">
               Danh mục
             </AccordionTrigger>
             <AccordionContent>
@@ -136,7 +140,9 @@ export default function ModernLeftSideBar() {
         </Accordion>
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-700">Thương hiệu</h3>
+          <h3 className="text-lg font-semibold text-black-primary">
+            Thương hiệu
+          </h3>
           <ScrollArea className="h-48 w-full pr-4">
             <div className="space-y-3">
               {brands.map((brand) => (
@@ -145,7 +151,7 @@ export default function ModernLeftSideBar() {
                   <div className="flex justify-between space-x-2 w-full">
                     <Label
                       htmlFor={brand.id}
-                      className="text-sm text-gray-500 cursor-pointer"
+                      className="text-sm text-black-primary cursor-pointer"
                     >
                       {brand.label}
                     </Label>
@@ -166,21 +172,21 @@ export default function ModernLeftSideBar() {
         <Separator className="bg-black-tertiary opacity-20" />
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Giá bán</h3>
+          <h3 className="text-lg font-semibold text-black-primary">Giá bán</h3>
           <Slider
             value={priceRange}
             onValueChange={handlePriceChange}
             min={0}
             max={999999999}
             step={100000}
-            className="w-full"
+            className="w-full text-black-primary"
           />
           <div className="flex justify-between text-sm">
-            <span className="font-extralight">
+            <span className="font-extralight text-black-primary">
               {formatCurrency(priceRange[0])}
             </span>
-            <span className="font-extralight">-</span>
-            <span className="font-extralight">
+            <span className="font-extralight text-black-primary">-</span>
+            <span className="font-extralight text-black-primary">
               {formatCurrency(priceRange[1])}
             </span>
           </div>
@@ -189,21 +195,32 @@ export default function ModernLeftSideBar() {
         <Separator className="bg-black-tertiary opacity-20" />
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-700">Đánh giá</h3>
-          <div className="flex space-x-1">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <div
-                key={star}
-                onClick={() => handleStarClick(star)}
-                className="cursor-pointer"
+          <h3 className="text-lg font-semibold text-black-primary">Đánh Giá</h3>
+          <div className="space-y-2">
+            {ratings.map((rating) => (
+              <button
+                key={rating}
+                onClick={() => setSelectedRating(rating)}
+                className={`w-full flex items-center space-x-2 px-2 py-1.5 rounded-md transition-colors hover:text-gray-primary ${
+                  selectedRating === rating ? "text-black-primary" : ""
+                }`}
               >
-                <Star
-                  className={
-                    star <= rating ? "text-yellow-400" : "text-gray-300"
-                  }
-                  size={24}
-                />
-              </div>
+                <div className="flex">
+                  {[...Array(5)].map((_, index) => (
+                    <Star
+                      key={index}
+                      className={`w-5 h-5 ${
+                        index < rating
+                          ? "text-yellow-primary fill-white-primary"
+                          : "text-gray-primary"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-sm font-light text-black-primary">
+                  {rating == 5 ? "" : "trở lên"}
+                </span>
+              </button>
             ))}
           </div>
         </div>
@@ -211,7 +228,7 @@ export default function ModernLeftSideBar() {
         <Separator className="bg-black-tertiary opacity-20" />
 
         <Button className="w-full text-white-primary bg-black-primary hover:bg-black-tertiary transition-colors duration-200">
-          Áp dụng bộ lọc
+          Xoá tất cả
         </Button>
       </div>
     </div>
