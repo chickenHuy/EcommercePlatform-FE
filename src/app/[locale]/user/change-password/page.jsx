@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,13 +10,11 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
 import { updatePassword } from "@/api/user/changePassword";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
-import { Toaster } from "@/components/ui/toaster";
 
 const changePasswordSchema = z
   .object({
