@@ -1,11 +1,23 @@
-"use client"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+"use client";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-export default function RenderCategories (categories, level = 0, handleCategoryChange, selectedCategory) {
+export default function RenderCategories(
+  categories,
+  level = 0,
+  handleCategoryChange,
+  selectedCategory
+) {
+
   return (
-    <RadioGroup value={selectedCategory} onValueChange={handleCategoryChange}>
+    <>
+    {categories ? (<RadioGroup value={selectedCategory} onValueChange={handleCategoryChange}>
       {categories.map((category) => (
         <div key={category.id}>
           <div
@@ -33,6 +45,7 @@ export default function RenderCategories (categories, level = 0, handleCategoryC
           )}
         </div>
       ))}
-    </RadioGroup>
+    </RadioGroup>) : null}
+    </>
   );
-};
+}

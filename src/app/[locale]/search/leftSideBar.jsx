@@ -17,79 +17,33 @@ import BrandEmpty from "@/assets/images/brandEmpty.jpg";
 import { Label } from "@/components/ui/label";
 import RenderCategories from "./renderCategories";
 import Image from "next/image";
+import { getBrands, getCategoriesWithTreeView } from "@/api/search/searchApi";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ModernLeftSideBar() {
-  const categories = [
-    {
-      id: "electronics",
-      name: "Electronics",
-      children: [
-        {
-          id: "computers",
-          name: "Computers",
-          children: [
-            { id: "laptops", name: "Laptops" },
-            { id: "desktops", name: "Desktops" },
-            { id: "tablets", name: "Tablets" },
-          ],
-        },
-        {
-          id: "smartphones",
-          name: "Smartphones",
-          children: [
-            { id: "android", name: "Android" },
-            { id: "ios", name: "iOS" },
-          ],
-        },
-        { id: "accessories", name: "Accessories" },
-      ],
-    },
-    {
-      id: "clothing",
-      name: "Clothing",
-      children: [
-        {
-          id: "mens",
-          name: "Men's",
-          children: [
-            { id: "shirts", name: "Shirts" },
-            { id: "pants", name: "Pants" },
-            { id: "shoes", name: "Shoes" },
-          ],
-        },
-        {
-          id: "womens",
-          name: "Women's",
-          children: [
-            { id: "dresses", name: "Dresses" },
-            { id: "tops", name: "Tops" },
-            { id: "shoes", name: "Shoes" },
-          ],
-        },
-        { id: "kids", name: "Kids" },
-      ],
-    },
-  ];
+  const [categories, setCategories] = React.useState([]);
+  const [brands, setBrands] = React.useState([]);
+  const [isLoadingBrands, setIsLoadingBrands] = React.useState(true);
 
-  const brands = [
-    {
-      id: "hyperx",
-      label: "HyperX",
-      logo: "",
-    },
-    { id: "razer", label: "Razer", logo: "" },
-    {
-      id: "logitech",
-      label: "Logitech",
-      logo: "",
-    },
-    { id: "shure", label: "Shure", logo: "" },
-    {
-      id: "singing-machine",
-      label: "The singing machine",
-      logo: "",
-    },
-  ];
+  React.useEffect(() => {
+    getCategoriesWithTreeView()
+      .then((response) => {
+        setCategories(response.result);
+      })
+      .catch((error) => {
+        setCategories([]);
+      });
+
+    setIsLoadingBrands(true);
+    getBrands()
+      .then((response) => {
+        setBrands(response.result);
+      })
+      .catch((error) => {
+        setBrands([]);
+      });
+    setIsLoadingBrands(false);
+  }, []);
 
   const [priceRange, setPriceRange] = React.useState([0, 999999999]);
   const [rating, setRating] = React.useState(0);
@@ -118,6 +72,20 @@ export default function ModernLeftSideBar() {
 
   const ratings = [5, 4, 3, 2, 1];
 
+  const BrandsSkeleton = () => (
+    <div className="space-y-3">
+      {[...Array(5)].map((_, index) => (
+        <div key={index} className="flex items-center space-x-2">
+          <Skeleton className="h-4 w-4" />
+          <div className="flex justify-between space-x-2 w-full">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-6 w-6" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="space-y-8 m-4 max-w-sm">
       <div className="bg-blue-primary rounded-xl p-4 space-y-6">
@@ -144,28 +112,32 @@ export default function ModernLeftSideBar() {
             Thương hiệu
           </h3>
           <ScrollArea className="h-48 w-full pr-4">
-            <div className="space-y-3">
-              {brands.map((brand) => (
-                <div key={brand.id} className="flex items-center space-x-2">
-                  <Checkbox id={brand.id} />
-                  <div className="flex justify-between space-x-2 w-full">
-                    <Label
-                      htmlFor={brand.id}
-                      className="text-sm text-black-primary cursor-pointer"
-                    >
-                      {brand.label}
-                    </Label>
-                    <Image
-                      src={brand.logo || BrandEmpty}
-                      alt={`${brand.label} logo`}
-                      width={24}
-                      height={24}
-                      className="object-contain left-0"
-                    />
+            {isLoadingBrands ? (
+              <BrandsSkeleton />
+            ) : (
+              <div className="space-y-3">
+                {brands.map((brand) => (
+                  <div key={brand.id} className="flex items-center space-x-2">
+                    <Checkbox id={brand.id} />
+                    <div className="flex justify-between space-x-2 w-full">
+                      <Label
+                        htmlFor={brand.id}
+                        className="text-sm text-black-primary cursor-pointer"
+                      >
+                        {brand.name}
+                      </Label>
+                      <Image
+                        src={brand.logoUrl || BrandEmpty}
+                        alt={`${brand.name} logo`}
+                        width={24}
+                        height={24}
+                        className="object-contain left-0"
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </ScrollArea>
         </div>
 

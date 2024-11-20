@@ -10,3 +10,21 @@ export const getSuggestions = async (keyword) => {
     throw error;
   }
 };
+
+export const getCategoriesWithTreeView = async () => {
+  try {
+    const response = await get(`/api/v1/categories/tree-view`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getBrands = async () => {
+  try {
+    const response = await get(`/api/v1/brands/all`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
