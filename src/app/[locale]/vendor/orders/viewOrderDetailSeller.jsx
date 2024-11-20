@@ -35,6 +35,7 @@ import {
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import DialogUpdateOrCancelOrderSeller from "./dialogUpdateOrCancelOrderSeller";
+import Link from "next/link";
 
 export default function ViewOrderDetailSeller(props) {
   const { isOpen, onClose, orderId } = props;
@@ -252,7 +253,7 @@ export default function ViewOrderDetailSeller(props) {
                           <Card key={index}>
                             <CardContent>
                               <div className="flex items-start gap-4 mt-6">
-                                <a
+                                <Link
                                   href="/vendor/orders"
                                   target="_blank"
                                   rel="noopener noreferrer"
@@ -264,17 +265,17 @@ export default function ViewOrderDetailSeller(props) {
                                     width={100}
                                     className="rounded-md transition-transform duration-300 hover:scale-125 hover:mr-2"
                                   />
-                                </a>
+                                </Link>
                                 <div className="flex-1 space-y-2">
                                   <p className="font-bold text-xl">
-                                    <a
+                                    <Link
                                       href="/vendor/orders"
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="hover:underline hover:text-2xl"
                                     >
                                       {item.product.name}
-                                    </a>
+                                    </Link>
                                   </p>
                                   <p>{item.product.brand.name}</p>
                                   <p className="text-sm text-muted-foreground">
@@ -342,9 +343,9 @@ export default function ViewOrderDetailSeller(props) {
                         <p className="text-sm text-muted-foreground">
                           Xem lại đơn hàng nhanh chóng trên trang Đơn hàng
                         </p>
-                        <a href="/vendor/orders" className="flex gap-2">
+                        <Link href="/vendor/orders" className="flex gap-2">
                           <Button variant="outline">Xem tất cả đơn hàng</Button>
-                        </a>
+                        </Link>
                       </CardFooter>
                     </Card>
                   </div>

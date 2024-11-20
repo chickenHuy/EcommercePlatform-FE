@@ -3,7 +3,6 @@ import { get, post, put, del } from "@/lib/httpClient";
 export const getProfile = async () => {
   try {
     const response = await get(`/api/v1/users/me`);
-    console.log(response);
     return response;
   } catch (error) {
     console.error("Error during get profile:", error);

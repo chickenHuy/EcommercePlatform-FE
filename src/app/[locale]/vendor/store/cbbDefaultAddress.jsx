@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/popover";
 import { useState, useEffect } from "react";
 import { getAddressOfStore } from "@/api/vendor/storeRequest";
+import { on } from "events";
 
 export default function CbbAddresses({
   onAddressSelect,
@@ -28,11 +29,8 @@ export default function CbbAddresses({
     const fetchAddresses = async () => {
       try {
         const response = await getAddressOfStore();
+        console.log("fetchAddresses: ", response.result);
         setAddresses(response.result);
-        if (!defaultAddressToUpdate && response.result.length > 0) {
-          const defaultAddress = response.result[0];
-          onAddressSelect(defaultAddress);
-        }
       } catch (error) {
         console.error("Failed to fetch addresses:", error);
         toast({
@@ -59,11 +57,7 @@ export default function CbbAddresses({
           aria-expanded={open}
           className="w-[300px] justify-between"
         >
-          <span className="truncate">
-            {defaultAddressToUpdate
-              ? defaultAddressToUpdate.defaultAddressStr
-              : "Chọn địa chỉ mặc định..."}
-          </span>
+          <span>{defaultAddressToUpdate?.defaultAddressStr}</span>
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

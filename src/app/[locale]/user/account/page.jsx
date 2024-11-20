@@ -1,13 +1,11 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCallback, useEffect, useState } from "react";
 import { CircleCheck } from "lucide-react";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import {
   getAccount,
@@ -23,53 +21,36 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const accountSchema = z.object({
-  email: z.string().trim().email({
-    message: "Email không hợp lệ",
-  }),
-  phone: z
-    .string()
-    .trim()
-    .regex(/^0\d{9}$/, {
-      message:
-        "Số điện thoại phải gồm 10 chữ số, không chứa ký tự đặc biệt và phải bắt đầu là số 0",
-    }),
-});
-
 export default function ManageAccount() {
-  const [account, setAccount] = useState({
-    email: "",
-    phone: "",
-    username: "",
-    emailValidationStatus: "UNVERIFIED",
-  });
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [username, setUsername] = useState("");
+  const [emailValidationStatus, setEmailValidationStatus] = useState("");
+  const [userId, setUserId] = useState(null);
+  const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editField, setEditField] = useState("");
   const { toast } = useToast();
 
-  const formData = useForm({
-    resolver: zodResolver(accountSchema),
-    defaultValues: {
-      email: account.email,
-      phone: account.phone,
-    },
-  });
-
   const fetchAccount = useCallback(async () => {
     try {
       const response = await getAccount();
-      setAccount(response.result);
-      formData.setValue("email", response.result.email);
-      formData.setValue("phone", response.result.phone);
+      console.log("Account: ", response.result);
+      setEmail(response.result.email);
+      setPhone(response.result.phone);
+      setEmailValidationStatus(response.result.emailValidationStatus);
+      setUsername(response.result.username);
+      setUserId(response.result.id);
     } catch (error) {
       console.error("fetchAccount thất bại: ", error);
       toast({
         title: "Thất bại",
-        description: "Xảy ra lỗi khi lấy thông tin tài khoản",
+        description: error.message,
         variant: "destructive",
       });
     }
-  }, [toast, formData]);
+  }, [toast]);
 
   useEffect(() => {
     fetchAccount();
@@ -80,14 +61,34 @@ export default function ManageAccount() {
     setIsDialogOpen(true);
   };
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = (field) => {
+    setEditField(field);
     setIsDialogOpen(false);
   };
 
-  const handleUpdate = async (data) => {
+  const handleUpdate = async () => {
+    setEmailError("");
+    setPhoneError("");
+
+    if (editField === "email") {
+      if (!/^\S+@\S+\.\S+$/.test(email)) {
+        setEmailError("Email không hợp lệ");
+        return;
+      }
+    }
+
+    if (editField === "phone") {
+      if (!/^0\d{9}$/.test(phone)) {
+        setPhoneError("Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0");
+        return;
+      }
+    }
+
     const updateFunction = editField === "email" ? updateEmail : updatePhone;
+    const data = editField === "email" ? { email } : { phone };
+
     try {
-      await updateFunction({ ...data, userId: account.id });
+      await updateFunction({ ...data, userId });
       toast({
         title: "Thành công",
         description: `${
@@ -134,20 +135,24 @@ export default function ManageAccount() {
           <div className="flex items-center justify-start mb-8">
             <Label className="w-1/5 font-medium mr-2">Tên đăng nhập</Label>
             <span className="flex-grow">
-              {account.username || "chưa có tên đăng nhập"}
+              {username || "chưa có tên đăng nhập"}
             </span>
           </div>
           <div className="flex items-center justify-start mb-8">
             <Label className="w-1/5 font-medium mr-2">Email</Label>
-            <span className="flex-grow">
-              {account.email || "chưa có email"}
-            </span>
-            {account.emailValidationStatus === "VERIFIED" && (
+            <Input
+              value={email || "bạn chưa có email"}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              disabled={true}
+              className="flex-grow mr-4 border-none"
+            ></Input>
+            {emailValidationStatus === "VERIFIED" && (
               <CircleCheck className="mr-4" />
             )}
             <Button onClick={() => handleOpenDialog("email")}>Thay đổi</Button>
           </div>
-          {account.emailValidationStatus !== "VERIFIED" && (
+          {emailValidationStatus !== "VERIFIED" && (
             <div className="flex justify-start mb-8">
               <Button onClick={handleSendMailValidation}>Xác thực email</Button>
             </div>
@@ -156,9 +161,13 @@ export default function ManageAccount() {
             <Label htmlFor="phone" className="w-1/5 font-medium mr-2">
               Số điện thoại
             </Label>
-            <span className=" flex-grow">
-              {account.phone || "chưa có số điện thoại"}
-            </span>
+            <Input
+              value={phone || "bạn chưa có số điện thoại"}
+              onChange={(e) => setPhone(e.target.value)}
+              type="text"
+              disabled={true}
+              className="flex-grow mr-4 border-none"
+            ></Input>
             <Button onClick={() => handleOpenDialog("phone")}>Thay đổi</Button>
           </div>
         </CardContent>
@@ -180,19 +189,42 @@ export default function ManageAccount() {
                 hoàn thành cập nhật
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={formData.handleSubmit(handleUpdate)}>
-              <Input
-                {...formData.register(editField)}
-                type={editField === "email" ? "email" : "text"}
-                defaultValue={
-                  editField === "email" ? account.email : account.phone
-                }
-                className="w-full rounded-lg shadow-sm"
-              />
-              {formData.formState.errors[editField] && (
-                <p className="mt-2 text-error col-start-2 col-span-3">
-                  {formData.formState.errors[editField].message}
-                </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleUpdate();
+              }}
+            >
+              {editField === "email" ? (
+                <>
+                  <Input
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    type="email"
+                    placeholder="nhập email mới"
+                    className="w-full rounded-lg shadow-sm"
+                  />
+                  {emailError && (
+                    <p className="mt-2 text-sm text-error col-start-2 col-span-3">
+                      {emailError}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Input
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    type="text"
+                    placeholder="nhập số điện thoại mới"
+                    className="w-full rounded-lg shadow-sm"
+                  />
+                  {phoneError && (
+                    <p className="mt-2 text-sm text-error col-start-2 col-span-3">
+                      {phoneError}
+                    </p>
+                  )}
+                </>
               )}
               <div className="mt-4 flex justify-end gap-3">
                 <Button type="button" onClick={handleCloseDialog}>

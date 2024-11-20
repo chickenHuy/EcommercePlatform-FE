@@ -78,7 +78,6 @@ export default function ManageProfile() {
       dateOfBirth: profileData.dateOfBirth
         ? new Date(profileData.dateOfBirth).toLocaleDateString("sv-SE")
         : null,
-      phone: profile.phone,
     };
 
     try {

@@ -25,6 +25,7 @@ const storeSchema = z.object({
 export default function ManageStoreInfo() {
   const [store, setStore] = useState([]);
   const [defaultAddressToUpdate, setDefaultAddressToUpdate] = useState(null);
+  const [addressError, setAddressError] = useState("");
 
   const { toast } = useToast();
 
@@ -39,12 +40,18 @@ export default function ManageStoreInfo() {
   const fetchStoreByUserId = useCallback(async () => {
     try {
       const response = await getStoreByUserId();
+      console.log("fetchStoreByUserId: ", response.result);
       setStore(response.result);
       formData.reset(response.result);
-      if (response.result.defaultAddress) {
+      if (response.result.defaultAddress === null) {
+        setDefaultAddressToUpdate({
+          defaultAddressStr: "Chọn địa chỉ mặc định",
+          defaultAddressId: null,
+        });
+      } else {
         setDefaultAddressToUpdate({
           defaultAddressStr: response.result.defaultAddress,
-          defaultAddressId: response.result.defaultAddressId,
+          defaultAddressId: null,
         });
       }
     } catch (error) {
@@ -62,6 +69,11 @@ export default function ManageStoreInfo() {
   }, [fetchStoreByUserId]);
 
   const handleUpdate = async (storeData) => {
+    if (!defaultAddressToUpdate?.defaultAddressId) {
+      setAddressError("Vui lòng chọn địa chỉ mặc định");
+      return;
+    }
+    setAddressError("");
     const payload = {
       ...storeData,
       bio:
@@ -161,6 +173,11 @@ export default function ManageStoreInfo() {
               defaultAddressToUpdate={defaultAddressToUpdate}
               onAddressSelect={setDefaultAddressToUpdate}
             />
+            {addressError && (
+              <p className="text-sm text-error col-start-2 col-span-3">
+                {addressError}
+              </p>
+            )}
           </div>
 
           <div className="border-t px-6 py-4 flex justify-center">
