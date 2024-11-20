@@ -40,15 +40,8 @@ export default async function RootLayout({ children, params }) {
       <StoreProvider>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <body>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
               <UserHeader />
               {children}
-            </ThemeProvider>
           </body>
         </NextIntlClientProvider>
       </StoreProvider>

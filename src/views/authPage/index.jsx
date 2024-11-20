@@ -18,6 +18,7 @@ import { handleLoginNavigation } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import SignUpNow from "@/app/[locale]/auth/signUp";
 import Cookies from "js-cookie";
+import Link from "next/link";
 const AuthPage = () => {
   const [isSignIn, setIsSignIn] = useState(true);
   const t = useTranslations("AuthPage");
@@ -151,9 +152,9 @@ const AuthPage = () => {
               <label>
                 <input type="checkbox" /> {t("rememberMe")}
               </label>
-              <a className="text-black-primary" href="#">
+              <Link className="text-black-primary" href="#">
                 {t("forgotPassword")}
-              </a>
+              </Link>
             </div>
 
             <div className="my-4">

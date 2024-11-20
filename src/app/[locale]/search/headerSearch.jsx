@@ -20,17 +20,17 @@ export default function SearchHeader(props) {
       </div>
 
       <div className="relative container mx-auto px-12 pt-[160px]">
-        <nav className="flex items-center space-x-2 text-sm text-white-primary">
+        <div className="flex items-center space-x-2 text-sm text-white-primary">
           <Link href="/" className="">
             <Home className="h-4 w-4" />
           </Link>
-          <span>/</span>
+          /
           <Link href="/category" className="">
             Category
           </Link>
-          <span>/</span>
+          /
           <h1 className="text-white-primary">Headphones</h1>
-        </nav>
+        </div>
 
         <h1 className="mt-4 text-[80px] font-light leading-tight tracking-tight text-white-primary">
           Headphones

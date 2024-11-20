@@ -1,5 +1,3 @@
-"use client";
-
 import { User, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -37,10 +35,10 @@ const UserHeader = () => {
                 className="text-white-primary relative"
               >
                 <ShoppingCart className="h-5 w-5" />
-                <span className="sr-only">Cart</span>
-                <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-500 text-[10px] font-bold flex items-center justify-center">
+                <div className="sr-only">Cart</div>
+                <div className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-500 text-[10px] font-bold flex items-center justify-center">
                   2
-                </span>
+                </div>
               </Button>
             </div>
           </div>

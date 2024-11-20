@@ -47,6 +47,7 @@ import {
 } from "@/store/features/orderFilterSlice";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 const data = {
   navMain: [
     {
@@ -243,10 +244,10 @@ export default function VendorNavigate({ vendorContent }) {
               {data.projects.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon />
                       <span>{item.name}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
