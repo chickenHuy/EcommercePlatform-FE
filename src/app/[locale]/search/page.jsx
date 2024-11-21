@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import LeftSideBar from "./leftSideBar";
 import RightSideBar from "./rightSidebar";
+import ProductGrid from "./productGrid";
 
 export default function SearchPage() {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
@@ -107,11 +108,8 @@ export default function SearchPage() {
 
             {/* Main Content Area - Scrollable */}
             <div className="flex-1 overflow-auto p-4">
-              <h2 className="text-xl font-bold mb-4">Search Results</h2>
               <div className="space-y-4">
-                <div className="p-4 border rounded shadow-sm">Result 1</div>
-                <div className="p-4 border rounded shadow-sm">Result 2</div>
-                <div className="p-4 border rounded shadow-sm">Result 3</div>
+                <ProductGrid></ProductGrid>
                 {/* Add more results as needed */}
               </div>
             </div>

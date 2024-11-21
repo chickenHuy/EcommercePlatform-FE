@@ -1,12 +1,32 @@
+"use client"
 import { User, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SearchWithSuggestions } from "../searchBars/userSearch";
+import { useEffect, useState } from "react";
 
 const UserHeader = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Theo dõi trạng thái cuộn
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-transparent-primary">
-      <div className="container mx-auto px-4 py-2 sm:px-6 sm:py-3">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 pt-2 transition-transform duration-300 ${
+        isScrolled ? "-translate-y-2 bg-black-primary" : "translate-y-0"
+      }`}
+    >
+      <div className="container mx-auto px-4 sm:px-6">
         <div className="w-full bg-black-primary text-white rounded-lg">
           <div className="flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6">
             <Link
