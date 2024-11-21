@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   categories: [],
+  mainCategoryId: null,
   brands: [],
   store: "",
   sortBy: "",
@@ -14,18 +15,22 @@ const initialState = {
 
 const resetState = {
   categories: [],
+  mainCategoryId: null,
   brands: [],
   store: "",
   sortBy: "",
   order: "",
   minPrice: 0,
-  maxPrice: 0,
+  maxPrice: 99999999,
   rating: 0,
 };
 const userSearchSlice = createSlice({
   name: "userSearchSlice",
   initialState,
   reducers: {
+    setMainCategoryId: (state, action) => {
+      state.mainCategoryId = action.payload;
+    },
     setCategories: (state, action) => {
       state.categories = action.payload;
     },
@@ -70,6 +75,7 @@ export const {
   setRating,
   setSearch,
   resetFilters,
+  setMainCategoryId,
 } = userSearchSlice.actions;
 
 export default userSearchSlice.reducer;

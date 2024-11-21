@@ -17,7 +17,7 @@ export default function RenderCategories(
 
   return (
     <>
-    {categories ? (<RadioGroup value={selectedCategory} onValueChange={handleCategoryChange}>
+    {categories ? (<RadioGroup value={selectedCategory} onValueChange={(value) => {handleCategoryChange(value)}}>
       {categories.map((category) => (
         <div key={category.id}>
           <div

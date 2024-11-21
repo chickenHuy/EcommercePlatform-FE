@@ -19,64 +19,69 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
 import { getSuggestions } from "@/api/search/searchApi";
+import { useDispatch } from "react-redux";
+import { setSearch } from "@/store/features/userSearchSlice";
 
 export function SearchWithSuggestions({ className }) {
-  const [query, setQuery] = React.useState("")
-  const [isExpanded, setIsExpanded] = React.useState(false)
-  const [suggestions, setSuggestions] = React.useState([])
-  const [selectedIndex, setSelectedIndex] = React.useState(-1)
-  const inputRef = React.useRef(null)
-  const suggestionRefs = React.useRef([])
+  const [query, setQuery] = React.useState("");
+  const [isExpanded, setIsExpanded] = React.useState(false);
+  const [suggestions, setSuggestions] = React.useState([]);
+  const [selectedIndex, setSelectedIndex] = React.useState(-1);
+  const inputRef = React.useRef(null);
+  const suggestionRefs = React.useRef([]);
 
-  const debouncedQuery = useDebounce(query, 300)
+  const debouncedQuery = useDebounce(query, 300);
 
   React.useEffect(() => {
     if (debouncedQuery) {
       getSuggestions(debouncedQuery)
         .then((data) => {
-          setSuggestions(data.result || [])
-          setSelectedIndex(-1)
+          setSuggestions(data.result || []);
+          setSelectedIndex(-1);
         })
         .catch((error) => {
-          console.error("Error fetching suggestions:", error)
-          setSuggestions([])
-        })
+          console.error("Error fetching suggestions:", error);
+          setSuggestions([]);
+        });
     } else {
-      setSuggestions([])
+      setSuggestions([]);
     }
-  }, [debouncedQuery])
+  }, [debouncedQuery]);
 
-  const toggleExpand = () => setIsExpanded(!isExpanded)
+  const toggleExpand = () => setIsExpanded(!isExpanded);
 
   const handleInputChange = (e) => {
-    setQuery(e.target.value)
-    setSelectedIndex(-1)
-  }
+    setQuery(e.target.value);
+    setSelectedIndex(-1);
+  };
+
+  const dispatch = useDispatch();
+  dispatch(setSearch(query));
 
   const handleKeyDown = (e) => {
     if (suggestions.length > 0) {
       if (e.key === "ArrowDown") {
-        e.preventDefault()
-        setSelectedIndex((prev) => Math.min(prev + 1, suggestions.length - 1))
+        e.preventDefault();
+        setSelectedIndex((prev) => Math.min(prev + 1, suggestions.length - 1));
       } else if (e.key === "ArrowUp") {
-        e.preventDefault()
-        setSelectedIndex((prev) => Math.max(prev - 1, -1))
+        e.preventDefault();
+        setSelectedIndex((prev) => Math.max(prev - 1, -1));
       } else if (e.key === "Enter" && selectedIndex >= 0) {
-        e.preventDefault()
-        setQuery(suggestions[selectedIndex])
-        setIsExpanded(false)
-        inputRef.current?.focus()
+        e.preventDefault();
+        setQuery(suggestions[selectedIndex]);
+        setIsExpanded(false);
+        inputRef.current?.focus();
       }
     }
-  }
+  };
 
   React.useEffect(() => {
     if (selectedIndex >= 0 && suggestionRefs.current[selectedIndex]) {
       suggestionRefs.current[selectedIndex]?.scrollIntoView({
         block: "nearest",
-      })
+      });
     }
-  }, [selectedIndex])
+  }, [selectedIndex]);
 
   return (
     <div className={cn("relative w-full max-w-[480px]", className)}>
@@ -107,9 +112,9 @@ export function SearchWithSuggestions({ className }) {
             isExpanded ? "md:pointer-events-none" : "md:hidden"
           )}
           onClick={(e) => {
-            e.preventDefault()
-            toggleExpand()
-            inputRef.current?.focus()
+            e.preventDefault();
+            toggleExpand();
+            inputRef.current?.focus();
           }}
         >
           <Search className="h-full text-white-primary" />
@@ -126,9 +131,9 @@ export function SearchWithSuggestions({ className }) {
                     key={index}
                     onMouseEnter={() => setSelectedIndex(index)}
                     onSelect={() => {
-                      setQuery(item)
-                      setIsExpanded(false)
-                      inputRef.current?.focus()
+                      setQuery(item);
+                      setIsExpanded(false);
+                      inputRef.current?.focus();
                     }}
                     ref={(el) => (suggestionRefs.current[index] = el)}
                     className={cn(
@@ -146,5 +151,5 @@ export function SearchWithSuggestions({ className }) {
         </div>
       )}
     </div>
-  )
+  );
 }
