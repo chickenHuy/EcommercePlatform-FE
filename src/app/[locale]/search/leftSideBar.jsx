@@ -19,6 +19,8 @@ import RenderCategories from "./renderCategories";
 import Image from "next/image";
 import { getBrands, getCategoriesWithTreeView } from "@/api/search/searchApi";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useDispatch, useSelector } from "react-redux";
+import { setBrands as setSelectedBrands } from "@/store/features/userSearchSlice";
 
 export default function ModernLeftSideBar() {
   const [categories, setCategories] = React.useState([]);
@@ -48,6 +50,22 @@ export default function ModernLeftSideBar() {
   const [priceRange, setPriceRange] = React.useState([0, 999999999]);
   const [rating, setRating] = React.useState(0);
   const [selectedCategory, setSelectedCategory] = React.useState("");
+
+  const dispatch = useDispatch();
+  const selectedBrands = useSelector((state) =>
+    Array.isArray(state.searchFilter.brands) ? state.searchFilter.brands : []
+  );
+
+  const handleBrandChange = (brand, checked) => {
+    checked ? (
+      dispatch(setSelectedBrands([...selectedBrands,brand]))
+    ) :
+    (
+      dispatch(setSelectedBrands(selectedBrands.filter((item) => item !== brand)))
+    )
+  
+    console.log(selectedBrands)
+  };
 
   const handlePriceChange = (value) => {
     setPriceRange(value);
@@ -118,7 +136,13 @@ export default function ModernLeftSideBar() {
               <div className="space-y-3">
                 {brands.map((brand) => (
                   <div key={brand.id} className="flex items-center space-x-2">
-                    <Checkbox id={brand.id} />
+                    <Checkbox
+                      id={brand.id}
+                      onCheckedChange={
+                        (checked) => handleBrandChange(brand.id, checked)
+                      }
+                    />
+
                     <div className="flex justify-between space-x-2 w-full">
                       <Label
                         htmlFor={brand.id}
