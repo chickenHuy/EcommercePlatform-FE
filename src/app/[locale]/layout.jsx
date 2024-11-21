@@ -34,11 +34,6 @@ export const metadata = {
 export default async function RootLayout({ children, params }) {
   const locale = params?.locale || "en";
   const messages = await getMessages(locale);
-  const pathname = params.pathname || "";
-  const isNotDashboard =
-    pathname.startsWith("/admin") ||
-    pathname.startsWith("/vendor") ||
-    pathname.startsWith("/auth");
 
   return (
     <html lang={locale}>
