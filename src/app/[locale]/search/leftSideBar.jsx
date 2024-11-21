@@ -199,7 +199,7 @@ export default function ModernLeftSideBar() {
 
         <Separator className="bg-black-tertiary opacity-20" />
 
-        <Button className="w-full text-white-primary bg-black-primary hover:bg-black-tertiary transition-colors duration-200">
+        <Button className="w-full text-white-primary bg-red-primary hover:bg-red-primary/50 transition-colors duration-200">
           Xoá tất cả
         </Button>
       </div>

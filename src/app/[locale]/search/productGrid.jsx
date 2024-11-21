@@ -110,9 +110,7 @@ const products = [
     videoUrl: "https://example.com/video/jeans.mp4",
     rating: 4.2,
   },
-  
 
-  // Add more products as needed
 ];
 
 export default function ProductGrid() {

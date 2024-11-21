@@ -110,7 +110,6 @@ export default function SearchPage() {
             <div className="flex-1 overflow-auto p-4">
               <div className="space-y-4">
                 <ProductGrid></ProductGrid>
-                {/* Add more results as needed */}
               </div>
             </div>
           </div>
