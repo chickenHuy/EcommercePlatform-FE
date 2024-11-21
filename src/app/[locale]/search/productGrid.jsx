@@ -34,7 +34,7 @@ const products = [
     name: "Quần jean thoải mái",
     price: 599000,
     originalPrice: 799000,
-    imageUrl: "/placeholder.svg?height=300&width=300",
+    mainImageUrl: "/placeholder.svg?height=300&width=300",
     videoUrl: "https://example.com/video/jeans.mp4",
     rating: 4.2,
   },
@@ -43,7 +43,7 @@ const products = [
     name: "Quần jean thoải mái",
     price: 599000,
     originalPrice: 799000,
-    imageUrl: "/placeholder.svg?height=300&width=300",
+    mainImageUrl: "/placeholder.svg?height=300&width=300",
     videoUrl: "https://example.com/video/jeans.mp4",
     rating: 4.2,
   },
@@ -52,7 +52,7 @@ const products = [
     name: "Quần jean thoải mái",
     price: 599000,
     originalPrice: 799000,
-    imageUrl: "/placeholder.svg?height=300&width=300",
+    mainImageUrl: "/placeholder.svg?height=300&width=300",
     videoUrl: "https://example.com/video/jeans.mp4",
     rating: 4.2,
   },
@@ -61,7 +61,7 @@ const products = [
     name: "Quần jean thoải mái",
     price: 599000,
     originalPrice: 799000,
-    imageUrl: "/placeholder.svg?height=300&width=300",
+    mainImageUrl: "/placeholder.svg?height=300&width=300",
     videoUrl: "https://example.com/video/jeans.mp4",
     rating: 4.2,
   },
@@ -70,7 +70,7 @@ const products = [
     name: "Quần jean thoải mái",
     price: 599000,
     originalPrice: 799000,
-    imageUrl: "/placeholder.svg?height=300&width=300",
+    mainImageUrl: "/placeholder.svg?height=300&width=300",
     videoUrl: "https://example.com/video/jeans.mp4",
     rating: 4.2,
   },
@@ -79,7 +79,7 @@ const products = [
     name: "Quần jean thoải mái",
     price: 599000,
     originalPrice: 799000,
-    imageUrl: "/placeholder.svg?height=300&width=300",
+    mainImageUrl: "/placeholder.svg?height=300&width=300",
     videoUrl: "https://example.com/video/jeans.mp4",
     rating: 4.2,
   },
@@ -88,7 +88,7 @@ const products = [
     name: "Quần jean thoải mái",
     price: 599000,
     originalPrice: 799000,
-    imageUrl: "/placeholder.svg?height=300&width=300",
+    mainImageUrl: "/placeholder.svg?height=300&width=300",
     videoUrl: "https://example.com/video/jeans.mp4",
     rating: 4.2,
   },
@@ -97,7 +97,7 @@ const products = [
     name: "Quần jean thoải mái",
     price: 599000,
     originalPrice: 799000,
-    imageUrl: "/placeholder.svg?height=300&width=300",
+    mainImageUrl: "/placeholder.svg?height=300&width=300",
     videoUrl: "https://example.com/video/jeans.mp4",
     rating: 4.2,
   },
@@ -106,7 +106,7 @@ const products = [
     name: "Quần jean thoải mái",
     price: 599000,
     originalPrice: 799000,
-    imageUrl: "/placeholder.svg?height=300&width=300",
+    mainImageUrl: "/placeholder.svg?height=300&width=300",
     videoUrl: "https://example.com/video/jeans.mp4",
     rating: 4.2,
   },
@@ -149,7 +149,7 @@ export default function ProductGrid() {
           name={product.name}
           price={product.price}
           originalPrice={product.originalPrice}
-          imageUrl={product.imageUrl}
+          mainImageUrl={product.mainImageUrl}
           videoUrl={product.videoUrl}
           rating={product.rating}
           onAddToCart={() => handleAddToCart(product)}
