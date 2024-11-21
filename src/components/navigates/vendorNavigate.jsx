@@ -2,17 +2,12 @@
 
 import {
   BookOpen,
-  Bot,
-  ChevronRight,
-  Map,
-  PieChart,
-  Frame,
   Box,
-  SquareTerminal,
-  Store,
-  MapPinHouse,
-  Star,
+  ChevronRight,
   ShoppingBag,
+  Star,
+  MapPinHouse,
+  Store,
 } from "lucide-react";
 
 import {
@@ -26,16 +21,15 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
-  SidebarHeader,
-  SidebarInset,
   SidebarMenu,
-  SidebarMenuButton,
+  SidebarRail,
+  SidebarInset,
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
+  SidebarMenuButton,
   SidebarMenuSubItem,
   SidebarProvider,
-  SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import VendorHeader from "../headers/vendorHeader";
@@ -48,6 +42,7 @@ import {
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
 const data = {
   navMain: [
     {
@@ -60,51 +55,61 @@ const data = {
           title: "Tất cả",
           url: "/vendor/orders",
           filterKey: "",
+          activeKey: "all",
         },
         {
           title: "Chờ thanh toán",
           url: "/vendor/orders",
           filterKey: "ON_HOLD",
+          activeKey: "onHold",
         },
         {
           title: "Chờ xác nhận",
           url: "/vendor/orders",
           filterKey: "PENDING",
+          activeKey: "pending",
         },
         {
           title: "Đã xác nhận",
           url: "/vendor/orders",
           filterKey: "CONFIRMED",
+          activeKey: "confirmed",
         },
         {
           title: "Chuẩn bị hàng",
           url: "/vendor/orders",
           filterKey: "PREPARING",
+          activeKey: "preparing",
         },
         {
           title: "Chờ vận chuyển",
           url: "/vendor/orders",
           filterKey: "WAITING_FOR_SHIPPING",
+          activeKey: "waitingForShipping",
         },
         {
           title: "Đã giao cho ĐVVC",
           url: "/vendor/orders",
           filterKey: "PICKED_UP",
+          activeKey: "pickedUp",
         },
         {
           title: "Đang giao hàng",
           url: "/vendor/orders",
           filterKey: "OUT_FOR_DELIVERY",
+          activeKey: "outForDelivery",
         },
         {
           title: "Hoàn thành",
           url: "/vendor/orders",
           filterKey: "DELIVERED",
+          activeKey: "delivered",
         },
         {
           title: "Đã hủy",
           url: "/vendor/orders",
           filterKey: "CANCELLED",
+          activeKey: "cancelled",
         },
       ],
     },
@@ -116,10 +121,12 @@ const data = {
         {
           title: "Thêm sản phẩm",
           url: "/vendor/products/create",
+          activeKey: "createProduct",
         },
         {
           title: "Danh sách sản phẩm",
           url: "/vendor/products",
+          activeKey: "productList",
         },
       ],
     },
@@ -128,33 +135,15 @@ const data = {
       url: "#",
       icon: BookOpen,
       items: [
-        {
-          title: "Doanh thu",
-          url: "#",
-        },
-        {
-          title: "Hiệu quả hoạt động",
-          url: "#",
-        },
+        { title: "Doanh thu", url: "#", activeKey: "revenue" },
+        { title: "Hiệu quả hoạt động", url: "#", activeKey: "performance" },
       ],
     },
   ],
   projects: [
-    {
-      name: "Đánh giá & bình luận",
-      url: "#",
-      icon: Star,
-    },
-    {
-      name: "Địa chỉ lấy hàng",
-      url: "#",
-      icon: MapPinHouse,
-    },
-    {
-      name: "Hồ sơ cửa hàng",
-      url: "#",
-      icon: Store,
-    },
+    { name: "Đánh giá & bình luận", url: "#", icon: Star },
+    { name: "Địa chỉ lấy hàng", url: "#", icon: MapPinHouse },
+    { name: "Hồ sơ cửa hàng", url: "#", icon: Store },
   ],
 };
 
@@ -165,28 +154,29 @@ export default function VendorNavigate({ vendorContent }) {
     (state) => state.orderFilterReducer.activeItem
   );
 
-  const handleSetFilter = (filterKey, url, showFilter) => {
+  const handleSetFilter = (filterKey, url, showFilter, activeKey) => {
     dispatch(setFilter(filterKey));
-    console.log("filterKey ở VendorNavigate: ", filterKey);
     dispatch(setShowFilter(showFilter));
-    dispatch(setActiveItem(filterKey));
+    dispatch(setActiveItem(activeKey));
     router.push(url);
   };
 
   useEffect(() => {
     if (router && router.asPath) {
       const path = router.asPath;
-      if (path.includes("/vendor/orders")) {
-        setActiveItem("");
+      if (path.includes("/vendor/products/create")) {
+        dispatch(setActiveItem("createProduct"));
+      } else if (path.includes("/vendor/products")) {
+        dispatch(setActiveItem("productList"));
       } else {
-        setActiveItem(null);
+        dispatch(setActiveItem(null));
       }
     }
-  }, [router, router.asPath]);
+  }, [router, router.asPath, dispatch]);
 
   return (
     <SidebarProvider>
-      <VendorHeader></VendorHeader>
+      <VendorHeader />
       <Sidebar collapsible="icon" className="mt-16">
         <SidebarContent>
           <SidebarGroup>
@@ -214,7 +204,7 @@ export default function VendorNavigate({ vendorContent }) {
                             <SidebarMenuSubButton asChild>
                               <button
                                 className={`w-full hover:cursor-pointer ${
-                                  activeItem === subItem.filterKey
+                                  activeItem === subItem.activeKey
                                     ? "font-bold"
                                     : "font-normal"
                                 }`}
@@ -222,7 +212,8 @@ export default function VendorNavigate({ vendorContent }) {
                                   handleSetFilter(
                                     subItem.filterKey,
                                     subItem.url,
-                                    subItem.filterKey === ""
+                                    subItem.filterKey === "",
+                                    subItem.activeKey
                                   )
                                 }
                               >
@@ -238,6 +229,7 @@ export default function VendorNavigate({ vendorContent }) {
               ))}
             </SidebarMenu>
           </SidebarGroup>
+
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>Cửa hàng của tôi</SidebarGroupLabel>
             <SidebarMenu>
@@ -254,6 +246,7 @@ export default function VendorNavigate({ vendorContent }) {
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
+
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -270,7 +263,7 @@ export default function VendorNavigate({ vendorContent }) {
         </SidebarFooter>
         <SidebarRail />
       </Sidebar>
-      {<SidebarInset>{vendorContent}</SidebarInset>}
+      <SidebarInset>{vendorContent}</SidebarInset>
     </SidebarProvider>
   );
 }
