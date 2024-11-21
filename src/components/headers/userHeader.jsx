@@ -1,14 +1,15 @@
-"use client"
+"use client";
 import { User, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SearchWithSuggestions } from "../searchBars/userSearch";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 const UserHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname(); 
 
-  // Theo dõi trạng thái cuộn
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -19,6 +20,14 @@ const UserHeader = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  const isHeaderVisible =
+    !pathname.includes("/admin") &&
+    !pathname.includes("/vendor") &&
+    !pathname.includes("/user") &&
+    !pathname.includes("/auth");
+
+  if (!isHeaderVisible) return null;
 
   return (
     <header
