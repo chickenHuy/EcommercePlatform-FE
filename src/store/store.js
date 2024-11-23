@@ -4,6 +4,7 @@ import componentSlice from "./features/componentSlice";
 import brandSlice from "./features/brandSlice";
 import searchSlice from "./features/searchSlice";
 import orderFilter from "./features/orderFilterSlice";
+import userSearchSlice from "./features/userSearchSlice";
 
 export const makeStore = () => {
   return configureStore({
@@ -13,6 +14,7 @@ export const makeStore = () => {
       brandReducer: brandSlice,
       searchReducer: searchSlice,
       orderFilterReducer: orderFilter,
+      searchFilter: userSearchSlice
     },
   });
 };

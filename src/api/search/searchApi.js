@@ -28,3 +28,14 @@ export const getBrands = async () => {
     throw error;
   }
 }
+
+export const getCategory = async (id) => {
+  try {
+    const response = await get(`/api/v1/categories/with-id/${id}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
