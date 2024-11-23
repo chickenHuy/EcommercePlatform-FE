@@ -229,7 +229,7 @@ export default function ManageOrderSeller() {
       case "PREPARING":
         return "Chuẩn bị hàng";
       case "WAITING_FOR_SHIPPING":
-        return "Chờ vận chuyển";
+        return "Chờ giao cho ĐVVC";
       case "PICKED_UP":
         return "Đã giao cho ĐVVC";
       case "OUT_FOR_DELIVERY":
@@ -259,7 +259,7 @@ export default function ManageOrderSeller() {
   }
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+    <div className="flex min-h-screen w-full flex-col bg-muted/40 pt-16">
       <Toaster />
       <div className="flex flex-col sm:gap-4 sm:py-4">
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-4">

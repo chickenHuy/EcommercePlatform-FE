@@ -54,12 +54,11 @@ export default function ViewOrderDetailSeller(props) {
     }
     try {
       const response = await getOneOrderBySeller(orderId);
-      console.log("Order: ", response.result);
       setOrder(response.result);
     } catch (error) {
       toast({
         title: "Lấy thông tin thất bại",
-        description: "Không thể lấy thông tin đơn hàng",
+        description: error.message,
         variant: "destructive",
       });
     }

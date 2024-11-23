@@ -211,7 +211,7 @@ export default function ManageOrderAdmin() {
       case "PREPARING":
         return "Chuẩn bị hàng";
       case "WAITING_FOR_SHIPPING":
-        return "Chờ vận chuyển";
+        return "Chờ giao cho ĐVVC";
       case "PICKED_UP":
         return "Đã giao cho ĐVVC";
       case "OUT_FOR_DELIVERY":
@@ -246,7 +246,7 @@ export default function ManageOrderAdmin() {
     { label: "Chờ xác nhận", filterKey: "PENDING" },
     { label: "Đã xác nhận", filterKey: "CONFIRMED" },
     { label: "Chuẩn bị hàng", filterKey: "PREPARING" },
-    { label: "Chờ vận chuyển", filterKey: "WAITING_FOR_SHIPPING" },
+    { label: "Chờ giao cho ĐVVC", filterKey: "WAITING_FOR_SHIPPING" },
     { label: "Đã giao cho ĐVVC", filterKey: "PICKED_UP" },
     { label: "Đang giao hàng", filterKey: "OUT_FOR_DELIVERY" },
     { label: "Hoàn thành", filterKey: "DELIVERED" },
@@ -379,7 +379,7 @@ export default function ManageOrderAdmin() {
                             {formatDate(order.createdAt)}
                           </TableCell>
                           <TableCell className="text-center">
-                            {order.phone}
+                            {order.orderPhone}
                           </TableCell>
                           <TableCell className="text-center">
                             {order.province}

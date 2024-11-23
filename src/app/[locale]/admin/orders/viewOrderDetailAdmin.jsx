@@ -367,7 +367,12 @@ export default function ViewOrderDetailAdmin(props) {
                         <p className="text-sm text-muted-foreground">
                           Xem lại đơn hàng nhanh chóng trên trang Đơn hàng
                         </p>
-                        <Link href="/admin/orders" className="flex gap-2">
+                        <Link
+                          href="/admin/orders"
+                          className="flex gap-2"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           <Button variant="outline">Xem tất cả đơn hàng</Button>
                         </Link>
                       </CardFooter>
@@ -405,6 +410,10 @@ export default function ViewOrderDetailAdmin(props) {
                         <div className="flex space-x-2">
                           <UserRound />
                           <p>{order?.recipientName}</p>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Phone />
+                          <p>{order?.orderPhone}</p>
                         </div>
                         <p>{`${order?.detailLocate}, ${order?.detailAddress}`}</p>
                         <p>{order?.subDistrict}</p>
