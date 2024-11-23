@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import SearchHeader from "./headerSearch";
 import {
@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   ArrowDownWideNarrow,
+  ArrowUpWideNarrow,
   Filter,
   FilterX,
   Menu,
@@ -27,10 +28,70 @@ import {
 import LeftSideBar from "./leftSideBar";
 import RightSideBar from "./rightSidebar";
 import ProductGrid from "./productGrid";
+import { useDispatch, useSelector } from "react-redux";
+import { setOrder, setSortBy } from "@/store/features/userSearchSlice";
+import { searchProducts } from "@/api/search/searchApi";
 
 export default function SearchPage() {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
+  const dispatch = useDispatch();
+
+  const order = useSelector((state) => state.searchFilter.order);
+  const sortBy = useSelector((state) => state.searchFilter.sortBy);
+  const categories = useSelector((state) => state.searchFilter.categories);
+  const brands = useSelector((state) => state.searchFilter.brands);
+  const minPrice = useSelector((state) => state.searchFilter.minPrice);
+  const maxPrice = useSelector((state) => state.searchFilter.maxPrice);
+  const search = useSelector((state) => state.searchFilter.search);
+  const rating = useSelector((state) => state.searchFilter.rating);
+  const store = useSelector((state) => state.searchFilter.store);
+  const page = useSelector((state) => state.searchFilter.page);
+  const limit = useSelector((state) => state.searchFilter.limit);
+
+  const handleOrderChange = () => {
+    if (order === "desc") dispatch(setOrder("asc"));
+    else if (order === "") dispatch(setOrder("desc"));
+    else {
+      dispatch(setOrder(null));
+      dispatch(setSortBy(null));
+    }
+  };
+  const handleSortByChange = (value) => {
+    dispatch(setSortBy(value));
+  };
+
+  useEffect(() => {
+    searchProducts(
+      categories,
+      brands,
+      minPrice,
+      maxPrice,
+      search,
+      rating,
+      store,
+      sortBy,
+      order,
+      page,
+      limit
+    )
+      .then((resp) => {
+        console.log(resp.result)
+      })
+      .catch((error) => {});
+  }, [
+    categories,
+    brands,
+    minPrice,
+    maxPrice,
+    search,
+    rating,
+    store,
+    sortBy,
+    order,
+    page,
+    limit,
+  ]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -69,25 +130,33 @@ export default function SearchPage() {
                 </div>
                 <div className="flex items-center ml-auto mr-14 space-x-4">
                   <div className="flex">
-                    <Button className="bg-white-secondary opacity-50 m-1 hover:bg-white-tertiary">
-                      <Filter className="text-black-tertiary" />
-                    </Button>
-                    <Button className="bg-white-secondary opacity-50 m-1 hover:bg-white-tertiary">
-                      <ArrowDownWideNarrow className="text-black-tertiary" />
+                    <Button
+                      className="bg-white-secondary opacity-50 m-1 hover:bg-white-tertiary"
+                      onClick={() => handleOrderChange()}
+                    >
+                      {order === "desc" ? (
+                        <ArrowDownWideNarrow className="text-black-tertiary" />
+                      ) : order === "asc" ? (
+                        <ArrowUpWideNarrow className="text-black-tertiary"></ArrowUpWideNarrow>
+                      ) : (
+                        <FilterX className="text-black-tertiary"></FilterX>
+                      )}
                     </Button>
                   </div>
                   <div className="flex">
-                    <span className="text-black-primary font-light ml-1 mr-1 mt-2 hidden sm:inline">
-                      Sort by:
-                    </span>
-                    <Select>
+                    <Select
+                      value={sortBy}
+                      onValueChange={(value) => handleSortByChange(value)}
+                    >
                       <SelectTrigger className="w-[180px] h-10 rounded-full border-none text-black-primary bg-white-secondary opacity-50">
-                        <SelectValue placeholder="Theme" />
+                        <SelectValue placeholder="Sắp xếp theo" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="light">Light</SelectItem>
-                        <SelectItem value="dark">Dark</SelectItem>
-                        <SelectItem value="system">System</SelectItem>
+                        <SelectItem value="name">Tên sản phẩm</SelectItem>
+                        <SelectItem value="createdAt">Ngày đăng bán</SelectItem>
+                        <SelectItem value="originalPrice">Giá gốc</SelectItem>
+                        <SelectItem value="salePrice">Giá bán</SelectItem>
+                        <SelectItem value="rating">Đánh giá</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
