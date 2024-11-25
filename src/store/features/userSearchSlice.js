@@ -8,7 +8,7 @@ const initialState = {
   sortBy: "",
   order: "",
   minPrice: 0,
-  maxPrice: 0,
+  maxPrice: 99999999,
   rating: 0,
   search: "",
 };
