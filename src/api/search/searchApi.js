@@ -38,7 +38,7 @@ export const getCategory = async (id) => {
   }
 };
 
-export const searchProducts = async (
+export const searchProducts = async ({
   categories,
   brands,
   minPrice,
@@ -49,7 +49,7 @@ export const searchProducts = async (
   sortBy,
   order,
   page = 1,
-  limit = 40
+  limit,}
 ) => {
   try {
     // Xây dựng query string

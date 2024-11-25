@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState, lazy } from "react";
 import { Separator } from "@/components/ui/separator";
 import SearchHeader from "./headerSearch";
 import {
@@ -27,10 +27,9 @@ import {
 } from "lucide-react";
 import LeftSideBar from "./leftSideBar";
 import RightSideBar from "./rightSidebar";
-import ProductGrid from "./productGrid";
+const ProductGrid = lazy(() => import("./productGrid"));
 import { useDispatch, useSelector } from "react-redux";
 import { setOrder, setSortBy } from "@/store/features/userSearchSlice";
-import { searchProducts } from "@/api/search/searchApi";
 
 export default function SearchPage() {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
@@ -39,59 +38,25 @@ export default function SearchPage() {
 
   const order = useSelector((state) => state.searchFilter.order);
   const sortBy = useSelector((state) => state.searchFilter.sortBy);
-  const categories = useSelector((state) => state.searchFilter.categories);
-  const brands = useSelector((state) => state.searchFilter.brands);
-  const minPrice = useSelector((state) => state.searchFilter.minPrice);
-  const maxPrice = useSelector((state) => state.searchFilter.maxPrice);
-  const search = useSelector((state) => state.searchFilter.search);
-  const rating = useSelector((state) => state.searchFilter.rating);
-  const store = useSelector((state) => state.searchFilter.store);
-  const page = useSelector((state) => state.searchFilter.page);
-  const limit = useSelector((state) => state.searchFilter.limit);
 
   const handleOrderChange = () => {
-    if (order === "desc") dispatch(setOrder("asc"));
-    else if (order === "") dispatch(setOrder("desc"));
+    if (order === null || order === "") {
+      dispatch(setOrder("asc"));
+      if (sortBy === null) {
+        dispatch(setSortBy("name"));
+      }
+    } else if (order === "asc") dispatch(setOrder("desc"));
     else {
       dispatch(setOrder(null));
       dispatch(setSortBy(null));
     }
   };
   const handleSortByChange = (value) => {
+    if (order === null || order === "") {
+      dispatch(setOrder("asc"));
+    }
     dispatch(setSortBy(value));
   };
-
-  useEffect(() => {
-    searchProducts(
-      categories,
-      brands,
-      minPrice,
-      maxPrice,
-      search,
-      rating,
-      store,
-      sortBy,
-      order,
-      page,
-      limit
-    )
-      .then((resp) => {
-        console.log(resp.result)
-      })
-      .catch((error) => {});
-  }, [
-    categories,
-    brands,
-    minPrice,
-    maxPrice,
-    search,
-    rating,
-    store,
-    sortBy,
-    order,
-    page,
-    limit,
-  ]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -156,7 +121,6 @@ export default function SearchPage() {
                         <SelectItem value="createdAt">Ngày đăng bán</SelectItem>
                         <SelectItem value="originalPrice">Giá gốc</SelectItem>
                         <SelectItem value="salePrice">Giá bán</SelectItem>
-                        <SelectItem value="rating">Đánh giá</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -178,7 +142,9 @@ export default function SearchPage() {
             {/* Main Content Area - Scrollable */}
             <div className="flex-1 overflow-auto p-4">
               <div className="space-y-4">
-                <ProductGrid></ProductGrid>
+                <Suspense fallback={<div>Đang tải sản phẩm...</div>}>
+                  <ProductGrid />
+                </Suspense>
               </div>
             </div>
           </div>

@@ -11,8 +11,6 @@ const initialState = {
   maxPrice: 0,
   rating: 0,
   search: "",
-  page: "1",
-  limit: "40",
 };
 
 const resetState = {
@@ -25,8 +23,6 @@ const resetState = {
   minPrice: 0,
   maxPrice: 99999999,
   rating: 0,
-  page: "1",
-  limit: "40",
 };
 const userSearchSlice = createSlice({
   name: "userSearchSlice",
@@ -65,12 +61,6 @@ const userSearchSlice = createSlice({
     resetFilters: (state) => {
       Object.assign(state, resetState);
     },
-    setPage: (state, action) => {
-      state.page = action.page;
-    },
-    setLimit: (state, action) => {
-      state.limit = action.limit;
-    },
   },
 });
 
@@ -86,8 +76,6 @@ export const {
   setSearch,
   resetFilters,
   setMainCategoryId,
-  setLimit,
-  setPage
 } = userSearchSlice.actions;
 
 export default userSearchSlice.reducer;
