@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Star, ShoppingCart, Heart, Minus, Plus } from "lucide-react";
+import { Star, ShoppingCart, Heart, Minus, Plus, Store } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 import { Button } from "@/components/ui/button";
@@ -174,11 +174,12 @@ export default function ProductDetail({ product }) {
               />
               <div>
                 <h3 className="font-semibold">{product.store.name}</h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-black-tertiary">
                   Đánh giá: {product.store.rating?.toFixed(1)}/5.0
                 </p>
               </div>
               <Button className="mt-4 mr-auto" variant="outline">
+                <Store className="mr-2"></Store>
                 Xem shop
               </Button>
             </div>

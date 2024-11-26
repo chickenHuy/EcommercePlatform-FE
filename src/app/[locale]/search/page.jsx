@@ -19,7 +19,6 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowDownWideNarrow,
   ArrowUpWideNarrow,
-  Filter,
   FilterX,
   Menu,
   Store,

@@ -65,12 +65,6 @@ export default function ProductGrid() {
     }
   }, [inView, loading, loadProducts]);
 
-  const handleAddToCart = (product) => {
-    toast({
-      title: "Đã thêm vào giỏ hàng",
-      description: `${product.name} đã được thêm vào giỏ hàng của bạn.`,
-    });
-  };
 
   const handleAddToFavorites = (productId) => {
     setFavorites((prev) =>
@@ -101,9 +95,10 @@ export default function ProductGrid() {
           mainImageUrl={product.mainImageUrl}
           videoUrl={product.videoUrl}
           rating={product.rating}
-          onAddToCart={() => handleAddToCart(product)}
+          onViewDetail={() => handleViewDetail(product)}
           onAddToFavorites={() => handleAddToFavorites(product.id)}
           isFavorite={favorites.includes(product.id)}
+          link={product.slug}
         />
       ))}
       {hasMore && (

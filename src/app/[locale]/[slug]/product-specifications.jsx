@@ -7,13 +7,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-
+import Empty from "@/assets/images/reviewEmpty.png";
 
 export function ProductSpecifications({
   components,
 }) {
   if (components.length === 0) {
-    return <p>Không có thông số kỹ thuật.</p>;
+    return (<></>);
   }
 
   return (
