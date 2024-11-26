@@ -21,14 +21,17 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { getSuggestions } from "@/api/search/searchApi";
 import { useDispatch } from "react-redux";
 import { setSearch } from "@/store/features/userSearchSlice";
+import { useRouter } from "next/navigation";
+import { CommandDialog } from "cmdk";
 
 export function SearchWithSuggestions({ className }) {
   const [query, setQuery] = React.useState("");
-  const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isExpanded, setIsExpanded] = React.useState(true);
   const [suggestions, setSuggestions] = React.useState([]);
   const [selectedIndex, setSelectedIndex] = React.useState(-1);
   const inputRef = React.useRef(null);
   const suggestionRefs = React.useRef([]);
+  const router = useRouter();
 
   const debouncedQuery = useDebounce(query, 300);
 
@@ -53,10 +56,11 @@ export function SearchWithSuggestions({ className }) {
   const handleInputChange = (e) => {
     setQuery(e.target.value);
     setSelectedIndex(-1);
+
+    setIsExpanded(true)
   };
 
   const dispatch = useDispatch();
-  dispatch(setSearch(query));
 
   const handleKeyDown = (e) => {
     if (suggestions.length > 0) {
@@ -66,12 +70,28 @@ export function SearchWithSuggestions({ className }) {
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setSelectedIndex((prev) => Math.max(prev - 1, -1));
-      } else if (e.key === "Enter" && selectedIndex >= 0) {
-        e.preventDefault();
-        setQuery(suggestions[selectedIndex]);
+      } else if (e.key === "Enter") {
         setIsExpanded(false);
-        inputRef.current?.focus();
+        e.preventDefault();
+        if (selectedIndex >= 0) {
+          setQuery(suggestions[selectedIndex]); // Chọn suggestion
+        } else {
+          if (router.pathname !== "/search") {
+            router.push("/search");
+          }
+          dispatch(setSearch(query));
+           inputRef.current?.blur();
+        }
+
       }
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (router.pathname !== "/search") {
+        router.push("/search");
+      }
+      dispatch(setSearch(query));
+      inputRef.current?.blur();
+      setIsExpanded(false);
     }
   };
 
@@ -121,9 +141,9 @@ export function SearchWithSuggestions({ className }) {
           <span className="sr-only">Search</span>
         </Button>
       </div>
-      {suggestions.length > 0 && (
+      {suggestions.length > 0 && isExpanded && (
         <div className="absolute w-full mt-1 bg-white rounded-md shadow-lg z-10">
-          <Command>
+          <Command open={true}>
             <CommandList>
               <CommandGroup heading="Suggestions">
                 {suggestions.map((item, index) => (
