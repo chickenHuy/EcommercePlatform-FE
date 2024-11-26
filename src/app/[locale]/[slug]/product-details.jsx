@@ -18,6 +18,7 @@ export default function ProductDetail({ product }) {
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [quantity, setQuantity] = useState(1);
 
+
   const handleAttributeSelect = (attributeName, value) => {
     setSelectedAttributes((prev) => ({ ...prev, [attributeName]: value }));
 
