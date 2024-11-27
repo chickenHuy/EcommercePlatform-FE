@@ -32,7 +32,7 @@ function AdminHeader() {
       description: "Quản lý danh mục sản phẩm và thêm mới danh mục",
     },
     {
-      title: "Thành phần sản phẩm",
+      title: "Thông số sản phẩm",
       href: "/admin/components",
       description:
         "Đây là các thông tin như màu sắc, kích thước, chất liệu, hoặc bất kỳ chi tiết nào liên quan đến sản phẩm mà người bán cần cung cấp",

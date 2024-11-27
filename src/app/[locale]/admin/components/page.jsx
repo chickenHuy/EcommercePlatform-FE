@@ -137,7 +137,7 @@ export default function ManageComponent() {
         loadComponents(currentPage);
         toast({
           title: "Thành công",
-          description: "Thêm thành phần thành công",
+          description: "Thêm thông số sản phẩm thành công",
         });
       })
       .catch((error) => {
