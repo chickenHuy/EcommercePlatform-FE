@@ -14,6 +14,7 @@ import { ProductMediaViewer } from "./product-media-viewer";
 import { addToCart } from "@/api/cart/addToCart";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/hooks/use-toast";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function ProductDetail({ product }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -92,6 +93,9 @@ export default function ProductDetail({ product }) {
     return getValidVariants(testAttributes).length === 0;
   };
 
+  const dispatch = useDispatch();
+  const oldQuantity = useSelector((state) => state.cartReducer.count);
+
   const addProductToCart = () => {
     const request = {
       productId: product.id,
@@ -101,6 +105,7 @@ export default function ProductDetail({ product }) {
 
     console.log(request);
     addToCart(request).then((data) => {
+      dispatch(setQuantity(quantity + oldQuantity));
       toast({
         title: "Sản phẩm đã được thêm vào giỏ hàng",
       })

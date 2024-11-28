@@ -62,7 +62,7 @@ const request = async (
       let errorMessage = `HTTP error! Status: ${response.status}`;
       if (response.status === 401 && reTryCount < 1) {
         await refreshToken();
-        return request(endpoint, { method, headers, body, signal, reTryCount: reTryCount + 1 });
+        return request(endpoint, { method, headers, body, signal, reTryCount: 1});
       }
       else {
         try {
