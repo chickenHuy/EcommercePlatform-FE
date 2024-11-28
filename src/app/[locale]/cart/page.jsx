@@ -1,6 +1,10 @@
 "use client";
 
-import { getAllCart } from "@/api/cart/cartRequest";
+import {
+  changeQuantity,
+  deleteCartItem,
+  getAllCart,
+} from "@/api/cart/cartRequest";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
@@ -12,11 +16,16 @@ import {
   ArrowDown,
   ArrowUp,
   BriefcaseBusiness,
+  Minus,
   PiggyBank,
+  Plus,
   Search,
 } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import storeEmpty from "@/assets/images/storeEmpty.jpg";
+import { Toaster } from "@/components/ui/toaster";
+import DialogConfirmDeleteCartItem from "./dialogConfirmDeleteCartItem";
 
 export default function ManageCartUser() {
   const [carts, setCarts] = useState([]);
@@ -25,9 +34,10 @@ export default function ManageCartUser() {
   const [totalElement, setTotalElement] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
-  const [isOpenArrow, setIsOpenArrow] = useState({});
-  const [isOpenVariant, setIsOpenVariant] = useState({});
-  const dropdownRef = useRef(null);
+  const [isOpenArrow, setIsOpenArrow] = useState(true);
+  const [isOpenVariant, setIsVariant] = useState(false);
+  const [isOpenDialogConfirm, setIsOpenDialogConfirm] = useState(false);
+  const [cartItemToDelete, setCartItemToDelete] = useState(null);
   const { toast } = useToast();
 
   const handleNextPage = () => {
@@ -41,22 +51,84 @@ export default function ManageCartUser() {
       setCurrentPage(currentPage - 1);
     }
   };
+  const toggleArrow = () => {
+    setIsOpenArrow(!isOpenArrow);
+    setIsVariant(!isOpenVariant);
+  };
 
-  const toggleArrow = (index) => {
-    setIsOpenArrow((prevState) => ({
-      ...prevState,
-      [index]: !prevState[index],
-    }));
-    setIsOpenVariant((prevState) => ({
-      ...prevState,
-      [index]: !prevState[index],
-    }));
+  const handleQuantityChange = async (cartItemId, quantityUpdate) => {
+    try {
+      await changeQuantity(cartItemId, quantityUpdate);
+      console.log("quantityUpdate: ", quantityUpdate);
+      toast({
+        title: "Thành công",
+        description: `Bạn đã cập nhật số lượng thành công`,
+      });
+      updateCartQuantityUI(cartItemId, quantityUpdate);
+    } catch (error) {
+      toast({
+        title: "Thất bại",
+        description: error.message,
+      });
+    }
+  };
+
+  const updateCartQuantityUI = (cartItemId, quantityUpdate) => {
+    setCarts((prevCarts) => {
+      return prevCarts.map((cart) => ({
+        ...cart,
+        items: cart.items.map((item) => {
+          if (item.id === cartItemId) {
+            return { ...item, quantity: quantityUpdate };
+          }
+          return item;
+        }),
+      }));
+    });
+  };
+
+  const handleOnClickButtonMinus = (item) => {
+    const quantityUpdate = item.quantity - 1;
+    if (quantityUpdate === 0) {
+      setCartItemToDelete(item);
+      setIsOpenDialogConfirm(true);
+    } else {
+      handleQuantityChange(item.id, quantityUpdate);
+    }
+  };
+
+  const handleOnClickButtonPlus = (item) => {
+    const quantityUpdate = item.quantity + 1;
+    handleQuantityChange(item.id, quantityUpdate);
+  };
+
+  const handleDeleteCartItem = async () => {
+    if (cartItemToDelete) {
+      try {
+        await deleteCartItem(cartItemToDelete.id);
+        toast({
+          title: "Thành công",
+          description: `Bạn đã xóa sản phẩm ${cartItemToDelete.name} khỏi giỏ hàng thành công`,
+        });
+        setIsOpenDialogConfirm(false);
+        fetchAllCart();
+      } catch (error) {
+        toast({
+          title: "Thất bại",
+          description: error.message,
+        });
+      }
+    }
+  };
+
+  const handleOnclickButtonDeleteCartItem = (cartItem) => {
+    setIsOpenDialogConfirm(true);
+    setCartItemToDelete(cartItem);
   };
 
   const fetchAllCart = useCallback(async () => {
     try {
       const response = await getAllCart(currentPage);
-      console.log("Carts: ", response.result.data);
       setCarts(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
@@ -78,18 +150,12 @@ export default function ManageCartUser() {
     fetchAllCart();
   }, [fetchAllCart, totalPage, totalElement]);
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpenVariant(false);
-        setIsOpenArrow(true);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpenVariant, isOpenArrow]);
+  const calculateTotalSavings = (cartItems) => {
+    return cartItems.reduce((totalSavings, item) => {
+      const savings = item.quantity * (item.originalPrice - item.salePrice);
+      return totalSavings + savings;
+    }, 0);
+  };
 
   function formatCurrency(value) {
     return Number(value).toLocaleString("vi-VN", {
@@ -102,6 +168,7 @@ export default function ManageCartUser() {
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-muted/4 bg-blue-primary space-y-4">
+      <Toaster />
       <div className="h-[80px] flex items-center justify-between bg-white-primary border-b-2">
         <div className="flex items-center space-x-2 ml-4">
           <div className="flex items-center space-x-1">
@@ -147,7 +214,7 @@ export default function ManageCartUser() {
                 <div className="w-11/12 flex items-center space-x-2">
                   <Image
                     alt="avatar store"
-                    src={cart.avatarStore}
+                    src={cart.avatarStore || storeEmpty}
                     height={30}
                     width={30}
                     unoptimized={true}
@@ -163,9 +230,9 @@ export default function ManageCartUser() {
               </CardTitle>
               <CardContent className="w-full flex flex-col items-center min-h-[150px] border-t-2 border-b-2 pr-0 pl-0 pt-4 pb-4">
                 {cart.items && cart.items.length > 0 ? (
-                  cart.items.map((item, itemIndex) => (
+                  cart.items.map((item) => (
                     <div
-                      key={itemIndex}
+                      key={item.id}
                       className="w-full flex items-center border m-4"
                     >
                       <div className="w-1/2 flex items-center">
@@ -195,31 +262,30 @@ export default function ManageCartUser() {
                               </div>
                             </div>
                           </div>
-                          <div
-                            ref={dropdownRef}
-                            className="w-1/3 flex flex-col relative"
-                          >
+                          <div className="w-1/3 flex flex-col relative">
                             <Button
                               variant="outline"
                               className="w-full h-full flex flex-col items-start truncate"
-                              onClick={() => toggleArrow(index)}
+                              onClick={toggleArrow}
                             >
                               <div className="flex items-center space-x-1">
                                 <Label className="hover:cursor-pointer">
                                   Phân loại hàng:
                                 </Label>
-                                {!isOpenArrow[index] && (
+                                {isOpenArrow && (
                                   <ArrowDown className="hover:cursor-pointer" />
                                 )}
-                                {isOpenArrow[index] && (
+                                {!isOpenArrow && (
                                   <ArrowUp className="hover:cursor-pointer" />
                                 )}
                               </div>
                               <Label className="hover:cursor-pointer">
-                                {item.value.join(" | ")}
+                                {item.value && item.value > 0
+                                  ? item.value.join(" | ")
+                                  : "(không có)"}
                               </Label>
                             </Button>
-                            {isOpenVariant[index] && (
+                            {isOpenVariant && (
                               <div className="bg-yellow-primary flex flex-col absolute w-[calc(100%+200px)] left-[-100px] top-[70px] z-10">
                                 <div className="flex items-center justify-center">
                                   <div className="">mũi tên</div>
@@ -265,25 +331,24 @@ export default function ManageCartUser() {
                           <Label>{formatCurrency(item.salePrice)}</Label>
                         </div>
                         <div className="w-1/4 flex items-center justify-center">
-                          <div className="flex items-center justify-center border border-black-primary">
-                            <Button
-                              variant="outline"
-                              className="text-2xl text-center"
-                            >
-                              -
-                            </Button>
-                          </div>
-                          <div className="min-w-14 h-10 flex items-center justify-center border border-black-primary">
-                            <Label className="text-xl">{item.quantity}</Label>
-                          </div>
-                          <div className="flex items-center justify-center border border-black-primary">
-                            <Button
-                              variant="outline"
-                              className="text-2xl text-center"
-                            >
-                              +
-                            </Button>
-                          </div>
+                          <Button
+                            variant="outline"
+                            className="w-1/6"
+                            onClick={() => handleOnClickButtonMinus(item)}
+                          >
+                            <Minus className="scale-[4]" />
+                          </Button>
+                          <Input
+                            value={item.quantity}
+                            className="w-1/3 text-2xl text-center"
+                          />
+                          <Button
+                            variant="outline"
+                            className="w-1/6"
+                            onClick={() => handleOnClickButtonPlus(item)}
+                          >
+                            <Plus className="scale-[4]" />
+                          </Button>
                         </div>
                         <div className="w-1/4 flex items-center justify-center">
                           <Label>
@@ -291,7 +356,14 @@ export default function ManageCartUser() {
                           </Label>
                         </div>
                         <div className="w-1/4 flex items-center justify-center">
-                          <Button variant="outline">Xóa</Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              handleOnclickButtonDeleteCartItem(item);
+                            }}
+                          >
+                            Xóa
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -304,19 +376,12 @@ export default function ManageCartUser() {
               </CardContent>
               <CardFooter className="mt-6 mb-6 p-0">
                 <PiggyBank className="w-1/12" />
-                {cart.items && cart.items.length > 0
-                  ? cart.items.map((item, index) => (
-                      <div
-                        key={index}
-                        className="w-11/12 flex items-center space-x-2"
-                      >
-                        <Label>Tiết kiệm ngay</Label>
-                        <Label className="text-xl font-bold">
-                          {formatCurrency(item.originalPrice - item.salePrice)}
-                        </Label>
-                      </div>
-                    ))
-                  : ""}
+                <div className="w-11/12 flex items-center space-x-2">
+                  <Label>Tiết kiệm ngay</Label>
+                  <Label className="text-xl font-bold">
+                    {formatCurrency(calculateTotalSavings(cart.items))}
+                  </Label>
+                </div>
               </CardFooter>
             </Card>
           ))
@@ -353,6 +418,14 @@ export default function ManageCartUser() {
           </Button>
         </div>
       </div>
+      {isOpenDialogConfirm && (
+        <DialogConfirmDeleteCartItem
+          isOpen={isOpenDialogConfirm}
+          onClose={() => setIsOpenDialogConfirm(false)}
+          cartItem={cartItemToDelete}
+          confirmDeleteCartItem={handleDeleteCartItem}
+        />
+      )}
     </div>
   );
 }
