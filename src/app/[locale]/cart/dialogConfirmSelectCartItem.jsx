@@ -10,12 +10,12 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-export default function DialogConfirmDeleteCartItem(props) {
+export default function DialogConfirmSelectCartItem(props) {
   const {
     isOpen,
     onClose,
-    cartItem,
-    confirmDeleteCartItem,
+    selectedCartItemIds,
+    confirmDeleteSelectedCartItem,
   } = props;
 
   return (
@@ -24,15 +24,14 @@ export default function DialogConfirmDeleteCartItem(props) {
         <DialogHeader>
           <DialogTitle>Xác nhận xóa</DialogTitle>
           <DialogDescription>
-            Bạn có chắc chắn muốn xóa sản phẩm <strong>{cartItem.name}</strong>{" "}
-            này khỏi giỏ hàng không?
+            {`Bạn có chắc chắn muốn xóa ${selectedCartItemIds.size} sản phẩm đã chọn khỏi giỏ hàng không?`}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex justify-between">
           <Button variant="outline" onClick={onClose}>
             Hủy
           </Button>
-          <Button onClick={confirmDeleteCartItem}>Đồng ý</Button>
+          <Button onClick={confirmDeleteSelectedCartItem}>Đồng ý</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -26,6 +26,7 @@ import { useCallback, useEffect, useState } from "react";
 import storeEmpty from "@/assets/images/storeEmpty.jpg";
 import { Toaster } from "@/components/ui/toaster";
 import DialogConfirmDeleteCartItem from "./dialogConfirmDeleteCartItem";
+import DialogConfirmSelectCartItem from "./dialogConfirmSelectCartItem";
 
 export default function ManageCartUser() {
   const [carts, setCarts] = useState([]);
@@ -38,6 +39,9 @@ export default function ManageCartUser() {
   const [isOpenVariant, setIsVariant] = useState(false);
   const [isOpenDialogConfirm, setIsOpenDialogConfirm] = useState(false);
   const [cartItemToDelete, setCartItemToDelete] = useState(null);
+  const [selectedCartItemIds, setSelectedCartItemIds] = useState(new Set());
+  const [isOpenDialogConfirmSelect, setIsOpenDialogConfirmSelect] =
+    useState(false);
   const { toast } = useToast();
 
   const handleNextPage = () => {
@@ -126,6 +130,80 @@ export default function ManageCartUser() {
     setCartItemToDelete(cartItem);
   };
 
+  const handleSelectCartItem = (cartItemId) => {
+    console.log("cartItemId: ", cartItemId);
+    setSelectedCartItemIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(cartItemId)) {
+        newSet.delete(cartItemId);
+      } else {
+        newSet.add(cartItemId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleOnclickButtonDeleteCartItemSelect = () => {
+    if (selectedCartItemIds.size > 0) {
+      setIsOpenDialogConfirmSelect(true);
+    } else {
+      toast({
+        title: "Thông báo",
+        description: "Vui lòng chọn ít nhất một sản phẩm",
+      });
+    }
+  };
+
+  const handleDeleteSelectedCartItems = async () => {
+    if (selectedCartItemIds.size > 0) {
+      try {
+        for (const cartItemId of selectedCartItemIds) {
+          await deleteCartItem(cartItemId);
+        }
+        toast({
+          title: "Thành công",
+          description: `Bạn đã xóa ${selectedCartItemIds.size} sản phẩm đã chọn khỏi giỏ hàng thành công`,
+        });
+        setSelectedCartItemIds(new Set());
+        setIsOpenDialogConfirmSelect(false);
+        fetchAllCart();
+      } catch (error) {
+        toast({
+          title: "Thất bại",
+          description: error.message,
+        });
+      }
+    }
+  };
+
+  const handleToggleCartSelection = (cart, isChecked) => {
+    const newSelectedCartItemIds = new Set(selectedCartItemIds);
+
+    cart.items.forEach((item) => {
+      if (isChecked) {
+        newSelectedCartItemIds.add(item.id);
+      } else {
+        newSelectedCartItemIds.delete(item.id);
+      }
+    });
+
+    setSelectedCartItemIds(newSelectedCartItemIds);
+  };
+
+  const handleSelectAll = (isChecked) => {
+    const newSelectedCartItemIds = new Set();
+
+    if (isChecked) {
+      carts.forEach((cart) => {
+        cart.items.forEach((item) => {
+          newSelectedCartItemIds.add(item.id);
+        });
+      });
+    }
+
+    setSelectedCartItemIds(newSelectedCartItemIds);
+  };
+
   const fetchAllCart = useCallback(async () => {
     try {
       const response = await getAllCart(currentPage);
@@ -134,6 +212,7 @@ export default function ManageCartUser() {
       setTotalElement(response.result.totalElements);
       setHasNext(response.result.hasNext);
       setHasPrevious(response.result.hasPrevious);
+      //setSelectedCartItemIds(new Set());
     } catch (error) {
       toast({
         title: "Thất bại",
@@ -148,7 +227,8 @@ export default function ManageCartUser() {
 
   useEffect(() => {
     fetchAllCart();
-  }, [fetchAllCart, totalPage, totalElement]);
+    console.log("selectedCartItemIds: ", selectedCartItemIds);
+  }, [fetchAllCart, totalPage, totalElement, selectedCartItemIds]);
 
   const calculateTotalSavings = (cartItems) => {
     return cartItems.reduce((totalSavings, item) => {
@@ -187,7 +267,17 @@ export default function ManageCartUser() {
       </div>
       <div className="flex items-center justify-between bg-white-primary m-4">
         <div className="w-1/2 flex items-center">
-          <Checkbox className="w-1/6" />
+          {/*Checkbox ông nội dùng để chọn tất cả các checkbox cha (cart) và checkbox con (cartItem)*/}
+          <Checkbox
+            className="w-1/6"
+            checked={
+              selectedCartItemIds.size > 0 &&
+              carts.every((cart) =>
+                cart.items.every((item) => selectedCartItemIds.has(item.id))
+              )
+            }
+            onChange={(e) => handleSelectAll(e.target.checked)}
+          />
           <Label className="w-5/6">Sản phẩm</Label>
         </div>
         <div className="w-1/2 flex items-center justify-between">
@@ -210,7 +300,16 @@ export default function ManageCartUser() {
           carts.map((cart, index) => (
             <Card key={index} className="rounded-none">
               <CardTitle className="flex items-center mt-4 mb-4">
-                <Checkbox className="w-1/12" />
+                {/*Checkbox cha (cart) dùng để chọn tất cả các checkbox con (cartItem)*/}
+                <Checkbox
+                  className="w-1/12"
+                  checked={cart.items.every((item) =>
+                    selectedCartItemIds.has(item.id)
+                  )}
+                  onChange={(e) =>
+                    handleToggleCartSelection(cart, e.target.checked)
+                  }
+                />
                 <div className="w-11/12 flex items-center space-x-2">
                   <Image
                     alt="avatar store"
@@ -236,7 +335,12 @@ export default function ManageCartUser() {
                       className="w-full flex items-center border m-4"
                     >
                       <div className="w-1/2 flex items-center">
-                        <Checkbox className="w-1/6" />
+                        {/*Checkbox con (cartItem)*/}
+                        <Checkbox
+                          className="w-1/6"
+                          checked={selectedCartItemIds.has(item.id)}
+                          onChange={() => handleSelectCartItem(item.id)}
+                        />
                         <div className="w-5/6 flex items-center">
                           <div className="w-2/3 flex items-center space-x-4">
                             <Image
@@ -257,6 +361,7 @@ export default function ManageCartUser() {
                                   height={30}
                                   width={30}
                                   unoptimized={true}
+                                  className="rounded-md"
                                 />
                                 <Label>{item.brand}</Label>
                               </div>
@@ -402,11 +507,29 @@ export default function ManageCartUser() {
         ></PaginationAdminTable>
       </div>
       <div className="flex items-center justify-between bg-white-primary min-h-[80px] m-4 sticky bottom-0 border-t-2 ">
-        <Checkbox className="w-1/12" />
+        {/*Checkbox ông nội dùng để chọn tất cả các checkbox cha (cart) và checkbox con (cartItem)*/}
+        <Checkbox
+          className="w-1/12"
+          checked={
+            selectedCartItemIds.size > 0 &&
+            carts.every((cart) =>
+              cart.items.every((item) => selectedCartItemIds.has(item.id))
+            )
+          }
+          onChange={(e) => handleSelectAll(e.target.checked)}
+        />
         <div className="w-11/12 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Button variant="outline">Chọn tất cả (3)</Button>
-            <Button variant="outline">Xóa</Button>
+            <Button variant="outline">
+              Chọn tất cả ({selectedCartItemIds.size})
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleOnclickButtonDeleteCartItemSelect()}
+            >
+              Xóa
+            </Button>{" "}
+            {/*Button xóa tất cả các cart hoặc cartItem đã chọn (từ checkbox cha (card) hoặc checkcon con (cartItem)*/}
           </div>
           <Button variant="outline">Bỏ sản phẩm không hoạt động</Button>
           <div className="flex items-center space-x-4">
@@ -424,6 +547,14 @@ export default function ManageCartUser() {
           onClose={() => setIsOpenDialogConfirm(false)}
           cartItem={cartItemToDelete}
           confirmDeleteCartItem={handleDeleteCartItem}
+        />
+      )}
+      {isOpenDialogConfirmSelect && (
+        <DialogConfirmSelectCartItem
+          isOpen={isOpenDialogConfirmSelect}
+          onClose={() => setIsOpenDialogConfirmSelect(false)}
+          selectedCartItemIds={selectedCartItemIds}
+          confirmDeleteSelectedCartItem={handleDeleteSelectedCartItems}
         />
       )}
     </div>
