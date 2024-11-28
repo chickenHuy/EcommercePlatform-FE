@@ -32,7 +32,7 @@ export default function SearchHeader() {
         <div className="relative min-h-[360px] bg-[#14161F]">
           <div className="absolute inset-0">
             <Image
-              src={category?.imageUrl ? category.imageUrl : Placeholder}
+              src={category?.image_url ? category.image_url : Placeholder}
               alt="Headphone background"
               fill
               className="object-cover object-center opacity-50"

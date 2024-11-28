@@ -1,10 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import { Star, ShoppingCart, Heart, Minus, Plus, Store } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
+import { Star, ShoppingCart, Heart, Minus, Plus, Store } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,39 +11,112 @@ import { ProductSpecifications } from "./product-specifications";
 import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 import { Reviews } from "./reviewPage";
 import { ProductMediaViewer } from "./product-media-viewer";
+import { addToCart } from "@/api/cart/addToCart";
+import { Toaster } from "@/components/ui/toaster";
+import { toast } from "@/hooks/use-toast";
 
 export default function ProductDetail({ product }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [quantity, setQuantity] = useState(1);
+  const [availableOptions, setAvailableOptions] = useState({});
 
+  const initializeAvailableOptions = () => {
+    const initialOptions = {};
+    product.attributes.forEach(attr => {
+      initialOptions[attr.name] = new Set(attr.values.map(v => v.value));
+    });
+    setAvailableOptions(initialOptions);
+    console.log(product.variants);
+    console.log("HAHHA")
+  };
 
-  const handleAttributeSelect = (attributeName, value) => {
-    setSelectedAttributes((prev) => ({ ...prev, [attributeName]: value }));
+  useEffect(() => {
+    initializeAvailableOptions();
+  }, []);
 
-    const matchingVariant = product.variants.find((variant) =>
-      variant.values.every((v) =>
-        v.attribute === attributeName
-          ? v.value === value
-          : selectedAttributes[v.attribute] === v.value
+  const getValidVariants = (attributes) => {
+    return product.variants.filter(variant =>
+      Object.entries(attributes).every(([attr, val]) =>
+        variant.values.some(v => v.attribute === attr && v.value === val)
       )
     );
+  };
 
-    setSelectedVariant(matchingVariant || null);
+  const handleAttributeSelect = (attributeName, value) => {
+    const newSelectedAttributes = { ...selectedAttributes, [attributeName]: value };
+    setSelectedAttributes(newSelectedAttributes);
+
+    const validVariants = getValidVariants(newSelectedAttributes);
+
+    const newAvailableOptions = { ...availableOptions };
+    product.attributes.forEach(attr => {
+      if (attr.name !== attributeName) {
+        newAvailableOptions[attr.name] = new Set(
+          validVariants.flatMap(v =>
+            v.values.filter(val => val.attribute === attr.name).map(val => val.value)
+          )
+        );
+      } else {
+        newAvailableOptions[attr.name] = new Set(attr.values.map(v => v.value));
+      }
+    });
+    setAvailableOptions(newAvailableOptions);
+
+    if (Object.keys(newSelectedAttributes).length === product.attributes.length) {
+      const exactMatch = validVariants.find(v =>
+        v.values.every(val => newSelectedAttributes[val.attribute] === val.value)
+      );
+      setSelectedVariant(exactMatch || null);
+
+      if (exactMatch && quantity > exactMatch.quantity) {
+        setQuantity(exactMatch.quantity);
+      }
+    } else {
+      setSelectedVariant(null);
+    }
   };
 
   const updateQuantity = (change) => {
-    setQuantity((prev) =>
-      Math.max(1, Math.min(prev + change, product.quantity))
-    );
+    const maxQuantity = selectedVariant ? selectedVariant.quantity : product.quantity;
+    setQuantity((prev) => Math.max(1, Math.min(prev + change, maxQuantity)));
   };
 
   const currentPrice = selectedVariant?.salePrice || product.salePrice;
-  const currentOriginalPrice =
-    selectedVariant?.originalPrice || product.originalPrice;
+  const currentOriginalPrice = selectedVariant?.originalPrice || product.originalPrice;
+
+  const isAttributeDisabled = (attributeName, value) => {
+    if (Object.keys(selectedAttributes).length === 0) return false;
+
+    const testAttributes = { ...selectedAttributes, [attributeName]: value };
+    return getValidVariants(testAttributes).length === 0;
+  };
+
+  const addProductToCart = () => {
+    const request = {
+      productId: product.id,
+      variantId: selectedVariant?.id ? selectedVariant.id : "",
+      quantity: quantity,
+    }
+
+    console.log(request);
+    addToCart(request).then((data) => {
+      toast({
+        title: "Sản phẩm đã được thêm vào giỏ hàng",
+      })
+    }).catch((error) => {
+      toast({
+        title: "Thêm sản phẩm thất bại",
+        description: error.message,
+        variant: "destructive"
+      })
+    });
+
+  }
 
   return (
     <div className="flex-col bg-opacity-60 bg-blue-primary">
+      <Toaster />
       <div className="mx-auto px-4 h-1 bg-blue-primary w-3/4"></div>
       <div className="mx-auto px-4 bg-white-primary mt-20 w-3/4">
         <div className="grid gap-8 md:grid-cols-2 mt-2">
@@ -57,11 +129,10 @@ export default function ProductDetail({ product }) {
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
-                      className={`h-5 w-5 ${
-                        star <= (product.rating || 0)
-                          ? "text-yellow-primary fill-current"
-                          : "text-gray-secondary"
-                      }`}
+                      className={`h-5 w-5 ${star <= (product.rating || 0)
+                        ? "text-yellow-primary fill-current"
+                        : "text-gray-secondary"
+                        }`}
                     />
                   ))}
                 </div>
@@ -109,9 +180,8 @@ export default function ProductDetail({ product }) {
                           ? "default"
                           : "outline"
                       }
-                      onClick={() =>
-                        handleAttributeSelect(attribute.name, value.value)
-                      }
+                      onClick={() => handleAttributeSelect(attribute.name, value.value)}
+                      disabled={isAttributeDisabled(attribute.name, value.value)}
                     >
                       {value.value}
                     </Button>
@@ -127,6 +197,7 @@ export default function ProductDetail({ product }) {
                   variant="outline"
                   size="icon"
                   onClick={() => updateQuantity(-1)}
+                  disabled={quantity <= 1}
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
@@ -135,17 +206,23 @@ export default function ProductDetail({ product }) {
                   variant="outline"
                   size="icon"
                   onClick={() => updateQuantity(1)}
+                  disabled={quantity >= (selectedVariant?.quantity || product.quantity)}
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
                 <span className="text-sm text-black-tertiary">
-                  {product.quantity} sản phẩm có sẵn
+                  {selectedVariant ? selectedVariant.quantity : product.quantity} sản phẩm có sẵn
                 </span>
               </div>
             </div>
 
             <div className="flex space-x-4">
-              <Button className="flex-1 bg-red-primary bg-opacity-90" size="lg">
+              <Button
+                className="flex-1 bg-red-primary bg-opacity-90"
+                size="lg"
+                disabled={!selectedVariant && product.variants.length > 0}
+                onClick={() => addProductToCart()}
+              >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 Thêm vào giỏ hàng
               </Button>
@@ -209,3 +286,4 @@ export default function ProductDetail({ product }) {
     </div>
   );
 }
+

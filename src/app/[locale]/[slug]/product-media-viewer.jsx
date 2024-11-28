@@ -58,7 +58,7 @@ export function ProductMediaViewer({ product }) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 my-4">
       <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
         {mediaItems[selectedIndex].type === "image" ? (
           <Image

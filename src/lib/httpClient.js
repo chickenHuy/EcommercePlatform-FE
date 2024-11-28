@@ -1,8 +1,43 @@
 import Cookies from "js-cookie";
+const refreshToken = async () => {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auths/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: Cookies.get(process.env.NEXT_PUBLIC_JWT_NAME),
+      }),
+    });
+
+    if (!response.ok) {
+      let errorMessage = `HTTP error! Status: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData && errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } catch (jsonError) {
+        console.error("Error parsing JSON from response", jsonError);
+      }
+
+      throw new Error(errorMessage);
+
+    }
+
+    const data = await response.json();
+    Cookies.set(process.env.NEXT_PUBLIC_JWT_NAME, data.result.token);
+    return data.result.token;
+  } catch (error) {
+    console.error('Error refreshing token:', error);
+    throw error;
+  }
+};
 
 const request = async (
   endpoint,
-  { method = "GET", headers = {}, body = null, signal = null } = {}
+  { method = "GET", headers = {}, body = null, signal = null, reTryCount = 0 } = {}
 ) => {
   try {
     const token = Cookies.get(process.env.NEXT_PUBLIC_JWT_NAME);
@@ -25,17 +60,22 @@ const request = async (
 
     if (!response.ok) {
       let errorMessage = `HTTP error! Status: ${response.status}`;
-
-      try {
-        const errorData = await response.json();
-        if (errorData && errorData.message) {
-          errorMessage = errorData.message;
-        }
-      } catch (jsonError) {
-        console.error("Error parsing JSON from response", jsonError);
+      if (response.status === 401 && reTryCount < 1) {
+        await refreshToken();
+        return request(endpoint, { method, headers, body, signal, reTryCount: reTryCount + 1 });
       }
+      else {
+        try {
+          const errorData = await response.json();
+          if (errorData && errorData.message) {
+            errorMessage = errorData.message;
+          }
+        } catch (jsonError) {
+          console.error("Error parsing JSON from response", jsonError);
+        }
 
-      throw new Error(errorMessage);
+        throw new Error(errorMessage);
+      }
     }
 
     return await response.json();

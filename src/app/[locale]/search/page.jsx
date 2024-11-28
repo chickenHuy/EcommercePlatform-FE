@@ -41,8 +41,8 @@ export default function SearchPage() {
   const handleOrderChange = () => {
     if (order === null || order === "") {
       dispatch(setOrder("asc"));
-      if (sortBy === null) {
-        dispatch(setSortBy("name"));
+      if (sortBy === null || sortBy === "") {
+        dispatch(setSortBy("createdAt"));
       }
     } else if (order === "asc") dispatch(setOrder("desc"));
     else {
@@ -116,8 +116,7 @@ export default function SearchPage() {
                         <SelectValue placeholder="Sắp xếp theo" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="name">Tên sản phẩm</SelectItem>
-                        <SelectItem value="createdAt">Ngày đăng bán</SelectItem>
+                        <SelectItem value="createdAt">Ngày đăng sản phẩm</SelectItem>
                         <SelectItem value="originalPrice">Giá gốc</SelectItem>
                         <SelectItem value="salePrice">Giá bán</SelectItem>
                       </SelectContent>
