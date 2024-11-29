@@ -39,8 +39,8 @@ export default function ManageCartUser() {
   const [isOpenVariant, setIsVariant] = useState(false);
   const [isOpenDialogConfirm, setIsOpenDialogConfirm] = useState(false);
   const [cartItemToDelete, setCartItemToDelete] = useState(null);
-  const [selectedCartItemIds, setSelectedCartItemIds] = useState(new Set());
-  const [isOpenDialogConfirmSelect, setIsOpenDialogConfirmSelect] =
+  const [selectedCartItems, setSelectedCartItems] = useState([]);
+  const [isOpenDialogConfirmSelected, setIsOpenDialogConfirmSelected] =
     useState(false);
   const { toast } = useToast();
 
@@ -63,7 +63,6 @@ export default function ManageCartUser() {
   const handleQuantityChange = async (cartItemId, quantityUpdate) => {
     try {
       await changeQuantity(cartItemId, quantityUpdate);
-      console.log("quantityUpdate: ", quantityUpdate);
       toast({
         title: "Thành công",
         description: `Bạn đã cập nhật số lượng thành công`,
@@ -130,78 +129,64 @@ export default function ManageCartUser() {
     setCartItemToDelete(cartItem);
   };
 
-  const handleSelectCartItem = (cartItemId) => {
-    console.log("cartItemId: ", cartItemId);
-    setSelectedCartItemIds((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(cartItemId)) {
-        newSet.delete(cartItemId);
-      } else {
-        newSet.add(cartItemId);
-      }
-      return newSet;
-    });
-  };
-
-  const handleOnclickButtonDeleteCartItemSelect = () => {
-    if (selectedCartItemIds.size > 0) {
-      setIsOpenDialogConfirmSelect(true);
+  const handleOnClickButtonDeleteSelectCartItem = () => {
+    if (selectedCartItems.length > 0) {
+      setIsOpenDialogConfirmSelected(true);
     } else {
       toast({
-        title: "Thông báo",
-        description: "Vui lòng chọn ít nhất một sản phẩm",
+        title: "Thất bại",
+        description: `Vui lòng chọn sản phẩm`,
       });
     }
   };
 
-  const handleDeleteSelectedCartItems = async () => {
-    if (selectedCartItemIds.size > 0) {
-      try {
-        for (const cartItemId of selectedCartItemIds) {
-          await deleteCartItem(cartItemId);
-        }
-        toast({
-          title: "Thành công",
-          description: `Bạn đã xóa ${selectedCartItemIds.size} sản phẩm đã chọn khỏi giỏ hàng thành công`,
-        });
-        setSelectedCartItemIds(new Set());
-        setIsOpenDialogConfirmSelect(false);
-        fetchAllCart();
-      } catch (error) {
-        toast({
-          title: "Thất bại",
-          description: error.message,
-        });
-      }
+  const handleDeleteSelectCartItems = async () => {
+    const deletePromises = selectedCartItems.map((cartItem) =>
+      deleteCartItem(cartItem.id)
+    );
+    try {
+      await Promise.all(deletePromises);
+      toast({
+        title: "Thành công",
+        description: `Bạn đã xóa ${selectedCartItems.length} sản phẩm khỏi giỏ hàng thành công`,
+      });
+      fetchAllCart();
+      setIsOpenDialogConfirmSelected(false);
+      setSelectedCartItems([]);
+    } catch (error) {
+      toast({
+        title: "Thất bại",
+        description: `Lỗi xóa sản phẩm khỏi giỏ hàng: ${error.message}`,
+      });
     }
   };
 
-  const handleToggleCartSelection = (cart, isChecked) => {
-    const newSelectedCartItemIds = new Set(selectedCartItemIds);
-
-    cart.items.forEach((item) => {
-      if (isChecked) {
-        newSelectedCartItemIds.add(item.id);
-      } else {
-        newSelectedCartItemIds.delete(item.id);
-      }
-    });
-
-    setSelectedCartItemIds(newSelectedCartItemIds);
-  };
-
-  const handleSelectAll = (isChecked) => {
-    const newSelectedCartItemIds = new Set();
-
+  const handleSelectCartItem = (cartItem, isChecked) => {
     if (isChecked) {
-      carts.forEach((cart) => {
-        cart.items.forEach((item) => {
-          newSelectedCartItemIds.add(item.id);
-        });
-      });
+      setSelectedCartItems([...selectedCartItems, cartItem]);
+    } else {
+      setSelectedCartItems(
+        selectedCartItems.filter((item) => item.id !== cartItem.id)
+      );
     }
+    console.log("cartItem: ", cartItem.id);
+  };
 
-    setSelectedCartItemIds(newSelectedCartItemIds);
+  const handleSelectCart = (cart, isChecked) => {
+    if (isChecked) {
+      const newSelectedItems = cart.items.filter(
+        (item) =>
+          !selectedCartItems.find((selectedItem) => selectedItem.id === item.id)
+      );
+      setSelectedCartItems([...selectedCartItems, ...newSelectedItems]);
+    } else {
+      setSelectedCartItems(
+        selectedCartItems.filter(
+          (selectedItem) =>
+            !cart.items.find((item) => item.id === selectedItem.id)
+        )
+      );
+    }
   };
 
   const fetchAllCart = useCallback(async () => {
@@ -212,7 +197,6 @@ export default function ManageCartUser() {
       setTotalElement(response.result.totalElements);
       setHasNext(response.result.hasNext);
       setHasPrevious(response.result.hasPrevious);
-      //setSelectedCartItemIds(new Set());
     } catch (error) {
       toast({
         title: "Thất bại",
@@ -227,8 +211,8 @@ export default function ManageCartUser() {
 
   useEffect(() => {
     fetchAllCart();
-    console.log("selectedCartItemIds: ", selectedCartItemIds);
-  }, [fetchAllCart, totalPage, totalElement, selectedCartItemIds]);
+    console.log("selectedCartItems: ", selectedCartItems);
+  }, [fetchAllCart, totalPage, totalElement, selectedCartItems]);
 
   const calculateTotalSavings = (cartItems) => {
     return cartItems.reduce((totalSavings, item) => {
@@ -268,16 +252,7 @@ export default function ManageCartUser() {
       <div className="flex items-center justify-between bg-white-primary m-4">
         <div className="w-1/2 flex items-center">
           {/*Checkbox ông nội dùng để chọn tất cả các checkbox cha (cart) và checkbox con (cartItem)*/}
-          <Checkbox
-            className="w-1/6"
-            checked={
-              selectedCartItemIds.size > 0 &&
-              carts.every((cart) =>
-                cart.items.every((item) => selectedCartItemIds.has(item.id))
-              )
-            }
-            onChange={(e) => handleSelectAll(e.target.checked)}
-          />
+          <Checkbox className="w-1/6" />
           <Label className="w-5/6">Sản phẩm</Label>
         </div>
         <div className="w-1/2 flex items-center justify-between">
@@ -304,11 +279,11 @@ export default function ManageCartUser() {
                 <Checkbox
                   className="w-1/12"
                   checked={cart.items.every((item) =>
-                    selectedCartItemIds.has(item.id)
+                    selectedCartItems.some(
+                      (selectedItem) => selectedItem.id === item.id
+                    )
                   )}
-                  onChange={(e) =>
-                    handleToggleCartSelection(cart, e.target.checked)
-                  }
+                  onChange={(e) => handleSelectCart(cart, e.target.checked)}
                 />
                 <div className="w-11/12 flex items-center space-x-2">
                   <Image
@@ -338,14 +313,18 @@ export default function ManageCartUser() {
                         {/*Checkbox con (cartItem)*/}
                         <Checkbox
                           className="w-1/6"
-                          checked={selectedCartItemIds.has(item.id)}
-                          onChange={() => handleSelectCartItem(item.id)}
+                          checked={selectedCartItems.some(
+                            (selectedItem) => selectedItem.id === item.id
+                          )}
+                          onChange={(e) =>
+                            handleSelectCartItem(item, e.target.checked)
+                          }
                         />
                         <div className="w-5/6 flex items-center">
                           <div className="w-2/3 flex items-center space-x-4">
                             <Image
                               alt="ảnh sản phẩm"
-                              src={item.image}
+                              src={item.image || storeEmpty}
                               height={125}
                               width={125}
                               className="mt-4 mb-4"
@@ -357,7 +336,7 @@ export default function ManageCartUser() {
                               <div className="flex items-center truncate space-x-2">
                                 <Image
                                   alt="logo thương hiệu"
-                                  src={item.logoBrand}
+                                  src={item.logoBrand || storeEmpty}
                                   height={30}
                                   width={30}
                                   unoptimized={true}
@@ -508,32 +487,23 @@ export default function ManageCartUser() {
       </div>
       <div className="flex items-center justify-between bg-white-primary min-h-[80px] m-4 sticky bottom-0 border-t-2 ">
         {/*Checkbox ông nội dùng để chọn tất cả các checkbox cha (cart) và checkbox con (cartItem)*/}
-        <Checkbox
-          className="w-1/12"
-          checked={
-            selectedCartItemIds.size > 0 &&
-            carts.every((cart) =>
-              cart.items.every((item) => selectedCartItemIds.has(item.id))
-            )
-          }
-          onChange={(e) => handleSelectAll(e.target.checked)}
-        />
+        <Checkbox className="w-1/12" />
         <div className="w-11/12 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Button variant="outline">
-              Chọn tất cả ({selectedCartItemIds.size})
+              Chọn tất cả ({selectedCartItems.length})
             </Button>
+            {/*Button xóa tất cả các cart hoặc cartItem đã chọn (từ checkbox cha (card) hoặc checkcon con (cartItem)*/}
             <Button
               variant="outline"
-              onClick={() => handleOnclickButtonDeleteCartItemSelect()}
+              onClick={() => handleOnClickButtonDeleteSelectCartItem()}
             >
               Xóa
-            </Button>{" "}
-            {/*Button xóa tất cả các cart hoặc cartItem đã chọn (từ checkbox cha (card) hoặc checkcon con (cartItem)*/}
+            </Button>
           </div>
           <Button variant="outline">Bỏ sản phẩm không hoạt động</Button>
           <div className="flex items-center space-x-4">
-            <Label>Tổng sản phẩm (0 sản phẩm):</Label>
+            <Label>Tổng sản phẩm ({selectedCartItems.length} sản phẩm):</Label>
             <Label className="text-2xl font-bold">0 đ</Label>
           </div>
           <Button variant="outline" className="w-1/6 mr-10">
@@ -549,12 +519,12 @@ export default function ManageCartUser() {
           confirmDeleteCartItem={handleDeleteCartItem}
         />
       )}
-      {isOpenDialogConfirmSelect && (
+      {isOpenDialogConfirmSelected && (
         <DialogConfirmSelectCartItem
-          isOpen={isOpenDialogConfirmSelect}
-          onClose={() => setIsOpenDialogConfirmSelect(false)}
-          selectedCartItemIds={selectedCartItemIds}
-          confirmDeleteSelectedCartItem={handleDeleteSelectedCartItems}
+          isOpen={isOpenDialogConfirmSelected}
+          onClose={() => setIsOpenDialogConfirmSelected(false)}
+          selectedCartItems={selectedCartItems}
+          confirmDeleteSelectedCartItem={handleDeleteSelectCartItems}
         />
       )}
     </div>

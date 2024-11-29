@@ -6,6 +6,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight, Maximize2, Play, Pause, Volume2, VolumeX } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import ImageProductPlaceholder from '@/assets/images/productPlaceholder.png'
 
 
 export function ProductMediaViewer({ product }) {
@@ -62,7 +63,7 @@ export function ProductMediaViewer({ product }) {
       <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
         {mediaItems[selectedIndex].type === "image" ? (
           <Image
-            src={mediaItems[selectedIndex].url}
+            src={mediaItems[selectedIndex].url || ImageProductPlaceholder}
             alt={`${product.name} - View ${selectedIndex + 1}`}
             fill
             className="object-cover"
@@ -100,7 +101,7 @@ export function ProductMediaViewer({ product }) {
           >
             {item.type === "image" ? (
               <Image
-                src={item.url}
+                src={item.url || ImageProductPlaceholder}
                 alt={`${product.name} thumbnail ${index + 1}`}
                 fill
                 className="object-cover"
@@ -117,7 +118,7 @@ export function ProductMediaViewer({ product }) {
         <DialogContent className="max-w-screen-lg">
           <div className="relative aspect-[3/2] w-full">
             <Image
-              src={mediaItems[selectedIndex].url}
+              src={mediaItems[selectedIndex].url || ImageProductPlaceholder}
               alt={`${product.name} - View ${selectedIndex + 1}`}
               fill
               className="object-contain"
