@@ -13,7 +13,7 @@ export function ProductMediaViewer({ product }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(true)
-  const videoRef = useRef<HTMLVideoElement>(null)
+  const videoRef = useRef < HTMLVideoElement > (null)
 
   // Combine images and video into a single media array
   const mediaItems = [
@@ -73,6 +73,9 @@ export function ProductMediaViewer({ product }) {
             <video
               src={mediaItems[selectedIndex].url}
               className="h-full w-full object-cover"
+              loop
+              muted
+              autoPlay
               controls
             />
           </div>

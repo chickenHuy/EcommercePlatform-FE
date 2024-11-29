@@ -43,15 +43,15 @@ const UserHeader = () => {
     !pathname.includes("/admin") &&
     !pathname.includes("/vendor") &&
     !pathname.includes("/user") &&
-    !pathname.includes("/auth");
+    !pathname.includes("/auth") &&
+    !pathname.includes("/checkout");
 
   if (!isHeaderVisible) return null;
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 pt-2 transition-transform duration-300 ${
-        isScrolled ? "-translate-y-2 bg-black-primary" : "translate-y-0"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 pt-2 transition-transform duration-300 ${isScrolled ? "-translate-y-2 bg-black-primary" : "translate-y-0"
+        }`}
     >
       <div className="container mx-auto px-4 sm:px-6">
         <div className="w-full bg-black-primary text-white rounded-lg">
@@ -77,7 +77,7 @@ const UserHeader = () => {
                 <User className="h-5 w-5" />
                 <span className="sr-only">Account</span>
               </Button>
-              <div 
+              <div
                 className="relative"
                 onMouseEnter={() => setIsCartVisible(true)}
                 onMouseLeave={() => setIsCartVisible(false)}

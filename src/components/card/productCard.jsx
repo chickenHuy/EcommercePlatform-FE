@@ -35,14 +35,14 @@ export default function ProductCard({
                 muted
                 autoPlay
                 playsInline
-                className="w-full h-full object-cover rounded-t-lg transition-transform duration-300 group-hover:scale-105"
+                className="w-full h-full object-cover rounded-t-lg transition-transform duration-300 group-hover:scale-103"
               />
             ) : (
               <Image
                 src={mainImageUrl ? mainImageUrl : Placeholder}
                 alt={name}
                 fill
-                className="object-cover rounded-t-lg transition-transform duration-300 group-hover:scale-105"
+                className="object-cover rounded-t-lg transition-transform duration-300 group-hover:scale-103"
               />
             )}
             {mainImageUrl && videoUrl && (
