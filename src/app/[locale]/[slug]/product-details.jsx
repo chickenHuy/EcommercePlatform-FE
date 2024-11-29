@@ -15,6 +15,7 @@ import { addToCart } from "@/api/cart/addToCart";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/hooks/use-toast";
 import { useDispatch, useSelector } from "react-redux";
+import { changeQuantity } from "@/store/features/cartSlice";
 
 export default function ProductDetail({ product }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -104,18 +105,22 @@ export default function ProductDetail({ product }) {
     }
 
     console.log(request);
-    addToCart(request).then((data) => {
-      dispatch(setQuantity(quantity + oldQuantity));
+    try {
+      const rs = addToCart(request);
+      const qty = oldQuantity + quantity;
+      dispatch(changeQuantity(qty));
       toast({
         title: "Sản phẩm đã được thêm vào giỏ hàng",
+        description: "Bạn có thể xem giỏ hàng bằng cách nhấn vào biểu tượng giỏ hàng ở góc trên bên phải",
       })
-    }).catch((error) => {
+    }
+    catch (error) {
       toast({
         title: "Thêm sản phẩm thất bại",
         description: error.message,
         variant: "destructive"
       })
-    });
+    };
 
   }
 

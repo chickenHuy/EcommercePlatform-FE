@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { countQuantity } from "@/api/cart/countItem";
-import { setQuantity } from "@/store/features/cartSlice";
+import { changeQuantity } from "@/store/features/cartSlice";
 const UserHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
@@ -15,7 +15,7 @@ const UserHeader = () => {
 
   useEffect(() => {
     countQuantity().then((data) => {
-      dispatch(setQuantity(data.result.quantity));
+      dispatch(changeQuantity(data.result.quantity));
     }).catch((err) => {
       dispatch(setQuantity(0));
     });

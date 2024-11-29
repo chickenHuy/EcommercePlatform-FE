@@ -6,11 +6,11 @@ const cartSlice = createSlice({
     count: 0
   },
   reducers: {
-    setQuantity: (state, action) => {
+    changeQuantity: (state, action) => {
       state.count = action.payload;
     }
   }
 });
 
-export const { setQuantity } = cartSlice.actions;
+export const { changeQuantity } = cartSlice.actions;
 export default cartSlice.reducer;
