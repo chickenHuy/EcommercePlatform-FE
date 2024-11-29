@@ -1,138 +1,104 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Image from "next/image"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Plus, Minus, ShoppingCart } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { Badge } from "../ui/badge"
+import { getTop5CartItems } from "@/api/cart/getTop5CartItem"
+import ShopEmpty from "@/assets/images/storeEmpty.jpg"
+import { useSelector } from "react-redux"
 
-interface CartItem {
-  id: string
-  name: string
-  price: number
-  quantity: number
-  image: string
-}
+export default function ShoppingCard() {
+    const [cartItems, setCartItems] = useState([])
+    const count = useSelector((state) => state.cartReducer.count)
 
-export default function ShoppingCart() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: "1",
-      name: "Băng bảo vệ cổ tay tránh chấn thương",
-      price: 44000,
-      quantity: 1,
-      image: "/placeholder.svg"
-    },
-    {
-      id: "2",
-      name: "Tập hợp 7 loại protein chất lượng",
-      price: 1265000,
-      quantity: 1,
-      image: "/placeholder.svg"
-    },
-    {
-      id: "3",
-      name: "Sữa tăng cơ Rule 1 Whey Blend",
-      price: 1265000,
-      quantity: 1,
-      image: "/placeholder.svg"
-    }
-  ])
+    useEffect(() => {
+        const fetchCartData = async () => {
+            try {
+                const data = await getTop5CartItems();
+                setCartItems(data.result)
+            }
+            catch (error) {
+                setCartItems([])
+            }
+        }
+        setCartItems([])
 
-  const updateQuantity = (id: string, increment: boolean) => {
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id
-          ? { ...item, quantity: increment ? item.quantity + 1 : Math.max(1, item.quantity - 1) }
-          : item
-      )
-    )
-  }
+        fetchCartData()
+    }, [])
 
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
-  const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-
-  if (cartItems.length === 0) {
-    return (
-      <Card className="w-full max-w-md mx-auto p-6 bg-white">
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="w-24 h-24 relative">
-            <Image
-              src="/placeholder.svg"
-              alt="Empty Cart"
-              fill
-              className="object-contain"
-            />
-          </div>
-          <h2 className="text-lg font-medium text-gray-900">Chưa Có Sản Phẩm</h2>
-        </div>
-      </Card>
-    )
-  }
-
-  return (
-    <Card className="w-full max-w-md mx-auto bg-white">
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-medium flex items-center gap-2">
-          <ShoppingCart className="w-5 h-5" />
-          Sản Phẩm Mới Thêm
-        </h2>
-      </div>
-      <div className="divide-y">
-        {cartItems.map((item) => (
-          <div key={item.id} className="p-4 flex gap-4">
-            <div className="w-16 h-16 relative flex-shrink-0">
-              <Image
-                src={item.image}
-                alt={item.name}
-                fill
-                className="object-cover rounded"
-              />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-medium text-gray-900 truncate">
-                {item.name}
-              </h3>
-              <div className="mt-1 flex items-center justify-between">
-                <p className="text-sm font-medium text-[#ee4d2d]">
-                  ₫{item.price.toLocaleString()}
-                </p>
-                <div className="flex items-center border rounded">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => updateQuantity(item.id, false)}
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <span className="w-10 text-center text-sm">{item.quantity}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => updateQuantity(item.id, true)}
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
+    if (cartItems.length === 0) {
+        return (
+            <Card className="w-[360px] shadow-lg absolute -right-2 top-[calc(100%+8px)] before:content-[''] before:absolute before:top-[-8px] before:right-[18px] before:w-0 before:h-0 before:border-l-[8px] before:border-l-transparent before:border-r-[8px] before:border-r-transparent before:border-b-[8px] before:border-b-white-primary">
+                <div className="text-center py-8">
+                    <Image
+                        src={ShopEmpty}
+                        alt="Empty Cart"
+                        width={80}
+                        height={80}
+                        className="mx-auto mb-4"
+                    />
+                    <p className="text-muted-foreground">Chưa có sản phẩm</p>
                 </div>
-              </div>
+            </Card>
+        )
+    }
+
+    return (
+        <Card className="w-[360px] shadow-lg absolute -right-2 top-[calc(100%+8px)] before:content-[''] before:absolute before:top-[-8px] before:right-[18px] before:w-0 before:h-0 before:border-l-[8px] before:border-l-transparent before:border-r-[8px] before:border-r-transparent before:border-b-[8px] before:border-b-white-primary">
+            <div className="p-3 border-b bg-gray-secondary bg-opacity-10">
+                <h3 className="text-sm font-medium">Sản Phẩm Mới Thêm</h3>
             </div>
-          </div>
-        ))}
-      </div>
-      <div className="p-4 border-t bg-gray-50">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-sm text-gray-600">{totalItems} Thêm Hàng Vào Giỏ</span>
-          <span className="text-lg font-medium text-[#ee4d2d]">₫{totalPrice.toLocaleString()}</span>
-        </div>
-        <Button 
-          className="w-full bg-[#ee4d2d] hover:bg-[#d73211] text-white"
-        >
-          Xem Giỏ Hàng
-        </Button>
-      </div>
-    </Card>
-  )
+            <div className="max-h-[400px] overflow-y-auto">
+                {cartItems.map((item) => (
+                    <Link
+                        href={`/${item.slug}`}
+                        key={item.id}
+                        className="flex items-center gap-2 p-2 hover:bg-blue-primary border-b last:border-b-0"
+                    >
+                        <div className="w-10 h-10 relative flex-shrink-0">
+                            <Image
+                                src={item.image}
+                                alt={item.name}
+                                fill
+                                className="object-cover rounded"
+                            />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <h4 className="text-sm text-black-secondary truncate">
+                                {item.name}
+                            </h4>
+                            <p className="text-sm font-medium text-red-primary mt-1">
+                                ₫{item.salePrice.toLocaleString()}
+                            </p>
+                        </div>
+                        {item.value && (<Badge className="text-black-secondary bg-blue-primary shadow-none">
+                            {
+                                Array.isArray(item.value)
+                                    ? item.value.join('|')
+                                    : item.value
+                            }
+                        </Badge>)
+                        }
+                    </Link>
+                ))}
+            </div>
+            <div className="p-2 bg-gray-secondary bg-opacity-10">
+                <div className="font-light text-gray-tertiary mb-3 text-sm">
+                    {count} Thêm Vào Giỏ Hàng
+                </div>
+                <Button
+                    className="w-full bg-red-primary hover:bg-red-primary/50 text-white-primary"
+                    asChild
+                >
+                    <Link href="/cart">
+                        Xem Giỏ Hàng
+                    </Link>
+                </Button>
+            </div>
+        </Card>
+    )
 }
 
