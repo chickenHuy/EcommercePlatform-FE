@@ -47,7 +47,7 @@ const addressSchema = z.object({
   isDefault: z.boolean().optional(),
 });
 
-export default function AddressForm({ open, onOpenChange, id }) {
+export default function AddressForm({ open, onOpenChange, id, setHasNew, hasNew }) {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [subDistricts, setSubDistricts] = useState([]);
@@ -208,6 +208,9 @@ export default function AddressForm({ open, onOpenChange, id }) {
           variant: "success",
         });
         onOpenChange(false);
+        if (setHasNew) {
+          setHasNew(!hasNew);
+        }
       })
       .catch((error) => {
         toast({
