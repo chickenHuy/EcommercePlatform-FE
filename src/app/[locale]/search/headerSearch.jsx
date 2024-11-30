@@ -38,7 +38,7 @@ export default function SearchHeader() {
               className="object-cover object-center opacity-50"
               priority
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#14161F] via-[#14161F]/80 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#e9e9e9]/20 via-[#e9e9e9]/50 to-transparent" />
           </div>
 
           <div className="relative container mx-auto px-12 pt-[160px]">

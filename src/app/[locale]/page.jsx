@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col justify-between m-auto p-12">
-      <div className="text-8xl ml-20 mb-20 mr-20">
+      <div className="text-8xl ml-20 mb-20 mr-20 mt-20">
         <div className="font-extralight">Redefining Your</div>
         <div className="font-extralight">Tech Experience</div>
       </div>

@@ -1,5 +1,5 @@
 "use client";
-
+import Cookies from "js-cookie";
 import { User, ShoppingCartIcon } from 'lucide-react';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { countQuantity } from "@/api/cart/countItem";
 import { changeQuantity } from "@/store/features/cartSlice";
 import ShoppingCard from '../card/shoppingCard';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { get, post } from '@/lib/httpClient';
+import { set } from "react-hook-form";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const UserHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -17,6 +21,15 @@ const UserHeader = () => {
   const pathname = usePathname();
   const dispatch = useDispatch();
   const router = useRouter();
+  const [user, setUser] = useState(null);
+
+  const getMe = async () => {
+    await get("/api/v1/users/me").then((res) => {
+      setUser(res.result);
+    }).catch((err) => {
+      setUser(null);
+    })
+  }
 
   useEffect(() => {
     countQuantity().then((data) => {
@@ -24,6 +37,10 @@ const UserHeader = () => {
     }).catch((err) => {
       dispatch(changeQuantity(0));
     });
+
+    getMe();
+
+
   }, [dispatch])
 
   const quantity = useSelector((state) => state.cartReducer.count);
@@ -46,9 +63,24 @@ const UserHeader = () => {
     !pathname.includes("/auth") &&
     !pathname.includes("/checkout") &&
     !pathname.includes("/cart") &&
-    !pathname.includes("/status") ;
+    !pathname.includes("/status");
 
   if (!isHeaderVisible) return null;
+
+
+  const handleMyAccount = () => {
+    router.push("/user");
+  }
+
+  const handleLogout = async () => {
+    const token = Cookies.get(process.env.NEXT_PUBLIC_JWT_NAME);
+    await post("/api/v1/auths/log-out", { token: token }).then(() => {
+      Cookies.remove(process.env.NEXT_PUBLIC_JWT_NAME);
+    }).catch((err) => {
+      console.log(err);
+    })
+    router.push("/auth");
+  }
 
   return (
     <header
@@ -70,15 +102,44 @@ const UserHeader = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white-primary"
-                onClick={() => router.push("/user/")}
-              >
-                <User className="h-5 w-5" />
-                <span className="sr-only">Account</span>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  {user ? (<Button size="icon" variant="ghost">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage className="h-6 w-6" src={user.imageUrl} >
+
+                      </AvatarImage>
+                      <AvatarFallback>
+                        <User className="h-5 w-5" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>) : (<Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white-primary"
+                  >
+                    <User className="h-5 w-5" />
+                    <span className="sr-only">Account</span>
+                  </Button>)}
+                </DropdownMenuTrigger>
+                {user ? (<DropdownMenuContent className="w-56">
+                  <DropdownMenuLabel className="truncate">{user ? user.name : "My Account"}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => handleMyAccount()}>
+                    Tài khoản
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleLogout()}>
+                    Đăng xuất
+                  </DropdownMenuItem>
+                </DropdownMenuContent>) : (
+                  <DropdownMenuContent className="w-56">
+                    <DropdownMenuItem>
+                      <Link href="/auth">
+                        Đăng nhập / Đăng ký
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>)}
+              </DropdownMenu>
               <div
                 className="relative"
                 onMouseEnter={() => setIsCartVisible(true)}

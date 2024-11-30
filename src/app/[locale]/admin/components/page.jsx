@@ -45,11 +45,11 @@ import {
 import Loading from "@/components/loading";
 import { formatDate } from "@/utils/commonUtils";
 import { useToast } from "@/hooks/use-toast";
+import { useSelector } from "react-redux";
 
 export default function ManageComponent() {
   const { toast } = useToast();
   const pageSize = 20;
-
   const [listComponents, setListComponents] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [paginationData, setPaginationData] = useState({
