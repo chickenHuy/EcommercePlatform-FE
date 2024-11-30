@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { File, ListFilter, Lock } from "lucide-react";
+import { ListFilter, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,6 +34,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getAllStore } from "@/api/admin/storeRequest";
 import DrawerStoreDetail from "./drawerStoreDetail";
 import { useSelector } from "react-redux";
+import { Label } from "@/components/ui/label";
 
 export default function ManageStores() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -192,7 +193,6 @@ export default function ManageStores() {
                         <TableHead className="hidden md:table-cell">
                           Đánh giá
                         </TableHead>
-                        <TableHead className="hidden md:table-cell"></TableHead>
                         <TableHead>
                           <span className="sr-only">Hành động</span>
                         </TableHead>
@@ -204,25 +204,25 @@ export default function ManageStores() {
                           key={store.id}
                           onClick={() => handleRowClick(store.id)}
                         >
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium text-center">
                             {store.name}
                           </TableCell>
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium text-center">
                             {store.username}
                           </TableCell>
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium text-center">
                             {new Date(store.created_at).toLocaleString()}{" "}
                           </TableCell>
-                          <TableCell className="flex items-center space-x-2">
+                          <TableCell className="flex items-center space-x-2 justify-center border-none">
                             <Rating
                               value={store?.rating ? store?.rating : 0}
                               precision={0.1}
                               readOnly
                             />
-                            <span>({store?.rating ? store?.rating : 0})</span>
+                            <Label>({store?.rating ? store?.rating : 0})</Label>
                           </TableCell>
 
-                          <TableCell className="hidden md:table-cell">
+                          <TableCell className="hidden md:table-cell text-center">
                             <Button
                               aria-haspopup="true"
                               size="icon"

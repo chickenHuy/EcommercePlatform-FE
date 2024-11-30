@@ -92,3 +92,21 @@ export const searchProducts = async ({
     throw error;
   }
 };
+
+export const getStore = async (id) => {
+  try {
+    const response = await get(`/api/v1/stores/${id}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getProductTop3 = async (id) => {
+  try {
+    const response = await get(`/api/v1/products/top3/store/${id}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

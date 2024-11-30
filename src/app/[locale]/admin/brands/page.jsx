@@ -1,6 +1,6 @@
 "use client";
 
-import { File, ListFilter, MoreHorizontal, PlusCircle } from "lucide-react";
+import { ListFilter, MoreHorizontal, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,6 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import UploadIcon from "@mui/icons-material/Upload";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -38,6 +41,7 @@ import iconNotFound from "../../../../../public/images/iconNotFound.png";
 import DialogImageBrand from "@/components/dialogs/dialogImageBrand";
 import DialogConfirm from "@/components/dialogs/dialogConfirm";
 import { useSelector } from "react-redux";
+import BrandEmpty from "@/assets/images/brandEmpty.jpg"
 
 export default function ManageBrand() {
   const [isDialogAddEditOpen, setIsDialogAddEditOpen] = useState(false);
@@ -266,22 +270,28 @@ export default function ManageBrand() {
                   {brands.map((brand) => (
                     <TableRow key={brand.id}>
                       <TableCell className="hidden sm:table-cell">
-                        <Image
-                          alt={brand.name}
-                          className="aspect-square rounded-md object-cover"
-                          src={brand.logoUrl ? brand.logoUrl : iconNotFound}
-                          width="64"
-                          height="64"
-                          unoptimized
-                          priority
-                        />
+                        <div className="flex items-center justify-center">
+                          <Image
+                            alt={brand.name}
+                            className="aspect-square rounded-md object-cover"
+                            src={brand.logoUrl ? brand.logoUrl : BrandEmpty}
+                            width={64}
+                            height={64}
+                            unoptimized
+                            priority
+                          />
+                        </div>
                       </TableCell>
-                      <TableCell>{brand.name}</TableCell>
-                      <TableCell>{brand.description}</TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="text-center">
+                        {brand.name}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {brand.description || "(trống)"}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-center">
                         {new Date(brand.createdAt).toLocaleString()}{" "}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
@@ -298,23 +308,27 @@ export default function ManageBrand() {
                             <DropdownMenuItem
                               onSelect={(e) => e.preventDefault()}
                               onClick={() => handleEditButtonClick(brand)}
-                              className="cursor-pointer"
+                              className="flex items-center justify-between cursor-pointer"
                             >
                               Sửa
+                              <EditIcon />
                             </DropdownMenuItem>
+
                             <DropdownMenuItem
                               onSelect={(e) => e.preventDefault()}
                               onClick={() => handleDeleteButtonClick(brand)}
-                              className="cursor-pointer"
+                              className="flex items-center justify-between cursor-pointer"
                             >
                               Xoá
+                              <DeleteIcon />
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onSelect={(e) => e.preventDefault()}
                               onClick={() => handleUploadImageClick(brand)}
-                              className="cursor-pointer"
+                              className="flex items-center justify-between cursor-pointer"
                             >
-                              Cập nhật Logo
+                              Tải Logo
+                              <UploadIcon />
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
