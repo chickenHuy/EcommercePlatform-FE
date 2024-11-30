@@ -34,7 +34,7 @@ export default function Address(props) {
     }
 
     return (
-        <Card className="m-4 border-0 border-t-[4px] border-red-primary p-3">
+        <Card className="m-4 border-0 rounded-none rounded-b-xl border-t-[4px] border-red-primary p-3">
             <CardHeader className="py-0 px-[7px] ">
                 <div className="flex flex-row justify-start items-center">
                     <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />

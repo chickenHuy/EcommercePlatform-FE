@@ -31,6 +31,9 @@ import ManageCartUserSkeleton from "./skeletonCart";
 import { useRouter } from "next/navigation";
 import { setStore } from "@/store/features/userSearchSlice";
 import { useDispatch } from "react-redux";
+import { setCheckout } from "@/store/features/checkoutSlice";
+import CommonHeader from "@/components/headers/commonHeader";
+import { Separator } from "@/components/ui/separator";
 
 export default function ManageCartUser() {
   const [carts, setCarts] = useState([]);
@@ -262,6 +265,7 @@ export default function ManageCartUser() {
       setTotalElement(response.result.totalElements);
       setHasNext(response.result.hasNext);
       setHasPrevious(response.result.hasPrevious);
+
     } catch (error) {
       toast({
         title: "Thất bại",
@@ -314,31 +318,27 @@ export default function ManageCartUser() {
     });
   }
 
+
+  const handleCheckout = () => {
+    const selectedCartWithItem = carts.map((cart) => ({
+      ...cart,
+      items: cart.items.filter((item) =>
+        selectedCartItems.some((selectedItem) => selectedItem.id === item.id)
+      )
+    })).filter(cart => cart.items.length > 0);
+
+
+
+    dispatch(setCheckout(selectedCartWithItem));
+    router.push("/checkout")
+
+  }
+
   return loading ? (
     <div className="flex flex-col min-h-screen w-full bg-muted/4 bg-blue-primary">
       <Toaster />
-      <div className="h-[80px] flex items-center justify-between bg-white-primary border-b-2 mt-24 mb-4">
-        <div
-          className="flex items-center space-x-4 ml-32 hover:cursor-pointer"
-          onClick={() => handleOnClickLogo()}
-        >
-          <div className="flex items-center space-x-2">
-            <BriefcaseBusiness size={50} className="text-error" />
-            <Label className="text-2xl text-error hover:cursor-pointer">
-              HKK
-            </Label>
-          </div>
-          <div className="w-[1px] h-6 bg-error"></div>
-          <Label className="text-2xl font-bold text-error hover:cursor-pointer">
-            Giỏ Hàng
-          </Label>
-        </div>
-        {/* <div className="w-1/2 flex items-center space-x-2 mr-4">
-          <Input placeholder="Tìm kiếm giỏ hàng" />
-          <Search className="hover:cursor-pointer" />
-        </div> */}
-      </div>
-      <div className="flex items-center justify-between bg-white-primary my-4 mx-20">
+      <CommonHeader />
+      <div className="flex items-center justify-between bg-white-primary my-4 mx-40 shadow-xl border-1 py-2">
         <div className="w-1/2 flex items-center">
           {/*Checkbox cart và cartItem*/}
           <Checkbox
@@ -363,7 +363,7 @@ export default function ManageCartUser() {
           </div>
         </div>
       </div>
-      <div className="my-4 mx-20 space-y-4">
+      <div className="my-4 mx-40 space-y-4">
         {carts.length > 0 ? (
           carts.map((cart, index) => (
             <Card key={index} className="rounded-none">
@@ -396,156 +396,161 @@ export default function ManageCartUser() {
                   ></Rating>
                 </div>
               </CardTitle>
-              <CardContent className="w-full flex flex-col items-center min-h-[150px] border-t-2 border-b-2 pr-0 pl-0 pt-4 pb-4">
+              <Separator className="mx-auto w-full" />
+              <CardContent className="w-full flex flex-col items-center min-h-[150px] pr-0 pl-0 pt-4 pb-4">
                 {cart.items && cart.items.length > 0 ? (
                   cart.items.map((item) => (
                     <div
                       key={item.id}
-                      className="w-full flex items-center border m-4"
+                      className="w-full flex flex-col"
                     >
-                      <div className="w-1/2 flex items-center">
-                        {/*Checkbox (cartItem)*/}
-                        <Checkbox
-                          className="w-1/6"
-                          checked={isSelectedCartItem(item)}
-                          onChange={(e) =>
-                            handleSelectCartItem(item, e.target.checked)
-                          }
-                        />
-                        <div className="w-5/6 flex items-center">
-                          <div className="w-2/3 flex items-center space-x-4">
-                            <Image
-                              alt="ảnh sản phẩm"
-                              src={item.image || storeEmpty}
-                              height={100}
-                              width={100}
-                              className="mt-4 mb-4"
-                            />
-                            <div className="flex-1 min-w-0 space-y-4">
-                              <Label className="line-clamp-2 text-xl">
-                                {item.name}
-                              </Label>
-                              <div className="flex items-center truncate space-x-2">
-                                <Image
-                                  alt="logo thương hiệu"
-                                  src={item.logoBrand || storeEmpty}
-                                  height={30}
-                                  width={30}
-                                  unoptimized={true}
-                                  className="rounded-md"
-                                />
-                                <Label>{item.brand}</Label>
+                      <div className="flex items-center">
+                        <div className="w-1/2 flex items-center">
+                          {/*Checkbox (cartItem)*/}
+                          <Checkbox
+                            className="w-1/6"
+                            checked={isSelectedCartItem(item)}
+                            onChange={(e) =>
+                              handleSelectCartItem(item, e.target.checked)
+                            }
+                          />
+                          <div className="w-5/6 flex items-center">
+                            <div className="w-2/3 flex items-center space-x-4 min-h-[72px]">
+                              <Image
+                                alt="ảnh sản phẩm"
+                                src={item.image || storeEmpty}
+                                height={68}
+                                width={68}
+                                className="mt-4 mb-4 max-w-[68px] max-h-[68px] rounded-md"
+                              />
+                              <div className="flex-1 min-w-0 space-y-4">
+                                <Label className="line-clamp-2 text-xl">
+                                  {item.name}
+                                </Label>
+                                <div className="flex items-center truncate space-x-2">
+                                  <Image
+                                    alt="logo thương hiệu"
+                                    src={item.logoBrand || storeEmpty}
+                                    height={30}
+                                    width={30}
+                                    unoptimized={true}
+                                    className="rounded-md"
+                                  />
+                                  <Label>{item.brand}</Label>
+                                </div>
                               </div>
                             </div>
+                            <div className="w-1/3 flex flex-col relative">
+                              <Button
+                                variant="outline"
+                                className="w-full h-full flex flex-col items-start truncate"
+                                onClick={toggleArrow}
+                              >
+                                <div className="flex items-center space-x-1">
+                                  <Label className="hover:cursor-pointer">
+                                    Phân loại hàng:
+                                  </Label>
+                                  {isOpenArrow && (
+                                    <ArrowDown className="hover:cursor-pointer" />
+                                  )}
+                                  {!isOpenArrow && (
+                                    <ArrowUp className="hover:cursor-pointer" />
+                                  )}
+                                </div>
+                                <Label className="hover:cursor-pointer">
+                                  {item.value
+                                    ? item.value.join(" | ")
+                                    : "(không có)"}
+                                </Label>
+                              </Button>
+                              {isOpenVariant && (
+                                <div className="bg-yellow-primary flex flex-col absolute w-[calc(100%+200px)] left-[-100px] top-[70px] z-10">
+                                  <div className="flex items-center justify-center">
+                                    <div className="">mũi tên</div>
+                                  </div>
+                                  <div className="w-full flex flex-wrap items-center justify-start p-4 space-x-4">
+                                    <Label className="mb-4 overflow-hidden whitespace-nowrap text-ellipsis">
+                                      Màu sắc:
+                                    </Label>
+                                    <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
+                                      1TB - GOLD
+                                    </Label>
+                                    <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
+                                      512GB - GOLD
+                                    </Label>
+                                    <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
+                                      1TB - BLACK
+                                    </Label>
+                                    <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
+                                      512GB - BLACK
+                                    </Label>
+                                    <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
+                                      512GB - BLACK
+                                    </Label>
+                                  </div>
+                                  <div className="flex items-center justify-center space-x-6 pb-4">
+                                    <Button variant="outline" className="w-1/3">
+                                      Trở lại
+                                    </Button>
+                                    <Button variant="outline" className="w-1/3">
+                                      Xác nhận
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          <div className="w-1/3 flex flex-col relative">
+                        </div>
+                        <div className="w-1/2 flex items-center justify-between">
+                          <div className="w-1/4 flex items-center justify-center space-x-2">
+                            <Label className="line-through text-muted-foreground">
+                              {formatCurrency(item.originalPrice)}
+                            </Label>
+                            <Label>{formatCurrency(item.salePrice)}</Label>
+                          </div>
+                          <div className="w-1/4 flex items-center justify-center">
                             <Button
                               variant="outline"
-                              className="w-full h-full flex flex-col items-start truncate"
-                              onClick={toggleArrow}
+                              className="w-1/6"
+                              onClick={() => handleOnClickButtonMinus(item)}
                             >
-                              <div className="flex items-center space-x-1">
-                                <Label className="hover:cursor-pointer">
-                                  Phân loại hàng:
-                                </Label>
-                                {isOpenArrow && (
-                                  <ArrowDown className="hover:cursor-pointer" />
-                                )}
-                                {!isOpenArrow && (
-                                  <ArrowUp className="hover:cursor-pointer" />
-                                )}
-                              </div>
-                              <Label className="hover:cursor-pointer">
-                                {item.value
-                                  ? item.value.join(" | ")
-                                  : "(không có)"}
-                              </Label>
+                              <Minus className="scale-[5]" />
                             </Button>
-                            {isOpenVariant && (
-                              <div className="bg-yellow-primary flex flex-col absolute w-[calc(100%+200px)] left-[-100px] top-[70px] z-10">
-                                <div className="flex items-center justify-center">
-                                  <div className="">mũi tên</div>
-                                </div>
-                                <div className="w-full flex flex-wrap items-center justify-start p-4 space-x-4">
-                                  <Label className="mb-4 overflow-hidden whitespace-nowrap text-ellipsis">
-                                    Màu sắc:
-                                  </Label>
-                                  <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
-                                    1TB - GOLD
-                                  </Label>
-                                  <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
-                                    512GB - GOLD
-                                  </Label>
-                                  <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
-                                    1TB - BLACK
-                                  </Label>
-                                  <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
-                                    512GB - BLACK
-                                  </Label>
-                                  <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
-                                    512GB - BLACK
-                                  </Label>
-                                </div>
-                                <div className="flex items-center justify-center space-x-6 pb-4">
-                                  <Button variant="outline" className="w-1/3">
-                                    Trở lại
-                                  </Button>
-                                  <Button variant="outline" className="w-1/3">
-                                    Xác nhận
-                                  </Button>
-                                </div>
-                              </div>
-                            )}
+                            <Input
+                              value={item.quantity}
+                              onChange={(e) =>
+                                handleInputQuantityChange(item.id, e.target.value)
+                              }
+                              type="number"
+                              className="w-1/3 text-xl text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
+                            <Button
+                              variant="outline"
+                              className="w-1/6"
+                              onClick={() => handleOnClickButtonPlus(item)}
+                            >
+                              <Plus className="scale-[5]" />
+                            </Button>
+                          </div>
+                          <div className="w-1/4 flex items-center justify-center">
+                            <Label>
+                              {formatCurrency(item.quantity * item.salePrice)}
+                            </Label>
+                          </div>
+                          <div className="w-1/4 flex items-center justify-center">
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                handleOnclickButtonDeleteCartItem(item);
+                              }}
+                            >
+                              Xóa
+                            </Button>
                           </div>
                         </div>
                       </div>
-                      <div className="w-1/2 flex items-center justify-between">
-                        <div className="w-1/4 flex items-center justify-center space-x-2">
-                          <Label className="line-through text-muted-foreground">
-                            {formatCurrency(item.originalPrice)}
-                          </Label>
-                          <Label>{formatCurrency(item.salePrice)}</Label>
-                        </div>
-                        <div className="w-1/4 flex items-center justify-center">
-                          <Button
-                            variant="outline"
-                            className="w-1/6"
-                            onClick={() => handleOnClickButtonMinus(item)}
-                          >
-                            <Minus className="scale-[5]" />
-                          </Button>
-                          <Input
-                            value={item.quantity}
-                            onChange={(e) =>
-                              handleInputQuantityChange(item.id, e.target.value)
-                            }
-                            type="number"
-                            className="w-1/3 text-xl text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          />
-                          <Button
-                            variant="outline"
-                            className="w-1/6"
-                            onClick={() => handleOnClickButtonPlus(item)}
-                          >
-                            <Plus className="scale-[5]" />
-                          </Button>
-                        </div>
-                        <div className="w-1/4 flex items-center justify-center">
-                          <Label>
-                            {formatCurrency(item.quantity * item.salePrice)}
-                          </Label>
-                        </div>
-                        <div className="w-1/4 flex items-center justify-center">
-                          <Button
-                            variant="outline"
-                            onClick={() => {
-                              handleOnclickButtonDeleteCartItem(item);
-                            }}
-                          >
-                            Xóa
-                          </Button>
-                        </div>
-                      </div>
+                      <Separator className="mx-auto"></Separator
+                      >
                     </div>
                   ))
                 ) : (
@@ -588,7 +593,7 @@ export default function ManageCartUser() {
           hasPrevious={hasPrevious}
         ></PaginationAdminTable>
       </div>
-      <div className="flex items-center justify-between bg-white-primary min-h-[80px] my-4 mx-20 sticky bottom-0 border-t-2 ">
+      <div className="flex items-center justify-between bg-white-primary min-h-[80px] my-4 sticky bottom-0 border-t-2 ">
         {/*Checkbox cart và cartItem*/}
         <Checkbox
           className="w-1/12"
@@ -622,7 +627,7 @@ export default function ManageCartUser() {
               )}
             </Label>
           </div>
-          <Button variant="outline" className="w-1/6 mr-10">
+          <Button variant="outline" className="w-1/6 mr-10" onClick={() => handleCheckout()}>
             Mua hàng
           </Button>
         </div>

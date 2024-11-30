@@ -21,6 +21,8 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { refreshToken } from "@/lib/httpClient";
 
 const registerStoreSchema = z.object({
   name: z.string().trim().min(1, {
@@ -67,6 +69,7 @@ export default function RegisterStore() {
         title: "Thành công",
         description: "Bạn đã đăng ký cửa hàng thành công",
       });
+      await refreshToken();
       router.push("/vendor");
     } catch (error) {
       toast({

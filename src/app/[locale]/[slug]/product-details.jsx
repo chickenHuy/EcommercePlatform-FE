@@ -108,7 +108,8 @@ export default function ProductDetail({ product }) {
     try {
       const rs = addToCart(request);
       const qty = oldQuantity + quantity;
-      dispatch(changeQuantity(qty));
+      dispatch(changeQuantity
+        (qty));
       toast({
         title: "Sản phẩm đã được thêm vào giỏ hàng",
         description: "Bạn có thể xem giỏ hàng bằng cách nhấn vào biểu tượng giỏ hàng ở góc trên bên phải",

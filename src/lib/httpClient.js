@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-const refreshToken = async () => {
+export const refreshToken = async () => {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auths/refresh`, {
       method: 'POST',

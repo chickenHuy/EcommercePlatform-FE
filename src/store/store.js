@@ -7,6 +7,7 @@ import orderFilter from "./features/orderFilterSlice";
 import userSearchSlice from "./features/userSearchSlice";
 import userSlice from "./features/userSlice";
 import cartSlice from "./features/cartSlice";
+import checkoutSlice from "./features/checkoutSlice";
 
 export const makeStore = () => {
   return configureStore({
@@ -19,6 +20,7 @@ export const makeStore = () => {
       searchFilter: userSearchSlice,
       userReducer: userSlice,
       cartReducer: cartSlice,
+      checkoutReducer: checkoutSlice,
     },
   });
 };
