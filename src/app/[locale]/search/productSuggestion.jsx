@@ -11,7 +11,7 @@ export function SuggestedProducts() {
       brand: "Apple",
       name: "MacBook Pro",
       image: "",
-      price: 69990000,
+      originalPrice: 69990000,
       discountedPrice: 65990000,
     },
     {
@@ -19,7 +19,7 @@ export function SuggestedProducts() {
       brand: "Microsoft",
       name: "Surface Laptop Studio",
       image: "",
-      price: 54990000,
+      originalPrice: 54990000,
       discountedPrice: 49990000,
     },
     {
@@ -27,7 +27,7 @@ export function SuggestedProducts() {
       brand: "LG",
       name: "Gram 17Z90P",
       image: "",
-      price: 42990000,
+      originalPrice: 42990000,
       discountedPrice: 38990000,
     },
   ];
@@ -59,7 +59,7 @@ export function SuggestedProducts() {
                   </h4>
                   <div className="mt-1">
                     <span className="block text-xs text-muted-foreground line-through">
-                      {formatCurrency(product.price)}
+                      {formatCurrency(product.originalPrice)}
                     </span>
                     <span className="block text-lg font-semibold text-black-primary">
                       {formatCurrency(product.discountedPrice)}

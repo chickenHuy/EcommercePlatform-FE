@@ -27,6 +27,10 @@ import storeEmpty from "@/assets/images/storeEmpty.jpg";
 import { Toaster } from "@/components/ui/toaster";
 import DialogConfirmDeleteCartItem from "./dialogConfirmDeleteCartItem";
 import DialogConfirmSelectCartItem from "./dialogConfirmSelectCartItem";
+import ManageCartUserSkeleton from "./skeletonCart";
+import { useRouter } from "next/navigation";
+import { setStore } from "@/store/features/userSearchSlice";
+import { useDispatch } from "react-redux";
 
 export default function ManageCartUser() {
   const [carts, setCarts] = useState([]);
@@ -39,10 +43,12 @@ export default function ManageCartUser() {
   const [isOpenVariant, setIsVariant] = useState(false);
   const [isOpenDialogConfirm, setIsOpenDialogConfirm] = useState(false);
   const [cartItemToDelete, setCartItemToDelete] = useState(null);
-  const [selectedCartItemIds, setSelectedCartItemIds] = useState(new Set());
-  const [isOpenDialogConfirmSelect, setIsOpenDialogConfirmSelect] =
+  const [selectedCartItems, setSelectedCartItems] = useState([]);
+  const [isOpenDialogConfirmSelected, setIsOpenDialogConfirmSelected] =
     useState(false);
   const { toast } = useToast();
+  const router = useRouter();
+  const dispatch = useDispatch();
 
   const handleNextPage = () => {
     if (currentPage < totalPage) {
@@ -63,17 +69,26 @@ export default function ManageCartUser() {
   const handleQuantityChange = async (cartItemId, quantityUpdate) => {
     try {
       await changeQuantity(cartItemId, quantityUpdate);
-      console.log("quantityUpdate: ", quantityUpdate);
       toast({
         title: "Thành công",
         description: `Bạn đã cập nhật số lượng thành công`,
       });
       updateCartQuantityUI(cartItemId, quantityUpdate);
+      updateSelectedCartItems(cartItemId, quantityUpdate);
     } catch (error) {
       toast({
         title: "Thất bại",
         description: error.message,
       });
+    }
+  };
+
+  const handleInputQuantityChange = (cartItemId, newQuantity) => {
+    const quantityUpdate = parseInt(newQuantity, 10);
+    if (!isNaN(quantityUpdate) && quantityUpdate > 0) {
+      handleQuantityChange(cartItemId, quantityUpdate);
+    } else {
+      return;
     }
   };
 
@@ -89,6 +104,17 @@ export default function ManageCartUser() {
         }),
       }));
     });
+  };
+
+  const updateSelectedCartItems = (cartItemId, quantityUpdate) => {
+    setSelectedCartItems((prevItems) =>
+      prevItems.map((item) => {
+        if (item.id === cartItemId) {
+          return { ...item, quantity: quantityUpdate };
+        }
+        return item;
+      })
+    );
   };
 
   const handleOnClickButtonMinus = (item) => {
@@ -130,78 +156,102 @@ export default function ManageCartUser() {
     setCartItemToDelete(cartItem);
   };
 
-  const handleSelectCartItem = (cartItemId) => {
-    console.log("cartItemId: ", cartItemId);
-    setSelectedCartItemIds((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(cartItemId)) {
-        newSet.delete(cartItemId);
-      } else {
-        newSet.add(cartItemId);
-      }
-      return newSet;
-    });
-  };
-
-  const handleOnclickButtonDeleteCartItemSelect = () => {
-    if (selectedCartItemIds.size > 0) {
-      setIsOpenDialogConfirmSelect(true);
+  const handleOnClickButtonDeleteSelectCartItem = () => {
+    if (selectedCartItems.length > 0) {
+      setIsOpenDialogConfirmSelected(true);
     } else {
       toast({
-        title: "Thông báo",
-        description: "Vui lòng chọn ít nhất một sản phẩm",
+        title: "Thất bại",
+        description: `Vui lòng chọn sản phẩm`,
       });
     }
   };
 
-  const handleDeleteSelectedCartItems = async () => {
-    if (selectedCartItemIds.size > 0) {
+  const handleDeleteSelectCartItems = async () => {
+    for (const cartItem of selectedCartItems) {
       try {
-        for (const cartItemId of selectedCartItemIds) {
-          await deleteCartItem(cartItemId);
-        }
-        toast({
-          title: "Thành công",
-          description: `Bạn đã xóa ${selectedCartItemIds.size} sản phẩm đã chọn khỏi giỏ hàng thành công`,
-        });
-        setSelectedCartItemIds(new Set());
-        setIsOpenDialogConfirmSelect(false);
-        fetchAllCart();
+        await deleteCartItem(cartItem.id);
+        setSelectedCartItems((prevItems) =>
+          prevItems.filter((item) => item.id !== cartItem.id)
+        );
       } catch (error) {
-        toast({
-          title: "Thất bại",
-          description: error.message,
-        });
+        break;
       }
     }
-  };
-
-  const handleToggleCartSelection = (cart, isChecked) => {
-    const newSelectedCartItemIds = new Set(selectedCartItemIds);
-
-    cart.items.forEach((item) => {
-      if (isChecked) {
-        newSelectedCartItemIds.add(item.id);
-      } else {
-        newSelectedCartItemIds.delete(item.id);
-      }
+    toast({
+      title: "Thành công",
+      description: `Bạn đã xóa ${selectedCartItems.length} sản phẩm khỏi giỏ hàng thành công`,
     });
-
-    setSelectedCartItemIds(newSelectedCartItemIds);
+    fetchAllCart();
+    setIsOpenDialogConfirmSelected(false);
   };
 
-  const handleSelectAll = (isChecked) => {
-    const newSelectedCartItemIds = new Set();
-
+  const handleSelectCartItem = (cartItem, isChecked) => {
     if (isChecked) {
-      carts.forEach((cart) => {
-        cart.items.forEach((item) => {
-          newSelectedCartItemIds.add(item.id);
-        });
-      });
+      setSelectedCartItems([...selectedCartItems, cartItem]);
+    } else {
+      setSelectedCartItems(
+        selectedCartItems.filter((item) => item.id !== cartItem.id)
+      );
     }
+    console.log("cartItem: ", cartItem.id);
+  };
 
-    setSelectedCartItemIds(newSelectedCartItemIds);
+  const handleSelectCart = (cart, isChecked) => {
+    if (isChecked) {
+      const newSelectedItems = cart.items.filter(
+        (item) =>
+          !selectedCartItems.find((selectedItem) => selectedItem.id === item.id)
+      );
+      setSelectedCartItems([...selectedCartItems, ...newSelectedItems]);
+    } else {
+      setSelectedCartItems(
+        selectedCartItems.filter(
+          (selectedItem) =>
+            !cart.items.find((item) => item.id === selectedItem.id)
+        )
+      );
+    }
+  };
+
+  const handleSelectAllCartAndCartItem = (isChecked) => {
+    if (isChecked) {
+      const allItems = carts.reduce((all, cart) => [...all, ...cart.items], []);
+      setSelectedCartItems(allItems);
+    } else {
+      setSelectedCartItems([]);
+    }
+  };
+
+  const isSelectedCartItem = (cartItem) => {
+    return selectedCartItems.some(
+      (selectedItem) => selectedItem.id === cartItem.id
+    );
+  };
+
+  const isSelectedCart = (cart) => {
+    return cart.items.every((item) =>
+      selectedCartItems.some((selectedItem) => selectedItem.id === item.id)
+    );
+  };
+
+  const isSelectedCartAndCartItem = () => {
+    const totalItems = carts.reduce(
+      (count, cart) => count + cart.items.length,
+      0
+    );
+    return (
+      selectedCartItems.length > 0 && selectedCartItems.length === totalItems
+    );
+  };
+
+  const handleOnclickViewShop = (storeId) => {
+    router.push("/search");
+    dispatch(setStore(storeId));
+  };
+
+  const handleOnClickLogo = () => {
+    router.push("/");
   };
 
   const fetchAllCart = useCallback(async () => {
@@ -212,7 +262,6 @@ export default function ManageCartUser() {
       setTotalElement(response.result.totalElements);
       setHasNext(response.result.hasNext);
       setHasPrevious(response.result.hasPrevious);
-      //setSelectedCartItemIds(new Set());
     } catch (error) {
       toast({
         title: "Thất bại",
@@ -225,14 +274,33 @@ export default function ManageCartUser() {
     }
   }, [toast, currentPage]);
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
+    setLoading(false);
     fetchAllCart();
-    console.log("selectedCartItemIds: ", selectedCartItemIds);
-  }, [fetchAllCart, totalPage, totalElement, selectedCartItemIds]);
+    setLoading(true);
+  }, [fetchAllCart, totalPage, totalElement]);
 
   const calculateTotalSavings = (cartItems) => {
-    return cartItems.reduce((totalSavings, item) => {
-      const savings = item.quantity * (item.originalPrice - item.salePrice);
+    return cartItems.reduce((totalSavings, cartItem) => {
+      const savings =
+        cartItem.quantity * (cartItem.originalPrice - cartItem.salePrice);
+      return totalSavings + savings;
+    }, 0);
+  };
+
+  const calculateTotalPriceSelectedCartItem = (cartItems) => {
+    return cartItems.reduce((totalPrice, cartItem) => {
+      const price = cartItem.quantity * cartItem.salePrice;
+      return totalPrice + price;
+    }, 0);
+  };
+
+  const calculateTotalSavingSelectedCartItem = (cartItems) => {
+    return cartItems.reduce((totalSavings, cartItem) => {
+      const savings =
+        cartItem.quantity * (cartItem.originalPrice - cartItem.salePrice);
       return totalSavings + savings;
     }, 0);
   };
@@ -246,37 +314,37 @@ export default function ManageCartUser() {
     });
   }
 
-  return (
-    <div className="flex flex-col min-h-screen w-full bg-muted/4 bg-blue-primary space-y-4">
+  return loading ? (
+    <div className="flex flex-col min-h-screen w-full bg-muted/4 bg-blue-primary">
       <Toaster />
-      <div className="h-[80px] flex items-center justify-between bg-white-primary border-b-2">
-        <div className="flex items-center space-x-2 ml-4">
-          <div className="flex items-center space-x-1">
-            <BriefcaseBusiness />
-            <Label>HKK</Label>
+      <div className="h-[80px] flex items-center justify-between bg-white-primary border-b-2 mt-24 mb-4">
+        <div
+          className="flex items-center space-x-4 ml-32 hover:cursor-pointer"
+          onClick={() => handleOnClickLogo()}
+        >
+          <div className="flex items-center space-x-2">
+            <BriefcaseBusiness size={50} className="text-error" />
+            <Label className="text-2xl text-error hover:cursor-pointer">
+              HKK
+            </Label>
           </div>
-          <div className="w-[1px] h-4 bg-black-primary"></div>
-          <div>
-            <Label>Giỏ Hàng</Label>
-          </div>
+          <div className="w-[1px] h-6 bg-error"></div>
+          <Label className="text-2xl font-bold text-error hover:cursor-pointer">
+            Giỏ Hàng
+          </Label>
         </div>
-        <div className="w-1/2 flex items-center space-x-2 mr-4">
+        {/* <div className="w-1/2 flex items-center space-x-2 mr-4">
           <Input placeholder="Tìm kiếm giỏ hàng" />
           <Search className="hover:cursor-pointer" />
-        </div>
+        </div> */}
       </div>
-      <div className="flex items-center justify-between bg-white-primary m-4">
+      <div className="flex items-center justify-between bg-white-primary my-4 mx-20">
         <div className="w-1/2 flex items-center">
-          {/*Checkbox ông nội dùng để chọn tất cả các checkbox cha (cart) và checkbox con (cartItem)*/}
+          {/*Checkbox cart và cartItem*/}
           <Checkbox
             className="w-1/6"
-            checked={
-              selectedCartItemIds.size > 0 &&
-              carts.every((cart) =>
-                cart.items.every((item) => selectedCartItemIds.has(item.id))
-              )
-            }
-            onChange={(e) => handleSelectAll(e.target.checked)}
+            checked={isSelectedCartAndCartItem()}
+            onChange={(e) => handleSelectAllCartAndCartItem(e.target.checked)}
           />
           <Label className="w-5/6">Sản phẩm</Label>
         </div>
@@ -295,22 +363,21 @@ export default function ManageCartUser() {
           </div>
         </div>
       </div>
-      <div className="m-4 space-y-4">
+      <div className="my-4 mx-20 space-y-4">
         {carts.length > 0 ? (
           carts.map((cart, index) => (
             <Card key={index} className="rounded-none">
               <CardTitle className="flex items-center mt-4 mb-4">
-                {/*Checkbox cha (cart) dùng để chọn tất cả các checkbox con (cartItem)*/}
+                {/*Checkbox (cart)*/}
                 <Checkbox
                   className="w-1/12"
-                  checked={cart.items.every((item) =>
-                    selectedCartItemIds.has(item.id)
-                  )}
-                  onChange={(e) =>
-                    handleToggleCartSelection(cart, e.target.checked)
-                  }
+                  checked={isSelectedCart(cart)}
+                  onChange={(e) => handleSelectCart(cart, e.target.checked)}
                 />
-                <div className="w-11/12 flex items-center space-x-2">
+                <div
+                  className="w-11/12 flex items-center space-x-2 hover:cursor-pointer"
+                  onClick={() => handleOnclickViewShop(cart.storeId)}
+                >
                   <Image
                     alt="avatar store"
                     src={cart.avatarStore || storeEmpty}
@@ -319,7 +386,9 @@ export default function ManageCartUser() {
                     unoptimized={true}
                     className="rounded-full transition-transform duration-300"
                   />
-                  <Label className="text-xl">{cart.storeName}</Label>
+                  <Label className="text-xl hover:cursor-pointer">
+                    {cart.storeName}
+                  </Label>
                   <Rating
                     value={cart.ratingStore}
                     precision={0.1}
@@ -335,19 +404,21 @@ export default function ManageCartUser() {
                       className="w-full flex items-center border m-4"
                     >
                       <div className="w-1/2 flex items-center">
-                        {/*Checkbox con (cartItem)*/}
+                        {/*Checkbox (cartItem)*/}
                         <Checkbox
                           className="w-1/6"
-                          checked={selectedCartItemIds.has(item.id)}
-                          onChange={() => handleSelectCartItem(item.id)}
+                          checked={isSelectedCartItem(item)}
+                          onChange={(e) =>
+                            handleSelectCartItem(item, e.target.checked)
+                          }
                         />
                         <div className="w-5/6 flex items-center">
                           <div className="w-2/3 flex items-center space-x-4">
                             <Image
                               alt="ảnh sản phẩm"
-                              src={item.image}
-                              height={125}
-                              width={125}
+                              src={item.image || storeEmpty}
+                              height={100}
+                              width={100}
                               className="mt-4 mb-4"
                             />
                             <div className="flex-1 min-w-0 space-y-4">
@@ -357,7 +428,7 @@ export default function ManageCartUser() {
                               <div className="flex items-center truncate space-x-2">
                                 <Image
                                   alt="logo thương hiệu"
-                                  src={item.logoBrand}
+                                  src={item.logoBrand || storeEmpty}
                                   height={30}
                                   width={30}
                                   unoptimized={true}
@@ -385,7 +456,7 @@ export default function ManageCartUser() {
                                 )}
                               </div>
                               <Label className="hover:cursor-pointer">
-                                {item.value && item.value > 0
+                                {item.value
                                   ? item.value.join(" | ")
                                   : "(không có)"}
                               </Label>
@@ -430,7 +501,7 @@ export default function ManageCartUser() {
                       </div>
                       <div className="w-1/2 flex items-center justify-between">
                         <div className="w-1/4 flex items-center justify-center space-x-2">
-                          <Label className="line-through">
+                          <Label className="line-through text-muted-foreground">
                             {formatCurrency(item.originalPrice)}
                           </Label>
                           <Label>{formatCurrency(item.salePrice)}</Label>
@@ -441,18 +512,22 @@ export default function ManageCartUser() {
                             className="w-1/6"
                             onClick={() => handleOnClickButtonMinus(item)}
                           >
-                            <Minus className="scale-[4]" />
+                            <Minus className="scale-[5]" />
                           </Button>
                           <Input
                             value={item.quantity}
-                            className="w-1/3 text-2xl text-center"
+                            onChange={(e) =>
+                              handleInputQuantityChange(item.id, e.target.value)
+                            }
+                            type="number"
+                            className="w-1/3 text-xl text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                           <Button
                             variant="outline"
                             className="w-1/6"
                             onClick={() => handleOnClickButtonPlus(item)}
                           >
-                            <Plus className="scale-[4]" />
+                            <Plus className="scale-[5]" />
                           </Button>
                         </div>
                         <div className="w-1/4 flex items-center justify-center">
@@ -492,7 +567,14 @@ export default function ManageCartUser() {
           ))
         ) : (
           <div className="flex items-center justify-center">
-            <Label className="text-2xl text-center">Giỏ hàng trống</Label>
+            <Image
+              alt="avatar store"
+              src={storeEmpty}
+              height={1000}
+              width={1000}
+              unoptimized={true}
+              className="rounded-md transition-transform duration-300"
+            />
           </div>
         )}
 
@@ -506,35 +588,39 @@ export default function ManageCartUser() {
           hasPrevious={hasPrevious}
         ></PaginationAdminTable>
       </div>
-      <div className="flex items-center justify-between bg-white-primary min-h-[80px] m-4 sticky bottom-0 border-t-2 ">
-        {/*Checkbox ông nội dùng để chọn tất cả các checkbox cha (cart) và checkbox con (cartItem)*/}
+      <div className="flex items-center justify-between bg-white-primary min-h-[80px] my-4 mx-20 sticky bottom-0 border-t-2 ">
+        {/*Checkbox cart và cartItem*/}
         <Checkbox
           className="w-1/12"
-          checked={
-            selectedCartItemIds.size > 0 &&
-            carts.every((cart) =>
-              cart.items.every((item) => selectedCartItemIds.has(item.id))
-            )
-          }
-          onChange={(e) => handleSelectAll(e.target.checked)}
+          checked={isSelectedCartAndCartItem()}
+          onChange={(e) => handleSelectAllCartAndCartItem(e.target.checked)}
         />
         <div className="w-11/12 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Button variant="outline">
-              Chọn tất cả ({selectedCartItemIds.size})
+              Chọn tất cả ({selectedCartItems.length})
             </Button>
+            {/*Button xóa tất cả các cart hoặc cartItem đã chọn (từ checkbox cha (card) hoặc checkcon con (cartItem)*/}
             <Button
               variant="outline"
-              onClick={() => handleOnclickButtonDeleteCartItemSelect()}
+              onClick={() => handleOnClickButtonDeleteSelectCartItem()}
             >
               Xóa
-            </Button>{" "}
-            {/*Button xóa tất cả các cart hoặc cartItem đã chọn (từ checkbox cha (card) hoặc checkcon con (cartItem)*/}
+            </Button>
           </div>
-          <Button variant="outline">Bỏ sản phẩm không hoạt động</Button>
+          <Label variant="outline">
+            Tiết kiệm ngay:{" "}
+            {formatCurrency(
+              calculateTotalSavingSelectedCartItem(selectedCartItems)
+            )}
+          </Label>
           <div className="flex items-center space-x-4">
-            <Label>Tổng sản phẩm (0 sản phẩm):</Label>
-            <Label className="text-2xl font-bold">0 đ</Label>
+            <Label>Tổng sản phẩm ({selectedCartItems.length} sản phẩm):</Label>
+            <Label className="text-2xl font-bold">
+              {formatCurrency(
+                calculateTotalPriceSelectedCartItem(selectedCartItems)
+              )}
+            </Label>
           </div>
           <Button variant="outline" className="w-1/6 mr-10">
             Mua hàng
@@ -549,14 +635,16 @@ export default function ManageCartUser() {
           confirmDeleteCartItem={handleDeleteCartItem}
         />
       )}
-      {isOpenDialogConfirmSelect && (
+      {isOpenDialogConfirmSelected && (
         <DialogConfirmSelectCartItem
-          isOpen={isOpenDialogConfirmSelect}
-          onClose={() => setIsOpenDialogConfirmSelect(false)}
-          selectedCartItemIds={selectedCartItemIds}
-          confirmDeleteSelectedCartItem={handleDeleteSelectedCartItems}
+          isOpen={isOpenDialogConfirmSelected}
+          onClose={() => setIsOpenDialogConfirmSelected(false)}
+          selectedCartItems={selectedCartItems}
+          confirmDeleteSelectedCartItem={handleDeleteSelectCartItems}
         />
       )}
     </div>
+  ) : (
+    <ManageCartUserSkeleton />
   );
 }
