@@ -231,7 +231,6 @@ export default function ManageCustomer() {
                         <TableHead>Username</TableHead>
                         <TableHead>Tên</TableHead>
                         <TableHead>Ngày tạo</TableHead>
-                        <TableHead></TableHead>
                         <TableHead className="hidden md:table-cell">
                           <span className="sr-only">Hành động</span>
                         </TableHead>
@@ -244,27 +243,29 @@ export default function ManageCustomer() {
                           onClick={() => handleRowClick(customer.id)}
                         >
                           <TableCell className="hidden sm:table-cell">
-                            <Avatar>
-                              <AvatarImage
-                                src={customer.imageUrl}
-                                alt={customer.username}
-                              />
-                              <AvatarFallback>
-                                {customer.name.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
+                            <div className="flex items-center justify-center">
+                              <Avatar>
+                                <AvatarImage
+                                  src={customer.imageUrl}
+                                  alt={customer.username}
+                                />
+                                <AvatarFallback>
+                                  {customer.name.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                            </div>
                           </TableCell>
-                          <TableCell className="font-medium">
-                            {customer.customername}
+                          <TableCell className="font-medium text-center">
+                            {customer.username}
                           </TableCell>
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium text-center">
                             {customer.name}
                           </TableCell>
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium text-center">
                             {new Date(customer.created_at).toLocaleString()}{" "}
                             {/* Format date */}
                           </TableCell>
-                          <TableCell className="hidden md:table-cell">
+                          <TableCell className="hidden md:table-cell text-center">
                             <Dialog>
                               <DialogTrigger asChild>
                                 <Button

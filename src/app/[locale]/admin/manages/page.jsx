@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { Eye, File, ListFilter, Lock, EyeClosed, LockOpen } from "lucide-react";
+import { Eye, ListFilter, Lock, EyeClosed, LockOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -231,7 +231,6 @@ export default function ManageAdmin() {
                         <TableHead>Username</TableHead>
                         <TableHead>Tên</TableHead>
                         <TableHead>Ngày tạo</TableHead>
-                        <TableHead></TableHead>
                         <TableHead className="hidden md:table-cell">
                           <span className="sr-only">Hành động</span>
                         </TableHead>
@@ -244,26 +243,28 @@ export default function ManageAdmin() {
                           onClick={() => handleRowClick(admin.id)}
                         >
                           <TableCell className="hidden sm:table-cell">
-                            <Avatar>
-                              <AvatarImage
-                                src={admin.imageUrl}
-                                alt={admin.username}
-                              />
-                              <AvatarFallback>
-                                {admin.name?.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
+                            <div className="flex items-center justify-center">
+                              <Avatar>
+                                <AvatarImage
+                                  src={admin.imageUrl}
+                                  alt={admin.username}
+                                />
+                                <AvatarFallback>
+                                  {admin.name?.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                            </div>
                           </TableCell>
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium text-center">
                             {admin.username}
                           </TableCell>
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium text-center">
                             {admin.name}
                           </TableCell>
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium text-center">
                             {new Date(admin.created_at).toLocaleString()}{" "}
                           </TableCell>
-                          <TableCell className="hidden md:table-cell">
+                          <TableCell className="hidden md:table-cell text-center">
                             <Dialog>
                               <DialogTrigger asChild>
                                 <Button

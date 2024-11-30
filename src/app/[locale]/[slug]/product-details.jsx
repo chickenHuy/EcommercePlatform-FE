@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState, useMemo } from "react";
-import { Star, ShoppingCart, Heart, Minus, Plus, Store } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Minus, Plus, Store } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/hooks/use-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { changeQuantity } from "@/store/features/cartSlice";
+import { useRouter } from "next/navigation";
+import { setStore } from "@/store/features/userSearchSlice";
 
 export default function ProductDetail({ product }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -25,12 +27,12 @@ export default function ProductDetail({ product }) {
 
   const initializeAvailableOptions = () => {
     const initialOptions = {};
-    product.attributes.forEach(attr => {
-      initialOptions[attr.name] = new Set(attr.values.map(v => v.value));
+    product.attributes.forEach((attr) => {
+      initialOptions[attr.name] = new Set(attr.values.map((v) => v.value));
     });
     setAvailableOptions(initialOptions);
     console.log(product.variants);
-    console.log("HAHHA")
+    console.log("HAHHA");
   };
 
   useEffect(() => {
@@ -38,36 +40,47 @@ export default function ProductDetail({ product }) {
   }, []);
 
   const getValidVariants = (attributes) => {
-    return product.variants.filter(variant =>
+    return product.variants.filter((variant) =>
       Object.entries(attributes).every(([attr, val]) =>
-        variant.values.some(v => v.attribute === attr && v.value === val)
+        variant.values.some((v) => v.attribute === attr && v.value === val)
       )
     );
   };
 
   const handleAttributeSelect = (attributeName, value) => {
-    const newSelectedAttributes = { ...selectedAttributes, [attributeName]: value };
+    const newSelectedAttributes = {
+      ...selectedAttributes,
+      [attributeName]: value,
+    };
     setSelectedAttributes(newSelectedAttributes);
 
     const validVariants = getValidVariants(newSelectedAttributes);
 
     const newAvailableOptions = { ...availableOptions };
-    product.attributes.forEach(attr => {
+    product.attributes.forEach((attr) => {
       if (attr.name !== attributeName) {
         newAvailableOptions[attr.name] = new Set(
-          validVariants.flatMap(v =>
-            v.values.filter(val => val.attribute === attr.name).map(val => val.value)
+          validVariants.flatMap((v) =>
+            v.values
+              .filter((val) => val.attribute === attr.name)
+              .map((val) => val.value)
           )
         );
       } else {
-        newAvailableOptions[attr.name] = new Set(attr.values.map(v => v.value));
+        newAvailableOptions[attr.name] = new Set(
+          attr.values.map((v) => v.value)
+        );
       }
     });
     setAvailableOptions(newAvailableOptions);
 
-    if (Object.keys(newSelectedAttributes).length === product.attributes.length) {
-      const exactMatch = validVariants.find(v =>
-        v.values.every(val => newSelectedAttributes[val.attribute] === val.value)
+    if (
+      Object.keys(newSelectedAttributes).length === product.attributes.length
+    ) {
+      const exactMatch = validVariants.find((v) =>
+        v.values.every(
+          (val) => newSelectedAttributes[val.attribute] === val.value
+        )
       );
       setSelectedVariant(exactMatch || null);
 
@@ -80,12 +93,15 @@ export default function ProductDetail({ product }) {
   };
 
   const updateQuantity = (change) => {
-    const maxQuantity = selectedVariant ? selectedVariant.quantity : product.quantity;
+    const maxQuantity = selectedVariant
+      ? selectedVariant.quantity
+      : product.quantity;
     setQuantity((prev) => Math.max(1, Math.min(prev + change, maxQuantity)));
   };
 
   const currentPrice = selectedVariant?.salePrice || product.salePrice;
-  const currentOriginalPrice = selectedVariant?.originalPrice || product.originalPrice;
+  const currentOriginalPrice =
+    selectedVariant?.originalPrice || product.originalPrice;
 
   const isAttributeDisabled = (attributeName, value) => {
     if (Object.keys(selectedAttributes).length === 0) return false;
@@ -102,7 +118,7 @@ export default function ProductDetail({ product }) {
       productId: product.id,
       variantId: selectedVariant?.id ? selectedVariant.id : "",
       quantity: quantity,
-    }
+    };
 
     console.log(request);
     try {
@@ -112,18 +128,23 @@ export default function ProductDetail({ product }) {
         (qty));
       toast({
         title: "Sản phẩm đã được thêm vào giỏ hàng",
-        description: "Bạn có thể xem giỏ hàng bằng cách nhấn vào biểu tượng giỏ hàng ở góc trên bên phải",
-      })
-    }
-    catch (error) {
+        description:
+          "Bạn có thể xem giỏ hàng bằng cách nhấn vào biểu tượng giỏ hàng ở góc trên bên phải",
+      });
+    } catch (error) {
       toast({
         title: "Thêm sản phẩm thất bại",
         description: error.message,
-        variant: "destructive"
-      })
-    };
+        variant: "destructive",
+      });
+    }
+  };
 
-  }
+  const router = useRouter();
+  const handleOnClickViewShop = (storeId) => {
+    router.push("/search");
+    dispatch(setStore(storeId));
+  };
 
   return (
     <div className="flex-col bg-opacity-60 bg-blue-primary">
@@ -140,10 +161,11 @@ export default function ProductDetail({ product }) {
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
-                      className={`h-5 w-5 ${star <= (product.rating || 0)
-                        ? "text-yellow-primary fill-current"
-                        : "text-gray-secondary"
-                        }`}
+                      className={`h-5 w-5 ${
+                        star <= (product.rating || 0)
+                          ? "text-yellow-primary fill-current"
+                          : "text-gray-secondary"
+                      }`}
                     />
                   ))}
                 </div>
@@ -191,8 +213,13 @@ export default function ProductDetail({ product }) {
                           ? "default"
                           : "outline"
                       }
-                      onClick={() => handleAttributeSelect(attribute.name, value.value)}
-                      disabled={isAttributeDisabled(attribute.name, value.value)}
+                      onClick={() =>
+                        handleAttributeSelect(attribute.name, value.value)
+                      }
+                      disabled={isAttributeDisabled(
+                        attribute.name,
+                        value.value
+                      )}
                     >
                       {value.value}
                     </Button>
@@ -217,12 +244,17 @@ export default function ProductDetail({ product }) {
                   variant="outline"
                   size="icon"
                   onClick={() => updateQuantity(1)}
-                  disabled={quantity >= (selectedVariant?.quantity || product.quantity)}
+                  disabled={
+                    quantity >= (selectedVariant?.quantity || product.quantity)
+                  }
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
                 <span className="text-sm text-black-tertiary">
-                  {selectedVariant ? selectedVariant.quantity : product.quantity} sản phẩm có sẵn
+                  {selectedVariant
+                    ? selectedVariant.quantity
+                    : product.quantity}{" "}
+                  sản phẩm có sẵn
                 </span>
               </div>
             </div>
@@ -267,7 +299,11 @@ export default function ProductDetail({ product }) {
                   Đánh giá: {product.store.rating?.toFixed(1)}/5.0
                 </p>
               </div>
-              <Button className="mt-4 mr-auto" variant="outline">
+              <Button
+                className="mt-4 mr-auto"
+                variant="outline"
+                onClick={() => handleOnClickViewShop(product.store.id)}
+              >
                 <Store className="mr-2"></Store>
                 Xem shop
               </Button>
@@ -297,4 +333,3 @@ export default function ProductDetail({ product }) {
     </div>
   );
 }
-
