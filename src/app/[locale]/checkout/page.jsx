@@ -4,8 +4,10 @@ import Address from "./address"
 import CheckoutContent from "./content"
 import { useSelector } from "react-redux";
 import Link from "next/link";
+import { useState } from "react";
 export default function CheckoutPage() {
     const stores = useSelector((state) => state.checkoutReducer.stores);
+    const [selectedAddress, setSelectedAddress] = useState(null);
 
     if (stores.length === 0) {
         return (
@@ -24,10 +26,10 @@ export default function CheckoutPage() {
         <div className="w-full flex flex-col bg-blue-primary">
             <CommonHeader />
             <div className="w-3/4 mx-auto bg-blue-primary bg-opacity-50">
-                <Address />
+                <Address defaultAddress={selectedAddress} setDefaultAddress={setSelectedAddress} />
             </div>
             <div className="w-3/4 mx-auto bg-blue-primary bg-opacity-50">
-                <CheckoutContent stores={stores} />
+                <CheckoutContent stores={stores} selectedAddress={selectedAddress} />
             </div>
         </div>
     )

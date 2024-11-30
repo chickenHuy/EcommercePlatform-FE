@@ -9,7 +9,7 @@ import { useCallback, useState, useEffect } from "react";
 export default function Address(props) {
 
     const [addresses, setAddresses] = useState([]);
-    const [defaultAddress, setDefaultAddress] = useState(null);
+    const { defaultAddress, setDefaultAddress } = props;
     const page = 1;
     const itemsPerPage = 10;
     const [hasNew, setHasNew] = useState(false);

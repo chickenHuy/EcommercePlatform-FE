@@ -45,7 +45,8 @@ const UserHeader = () => {
     !pathname.includes("/user") &&
     !pathname.includes("/auth") &&
     !pathname.includes("/checkout") &&
-    !pathname.includes("/cart");
+    !pathname.includes("/cart") &&
+    !pathname.includes("/status") ;
 
   if (!isHeaderVisible) return null;
 

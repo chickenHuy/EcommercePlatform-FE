@@ -15,11 +15,9 @@ import { Checkbox, Rating } from "@mui/material";
 import {
   ArrowDown,
   ArrowUp,
-  BriefcaseBusiness,
   Minus,
   PiggyBank,
   Plus,
-  Search,
 } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
@@ -265,6 +263,7 @@ export default function ManageCartUser() {
       setTotalElement(response.result.totalElements);
       setHasNext(response.result.hasNext);
       setHasPrevious(response.result.hasPrevious);
+      console.log("response", response);
 
     } catch (error) {
       toast({
@@ -328,11 +327,21 @@ export default function ManageCartUser() {
     })).filter(cart => cart.items.length > 0);
 
 
-
-    dispatch(setCheckout(selectedCartWithItem));
-    router.push("/checkout")
+    if (selectedCartWithItem.length === 0) {
+      toast({
+        title: "Thất bại",
+        description: "Vui lòng chọn sản phẩm để mua hàng",
+        variant: "destructive",
+      });
+    }
+    else {
+      dispatch(setCheckout(selectedCartWithItem));
+      router.push("/checkout")
+    }
 
   }
+
+  
 
   return loading ? (
     <div className="flex flex-col min-h-screen w-full bg-muted/4 bg-blue-primary">
