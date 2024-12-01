@@ -41,6 +41,10 @@ import { TabsContent } from "@radix-ui/react-tabs";
 import DialogCancelOrderUser from "./dialogCancelOrderUser";
 import ViewOrderDetailUser from "./viewOrderDetailUser";
 import { Rating } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { setStore } from "@/store/features/userSearchSlice";
+import { useDispatch } from "react-redux";
+import { Badge } from "@/components/ui/badge";
 
 export default function ManageOrderUser() {
   const [orders, setOrders] = useState([]);
@@ -102,9 +106,20 @@ export default function ManageOrderUser() {
     setActionType("cancel");
   };
 
-  const handleClickCard = (orderId) => {
+  const handleOnClickViewOrderDetail = (orderId) => {
     setIsDrawerOpen(true);
     setSelectedOrder(orderId);
+  };
+
+  const router = useRouter();
+  const handleOnClickViewProductDetail = (slug) => {
+    router.push(`/${slug}`);
+  };
+
+  const dispatch = useDispatch();
+  const handleOnclickViewShop = (storeId) => {
+    router.push("/search");
+    dispatch(setStore(storeId));
   };
 
   const confirmCancelOrder = async () => {
@@ -215,6 +230,28 @@ export default function ManageOrderUser() {
         return "Đơn hàng đã được giao thành công";
       case "CANCELLED":
         return "Đơn hàng đã bị hủy";
+      default:
+        return "N/A";
+    }
+  }
+
+  function getTransactionStatusOrder(status) {
+    switch (status) {
+      case "WAITING":
+        return "Chờ thanh toán";
+      case "SUCCESS":
+        return "Đã thanh toán";
+      default:
+        return "N/A";
+    }
+  }
+
+  function getPaymentMethodOrder(status) {
+    switch (status) {
+      case "COD":
+        return "Thanh toán khi nhận hàng";
+      case "VN_PAY":
+        return "Thanh toán VN PAY";
       default:
         return "N/A";
     }
@@ -359,22 +396,27 @@ export default function ManageOrderUser() {
           </div>
           <TabsContent
             value={filter}
-            className="flex flex-col items-center justify-center m-4 space-y-4"
+            className="flex flex-col items-center justify-center m-8 space-y-6"
           >
             {orders.length > 0 ? (
               orders.map((order) => (
                 <Card key={order.id} className="w-full">
                   <CardTitle className="flex justify-between items-center gap-4 m-4">
-                    <div className="flex items-center gap-4">
+                    <div
+                      className="flex items-center gap-4 hover:cursor-pointer"
+                      onClick={() => handleOnclickViewShop(order.storeId)}
+                    >
                       <Image
-                        alt="avatar shop"
+                        alt="ảnh shop"
                         src={order.avatarStore}
                         height={30}
                         width={30}
                         unoptimized={true}
                         className="rounded-full transition-transform duration-300"
                       />
-                      <Label className="text-xl">{order.storeName}</Label>
+                      <Label className="text-xl hover:cursor-pointer">
+                        {order.storeName}
+                      </Label>
                       <Rating
                         value={order.ratingStore}
                         precision={0.1}
@@ -385,7 +427,7 @@ export default function ManageOrderUser() {
                       <Button
                         variant="outline"
                         className="flex items-center gap-2"
-                        onClick={() => handleClickCard(order.id)}
+                        onClick={() => handleOnClickViewOrderDetail(order.id)}
                       >
                         <Forklift />
                         <Label className="hover:cursor-pointer">
@@ -403,13 +445,24 @@ export default function ManageOrderUser() {
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
+                      <Badge variant="outline">
+                        {getPaymentMethodOrder(order.paymentMethod)}
+                      </Badge>
+                      <Badge variant="outline">
+                        {getTransactionStatusOrder(
+                          order.currentStatusTransaction
+                        )}
+                      </Badge>
                       <div className="w-[1px] h-7 bg-black-primary"></div>
-                      <Label className="text-error-dark">
+                      <Label className="text-error-dark font-bold">
                         {getStatusOrder(order.currentStatus)}
                       </Label>
                     </div>
                   </CardTitle>
-                  <CardContent className="flex flex-col items-center justify-center min-h-[150px] space-y-4 border-t hover:cursor-pointer">
+                  <CardContent
+                    className="flex flex-col items-center justify-center min-h-[150px] space-y-4 border-t hover:cursor-pointer"
+                    onClick={() => handleOnClickViewOrderDetail(order.id)}
+                  >
                     {order.orderItems && order.orderItems.length > 0 ? (
                       order.orderItems.map((item, index) => (
                         <Card
@@ -417,46 +470,53 @@ export default function ManageOrderUser() {
                           className="flex w-full justify-between items-center gap-4 mt-4"
                         >
                           <div className="flex items-center gap-4 mb-6 ml-6">
-                            <Link
-                              href="/user/orders"
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOnClickViewProductDetail(
+                                  item.productSlug
+                                );
+                              }}
                             >
                               <Image
-                                alt={item.product.name}
-                                src={item.product.mainImageUrl}
+                                alt={item.productName}
+                                src={item.productMainImageUrl}
                                 height={100}
                                 width={100}
                                 unoptimized={true}
                                 className="mt-6 rounded-md transition-transform duration-300 hover:scale-125 hover:mr-4"
                               />
-                            </Link>
-                            <div>
-                              <Link
-                                href="/user/orders"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="hover:underline"
+                            </div>
+                            <div className="flex flex-col space-y-2">
+                              <div
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOnClickViewProductDetail(
+                                    item.productSlug
+                                  );
+                                }}
                               >
-                                <p className="text-xl font-bold hover:text-2xl">
-                                  {item.product.name}
-                                </p>
-                              </Link>
-                              <p className="text-muted-foreground">
-                                Phân loại hàng: {item.values.join(" | ")}
-                              </p>
-                              <p>x{item.quantity}</p>
+                                <Label className="text-xl font-bold hover:text-2xl hover:cursor-pointer">
+                                  {item.productName}
+                                </Label>
+                              </div>
+                              <Label className="text-muted-foreground">
+                                {item.values
+                                  ? `Phân loại hàng ${item.values.join(" | ")}`
+                                  : ""}
+                              </Label>
+                              <Label>x{item.quantity}</Label>
                             </div>
                           </div>
                           <div className="flex items-center gap-4 mr-6">
-                            <p className="line-through">
+                            <Label className="line-through text-muted-foreground">
                               {formatCurrency(item.price)}
-                            </p>
-                            <p>
+                            </Label>
+                            <Label>
                               {formatCurrency(
                                 item.price - item.price * item.discount
                               )}
-                            </p>
+                            </Label>
                           </div>
                         </Card>
                       ))
@@ -475,9 +535,10 @@ export default function ManageOrderUser() {
                     </div>
                     <div className="flex justify-between w-full items-center gap-2 m-4">
                       <div>
-                        <Label>Ghi chú của bạn: </Label>
-                        <Label className="font-bold">
-                          {order.note || "không có ghi chú"}
+                        <Label>
+                          {order.note
+                            ? `Ghi chú của bạn: ${order.note}`
+                            : "(không có ghi chú)"}
                         </Label>
                       </div>
                       <div className="flex items-center gap-2">
@@ -514,20 +575,26 @@ export default function ManageOrderUser() {
                 </Card>
               ))
             ) : (
-              <Label className="text-2xl text-error-dark text-center">
-                Hiện tại bạn không có đơn hàng thuộc trạng thái này
-              </Label>
+              <div className="w-full min-h-[700px] flex flex-col justify-center">
+                <Label className="text-4xl text-error-dark text-center">
+                  Hiện tại bạn không có đơn hàng thuộc trạng thái này
+                </Label>
+              </div>
             )}
           </TabsContent>
-          <PaginationAdminTable
-            currentPage={currentPage}
-            handleNextPage={handleNextPage}
-            handlePrevPage={handlePrevPage}
-            totalPage={totalPage}
-            setCurrentPage={setCurrentPage}
-            hasNext={hasNext}
-            hasPrevious={hasPrevious}
-          ></PaginationAdminTable>
+          {orders.length > 0 ? (
+            <PaginationAdminTable
+              currentPage={currentPage}
+              handleNextPage={handleNextPage}
+              handlePrevPage={handlePrevPage}
+              totalPage={totalPage}
+              setCurrentPage={setCurrentPage}
+              hasNext={hasNext}
+              hasPrevious={hasPrevious}
+            ></PaginationAdminTable>
+          ) : (
+            ""
+          )}
         </Tabs>
       </main>
       {isDrawerOpen && (

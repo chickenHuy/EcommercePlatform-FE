@@ -37,6 +37,8 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import DialogUpdateOrCancelOrderAdmin from "./dialogUpdateOrCancelOrderAdmin";
 import Link from "next/link";
+import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
 
 export default function ViewOrderDetailAdmin(props) {
   const { isOpen, onClose, orderId } = props;
@@ -48,6 +50,11 @@ export default function ViewOrderDetailAdmin(props) {
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [actionType, setActionType] = useState("");
   const { toast } = useToast();
+
+  const router = useRouter();
+  const handleOnClickViewProductDetail = (slug) => {
+    router.push(`/${slug}`);
+  };
 
   const fetchOneOrderByAdmin = useCallback(async () => {
     if (!orderId) {
@@ -158,6 +165,28 @@ export default function ViewOrderDetailAdmin(props) {
     }
   }
 
+  function getTransactionStatusOrder(status) {
+    switch (status) {
+      case "WAITING":
+        return "Chờ thanh toán";
+      case "SUCCESS":
+        return "Đã thanh toán";
+      default:
+        return "N/A";
+    }
+  }
+
+  function getPaymentMethodOrder(status) {
+    switch (status) {
+      case "COD":
+        return "COD";
+      case "VN_PAY":
+        return "VN PAY";
+      default:
+        return "N/A";
+    }
+  }
+
   function formatDate(dateString) {
     const date = new Date(dateString);
 
@@ -189,9 +218,9 @@ export default function ViewOrderDetailAdmin(props) {
                       <span className="sr-only">Quay lại</span>
                     </Button>
                   </DrawerClose>
-                  <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
+                  <Label className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
                     Chi tiết đơn hàng
-                  </h1>
+                  </Label>
                   <div className="hidden items-center gap-2 md:ml-auto md:flex">
                     <DrawerClose>
                       <Button variant="outline" size="sm">
@@ -200,26 +229,33 @@ export default function ViewOrderDetailAdmin(props) {
                     </DrawerClose>
                   </div>
                 </div>
-                <div className="flex justify-between items-center w-full">
+                <div className="flex flex-col w-full space-y-4">
                   <div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <h2 className="text-2xl font-semibold">
+                        <Label className="text-2xl font-bold">
                           Mã đơn hàng: #{order?.id}
-                        </h2>
+                        </Label>
                         <div className="flex items-center space-x-2">
                           <Badge variant="outline">
                             {getStatusOrder(order?.currentStatus)}
                           </Badge>
-                          <Badge variant="outline">Chưa thanh toán</Badge>
+                          <Badge variant="outline">
+                            {getTransactionStatusOrder(
+                              order?.currentStatusTransaction
+                            )}
+                          </Badge>
+                          <Badge variant="outline">
+                            {getPaymentMethodOrder(order?.paymentMethod)}
+                          </Badge>
                         </div>
                       </div>
                     </div>
-                    <div className="text-sm mt-2">
-                      Ngày đặt hàng: {formatDate(order?.lastUpdatedAt)}
-                    </div>
+                    <Label className="text-sm mt-2 ml-4">
+                      Ngày đặt hàng: {formatDate(order?.createdAt)}
+                    </Label>
                   </div>
-                  <div className="space-x-4">
+                  <div className="space-x-4 flex items-center justify-end">
                     {order?.currentStatus === "DELIVERED" ||
                     order?.currentStatus === "CANCELLED" ? (
                       ""
@@ -259,46 +295,51 @@ export default function ViewOrderDetailAdmin(props) {
                         order.orderItems.map((item, index) => (
                           <Card key={index}>
                             <CardContent>
-                              <div className="flex items-start gap-4 mt-6">
-                                <Link
-                                  href="/admin/orders"
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
+                              <div className="flex items-center justify-between gap-4 mt-6">
+                                <div className="flex items-center space-x-4">
                                   <Image
-                                    alt={item.product.name}
-                                    src={item.product.mainImageUrl}
+                                    alt={item.productName}
+                                    src={item.productMainImageUrl}
                                     height={100}
                                     width={100}
-                                    className="rounded-md transition-transform duration-300 hover:scale-125 hover:mr-2"
+                                    className="rounded-md transition-transform duration-300 hover:scale-125 hover:cursor-pointer hover:mr-2"
+                                    onClick={() =>
+                                      handleOnClickViewProductDetail(
+                                        item.productSlug
+                                      )
+                                    }
                                   />
-                                </Link>
-                                <div className="flex-1 space-y-2">
-                                  <p className="text-xl font-bold">
-                                    <Link
-                                      href="/vendor/orders"
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="hover:underline hover:text-2xl"
+                                  <div className="flex flex-col space-y-2">
+                                    <Label
+                                      className="text-xl font-bold hover:text-2xl hover:cursor-pointer"
+                                      onClick={() =>
+                                        handleOnClickViewProductDetail(
+                                          item.productSlug
+                                        )
+                                      }
                                     >
-                                      {item.product.name}
-                                    </Link>
-                                  </p>
-                                  <p>{item.product.brand.name}</p>
-                                  <p className="text-sm text-muted-foreground">
-                                    {item.values.join(" | ")}
-                                  </p>
+                                      {item.productName}
+                                    </Label>
+                                    <Label>{item.productNameBrand}</Label>
+                                    <Label className="text-sm text-muted-foreground">
+                                      {item.values
+                                        ? item.values.join(" | ")
+                                        : ""}
+                                    </Label>
+                                  </div>
                                 </div>
-                                <div className="flex flex-col items-end justify-center text-right">
-                                  <p>
-                                    <strong className="text-xl">
+                                <div className="flex flex-col items-end text-right">
+                                  <div className="flex items-center space-x-1">
+                                    <Label className="text-2xl font-bold">
                                       {item.quantity}
-                                    </strong>{" "}
-                                    x {formatCurrency(item.price)}
-                                  </p>
-                                  <p>
+                                    </Label>
+                                    <Label>
+                                      x {formatCurrency(item.price)}
+                                    </Label>
+                                  </div>
+                                  <Label>
                                     {formatCurrency(item.quantity * item.price)}
-                                  </p>
+                                  </Label>
                                 </div>
                               </div>
                             </CardContent>
@@ -315,58 +356,60 @@ export default function ViewOrderDetailAdmin(props) {
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <div className="space-y-2">
+                        <div className="space-y-4">
                           <div className="grid grid-cols-3 gap-x-2 items-center">
-                            <span className="col-span-1">Tổng cộng</span>
-                            <span className="col-span-1 text-center">
+                            <Label className="col-span-1">Tổng cộng</Label>
+                            <Label className="col-span-1 text-center">
                               {`${order?.orderItems.length} item(s)`}
-                            </span>
-                            <span className="col-span-1 text-right">
+                            </Label>
+                            <Label className="col-span-1 text-right">
                               {formatCurrency(order?.total)}
-                            </span>
+                            </Label>
                           </div>
                           <div className="grid grid-cols-2 gap-x-2 items-center">
-                            <span className="col-span-1">Phí Vận chuyển</span>
-                            <span className="col-span-1 text-right">
+                            <Label className="col-span-1">Phí Vận chuyển</Label>
+                            <Label className="col-span-1 text-right">
                               {`${formatCurrency(order?.shippingFee)}`}
-                            </span>
+                            </Label>
                           </div>
                           <div className="grid grid-cols-3 gap-x-2 items-center">
-                            <span className="col-span-1">Shop giảm giá</span>
-                            <span className="col-span-1 text-center">
+                            <Label className="col-span-1">Shop giảm giá</Label>
+                            <Label className="col-span-1 text-center">
                               {`${order?.discount * 100} %`}
-                            </span>
-                            <span className="col-span-1 text-right">
+                            </Label>
+                            <Label className="col-span-1 text-right">
                               {`- ${formatCurrency(
                                 order?.discount * order?.total
                               )}`}
-                            </span>
+                            </Label>
                           </div>
                           <div className="grid grid-cols-3 gap-x-2 items-center">
-                            <span className="col-span-1">
+                            <Label className="col-span-1">
                               Giảm giá vận chuyển
-                            </span>
-                            <span className="col-span-1 text-center">
+                            </Label>
+                            <Label className="col-span-1 text-center">
                               {`${order?.shippingDiscount * 100} %`}
-                            </span>
-                            <span className="col-span-1 text-right">
+                            </Label>
+                            <Label className="col-span-1 text-right">
                               {`- ${formatCurrency(
                                 order?.shippingDiscount * order?.shippingFee
                               )}`}
-                            </span>
+                            </Label>
                           </div>
                           <div className="grid grid-cols-3 gap-x-2 items-center font-bold">
-                            <span className="col-span-2">Tổng thanh toán</span>
-                            <span className="col-span-1 text-right">
+                            <Label className="col-span-2">
+                              Tổng thanh toán
+                            </Label>
+                            <Label className="col-span-1 text-right font-bold">
                               {formatCurrency(order?.grandTotal)}
-                            </span>
+                            </Label>
                           </div>
                         </div>
                       </CardContent>
                       <CardFooter className="flex justify-between items-center p-4 border-t">
-                        <p className="text-sm text-muted-foreground">
+                        <Label className="text-sm text-muted-foreground">
                           Xem lại đơn hàng nhanh chóng trên trang Đơn hàng
-                        </p>
+                        </Label>
                         <Link
                           href="/admin/orders"
                           className="flex gap-2"
@@ -388,15 +431,15 @@ export default function ViewOrderDetailAdmin(props) {
                       <CardContent className="space-y-2">
                         <div className="flex space-x-2">
                           <UserRoundCog />
-                          <p>{order?.accountName}</p>
+                          <Label>{order?.accountName}</Label>
                         </div>
                         <div className="flex space-x-2">
                           <Mail />
-                          <p>{order?.userEmail}</p>
+                          <Label>{order?.userEmail}</Label>
                         </div>
                         <div className="flex space-x-2">
                           <Phone />
-                          <p>{order?.userPhone}</p>
+                          <Label>{order?.userPhone}</Label>
                         </div>
                       </CardContent>
                     </Card>
@@ -406,19 +449,26 @@ export default function ViewOrderDetailAdmin(props) {
                           Địa chỉ giao hàng
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-2">
+                      <CardContent className="space-y-2 flex flex-col">
                         <div className="flex space-x-2">
                           <UserRound />
-                          <p>{order?.recipientName}</p>
+                          <Label>{order?.recipientName}</Label>
                         </div>
                         <div className="flex space-x-2">
                           <Phone />
-                          <p>{order?.orderPhone}</p>
+                          <Label>{order?.orderPhone}</Label>
                         </div>
-                        <p>{`${order?.detailLocate}, ${order?.detailAddress}`}</p>
-                        <p>{order?.subDistrict}</p>
-                        <p>{order?.district}</p>
-                        <p>{order?.province}</p>
+                        <div>
+                          {order?.detailLocate ? (
+                            <Label>{`${order?.detailLocate}, `}</Label>
+                          ) : (
+                            ""
+                          )}
+                          <Label>{`${order?.detailAddress}`}</Label>
+                        </div>
+                        <Label>{order?.subDistrict}</Label>
+                        <Label>{order?.district}</Label>
+                        <Label>{order?.province}</Label>
                       </CardContent>
                     </Card>
                     <Card className="w-full md:w-96 overflow-hidden">
@@ -428,9 +478,9 @@ export default function ViewOrderDetailAdmin(props) {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-2">
-                        <p className="whitespace-normal">
-                          {order ? order.note : "N/A"}
-                        </p>
+                        <Label className="whitespace-normal">
+                          {order?.note ? order.note : "(không có ghi chú)"}
+                        </Label>
                       </CardContent>
                     </Card>
                   </div>

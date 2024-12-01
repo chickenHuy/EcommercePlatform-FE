@@ -225,6 +225,28 @@ export default function ManageOrderAdmin() {
     }
   }
 
+  function getTransactionStatusOrder(status) {
+    switch (status) {
+      case "WAITING":
+        return "Chờ thanh toán";
+      case "SUCCESS":
+        return "Đã thanh toán";
+      default:
+        return "N/A";
+    }
+  }
+
+  function getPaymentMethodOrder(status) {
+    switch (status) {
+      case "COD":
+        return "COD";
+      case "VN_PAY":
+        return "VN PAY";
+      default:
+        return "N/A";
+    }
+  }
+
   function formatDate(dateString) {
     const date = new Date(dateString);
 
@@ -359,6 +381,7 @@ export default function ManageOrderAdmin() {
                         <TableHead>Số điện thoại</TableHead>
                         <TableHead>Địa chỉ</TableHead>
                         <TableHead>Thanh toán</TableHead>
+                        <TableHead>Phương thức</TableHead>
                         <TableHead>Trạng thái</TableHead>
                         <TableHead>Tổng tiền</TableHead>
                         <TableHead className="hidden md:table-cell">
@@ -385,7 +408,16 @@ export default function ManageOrderAdmin() {
                             {order.province}
                           </TableCell>
                           <TableCell className="text-center">
-                            Chưa thanh toán
+                            <Badge variant="outline">
+                              {getTransactionStatusOrder(
+                                order.currentStatusTransaction
+                              )}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Badge variant="outline">
+                              {getPaymentMethodOrder(order.paymentMethod)}
+                            </Badge>
                           </TableCell>
                           <TableCell className="text-center">
                             <Badge variant="outline">

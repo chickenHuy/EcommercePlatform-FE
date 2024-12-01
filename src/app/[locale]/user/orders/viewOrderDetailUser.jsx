@@ -39,6 +39,9 @@ import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
 import { TimelineOppositeContent } from "@mui/lab";
 import DialogCancelOrderUser from "./dialogCancelOrderUser";
+import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import { setStore } from "@/store/features/userSearchSlice";
 
 export default function ViewOrderDetailUser(props) {
   const { isOpen, onClose, orderId } = props;
@@ -49,6 +52,13 @@ export default function ViewOrderDetailUser(props) {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [actionType, setActionType] = useState("");
   const { toast } = useToast();
+
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const handleOnclickViewShop = (storeId) => {
+    router.push("/search");
+    dispatch(setStore(storeId));
+  };
 
   const handleCancelButtonClick = (order, orderId) => {
     setIsDialogCancelOrderOpen(true);
@@ -452,16 +462,21 @@ export default function ViewOrderDetailUser(props) {
             <div>
               <Card className="w-full mt-4 mb-8">
                 <CardTitle className="flex justify-between items-center gap-4 m-4">
-                  <div className="flex items-center gap-4">
+                  <div
+                    className="flex items-center gap-4 hover:cursor-pointer"
+                    onClick={() => handleOnclickViewShop(order?.storeId)}
+                  >
                     <Image
-                      alt="avatar shop"
+                      alt="ảnh shop"
                       src={order?.avatarStore}
                       height={30}
                       width={30}
                       unoptimized={true}
                       className="rounded-full transition-transform duration-300"
                     />
-                    <Label className="text-xl">{order?.storeName}</Label>
+                    <Label className="text-xl hover:cursor-pointer">
+                      {order?.storeName}
+                    </Label>
                     <Rating
                       value={Number(order?.ratingStore)}
                       precision={0.1}
@@ -484,7 +499,7 @@ export default function ViewOrderDetailUser(props) {
                 </CardTitle>
                 <CardContent className="flex flex-col items-center justify-center min-h-[150px] space-y-4 border-t hover:cursor-pointer">
                   {order?.orderItems && order?.orderItems.length > 0 ? (
-                    order?.orderItems.map((item, index) => (
+                    order.orderItems.map((item, index) => (
                       <Card
                         key={index}
                         className="flex w-full justify-between items-center gap-4 mt-4"
@@ -496,8 +511,8 @@ export default function ViewOrderDetailUser(props) {
                             rel="noopener noreferrer"
                           >
                             <Image
-                              alt={item.product.name}
-                              src={item.product.mainImageUrl}
+                              alt={item.productName}
+                              src={item.productMainImageUrl}
                               height={100}
                               width={100}
                               unoptimized={true}
@@ -512,11 +527,13 @@ export default function ViewOrderDetailUser(props) {
                               className="hover:underline"
                             >
                               <p className="text-xl font-bold hover:text-2xl">
-                                {item.product.name}
+                                {item.productName}
                               </p>
                             </Link>
                             <p className="text-muted-foreground">
-                              Phân loại hàng: {item.values.join(" | ")}
+                              {item.values
+                                ? `Phân loại hàng ${item.values.join(" | ")}`
+                                : ""}
                             </p>
                             <p>x{item.quantity}</p>
                           </div>
