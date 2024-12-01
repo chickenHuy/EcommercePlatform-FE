@@ -23,18 +23,18 @@ export function StoreInformation() {
     fetchStore();
   }, [fetchStore]);
   return (
-    <div className="flex items-center">
+    <div className="flex items-center gap-4">
       <div className="w-1/3 shrink-0">
         <Image
           src={store?.avatarStore || StoreEmpty}
           alt={store?.name}
           width={80}
           height={80}
-          className="rounded-full object-cover ml-4"
+          className="rounded-full object-cover ml-6"
         />
       </div>
       <div className="w-2/3 flex flex-col space-y-1 ml-2">
-        <Label className="truncate text-xl font-semibold">
+        <Label className="truncate text-xl font-bold">
           {store?.name || "(tên cửa hàng)"}
         </Label>
         <Label className="truncate">
