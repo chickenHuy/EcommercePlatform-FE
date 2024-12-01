@@ -514,7 +514,7 @@ export default function ManageOrderUser() {
                             </Label>
                             <Label>
                               {formatCurrency(
-                                item.price - item.price * item.discount
+                                item.price - item.discount
                               )}
                             </Label>
                           </div>

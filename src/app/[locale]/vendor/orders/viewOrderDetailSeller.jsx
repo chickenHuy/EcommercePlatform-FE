@@ -332,15 +332,10 @@ export default function ViewOrderDetailSeller(props) {
                               {formatCurrency(order?.total)}
                             </Label>
                           </div>
-                          <div className="grid grid-cols-3 items-center">
+                          <div className="grid grid-cols-2 items-center">
                             <Label className="col-span-1">Giảm giá</Label>
-                            <Label className="col-span-1 text-center">
-                              {`${order?.discount * 100} %`}
-                            </Label>
                             <Label className="col-span-1 text-right">
-                              {`- ${formatCurrency(
-                                order?.discount * order?.total
-                              )}`}
+                              {`- ${formatCurrency(order?.discount)}`}
                             </Label>
                           </div>
                           <div className="grid grid-cols-3 gap-x-2 items-center font-bold">
@@ -348,9 +343,7 @@ export default function ViewOrderDetailSeller(props) {
                               Tổng thanh toán
                             </Label>
                             <Label className="col-span-1 text-right font-bold">
-                              {formatCurrency(
-                                order?.total - order?.discount * order?.total
-                              )}
+                              {formatCurrency(order?.total - order?.discount)}
                             </Label>
                           </div>
                         </div>
@@ -387,10 +380,14 @@ export default function ViewOrderDetailSeller(props) {
                           <Mail />
                           <Label>{order?.userEmail}</Label>
                         </div>
-                        <div className="flex space-x-2">
-                          <Phone />
-                          <Label>{order?.userPhone}</Label>
-                        </div>
+                        {order?.userPhone ? (
+                          <div className="flex space-x-2">
+                            <Phone />
+                            <Label>{order?.userPhone}</Label>
+                          </div>
+                        ) : (
+                          ""
+                        )}
                       </CardContent>
                     </Card>
                     <Card className="w-full md:w-96 overflow-hidden">
