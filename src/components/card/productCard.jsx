@@ -25,7 +25,7 @@ export default function ProductCard({
 }) {
   return (
     <Link href={`/${link}`} passHref>
-      <Card className="w-full cursor-pointer relative group transition-transform duration-300 hover:scale-[1.03]">
+      <Card className="w-full h-[320px] cursor-pointer relative group transition-transform duration-300 hover:scale-[1.03]">
         <CardHeader className="p-0 relative">
           <div className="relative aspect-square overflow-hidden">
             {videoUrl ? (
@@ -73,7 +73,7 @@ export default function ProductCard({
             />
           </Button>
         </CardHeader>
-        <CardContent className="p-4">
+        <CardContent className="p-4 flex flex-col flex-grow">
           <CardTitle className="text-sm font-semibold line-clamp-2">
             {name}
           </CardTitle>
@@ -94,11 +94,11 @@ export default function ProductCard({
             </span>
           </div>
           <div className="mt-2">
-            <span className="text-sm font-bold text-primary">
+            <span className="text-sm font-bold text-red-primary">
               {formatPrice(price)}
             </span>
             {originalPrice && (
-              <span className="ml-2 text-xs text-gray-500 line-through">
+              <span className="ml-2 text-xs text-gray-tertiary line-through">
                 {formatPrice(originalPrice)}
               </span>
             )}

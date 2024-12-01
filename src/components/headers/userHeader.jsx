@@ -24,7 +24,7 @@ const UserHeader = () => {
   const [user, setUser] = useState(null);
 
   const getMe = async () => {
-    await get("/api/v1/users/me").then((res) => {
+    await get("/api/v1/users/info").then((res) => {
       setUser(res.result);
     }).catch((err) => {
       setUser(null);
@@ -95,6 +95,14 @@ const UserHeader = () => {
               className="text-sm font-bold text-white-primary hover:text-white-tertiary transition-colors"
             >
               HK-Uptech
+            </Link>
+            <Link
+              href={user?.lastRole === "USER" ? "/register-store" : user?.lastRole === "SELLER" ? "/vendor/" : user?.lastRole === "ADMIN" ? "/admin" : "/"}
+              className="text-s font-normal ml-2 text-white-primary/40 hover:text-white-tertiary transition-colors"
+            >
+              {user?.lastRole === "USER" ? "Trở thành người bán" : ""}
+              {user?.lastRole === "SELLER" ? "Đến trang bán hàng" : ""}
+              {user?.lastRole === "ADMIN" ? "Đến trang quản trị" : ""}
             </Link>
 
             <div className="flex-1 flex justify-center px-4">

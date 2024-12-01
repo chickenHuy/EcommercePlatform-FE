@@ -21,6 +21,8 @@ import { localeDetector } from "@/utils/commonUtils";
 import { getProfile } from "@/api/user/profileRequest";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { post } from "@/lib/httpClient";
 function VendorHeader() {
   const [timeoutId, setTimeoutId] = useState(null);
   const [activeButton, setActiveButton] = useState(null);
@@ -30,6 +32,17 @@ function VendorHeader() {
   const [timeoutIdLanguage, setTimeoutIdLanguage] = useState(null);
   const [showMenuLanguage, setShowMenuLanguage] = useState(false);
   const [user, setUser] = useState(null);
+
+
+  const handleLogout = async () => {
+    const token = Cookies.get(process.env.NEXT_PUBLIC_JWT_NAME);
+    await post("/api/v1/auths/log-out", { token: token }).then(() => {
+      Cookies.remove(process.env.NEXT_PUBLIC_JWT_NAME);
+    }).catch((err) => {
+      console.log(err);
+    })
+    router.push("/auth");
+  }
 
   const locale = localeDetector();
 
@@ -89,7 +102,6 @@ function VendorHeader() {
     <header className="fixed top-0 z-20 flex w-full h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 bg-black-primary">
       {/* Logo */}
       <div className="flex flex-row justify-center items-center cursor-pointer ml-3">
-        <Image src={ChickenImage} alt="Chicken" width={50} height={50} />
         <span className="text-white-secondary text-[19px]">
           {t("vendorTitle")}
         </span>
@@ -328,6 +340,7 @@ function VendorHeader() {
               <MenuItem
                 menuIcon={<ExitToAppOutlinedIcon />}
                 menuContext={t("userOptionsMenu.logout")}
+                onClick={() => handleLogout()}
               />,
             ]}
           />

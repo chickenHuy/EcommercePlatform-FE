@@ -43,18 +43,24 @@ export default function Address(props) {
             </CardHeader>
             <CardContent>
                 <div className="flex justify-between">
-                    <div className="space-y-1 flex justify-between items-start w-full">
-                        <div>
-                            <div className="font-medium">{defaultAddress?.recipient_name} ({defaultAddress?.phone})</div>
-                            <div className="text-sm text-muted-foreground truncate">{defaultAddress?.first_line + defaultAddress?.second_line}</div>
-                        </div>
-                        {
-                            defaultAddress?.is_default ?
-                                (<div className="text-red-primary/90 mr-6 text-sm">
-                                    Mặc định
-                                </div>) : null
-                        }
-                    </div>
+                    {
+                        defaultAddress ? (
+                            <div className="space-y-1 flex justify-between items-start w-full">
+                                <div>
+                                    <div className="font-medium">{defaultAddress?.recipient_name} ({defaultAddress?.phone})</div>
+                                    <div className="text-sm text-muted-foreground truncate">{defaultAddress?.first_line + defaultAddress?.second_line}</div>
+                                </div>
+                                {
+                                    defaultAddress?.is_default ?
+                                        (<div className="text-red-primary/90 mr-6 text-sm">
+                                            Mặc định
+                                        </div>) : null
+                                }
+                            </div>
+                        ) : (
+                            <div className="text-sm">Chưa có địa chỉ, vui lòng thêm mới</div>
+                        )
+                    }
                     <div className="">
                         <Button onClick={() => handleChangeAddress()}>
                             Thay Đổi
@@ -62,7 +68,7 @@ export default function Address(props) {
                     </div>
                 </div>
             </CardContent>
-            <ListAdress open={open} onOpenChange={setOpen} setHasNew={setHasNew} hasNew = {hasNew} setDefaultAddress={setDefaultAddress} defaultId={defaultAddress?.id} addresses={addresses} />
+            <ListAdress open={open} onOpenChange={setOpen} setHasNew={setHasNew} hasNew={hasNew} setDefaultAddress={setDefaultAddress} defaultId={defaultAddress?.id} addresses={addresses} />
         </Card>
     )
 }
