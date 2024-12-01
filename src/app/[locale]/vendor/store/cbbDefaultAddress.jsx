@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/popover";
 import { useState, useEffect } from "react";
 import { getAddressOfStore } from "@/api/vendor/storeRequest";
-import { on } from "events";
+import { toast } from "@/hooks/use-toast";
 
 export default function CbbAddresses({
   onAddressSelect,
