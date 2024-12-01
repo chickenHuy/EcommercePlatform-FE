@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { ListFilter, Lock } from "lucide-react";
+import { ListFilter, Lock, Unlock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,22 +28,26 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
-import { Rating } from "@mui/material";
+import { Dialog, Rating } from "@mui/material";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
-import { getAllStore } from "@/api/admin/storeRequest";
+import { changeStatus, getAllStore } from "@/api/admin/storeRequest";
 import DrawerStoreDetail from "./drawerStoreDetail";
 import { useSelector } from "react-redux";
 import { Label } from "@/components/ui/label";
+import DialogConfirm from "@/components/dialogs/dialogConfirm";
+import { set } from "react-hook-form";
+import DialogConfirmSecond from "@/components/dialogs/dialogConfirmSecond";
 
 export default function ManageStores() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [stores, setStores] = useState([]);
   const [selectedStoreId, setSelectedStoreId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const { toast } = useToast();
-  const [tab, setTab] = useState("all");
+  const [tab, setTab] = useState("active");
   const [sortType, setSortType] = useState("");
   const [totalElement, setTotalElement] = useState(0);
   const [hasNext, setHasNext] = useState(false);
@@ -67,6 +71,25 @@ export default function ManageStores() {
   const handleRowClick = (storeId) => {
     setSelectedStoreId(storeId);
     setIsDrawerOpen(true);
+  };
+
+  const handleChangeBanned = () => {
+    changeStatus(selectedStoreId).then((res) => {
+      toast({
+        title: "Thành công",
+        description: "Thay đổi trạng thái cửa hàng thành công",
+        variant: "success",
+      });
+      setConfirmDialogOpen(false);
+      fetchStore();
+    }).catch((error) => {
+      toast({
+        title: "Thất bại",
+        description: error.message,
+        variant: "destructive",
+      });
+    });
+
   };
 
   const handleCloseDrawer = () => {
@@ -117,12 +140,9 @@ export default function ManageStores() {
       <Toaster />
       <div className="flex flex-col sm:gap-4 sm:py-4">
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-          <Tabs defaultValue="all">
+          <Tabs defaultValue="active">
             <div className="flex items-center">
               <TabsList>
-                <TabsTrigger value="all" onClick={() => setTab("all")}>
-                  Tất cả
-                </TabsTrigger>
                 <TabsTrigger value="active" onClick={() => setTab("active")}>
                   Hoạt động
                 </TabsTrigger>
@@ -175,7 +195,7 @@ export default function ManageStores() {
                 </DropdownMenu>
               </div>
             </div>
-            <TabsContent value="all">
+            <TabsContent value={tab}>
               <Card x-chunk="dashboard-06-chunk-0">
                 <CardHeader>
                   <CardTitle>Danh sách cửa hàng ({totalElement})</CardTitle>
@@ -226,10 +246,18 @@ export default function ManageStores() {
                             <Button
                               aria-haspopup="true"
                               size="icon"
-                              variant="ghost"
+                              variant="ghost" onClick={
+                                (e) => {
+                                  e.stopPropagation();
+                                  setSelectedStoreId(store.id);
+                                  setConfirmDialogOpen(true);
+                                }
+                              }
                             >
-                              <Lock className="h-4 w-4" />
-                              <span className="sr-only">Khoá tài khoản</span>
+                              {tab === "active" ? (<><Lock className="h-4 w-4" />
+                                <span className="sr-only">Khoá tài khoản</span></>) :
+                                (<><Unlock className="h-4 w-4" />
+                                  <span className="sr-only">Khoá tài khoản</span></>)}
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -261,6 +289,12 @@ export default function ManageStores() {
           storeId={selectedStoreId}
         />
       )}
+      <DialogConfirmSecond isOpen={confirmDialogOpen}
+        onClose={() => setConfirmDialogOpen(false)}
+        onConfirm={handleChangeBanned}
+        title={`Xác nhận ${tab === 'active' ? 'khóa' : 'mở khóa'} cửa hàng`}
+        content={`Bạn có chắc chắn muốn ${tab === 'active' ? 'khóa' : 'mở khóa'} cửa hàng này không?`}
+      />
     </div>
   );
 }
