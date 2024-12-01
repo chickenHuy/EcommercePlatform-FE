@@ -97,11 +97,11 @@ const UserHeader = () => {
               HK-Uptech
             </Link>
             <Link
-              href={user?.lastRole === "USER" ? "/register-store" : user?.lastRole === "VENDOR" ? "/vendor/" : user?.lastRole === "ADMIN" ? "/admin" : "/"}
+              href={user?.lastRole === "USER" ? "/register-store" : user?.lastRole === "SELLER" ? "/vendor/" : user?.lastRole === "ADMIN" ? "/admin" : "/"}
               className="text-s font-normal ml-2 text-white-primary/40 hover:text-white-tertiary transition-colors"
             >
               {user?.lastRole === "USER" ? "Trở thành người bán" : ""}
-              {user?.lastRole === "VENDOR" ? "Đến trang bán hàng" : ""}
+              {user?.lastRole === "SELLER" ? "Đến trang bán hàng" : ""}
               {user?.lastRole === "ADMIN" ? "Đến trang quản trị" : ""}
             </Link>
 
