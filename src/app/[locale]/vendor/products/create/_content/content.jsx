@@ -38,6 +38,7 @@ export default function Content() {
   const [productName, setProductName] = useState("");
   const [productBrand, setProductBrand] = useState("");
   const [productCategory, setProductCategory] = useState("");
+  const [productDetails, setProductDetails] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [isCompleteBasic, setIsCompleteBasic] = useState(false);
 
@@ -49,6 +50,7 @@ export default function Content() {
       productName.trim() !== "" &&
       productCategory !== "" &&
       productBrand !== "" &&
+      productDetails.trim() !== "" &&
       productDescription.trim() !== "";
 
     setIsCompleteBasic(isComplete);
@@ -56,6 +58,7 @@ export default function Content() {
     productImages,
     productVideo,
     productName,
+    productDetails,
     productCategory,
     productDescription,
   ]);
@@ -226,7 +229,7 @@ export default function Content() {
     const data = {
       name: productName,
       description: productDescription,
-      details: productDescription,
+      details: productDetails,
       quantity: 0,
       originalPrice: 0,
       salePrice: 0,
@@ -265,7 +268,7 @@ export default function Content() {
   };
 
   return (
-    <div className='bg-white-primary'>
+    <div className="bg-white-primary">
       <Toaster />
       <header className="sticky top-16 z-10 h-10 shadow bg-white-primary">
         {isLoading && (
@@ -353,6 +356,8 @@ export default function Content() {
           productCategory={productCategory}
           setProductCategory={setProductCategory}
           productDescription={productDescription}
+          productDetails={productDetails}
+          setProductDetails={setProductDetails}
           setProductDescription={setProductDescription}
           listCategory={listCategory}
           setCategoryIdSelected={setCategoryIdSelected}

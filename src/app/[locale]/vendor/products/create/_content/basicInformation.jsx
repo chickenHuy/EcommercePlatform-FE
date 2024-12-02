@@ -26,6 +26,8 @@ const BasicInformation = ({
   setProductCategory = null,
   productDescription = "",
   setProductDescription = null,
+  productDetails = "",
+  setProductDetails = null,
   listCategory = [],
   setCategoryIdSelected = null,
   listBrand = [],
@@ -146,6 +148,18 @@ const BasicInformation = ({
               onChange={(e) => setProductDescription(e.target.value)}
             />
           </div>
+          <div className="grid w-full gap-1.5">
+            <div>
+              Nhập thông tin chi tiết của sản phẩm
+              <span className="px-3 text-error font-[900]">( * )</span>
+            </div>
+            <Textarea
+              placeholder="Nhập thông tin chi tiết của sản phẩm"
+              id="details"
+              value={productDetails}
+              onChange={(e) => setProductDetails(e.target.value)}
+            />
+          </div>
         </div>
       </div>
       <div className="min-w-[400px] h-full lg:flex hidden flex-col justify-start items-start gap-3 p-5 shadow-md rounded-md border-[0.5px] border-white-secondary">
@@ -176,6 +190,10 @@ const BasicInformation = ({
         <CompleteNotify
           isComplete={productDescription !== ""}
           content="Cung cấp thông tin mô tả của sản phẩm."
+        />
+        <CompleteNotify
+          isComplete={productDetails !== ""}
+          content="Cung cấp thông tin chi tiết của sản phẩm."
         />
       </div>
     </div>

@@ -148,6 +148,17 @@ export default function ManageComponent() {
     setOrder(value);
   };
 
+  function formatCurrency(number) {
+    const num = parseFloat(number);
+
+    if (isNaN(num)) {
+      return "";
+    }
+
+    const formattedNumber = num % 1 === 0 ? num.toFixed(0) : num.toFixed(2);
+    return formattedNumber.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+
   useEffect(() => {
     loadComponents(currentPage, sortBy, order, tab, search);
   }, [
@@ -161,7 +172,7 @@ export default function ManageComponent() {
   ]);
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+    <div className="flex min-h-screen w-full flex-col bg-muted/40 pt-[65px]">
       <Toaster />
       <div className="flex flex-col sm:gap-4 sm:py-4">
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
@@ -199,7 +210,7 @@ export default function ManageComponent() {
                       </span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" className="w-[150px]">
                     <DropdownMenuLabel>Sắp xếp</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuRadioGroup
@@ -235,12 +246,12 @@ export default function ManageComponent() {
                       </DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={
-                      () => {
+                    <DropdownMenuItem
+                      onClick={() => {
                         setSortBy("");
                         setOrder("");
-                      }
-                    }>
+                      }}
+                    >
                       Không sắp xếp
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -291,7 +302,7 @@ export default function ManageComponent() {
                           <TableCell className="font-medium text-center">
                             {index + 1 + (currentPage - 1) * 10}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="flex justify-center items-center border-none">
                             <Avatar>
                               <AvatarImage
                                 src={product.mainImageUrl}
@@ -308,10 +319,10 @@ export default function ManageComponent() {
                           <TableCell className="font-medium text-center">
                             {product.quantity}
                           </TableCell>
-                          <TableCell className="hidden lg:table-cell">
-                            {product.salePrice}
+                          <TableCell className="hidden lg:table-cell text-center">
+                            {formatCurrency(product.salePrice) + " đ"}
                           </TableCell>
-                          <TableCell className="hidden md:table-cell">
+                          <TableCell className="hidden md:table-cell text-center">
                             {new Date(product.createdAt).toLocaleString()}{" "}
                           </TableCell>
                           <TableCell className="hidden md:table-cell text-center">
@@ -367,6 +378,7 @@ export default function ManageComponent() {
                                   <span> Xoá</span>
                                   <DeleteIcon className="scale-75" />
                                 </DropdownMenuItem>
+                                <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                   className="flex flex-row justify-between items-center cursor-pointer"
                                   onClick={() =>
