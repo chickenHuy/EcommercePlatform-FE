@@ -66,6 +66,8 @@ export function ProductMediaViewer({ product }) {
             src={mediaItems[selectedIndex].url || ImageProductPlaceholder}
             alt={`${product.name} - View ${selectedIndex + 1}`}
             fill
+            sizes="80vw"
+            priority
             className="object-cover"
             onClick={() => setIsModalOpen(true)}
           />
@@ -107,6 +109,8 @@ export function ProductMediaViewer({ product }) {
                 src={item.url || ImageProductPlaceholder}
                 alt={`${product.name} thumbnail ${index + 1}`}
                 fill
+                sizes="80vw"
+                priority
                 className="object-cover"
               />
             ) : (
@@ -124,6 +128,7 @@ export function ProductMediaViewer({ product }) {
               src={mediaItems[selectedIndex].url || ImageProductPlaceholder}
               alt={`${product.name} - View ${selectedIndex + 1}`}
               fill
+              sizes="80vw"
               className="object-contain"
             />
           </div>

@@ -5,8 +5,6 @@ import { useEffect, useState, useMemo } from "react";
 import { Star, ShoppingCart, Heart, Minus, Plus, Store } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProductSpecifications } from "./product-specifications";
 import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 import { Reviews } from "./reviewPage";
@@ -18,6 +16,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { changeQuantity } from "@/store/features/cartSlice";
 import { useRouter } from "next/navigation";
 import { setStore } from "@/store/features/userSearchSlice";
+import { get, post } from "@/lib/httpClient";
+import { setWishList } from "@/store/features/wishListSlice";
 
 export default function ProductDetail({ product }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -31,8 +31,6 @@ export default function ProductDetail({ product }) {
       initialOptions[attr.name] = new Set(attr.values.map((v) => v.value));
     });
     setAvailableOptions(initialOptions);
-    console.log(product.variants);
-    console.log("HAHHA");
   };
 
   useEffect(() => {
@@ -124,8 +122,7 @@ export default function ProductDetail({ product }) {
     try {
       const rs = addToCart(request);
       const qty = oldQuantity + quantity;
-      dispatch(changeQuantity
-        (qty));
+      dispatch(changeQuantity(qty));
       toast({
         title: "Sản phẩm đã được thêm vào giỏ hàng",
         description:
@@ -140,10 +137,34 @@ export default function ProductDetail({ product }) {
     }
   };
 
+  const handleLoveProduct = async () => {
+    try {
+      await post(`/api/v1/users/follow/${product.id}`);
+      toast({
+        title: "Đã thêm sản phẩm vào danh sách yêu thích",
+        description: "Bạn có thể xem danh sách yêu thích ở thanh menu",
+      });
+
+      get(`/api/v1/users/listFollowedProduct`)
+        .then((res) => {
+          dispatch(setWishList(res.result));
+        })
+        .catch((err) => {
+          dispatch(setWishList([]));
+        });
+    } catch (error) {
+      toast({
+        title: "Thêm sản phẩm vào danh sách yêu thích thất bại",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const router = useRouter();
   const handleOnClickViewShop = (storeId) => {
-    router.push("/search");
     dispatch(setStore(storeId));
+    router.push("/search");
   };
 
   return (
@@ -269,7 +290,11 @@ export default function ProductDetail({ product }) {
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 Thêm vào giỏ hàng
               </Button>
-              <Button variant="outline" size="lg">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => handleLoveProduct()}
+              >
                 <Heart className="h-5 w-5" />
               </Button>
             </div>
