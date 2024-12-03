@@ -111,7 +111,7 @@ export default function ProductDetail({ product }) {
   const dispatch = useDispatch();
   const oldQuantity = useSelector((state) => state.cartReducer.count);
 
-  const addProductToCart = () => {
+  const addProductToCart = async () => {
     const request = {
       productId: product.id,
       variantId: selectedVariant?.id ? selectedVariant.id : "",
@@ -120,7 +120,7 @@ export default function ProductDetail({ product }) {
 
     console.log(request);
     try {
-      const rs = addToCart(request);
+      const rs = await addToCart(request);
       const qty = oldQuantity + quantity;
       dispatch(changeQuantity(qty));
       toast({
