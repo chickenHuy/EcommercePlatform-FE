@@ -1,4 +1,4 @@
-import { get } from "@/lib/httpClient";
+import { get, patch } from "@/lib/httpClient";
 
 export const getAllStore = (page, tab, sortType, search = "") => {
   try {
@@ -7,7 +7,6 @@ export const getAllStore = (page, tab, sortType, search = "") => {
     );
     return response;
   } catch (error) {
-    console.error("Error during authentication:", error);
     throw error;
   }
 };
@@ -17,7 +16,15 @@ export const getStoreById = (storeId) => {
     const response = get(`/api/v1/stores/${storeId}`);
     return response;
   } catch (error) {
-    console.error("Error during authentication:", error);
+    throw error;
+  }
+};
+
+export const changeStatus = (storeId) => {
+  try {
+    const response = patch(`/api/v1/stores/update-status/${storeId}`);
+    return response;
+  } catch (error) {
     throw error;
   }
 };
