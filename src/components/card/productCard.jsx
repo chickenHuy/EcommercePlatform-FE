@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Placeholder from "@/assets/images/productPlaceholder.png";
 import Link from "next/link";
-
+import { useDispatch } from "react-redux";
 function formatPrice(price) {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -21,8 +21,9 @@ export default function ProductCard({
   rating,
   onAddToFavorites,
   isFavorite,
-  link
+  link,
 }) {
+  const dispatch = useDispatch();
   return (
     <Link href={`/${link}`} passHref>
       <Card className="w-full h-[320px] cursor-pointer relative group transition-transform duration-300 hover:scale-[1.03]">
@@ -62,7 +63,6 @@ export default function ProductCard({
             size="icon"
             className="absolute top-2 right-2 z-10 bg-white-primary bg-opacity-50 hover:bg-opacity-100 transition-all duration-200"
             onClick={(e) => {
-              e.stopPropagation();
               onAddToFavorites();
             }}
           >

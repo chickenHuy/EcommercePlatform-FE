@@ -14,6 +14,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { get, post } from '@/lib/httpClient';
 import { set } from "react-hook-form";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import WishlistPopup from "../popUp/wishListPopUp";
 
 const UserHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -110,6 +111,7 @@ const UserHeader = () => {
             </div>
 
             <div className="flex items-center space-x-4">
+              <WishlistPopup />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   {user ? (<Button size="icon" variant="ghost">

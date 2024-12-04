@@ -17,7 +17,6 @@ const resetState = {
   categories: [],
   mainCategoryId: null,
   brands: [],
-  store: "",
   sortBy: "",
   order: "",
   minPrice: 0,

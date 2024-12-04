@@ -544,7 +544,7 @@ export default function ViewOrderDetailUser(props) {
                           </p>
                           <p>
                             {formatCurrency(
-                              item.price - item.price * item.discount
+                              item.price - item.discount
                             )}
                           </p>
                         </div>
@@ -576,7 +576,7 @@ export default function ViewOrderDetailUser(props) {
                       <TableRow>
                         <TableCell>Giảm giá từ Shop</TableCell>
                         <TableCell>{`- ${formatCurrency(
-                          order?.discount * order?.total
+                          order?.discount
                         )}`}</TableCell>
                       </TableRow>
                       <TableRow>

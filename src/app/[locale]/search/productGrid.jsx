@@ -1,10 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "@/hooks/use-toast";
 import ProductCard from "@/components/card/productCard";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { searchProducts } from "@/api/search/searchApi";
 import { useInView } from "react-intersection-observer";
 import Loading from "@/components/loading";
+import { get, post } from "@/lib/httpClient";
+import { setWishList } from "@/store/features/wishListSlice";
 
 export default function ProductGrid() {
   const [products, setProducts] = useState([]);
@@ -12,11 +14,12 @@ export default function ProductGrid() {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const { ref, inView } = useInView();
-
+  const storeId = useSelector((state) => state.searchFilter);
   const searchParams = useSelector((state) => state.searchFilter);
   const limit = 16;
 
-  const [favorites, setFavorites] = useState([]);
+  const favorites = useSelector((state) => state.wishListReducer.wishList);
+  const dispatch = useDispatch();
 
   const loadProducts = useCallback(
     async (isInitialLoad = false) => {
@@ -63,20 +66,30 @@ export default function ProductGrid() {
     if (inView && !loading) {
       loadProducts();
     }
-  }, [inView, loading, loadProducts]);
+  }, [inView, loading, loadProducts, storeId]);
 
+  const handleAddToFavorites = async (productId) => {
+    try {
+      await post(`/api/v1/users/follow/${productId}`);
+      toast({
+        title: "Đã thêm sản phẩm vào danh sách yêu thích",
+        description: "Bạn có thể xem danh sách yêu thích ở thanh menu",
+      });
 
-  const handleAddToFavorites = (productId) => {
-    setFavorites((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId]
-    );
-    toast({
-      title: "Danh sách yêu thích đã cập nhật",
-      description:
-        "Sản phẩm đã được thêm vào hoặc xóa khỏi danh sách yêu thích của bạn.",
-    });
+      get(`/api/v1/users/listFollowedProduct`)
+        .then((res) => {
+          dispatch(setWishList(res.result));
+        })
+        .catch((err) => {
+          dispatch(setWishList([]));
+        });
+    } catch (error) {
+      toast({
+        title: "Thêm sản phẩm vào danh sách yêu thích thất bại",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -89,6 +102,7 @@ export default function ProductGrid() {
       {products.map((product) => (
         <ProductCard
           key={product.id}
+          productId={product.id}
           name={product.name}
           price={product.salePrice}
           originalPrice={product.originalPrice}

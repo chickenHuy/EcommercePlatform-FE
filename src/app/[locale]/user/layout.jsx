@@ -45,7 +45,9 @@ export default function UserLayout({ children }) {
                   href="/user/orders"
                   onClick={() => handleLinkClick("/user/orders")}
                   className={`${
-                    activeLink === "/user" ? "text-primary font-semibold" : ""
+                    activeLink === "/user/orders"
+                      ? "text-primary font-semibold"
+                      : ""
                   } hover:text-primary transition-colors`}
                 >
                   Đơn hàng
@@ -84,7 +86,9 @@ export default function UserLayout({ children }) {
                   Đổi mật khẩu
                 </Link>
               </nav>
-              <div className="grid gap-6">{children}</div>
+              <div className="grid gap-6 overflow-hidden max-w-full p-4 md:p-10">
+                {children}
+              </div>
             </div>
           </main>
         </div>

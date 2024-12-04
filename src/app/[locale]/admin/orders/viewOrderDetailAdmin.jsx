@@ -372,15 +372,10 @@ export default function ViewOrderDetailAdmin(props) {
                               {`${formatCurrency(order?.shippingFee)}`}
                             </Label>
                           </div>
-                          <div className="grid grid-cols-3 gap-x-2 items-center">
+                          <div className="grid grid-cols-2 gap-x-2 items-center">
                             <Label className="col-span-1">Shop giảm giá</Label>
-                            <Label className="col-span-1 text-center">
-                              {`${order?.discount * 100} %`}
-                            </Label>
                             <Label className="col-span-1 text-right">
-                              {`- ${formatCurrency(
-                                order?.discount * order?.total
-                              )}`}
+                              {`- ${formatCurrency(order?.discount)}`}
                             </Label>
                           </div>
                           <div className="grid grid-cols-3 gap-x-2 items-center">
@@ -450,14 +445,18 @@ export default function ViewOrderDetailAdmin(props) {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-2 flex flex-col">
-                        <div className="flex space-x-2">
+                        <div className="flex items-center space-x-2">
                           <UserRound />
                           <Label>{order?.recipientName}</Label>
                         </div>
-                        <div className="flex space-x-2">
-                          <Phone />
-                          <Label>{order?.orderPhone}</Label>
-                        </div>
+                        {order?.orderPhone ? (
+                          <div className="flex items-center space-x-2">
+                            <Phone />
+                            <Label>{order?.orderPhone}</Label>
+                          </div>
+                        ) : (
+                          ""
+                        )}
                         <div>
                           {order?.detailLocate ? (
                             <Label>{`${order?.detailLocate}, `}</Label>

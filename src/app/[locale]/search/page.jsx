@@ -37,6 +37,7 @@ export default function SearchPage() {
 
   const order = useSelector((state) => state.searchFilter.order);
   const sortBy = useSelector((state) => state.searchFilter.sortBy);
+  const storeId = useSelector((state) => state.searchFilter.store);
 
   const handleOrderChange = () => {
     if (order === null || order === "") {
@@ -116,7 +117,9 @@ export default function SearchPage() {
                         <SelectValue placeholder="Sắp xếp theo" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="createdAt">Ngày đăng sản phẩm</SelectItem>
+                        <SelectItem value="createdAt">
+                          Ngày đăng sản phẩm
+                        </SelectItem>
                         <SelectItem value="originalPrice">Giá gốc</SelectItem>
                         <SelectItem value="salePrice">Giá bán</SelectItem>
                       </SelectContent>
@@ -151,16 +154,18 @@ export default function SearchPage() {
         <ResizableHandle withHandle />
 
         {/* Right Sidebar */}
-        <ResizablePanel
-          defaultSize={20}
-          collapsible={true}
-          collapsedSize={0}
-          minSize={20}
-          maxSize={30}
-          className="hidden md:block"
-        >
-          <RightSideBar />
-        </ResizablePanel>
+        {storeId && (
+          <ResizablePanel
+            defaultSize={20}
+            collapsible={true}
+            collapsedSize={0}
+            minSize={20}
+            maxSize={30}
+            className="hidden md:block"
+          >
+            <RightSideBar storeId={storeId} />
+          </ResizablePanel>
+        )}
       </ResizablePanelGroup>
 
       {/* Mobile Left Sidebar */}
@@ -181,7 +186,7 @@ export default function SearchPage() {
       )}
 
       {/* Mobile Right Sidebar */}
-      {rightSidebarOpen && (
+      {rightSidebarOpen && storeId && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 md:hidden">
           <div className="absolute right-0 top-0 h-full w-64 bg-transparent-primary">
             <Button
@@ -192,7 +197,7 @@ export default function SearchPage() {
             >
               <X className="h-4 w-4" />
             </Button>
-            <RightSideBar />
+            <RightSideBar storeId={storeId} />
           </div>
         </div>
       )}

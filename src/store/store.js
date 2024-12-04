@@ -8,6 +8,7 @@ import userSearchSlice from "./features/userSearchSlice";
 import userSlice from "./features/userSlice";
 import cartSlice from "./features/cartSlice";
 import checkoutSlice from "./features/checkoutSlice";
+import wishListSlice from "./features/wishListSlice";
 
 export const makeStore = () => {
   return configureStore({
@@ -21,6 +22,7 @@ export const makeStore = () => {
       userReducer: userSlice,
       cartReducer: cartSlice,
       checkoutReducer: checkoutSlice,
+      wishListReducer: wishListSlice,
     },
   });
 };
