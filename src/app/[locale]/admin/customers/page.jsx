@@ -49,6 +49,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useSelector } from "react-redux";
 import DrawerCustomerDetail from "./drawerUserDetail";
+import Loading from "@/components/loading";
 
 export default function ManageCustomer() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -64,8 +65,13 @@ export default function ManageCustomer() {
   const [password, setPassword] = useState(null);
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   var searchTerm = useSelector((state) => state.searchReducer.searchTerm);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, tab]);
 
   const handleNextPage = () => {
     console.log("Current page:", currentPage, "Total page:", totalPage);
@@ -117,6 +123,7 @@ export default function ManageCustomer() {
   };
 
   const fetchCustomer = useCallback(async () => {
+    
     try {
       const response = await getAllCustomer(
         currentPage,
@@ -129,25 +136,14 @@ export default function ManageCustomer() {
       setTotalElement(response.result.totalElements);
       setHasNext(response.result.hasNext);
       setHasPrevious(response.result.hasPrevious);
-    } catch (error) {
-      console.error("Error fetching customers:", error);
-      toast({
-        title: "Thất bại",
-        description:
-          error.message === "Unauthenticated"
-            ? "Phiên làm việc hết hạn. Vui lòng đăng nhập lại!!!"
-            : error.message,
-        variant: "destructive",
-      });
-    }
+    } catch (error) {}
+    
   }, [toast, currentPage, tab, sortType, searchTerm]);
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
-
-  useEffect(() => {
+    setIsLoading(true);
     fetchCustomer();
+    setIsLoading(false);
   }, [fetchCustomer, totalPage, totalElement, password]);
 
   return (
@@ -237,126 +233,130 @@ export default function ManageCustomer() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {customers.map((customer) => (
-                        <TableRow
-                          key={customer.id}
-                          onClick={() => handleRowClick(customer.id)}
-                        >
-                          <TableCell className="hidden sm:table-cell">
-                            <div className="flex items-center justify-center">
-                              <Avatar>
-                                <AvatarImage
-                                  src={customer.imageUrl}
-                                  alt={customer.username}
-                                />
-                                <AvatarFallback>
-                                  {customer.name.charAt(0)}
-                                </AvatarFallback>
-                              </Avatar>
-                            </div>
-                          </TableCell>
-                          <TableCell className="font-medium text-center">
-                            {customer.username}
-                          </TableCell>
-                          <TableCell className="font-medium text-center">
-                            {customer.name}
-                          </TableCell>
-                          <TableCell className="font-medium text-center">
-                            {new Date(customer.created_at).toLocaleString()}{" "}
-                            {/* Format date */}
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell text-center">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button
-                                  aria-haspopup="true"
-                                  size="icon"
-                                  variant="ghost"
+                      {!isLoading && (
+                        customers.map((customer) => (
+                          <TableRow
+                            key={customer.id}
+                            onClick={() => handleRowClick(customer.id)}
+                          >
+                            <TableCell className="hidden sm:table-cell">
+                              <div className="flex items-center justify-center">
+                                <Avatar>
+                                  <AvatarImage
+                                    src={customer.imageUrl}
+                                    alt={customer.username}
+                                  />
+                                  <AvatarFallback>
+                                    {customer.name.charAt(0)}
+                                  </AvatarFallback>
+                                </Avatar>
+                              </div>
+                            </TableCell>
+                            <TableCell className="font-medium text-center">
+                              {customer.username}
+                            </TableCell>
+                            <TableCell className="font-medium text-center">
+                              {customer.name}
+                            </TableCell>
+                            <TableCell className="font-medium text-center">
+                              {new Date(customer.created_at).toLocaleString()}{" "}
+                              {/* Format date */}
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell text-center">
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button
+                                    aria-haspopup="true"
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                    }}
+                                  >
+                                    {customer.is_blocked ? (
+                                      <LockOpen className="h-4 w-4" />
+                                    ) : (
+                                      <Lock className="h-4 w-4" />
+                                    )}
+                                    <span className="sr-only">
+                                      Khoá tài khoản
+                                    </span>
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent
+                                  className="sm:max-w-md"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                   }}
                                 >
-                                  {customer.is_blocked ? (
-                                    <LockOpen className="h-4 w-4" />
-                                  ) : (
-                                    <Lock className="h-4 w-4" />
-                                  )}
-                                  <span className="sr-only">
-                                    Khoá tài khoản
-                                  </span>
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent
-                                className="sm:max-w-md"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                }}
-                              >
-                                <DialogHeader>
-                                  <DialogTitle>
-                                    {customer.is_blocked
-                                      ? "Mở khoá tài khoản"
-                                      : "Khoá tài khoản"}
-                                    :{customer.username}
-                                  </DialogTitle>
-                                  <DialogDescription>
-                                    Vui lòng nhập mật khẩu trước khi thực hiện
-                                    thao tác này
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <div className="flex items-center space-x-2">
-                                  <div className="grid flex-1 gap-2">
-                                    <Label htmlFor="link" className="sr-only">
-                                      Link
-                                    </Label>
-                                    <Input
-                                      type={
-                                        isPasswordVisible ? "text" : "password"
-                                      }
-                                      id="password"
-                                      placeholder="Nhập mật khẩu"
-                                      value={password}
-                                      onChange={(e) =>
-                                        setPassword(e.target.value)
-                                      }
-                                    />
-                                  </div>
-                                  <Button
-                                    type="button"
-                                    size="sm"
-                                    className="px-3"
-                                    onClick={() =>
-                                      setIsPasswordVisible(!isPasswordVisible)
-                                    }
-                                  >
-                                    {isPasswordVisible ? (
-                                      <EyeClosed className="h-5 w-4" />
-                                    ) : (
-                                      <Eye className="h-5 w-4" />
-                                    )}
-                                  </Button>
-                                </div>
-                                <DialogFooter className="sm:justify-start">
-                                  <DialogClose asChild>
-                                    <Button
-                                      type="button"
-                                      variant="secondary"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleCustomerAccount(customer.id);
-                                      }}
-                                    >
+                                  <DialogHeader>
+                                    <DialogTitle>
                                       {customer.is_blocked
                                         ? "Mở khoá tài khoản"
                                         : "Khoá tài khoản"}
+                                      :{customer.username}
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                      Vui lòng nhập mật khẩu trước khi thực hiện
+                                      thao tác này
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <div className="flex items-center space-x-2">
+                                    <div className="grid flex-1 gap-2">
+                                      <Label htmlFor="link" className="sr-only">
+                                        Link
+                                      </Label>
+                                      <Input
+                                        type={
+                                          isPasswordVisible
+                                            ? "text"
+                                            : "password"
+                                        }
+                                        id="password"
+                                        placeholder="Nhập mật khẩu"
+                                        value={password}
+                                        onChange={(e) =>
+                                          setPassword(e.target.value)
+                                        }
+                                      />
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      size="sm"
+                                      className="px-3"
+                                      onClick={() =>
+                                        setIsPasswordVisible(!isPasswordVisible)
+                                      }
+                                    >
+                                      {isPasswordVisible ? (
+                                        <EyeClosed className="h-5 w-4" />
+                                      ) : (
+                                        <Eye className="h-5 w-4" />
+                                      )}
                                     </Button>
-                                  </DialogClose>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                                  </div>
+                                  <DialogFooter className="sm:justify-start">
+                                    <DialogClose asChild>
+                                      <Button
+                                        type="button"
+                                        variant="secondary"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleCustomerAccount(customer.id);
+                                        }}
+                                      >
+                                        {customer.is_blocked
+                                          ? "Mở khoá tài khoản"
+                                          : "Khoá tài khoản"}
+                                      </Button>
+                                    </DialogClose>
+                                  </DialogFooter>
+                                </DialogContent>
+                              </Dialog>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
                     </TableBody>
                   </Table>
                 </CardContent>
