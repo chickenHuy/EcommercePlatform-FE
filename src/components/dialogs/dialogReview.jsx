@@ -28,7 +28,6 @@ export function OrderReviewDialog({ order, toast }) {
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
   const [errorStar, setErrorStar] = useState("");
-  const [errorComment, setErrorComment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const products = order.orderItems;
@@ -120,12 +119,6 @@ export function OrderReviewDialog({ order, toast }) {
       return;
     }
 
-    if (!comment.trim()) {
-      setErrorComment("Vui lòng nhập nhận xét của bạn");
-      setIsLoading(false);
-      return;
-    }
-
     const reviewRequest = {
       rating: rating,
       comment: comment,
@@ -148,7 +141,6 @@ export function OrderReviewDialog({ order, toast }) {
         description: "Đánh giá sản phẩm thành công",
       });
       setIsOpen(false);
-      setComment("");
       setRating(0);
       setImages([]);
       setVideos([]);
@@ -170,7 +162,6 @@ export function OrderReviewDialog({ order, toast }) {
 
   const handleComment = (comment) => {
     setComment(comment);
-    setErrorComment("");
   };
 
   return (
@@ -257,9 +248,6 @@ export function OrderReviewDialog({ order, toast }) {
                 value={comment}
                 onChange={(e) => handleComment(e.target.value)}
               />
-              {errorComment && (
-                <p className="text-red-primary text-sm">{errorComment}</p>
-              )}
             </div>
 
             <div className="space-y-4">

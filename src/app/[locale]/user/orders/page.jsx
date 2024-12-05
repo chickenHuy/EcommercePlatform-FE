@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -21,12 +20,9 @@ import {
   ArrowUpDown,
   CircleHelp,
   Forklift,
-  ListFilter,
   Search,
-  Store,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import {
   Tooltip,
   TooltipContent,
@@ -45,10 +41,9 @@ import { useRouter } from "next/navigation";
 import { setStore } from "@/store/features/userSearchSlice";
 import { useDispatch } from "react-redux";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { OrderReviewDialog } from "@/components/dialogs/dialogReview";
 import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
-import Loading from "@/components/loading";
+import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 
 export default function ManageOrderUser() {
   const [orders, setOrders] = useState([]);
@@ -411,7 +406,7 @@ export default function ManageOrderUser() {
                   >
                     <Image
                       alt="ảnh shop"
-                      src={order.avatarStore}
+                      src={order.avatarStore || StoreEmpty}
                       height={30}
                       width={30}
                       unoptimized={true}

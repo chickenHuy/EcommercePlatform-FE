@@ -1,23 +1,24 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, Suspense, lazy } from "react";
 import { Star, ShoppingCart, Heart, Minus, Plus, Store } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ProductSpecifications } from "./product-specifications";
 import StoreEmpty from "@/assets/images/storeEmpty.jpg";
-import { Reviews } from "./reviewPage";
 import { ProductMediaViewer } from "./product-media-viewer";
 import { addToCart } from "@/api/cart/addToCart";
 import { Toaster } from "@/components/ui/toaster";
-import { toast } from "@/hooks/use-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { changeQuantity } from "@/store/features/cartSlice";
 import { useRouter } from "next/navigation";
 import { setStore } from "@/store/features/userSearchSlice";
 import { get, post } from "@/lib/httpClient";
 import { setWishList } from "@/store/features/wishListSlice";
+import Loading from "@/components/loading";
+
+const ReviewLazy = lazy(() => import("./reviewPage"));
 
 export default function ProductDetail({ product }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -358,7 +359,9 @@ export default function ProductDetail({ product }) {
         <Separator className="my-8" />
 
         <div className="mx-auto px-4 bg-white-primary">
-          <Reviews />
+          <Suspense fallback={<Loading></Loading>}>
+            <ReviewLazy productId={product.id} />
+          </Suspense>
         </div>
       </div>
     </div>

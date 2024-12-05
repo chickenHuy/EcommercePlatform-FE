@@ -1,4 +1,4 @@
-import { post } from "@/lib/httpClient";
+import { get, post } from "@/lib/httpClient";
 
 export const createReview = (reviewRequest) => {
   try {
@@ -38,6 +38,37 @@ export const uploadVideoReview = async (file, reviewId) => {
     const response = await post(`/api/v1/videos/reviews/${reviewId}`, formData);
     return response;
   } catch (error) {
+    throw error;
+  }
+};
+
+export const getReviewOneProduct = (
+  productId,
+  starNumber,
+  commentString,
+  mediaString,
+  page,
+  size
+) => {
+  try {
+    const response = get(
+      `/api/v1/reviews/product/${productId}?sort=createdAt&order=desc&page=${page}&size=${size}&starNumber=${starNumber}&commentString=${commentString}&mediaString=${mediaString}`
+    );
+    return response;
+  } catch (error) {
+    console.error("Error during authentication:", error);
+    throw error;
+  }
+};
+
+export const getCommentAndMediaTotalReview = (productId) => {
+  try {
+    const response = get(
+      `/api/v1/reviews/product/${productId}/comment-media-total`
+    );
+    return response;
+  } catch (error) {
+    console.error("Error during authentication:", error);
     throw error;
   }
 };

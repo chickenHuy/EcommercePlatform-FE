@@ -42,6 +42,7 @@ import DialogCancelOrderUser from "./dialogCancelOrderUser";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { setStore } from "@/store/features/userSearchSlice";
+import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 
 export default function ViewOrderDetailUser(props) {
   const { isOpen, onClose, orderId } = props;
@@ -468,7 +469,7 @@ export default function ViewOrderDetailUser(props) {
                   >
                     <Image
                       alt="ảnh shop"
-                      src={order?.avatarStore}
+                      src={order?.avatarStore || StoreEmpty}
                       height={30}
                       width={30}
                       unoptimized={true}
