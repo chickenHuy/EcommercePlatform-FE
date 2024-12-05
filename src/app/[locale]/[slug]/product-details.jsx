@@ -201,9 +201,6 @@ export default function ProductDetail({ product }) {
                 <span className="text-sm text-gray-500">
                   ({product.reviewCount} đánh giá)
                 </span>
-                <span className="text-sm text-gray-500">
-                  Đã bán {product.soldCount || 0}
-                </span>
               </div>
             </div>
 
