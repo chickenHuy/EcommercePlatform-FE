@@ -26,7 +26,7 @@ export default function ProductCard({
   const dispatch = useDispatch();
   return (
     <Link href={`/${link}`} passHref>
-      <Card className="w-full h-[320px] cursor-pointer relative group transition-transform duration-300 hover:scale-[1.03]">
+      <Card className="w-full h-[360px] cursor-pointer relative group transition-transform duration-300 hover:scale-[1.03]">
         <CardHeader className="p-0 relative">
           <div className="relative aspect-square overflow-hidden">
             {videoUrl ? (
@@ -42,7 +42,8 @@ export default function ProductCard({
               <Image
                 src={mainImageUrl ? mainImageUrl : Placeholder}
                 alt={name}
-                fill
+                width={200}
+                height={300}
                 className="object-cover rounded-t-lg transition-transform duration-300 group-hover:scale-103"
               />
             )}
