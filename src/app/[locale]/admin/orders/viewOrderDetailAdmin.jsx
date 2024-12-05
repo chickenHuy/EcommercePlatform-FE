@@ -424,17 +424,17 @@ export default function ViewOrderDetailAdmin(props) {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-2">
-                        <div className="flex space-x-2">
+                        <div className="flex items-center space-x-2">
                           <UserRoundCog />
                           <Label>{order?.accountName}</Label>
                         </div>
-                        <div className="flex space-x-2">
+                        <div className="flex items-center space-x-2">
                           <Mail />
-                          <Label>{order?.userEmail}</Label>
+                          <Label>{order?.userEmail || "user@gmail.com"}</Label>
                         </div>
-                        <div className="flex space-x-2">
+                        <div className="flex items-center space-x-2">
                           <Phone />
-                          <Label>{order?.userPhone}</Label>
+                          <Label>{order?.userPhone || "xxxxxxxxxx"}</Label>
                         </div>
                       </CardContent>
                     </Card>

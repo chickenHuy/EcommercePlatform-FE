@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Suspense } from "react";
 import { Star, ShoppingCart, Heart, Minus, Plus, Store } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -352,7 +352,9 @@ export default function ProductDetail({ product }) {
         <Separator className="my-8" />
 
         <div className="mx-auto px-4 bg-white-primary">
-          <Reviews />
+          <Suspense fallback={<div>Đang tải đánh giá sản phẩm...</div>}>
+            <Reviews productId={product.id} />
+          </Suspense>
         </div>
       </div>
     </div>
