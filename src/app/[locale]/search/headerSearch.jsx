@@ -59,8 +59,8 @@ export default function SearchHeader() {
           </div>
         </div>
       ) : (
-        <div className="flex items-center min-h-[160px] ">
-          <div className="mx-auto pt-20">
+        <div className="flex items-center min-h-[100px] bg-black-primary ">
+          <div className="mx-auto pt-20 pb-2 text-white-primary">
             Kết quả tìm kiếm cho từ khoá "
             <span className="text-red-primary">{keyword}</span>"
           </div>

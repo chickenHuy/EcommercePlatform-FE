@@ -18,6 +18,8 @@ import {
   Minus,
   PiggyBank,
   Plus,
+  Recycle,
+  Trash2,
 } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
@@ -32,6 +34,7 @@ import { useDispatch } from "react-redux";
 import { setCheckout } from "@/store/features/checkoutSlice";
 import CommonHeader from "@/components/headers/commonHeader";
 import { Separator } from "@/components/ui/separator";
+import { Remove } from "@mui/icons-material";
 
 export default function ManageCartUser() {
   const [carts, setCarts] = useState([]);
@@ -341,7 +344,7 @@ export default function ManageCartUser() {
 
   }
 
-  
+
 
   return loading ? (
     <div className="flex flex-col min-h-screen w-full bg-muted/4 bg-blue-primary">
@@ -376,7 +379,7 @@ export default function ManageCartUser() {
         {carts.length > 0 ? (
           carts.map((cart, index) => (
             <Card key={index} className="rounded-none">
-              <CardTitle className="flex items-center mt-4 mb-4">
+              <CardTitle className="flex items-center pt-4 pb-4 bg-gradient-to-r from-white-primary to-white-secondary">
                 {/*Checkbox (cart)*/}
                 <Checkbox
                   className="w-1/12"
@@ -511,20 +514,21 @@ export default function ManageCartUser() {
                           </div>
                         </div>
                         <div className="w-1/2 flex items-center justify-between">
-                          <div className="w-1/4 flex items-center justify-center space-x-2">
-                            <Label className="line-through text-muted-foreground">
+                          <div className="w-1/4 flex items-center justify-center text-red-primary/90 space-x-2 mx-2">
+                            <Label>{formatCurrency(item.salePrice)}</Label>
+                            <Label className="line-through text-muted-foreground truncate">
                               {formatCurrency(item.originalPrice)}
                             </Label>
-                            <Label>{formatCurrency(item.salePrice)}</Label>
                           </div>
                           <div className="w-1/4 flex items-center justify-center">
                             <Button
                               variant="outline"
-                              className="w-1/6"
+                              size="icon"
                               onClick={() => handleOnClickButtonMinus(item)}
                             >
-                              <Minus className="scale-[5]" />
+                              <Minus className="h-4 w-4" />
                             </Button>
+
                             <Input
                               value={item.quantity}
                               onChange={(e) =>
@@ -535,10 +539,10 @@ export default function ManageCartUser() {
                             />
                             <Button
                               variant="outline"
-                              className="w-1/6"
+                              size="icon"
                               onClick={() => handleOnClickButtonPlus(item)}
                             >
-                              <Plus className="scale-[5]" />
+                              <Plus className="h-4 w-4" />
                             </Button>
                           </div>
                           <div className="w-1/4 flex items-center justify-center">
@@ -553,7 +557,7 @@ export default function ManageCartUser() {
                                 handleOnclickButtonDeleteCartItem(item);
                               }}
                             >
-                              Xóa
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
@@ -568,11 +572,11 @@ export default function ManageCartUser() {
                   </Label>
                 )}
               </CardContent>
-              <CardFooter className="mt-6 mb-6 p-0">
-                <PiggyBank className="w-1/12" />
+              <CardFooter className="mb-8 p-0">
+                <PiggyBank className="w-1/12 text-error-dark" />
                 <div className="w-11/12 flex items-center space-x-2">
                   <Label>Tiết kiệm ngay</Label>
-                  <Label className="text-xl font-bold">
+                  <Label className="text-xl font-bold text-red-primary">
                     {formatCurrency(calculateTotalSavings(cart.items))}
                   </Label>
                 </div>
@@ -602,7 +606,7 @@ export default function ManageCartUser() {
           hasPrevious={hasPrevious}
         ></PaginationAdminTable>
       </div>
-      <div className="flex items-center justify-between bg-white-primary min-h-[80px] my-4 sticky bottom-0 border-t-2 ">
+      <div className="flex items-center sticky justify-between bg-gradient-to-r from-black-tertiary to-black-primary text-white-primary min-h-[80px] mt-4 w-full bottom-0 border-t-2 ">
         {/*Checkbox cart và cartItem*/}
         <Checkbox
           className="w-1/12"
@@ -611,15 +615,19 @@ export default function ManageCartUser() {
         />
         <div className="w-11/12 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Button variant="outline">
+            <Button
+            variant="outline"
+            className="text-black-primary"
+            >
               Chọn tất cả ({selectedCartItems.length})
             </Button>
             {/*Button xóa tất cả các cart hoặc cartItem đã chọn (từ checkbox cha (card) hoặc checkcon con (cartItem)*/}
             <Button
               variant="outline"
+              className="text-black-primary"
               onClick={() => handleOnClickButtonDeleteSelectCartItem()}
             >
-              Xóa
+              <Trash2 className="h-4 w-4" />
             </Button>
           </div>
           <Label variant="outline">
@@ -636,7 +644,7 @@ export default function ManageCartUser() {
               )}
             </Label>
           </div>
-          <Button variant="outline" className="w-1/6 mr-10" onClick={() => handleCheckout()}>
+          <Button className="w-1/6 mr-10 bg-red-primary rounded-xl" onClick={() => handleCheckout()}>
             Mua hàng
           </Button>
         </div>

@@ -11,6 +11,12 @@ const StatusPage = ({ params }) => {
     const [message, setMessage] = useState("");
     const [statusType, setStatusType] = useState("");
 
+    const formatVND = (amount) => {
+        return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        }).format(amount);
+    };
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -20,7 +26,7 @@ const StatusPage = ({ params }) => {
 
                 const { paymentMethod, status, amount } = response.result;
                 if (paymentMethod === "COD") {
-                    setMessage(`Vui lòng thanh toán tổng số tiền ${amount} khi nhận hàng.`);
+                    setMessage(`Vui lòng thanh toán tổng số tiền ${formatVND(amount)} khi nhận hàng.`);
                     setStatusType("COD");
                 } else if (paymentMethod === "VN_PAY") {
                     if (status === "WAITING") {

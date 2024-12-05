@@ -60,7 +60,7 @@ export default function ShoppingCard() {
                     >
                         <div className="w-10 h-10 relative flex-shrink-0">
                             <Image
-                                src={item.image}
+                                src={item.image ? item.image : ShopEmpty}
                                 alt={item.name}
                                 fill
                                 className="object-cover rounded"

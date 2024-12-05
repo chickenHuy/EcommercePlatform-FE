@@ -26,7 +26,7 @@ export default function ProductCard({
   const dispatch = useDispatch();
   return (
     <Link href={`/${link}`} passHref>
-      <Card className="w-full h-[360px] cursor-pointer relative group transition-transform duration-300 hover:scale-[1.03]">
+      <Card className="w-full h-[320px] cursor-pointer relative border-none transition-transform duration-300 hover:scale-[1.03] ">
         <CardHeader className="p-0 relative">
           <div className="relative aspect-square overflow-hidden">
             {videoUrl ? (
@@ -62,8 +62,9 @@ export default function ProductCard({
           <Button
             variant="outline"
             size="icon"
-            className="absolute top-2 right-2 z-10 bg-white-primary bg-opacity-50 hover:bg-opacity-100 transition-all duration-200"
+            className="absolute border-none top-2 right-2 z-10 bg-white-primary bg-opacity-50 hover:bg-opacity-100 transition-all duration-200"
             onClick={(e) => {
+              e.stopPropagation();
               onAddToFavorites();
             }}
           >
@@ -75,7 +76,7 @@ export default function ProductCard({
           </Button>
         </CardHeader>
         <CardContent className="p-4 flex flex-col flex-grow">
-          <CardTitle className="text-sm font-semibold line-clamp-2">
+          <CardTitle className="text-sm font-semibold line-clamp-2 truncate">
             {name}
           </CardTitle>
           <div className="flex items-center mt-2">
@@ -99,7 +100,7 @@ export default function ProductCard({
               {formatPrice(price)}
             </span>
             {originalPrice && (
-              <span className="ml-2 text-xs text-gray-tertiary line-through">
+              <span className="ml-2 text-xs text-gray-tertiary line-through truncate">
                 {formatPrice(originalPrice)}
               </span>
             )}
