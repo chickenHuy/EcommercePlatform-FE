@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Dialog,
@@ -13,14 +13,23 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Star, Camera, Video, X } from "lucide-react";
+import {
+  createReview,
+  uploadReviewListImage,
+  uploadVideoReview,
+} from "@/api/user/reviewRequest";
+import Loading from "../loading";
+import { CircularProgress, Typography } from "@mui/material";
 
-export function OrderReviewDialog({ order }) {
+export function OrderReviewDialog({ order, toast }) {
   const [isOpen, setIsOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
-  const [error, setError] = useState("");
+  const [errorStar, setErrorStar] = useState("");
+  const [errorComment, setErrorComment] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const products = order.orderItems;
 
@@ -101,197 +110,254 @@ export function OrderReviewDialog({ order }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Kiểm tra rating có được chọn chưa
+    setIsLoading(true);
+
     if (rating === 0) {
-      setError("Vui lòng chọn một mức đánh giá");
-      return; // Nếu chưa chọn rating thì không gửi form
+      setErrorStar("Vui lòng chọn một mức đánh giá");
+      setIsLoading(false);
+      return;
     }
 
+    if (!comment.trim()) {
+      setErrorComment("Vui lòng nhập nhận xét của bạn");
+      setIsLoading(false);
+      return;
+    }
+
+    const reviewRequest = {
+      rating: rating,
+      comment: comment,
+      orderId: order.id,
+    };
+    const listImage = images.map((image) => image.file);
+    const videoUrl = videos.length > 0 ? videos[0].file : null;
+
     try {
-      console.log(order.id, comment, rating);
-      console.log(images); //gọi image.file
-      console.log(videos); //gọi videos.file  
-
-      setError(""); // Xóa lỗi nếu đã chọn rating
-
-      //setIsOpen(false); turn on when test is done
+      const review = await createReview(reviewRequest);
+      if (listImage.length > 0) {
+        await uploadReviewListImage(listImage, review.result.id);
+      }
+      if (videoUrl) {
+        await uploadVideoReview(videoUrl, review.result.id);
+      }
+      toast({
+        variant: "success",
+        title: "Thành công",
+        description: "Đánh giá sản phẩm thành công",
+      });
+      setIsOpen(false);
+      setComment("");
+      setRating(0);
+      setImages([]);
+      setVideos([]);
     } catch (error) {
-      // handle toast
+      toast({
+        variant: "destructive",
+        title: "Thất bại",
+        description: error.message,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const handleRating = (star) => {
+    setRating(star);
+    setErrorStar("");
+  };
+
+  const handleComment = (comment) => {
+    setComment(comment);
+    setErrorComment("");
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Đánh Giá Đơn Hàng</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">
-            Đánh Giá Đơn Hàng #{order.id}
-          </DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
-            <Label className="text-lg font-semibold">
-              Sản phẩm trong đơn hàng
-            </Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  className="flex items-center gap-4 p-2 border rounded-md"
-                >
-                  <Image
-                    src={product.productMainImageUrl}
-                    alt={product.productName}
-                    width={50}
-                    height={50}
-                    className="rounded-md object-cover"
-                  />
-                  <div>
-                    <h3 className="font-medium">{product.productName}</h3>
-                    <p className="text-sm text-gray-500">
-                      {product.value ? product.values : ""}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Đánh giá chung</Label>
-            <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  className="focus:outline-none"
-                  onClick={() => setRating(star)}
-                >
-                  <Star
-                    className={`w-8 h-8 ${
-                      star <= rating
-                        ? "fill-yellow-primary text-yellow-primary"
-                        : "text-gray-primary"
-                    }`}
-                  />
-                </button>
-              ))}
-            </div>
-            {error && <p className="text-red-500 text-sm">{error}</p>}{" "}
-            {/* Hiển thị thông báo lỗi */}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="comment">Nhận xét</Label>
-            <Textarea
-              id="comment"
-              placeholder="Hãy chia sẻ trải nghiệm của bạn về đơn hàng này"
-              rows={4}
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-4">
-            {images.length > 0 && (
-              <div className="grid grid-cols-4 gap-2">
-                {images.map((image, index) => (
-                  <div key={index} className="relative aspect-square">
+    <>
+      {isLoading && (
+        <div className="fixed inset-0 flex flex-col justify-center items-center z-[100] space-y-4 bg-black-primary bg-opacity-90">
+          <CircularProgress></CircularProgress>
+          <p className="text-2xl text-white-primary">
+            Đang tải đánh giá sản phẩm...
+          </p>
+        </div>
+      )}
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline">Đánh Giá Đơn Hàng</Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">
+              Đánh Giá Đơn Hàng #{order.id}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-4">
+              <Label className="text-lg font-semibold">
+                Sản phẩm trong đơn hàng
+              </Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {products.map((product) => (
+                  <div
+                    key={product.id}
+                    className="flex items-center gap-4 p-2 border rounded-md"
+                  >
                     <Image
-                      src={image.url}
-                      alt={`Preview ${index + 1}`}
-                      fill
-                      className="object-cover rounded-lg"
+                      src={product.productMainImageUrl}
+                      alt={product.productName}
+                      width={50}
+                      height={50}
+                      className="rounded-md object-cover"
                     />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setImages(images.filter((_, i) => i !== index))
-                      }
-                      className="absolute -top-2 -right-2 bg-red-primary text-white-primary rounded-full p-1"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+                    <div>
+                      <h3 className="font-medium">{product.productName}</h3>
+                      <p className="text-sm text-gray-500">
+                        {product.value ? product.values : ""}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
-            )}
+            </div>
 
-            {videos.length > 0 && (
-              <div className="grid grid-cols-2 gap-2">
-                {videos.map((video, index) => (
-                  <div key={index} className="relative aspect-video">
-                    <video
-                      src={video.url}
-                      className="w-full h-full object-cover rounded-lg"
-                      controls
+            <div className="space-y-2">
+              <Label>Đánh giá chung</Label>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    className="focus:outline-none"
+                    onClick={() => handleRating(star)}
+                  >
+                    <Star
+                      className={`w-8 h-8 ${
+                        star <= rating
+                          ? "fill-yellow-primary text-yellow-primary"
+                          : "text-gray-primary"
+                      }`}
                     />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setVideos(videos.filter((_, i) => i !== index))
-                      }
-                      className="absolute -top-2 -right-2 bg-red-primary text-white-primary rounded-full p-1"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
+                  </button>
                 ))}
               </div>
-            )}
-          </div>
+              {errorStar && (
+                <p className="text-red-primary text-sm">{errorStar}</p>
+              )}{" "}
+              {/* Hiển thị thông báo lỗi */}
+            </div>
 
-          <div className="flex gap-2">
-            <Label
-              htmlFor="image-upload"
-              className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-gray-primary"
-            >
-              <Camera className="w-5 h-5 text-gray-500" />
-              <span>Thêm Hình ảnh</span>
-              <input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={handleImageUpload}
+            <div className="space-y-2">
+              <Label htmlFor="comment">Nhận xét</Label>
+              <Textarea
+                id="comment"
+                placeholder="Hãy chia sẻ trải nghiệm của bạn về đơn hàng này"
+                rows={4}
+                value={comment}
+                onChange={(e) => handleComment(e.target.value)}
               />
-            </Label>
+              {errorComment && (
+                <p className="text-red-primary text-sm">{errorComment}</p>
+              )}
+            </div>
 
-            <Label
-              htmlFor="video-upload"
-              className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-gray-primary"
-            >
-              <Video className="w-5 h-5 text-gray-500" />
-              <span>Thêm Video</span>
-              <input
-                id="video-upload"
-                type="file"
-                accept="video/*"
-                multiple
-                className="hidden"
-                onChange={handleVideoUpload}
-              />
-            </Label>
-          </div>
+            <div className="space-y-4">
+              {images.length > 0 && (
+                <div className="grid grid-cols-4 gap-2">
+                  {images.map((image, index) => (
+                    <div key={index} className="relative aspect-square">
+                      <Image
+                        src={image.url}
+                        alt={`Preview ${index + 1}`}
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setImages(images.filter((_, i) => i !== index))
+                        }
+                        className="absolute -top-2 -right-2 bg-red-primary text-white-primary rounded-full p-1"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsOpen(false)}
-            >
-              Hủy
-            </Button>
-            <Button type="submit">Gửi Đánh Giá</Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+              {videos.length > 0 && (
+                <div className="grid grid-cols-2 gap-2">
+                  {videos.map((video, index) => (
+                    <div key={index} className="relative aspect-video">
+                      <video
+                        src={video.url}
+                        className="w-full h-full object-cover rounded-lg"
+                        controls
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setVideos(videos.filter((_, i) => i !== index))
+                        }
+                        className="absolute -top-2 -right-2 bg-red-primary text-white-primary rounded-full p-1"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <Label
+                htmlFor="image-upload"
+                className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-gray-primary"
+              >
+                <Camera className="w-5 h-5 text-gray-500" />
+                <span>Thêm Hình ảnh</span>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+              </Label>
+
+              <Label
+                htmlFor="video-upload"
+                className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-gray-primary"
+              >
+                <Video className="w-5 h-5 text-gray-500" />
+                <span>Thêm Video</span>
+                <input
+                  id="video-upload"
+                  type="file"
+                  accept="video/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleVideoUpload}
+                />
+              </Label>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsOpen(false)}
+              >
+                Hủy
+              </Button>
+              <Button type="submit">Gửi Đánh Giá</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

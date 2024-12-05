@@ -40,7 +40,7 @@ import { cancelOrderByUser, getAllOrderByUser } from "@/api/user/orderRequest";
 import { TabsContent } from "@radix-ui/react-tabs";
 import DialogCancelOrderUser from "./dialogCancelOrderUser";
 import ViewOrderDetailUser from "./viewOrderDetailUser";
-import { Rating } from "@mui/material";
+import { CircularProgress, Rating } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { setStore } from "@/store/features/userSearchSlice";
 import { useDispatch } from "react-redux";
@@ -48,6 +48,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { OrderReviewDialog } from "@/components/dialogs/dialogReview";
 import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
+import Loading from "@/components/loading";
 
 export default function ManageOrderUser() {
   const [orders, setOrders] = useState([]);
@@ -67,6 +68,7 @@ export default function ManageOrderUser() {
   const [actionType, setActionType] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleNextPage = () => {
     if (currentPage < totalPage) {
@@ -159,6 +161,7 @@ export default function ManageOrderUser() {
       setTotalElement(response.result.totalElements);
       setHasNext(response.result.hasNext);
       setHasPrevious(response.result.hasPrevious);
+      setIsLoading(false);
     } catch (error) {
       toast({
         title: "Thất bại",
@@ -177,7 +180,7 @@ export default function ManageOrderUser() {
 
   useEffect(() => {
     fetchAllOrderByUser();
-  }, [fetchAllOrderByUser,]);
+  }, [fetchAllOrderByUser]);
 
   function formatCurrency(value) {
     return Number(value).toLocaleString("vi-VN", {
@@ -288,30 +291,27 @@ export default function ManageOrderUser() {
     { label: "Đã hủy", filterKey: "CANCELLED" },
   ];
 
-  const dropdownItems = [
-    { label: "Tất cả", filterKey: "" },
-    { label: "Chờ thanh toán", filterKey: "ON_HOLD" },
-    { label: "Chờ xác nhận", filterKey: "PENDING" },
-    { label: "Đã xác nhận", filterKey: "CONFIRMED" },
-    { label: "Chuẩn bị hàng", filterKey: "PREPARING" },
-    { label: "Chờ giao cho ĐVVC", filterKey: "WAITING_FOR_SHIPPING" },
-    { label: "Đã giao cho ĐVVC", filterKey: "PICKED_UP" },
-    { label: "Đang giao hàng", filterKey: "OUT_FOR_DELIVERY" },
-    { label: "Hoàn thành", filterKey: "DELIVERED" },
-    { label: "Đã hủy", filterKey: "CANCELLED" },
-  ];
-
-  const handleSubmitReview = (data) => {
-    console.log("Order review submitted:", data);
-  };
-
   return (
     <div className="flex flex-col space-y-4 bg-white-primary p-2">
+      <Toaster />
+      {isLoading && (
+        <div className="fixed inset-0 flex flex-col justify-center items-center z-50 space-y-4 bg-black-secondary">
+          <CircularProgress></CircularProgress>
+          <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
+        </div>
+      )}
       <Tabs value={filter}>
         <div className="flex flex-col space-y-4">
           <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <TabsList className="inline-flex flex-wrap h-10 items-center justify-start rounded-lg bg-muted p-1 text-muted-foreground overflow-x-auto">
-              {[listOrderStatus[0],listOrderStatus[1],listOrderStatus[2],listOrderStatus[3],listOrderStatus[8], listOrderStatus[9]].map((item) => (
+              {[
+                listOrderStatus[0],
+                listOrderStatus[1],
+                listOrderStatus[2],
+                listOrderStatus[3],
+                listOrderStatus[8],
+                listOrderStatus[9],
+              ].map((item) => (
                 <TabsTrigger
                   key={item.filterKey}
                   value={item.filterKey}
@@ -324,11 +324,7 @@ export default function ManageOrderUser() {
               <div value="more" className="text-primary font-bold">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="ml-2"
-                    >
+                    <Button variant="outline" size="sm" className="ml-2">
                       Thêm
                     </Button>
                   </DropdownMenuTrigger>
@@ -567,8 +563,8 @@ export default function ManageOrderUser() {
                           Hủy đơn hàng
                         </Button>
                       )}
-                      {order.currentStatus !== "DELIVERED" ? (
-                        <OrderReviewDialog order={order}/>
+                      {order.currentStatus === "DELIVERED" ? (
+                        <OrderReviewDialog order={order} toast={toast} />
                       ) : (
                         ""
                       )}
@@ -579,13 +575,12 @@ export default function ManageOrderUser() {
             ))
           ) : (
             <div className="w-full min-h-[700px] flex flex-col justify-start m-2">
-              <Image className="mx-auto" 
-              src ={ReviewEmpty} 
-              width={400}
-              height={400}
-              >
-
-              </Image>
+              <Image
+                className="mx-auto"
+                src={ReviewEmpty}
+                width={400}
+                height={400}
+              ></Image>
               <Label className="text-xl text-gray-tertiary text-center m-2">
                 Hiện tại bạn không có đơn hàng thuộc trạng thái này
               </Label>
