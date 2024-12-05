@@ -26,11 +26,11 @@ import {
 } from "lucide-react";
 import LeftSideBar from "./leftSideBar";
 import RightSideBar from "./rightSidebar";
-const ProductGrid = lazy(() => import("./productGrid"));
 import { useDispatch, useSelector } from "react-redux";
 import { setOrder, setSortBy } from "@/store/features/userSearchSlice";
 
 export default function SearchPage() {
+  const ProductGrid = lazy(() => import("./productGrid"));
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
   const dispatch = useDispatch();

@@ -47,11 +47,12 @@ export const getReviewOneProduct = (
   starNumber,
   commentString,
   mediaString,
-  page
+  page,
+  size
 ) => {
   try {
     const response = get(
-      `/api/v1/reviews/product/${productId}?sort=createdAt&order=desc&page=${page}&size=10&starNumber=${starNumber}&commentString=${commentString}&mediaString=${mediaString}`
+      `/api/v1/reviews/product/${productId}?sort=createdAt&order=desc&page=${page}&size=${size}&starNumber=${starNumber}&commentString=${commentString}&mediaString=${mediaString}`
     );
     return response;
   } catch (error) {

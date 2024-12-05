@@ -14,8 +14,9 @@ import { useCallback, useEffect, useState } from "react";
 import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 import ReviewEmpty from "@/assets/images/reviewEmpty.png";
 import Loading from "@/components/loading";
+import { useInView } from "react-intersection-observer";
 
-export function Reviews({ productId }) {
+export default function Reviews({ productId }) {
   const [listreviews, setListReviews] = useState([]);
   const { toast } = useToast();
   const [averageRating, setAverageRating] = useState(0);
@@ -26,7 +27,10 @@ export function Reviews({ productId }) {
   const [commentString, setCommentString] = useState("");
   const [mediaString, setMediaString] = useState("");
   const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+  const { ref, inView } = useInView();
+  const [isLoading, setIsLoading] = useState(false);
+  const size = 2;
 
   const handleRatingFilterClick = (rating) => {
     setStarNumber(rating);
@@ -54,31 +58,52 @@ export function Reviews({ productId }) {
     fiveStar: 5,
   };
 
-  const fetchReviewOneProduct = useCallback(async () => {
-    try {
-      const response = await getReviewOneProduct(
-        productId,
-        starNumber,
-        commentString,
-        mediaString,
-        page
-      );
-      console.log("ListReviews: ", response.result.data[0].reviews);
-      console.log("RatingCounts: ", response.result.data[0].ratingCounts);
-      setListReviews(response.result.data[0].reviews);
-      setAverageRating(response.result.data[0].productRating);
-      setRatingCounts(response.result.data[0].ratingCounts);
-    } catch (error) {
-      toast({
-        title: "Thất bại",
-        description:
-          error.message === "Unauthenticated"
-            ? "Phiên làm việc hết hạn. Vui lòng đăng nhập lại!!!"
-            : error.message,
-        variant: "destructive",
-      });
-    }
-  }, [toast, productId, starNumber, commentString, mediaString, page]);
+  const fetchReviewOneProduct = useCallback(
+    async (isInitialLoad = false) => {
+      if (isLoading || (!hasMore && !isInitialLoad) || page == null) return;
+      setIsLoading(true);
+      try {
+        const response = await getReviewOneProduct(
+          productId,
+          starNumber,
+          commentString,
+          mediaString,
+          isInitialLoad ? 1 : page,
+          size
+        );
+        setAverageRating(response.result.data[0].productRating);
+        setRatingCounts(response.result.data[0].ratingCounts);
+        const newReviews = response.result.data[0].reviews;
+        if (newReviews.length === 0) {
+          setHasMore(false);
+        } else {
+          setListReviews((prevReviews) =>
+            isInitialLoad ? newReviews : [...prevReviews, ...newReviews]
+          );
+          setPage(response.result.nextPage);
+        }
+      } catch (error) {
+        console.error("Error loading products:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load review of product. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+
+    [
+      productId,
+      starNumber,
+      commentString,
+      mediaString,
+      page,
+      isLoading,
+      hasMore,
+    ]
+  );
 
   const fetchCommentAndMediaTotalReview = useCallback(async () => {
     try {
@@ -89,14 +114,18 @@ export function Reviews({ productId }) {
   }, [productId]);
 
   useEffect(() => {
-    setIsLoading(true);
-    fetchReviewOneProduct();
-    setIsLoading(false);
-  }, [fetchReviewOneProduct]);
+    setListReviews([]);
+    setPage(1);
+    setHasMore(true);
+    fetchReviewOneProduct(true);
+    fetchCommentAndMediaTotalReview();
+  }, [productId, starNumber, commentString, mediaString]);
 
   useEffect(() => {
-    fetchCommentAndMediaTotalReview();
-  }, [fetchCommentAndMediaTotalReview]);
+    if (inView && !isLoading) {
+      fetchReviewOneProduct();
+    }
+  }, [fetchReviewOneProduct, inView]);
 
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -114,12 +143,7 @@ export function Reviews({ productId }) {
   }
 
   return (
-    <div className="space-y-6 p-4 max-w-4xl mx-auto mb-[100px] relative">
-      {isLoading ? (
-        <div className="flex flex-col justify-center items-center z-50 space-y-4 absolute inset-0">
-          <Loading />
-        </div>
-      ) : null}
+    <div className="space-y-6 p-4 max-w-4xl mx-auto relative">
       <h2 className="text-xl md:text-2xl font-bold">ĐÁNH GIÁ SẢN PHẨM</h2>
       <div className="bg-white rounded-lg p-4 md:p-6 space-y-6">
         {/* Rating Overview */}
@@ -191,8 +215,8 @@ export function Reviews({ productId }) {
         </div>
 
         {/* Review List */}
-        {listreviews && listreviews.length > 0 ? (
-          listreviews.map((listreview) => (
+        <>
+          {listreviews.map((listreview) => (
             <div key={listreview.id} className="space-y-6">
               <div className="border-t pt-6">
                 <div className="flex flex-col md:flex-row gap-4">
@@ -259,20 +283,26 @@ export function Reviews({ productId }) {
                 </div>
               </div>
             </div>
-          ))
-        ) : (
-          <div className="flex flex-col space-y-4 items-center justify-center bg-black-tertiary bg-opacity-5 w-full min-h-[200px]">
-            <p className="text-2xl text-black-primary">
-              Chưa có khách hàng nào đánh giá
-            </p>
+          ))}
+          {hasMore && (
+            <div ref={ref} className="col-span-full flex justify-center p-4">
+              {isLoading && <Loading />}
+            </div>
+          )}
+        </>
+        {listreviews.length === 0 && (
+          <div className="flex flex-col space-y-4 items-center justify-center bg-white-tertiary bg-opacity-15 rounded-xl w-full min-h-[200px]">
             <Image
               src={ReviewEmpty}
               alt="Review empty"
-              width={200}
+              width={400}
               height={200}
-              className="rounded-sm object-cover"
+              className="rounded-sm object-cover opacity-20"
               unoptimized={true}
             />
+            <p className="text-xl text-gray-tertiary pb-5">
+              Chưa có đánh giá phù hợp với bộ lọc
+            </p>
           </div>
         )}
       </div>
