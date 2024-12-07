@@ -6,7 +6,7 @@ export const Input = forwardRef(
     {
       width = "w-full",
       height = "h-12",
-      backgroundColor = "bg-input",
+      backgroundColor = "bg-[#f3f3f3]",
       borderColor = "border-black-tertiary",
       borderWidth = "border-[0px]",
       borderRadius = "rounded-lg",

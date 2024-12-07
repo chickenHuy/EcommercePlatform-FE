@@ -232,7 +232,7 @@ const AuthPage = () => {
               <div className="w-[45%] h-[2px] bg-black-tertiary opacity-30"></div>
             </div>
 
-            <SignUpNow></SignUpNow>
+            <SignUpNow setIsLogin={setIsSignIn}></SignUpNow>
 
             <div className="flex flex-row justify-center items-center">
               <span>{t("alreadyHaveAccount")}</span>
