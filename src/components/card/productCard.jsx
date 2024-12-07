@@ -42,8 +42,7 @@ export default function ProductCard({
               <Image
                 src={mainImageUrl ? mainImageUrl : Placeholder}
                 alt={name}
-                width={200}
-                height={300}
+                layout="fill"
                 className="object-cover rounded-t-lg transition-transform duration-300 group-hover:scale-103"
               />
             )}
