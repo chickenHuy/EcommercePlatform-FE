@@ -45,6 +45,9 @@ import ViewOrderDetailSeller from "./viewOrderDetailSeller";
 import { Badge } from "@/components/ui/badge";
 import { useDispatch, useSelector } from "react-redux";
 import { setFilter } from "@/store/features/orderFilterSlice";
+import Image from "next/image";
+import { Label } from "@/components/ui/label";
+import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
 
 export default function ManageOrderSeller() {
   const [orders, setOrders] = useState([]);
@@ -262,169 +265,188 @@ export default function ManageOrderSeller() {
     <div className="flex min-h-screen w-full flex-col bg-muted/40 pt-16">
       <Toaster />
       <div className="flex flex-col sm:gap-4 sm:py-4">
-        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-4">
-          <div className="ml-auto flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-7 gap-1">
-                  <ArrowUpDown className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Sắp xếp
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Sắp xếp</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuRadioGroup
-                  value={orderType}
-                  onValueChange={(value) => handleOrderChange(value)}
-                >
-                  <DropdownMenuRadioItem value="asc">
-                    Tăng dần
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="desc">
-                    Giảm dần
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuRadioGroup
-                  value={sortType}
-                  onValueChange={(value) => handleSortChange(value)}
-                >
-                  <DropdownMenuRadioItem value="createdAt">
-                    Ngày đặt hàng
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => {
-                    setSortType("");
-                    setOrderType("");
-                  }}
-                >
-                  Không sắp xếp
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            {showFilter && (
+        {orders && orders.length > 0 ? (
+          <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-4">
+            <div className="ml-auto flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="h-7 gap-1">
-                    <ListFilter className="h-3.5 w-3.5" />
+                    <ArrowUpDown className="h-3.5 w-3.5" />
                     <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                      Lọc
+                      Sắp xếp
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Lọc theo trạng thái</DropdownMenuLabel>
+                  <DropdownMenuLabel>Sắp xếp</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {dropdownItems.map((item) => (
-                    <DropdownMenuCheckboxItem
-                      key={item.filterKey}
-                      onClick={() => handleFilterChange(item.filterKey)}
-                      checked={filter === item.filterKey}
-                    >
-                      {item.label}
-                    </DropdownMenuCheckboxItem>
-                  ))}
+                  <DropdownMenuRadioGroup
+                    value={orderType}
+                    onValueChange={(value) => handleOrderChange(value)}
+                  >
+                    <DropdownMenuRadioItem value="asc">
+                      Tăng dần
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="desc">
+                      Giảm dần
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuRadioGroup
+                    value={sortType}
+                    onValueChange={(value) => handleSortChange(value)}
+                  >
+                    <DropdownMenuRadioItem value="createdAt">
+                      Ngày đặt hàng
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setSortType("");
+                      setOrderType("");
+                    }}
+                  >
+                    Không sắp xếp
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            )}
-          </div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Danh sách đơn hàng ({totalElement})</CardTitle>
-              <CardDescription>
-                Quản lý tất cả đơn hàng trong cửa hàng
-              </CardDescription>
-              <div className="ml-auto flex items-center gap-2">
-                <Input onChange={(e) => handleOnChange(e.target.value)}></Input>
-                <Search className="h-5 w-5" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Đơn hàng</TableHead>
-                    <TableHead>Ngày đặt hàng</TableHead>
-                    <TableHead>Trạng thái</TableHead>
-                    <TableHead>Tổng tiền</TableHead>
-                    <TableHead className="hidden md:table-cell">
-                      <span className="sr-only">Hành động</span>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {orders.map((order) => (
-                    <TableRow
-                      key={order.id}
-                      onClick={() => handleRowClick(order.id)}
-                    >
-                      <TableCell className="text-center">#{order.id}</TableCell>
-                      <TableCell className="text-center">
-                        {formatDate(order.createdAt)}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge variant="outline">
-                          {getStatusOrder(order.currentStatus)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {formatCurrency(order.total)}
-                      </TableCell>
-                      <TableCell className="md:table-cell text-center">
-                        {order.currentStatus === "PENDING" ||
-                        order.currentStatus === "CONFIRMED" ||
-                        order.currentStatus === "PREPARING" ? (
-                          <div>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleUpdateButtonClick(order, order.id);
-                              }}
-                            >
-                              <CalendarCog className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCancelButtonClick(order, order.id);
-                              }}
-                            >
-                              <SquareX className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                      </TableCell>
+              {showFilter && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-7 gap-1">
+                      <ListFilter className="h-3.5 w-3.5" />
+                      <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                        Lọc
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Lọc theo trạng thái</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {dropdownItems.map((item) => (
+                      <DropdownMenuCheckboxItem
+                        key={item.filterKey}
+                        onClick={() => handleFilterChange(item.filterKey)}
+                        checked={filter === item.filterKey}
+                      >
+                        {item.label}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+            <Card>
+              <CardHeader className="">
+                <CardTitle>Danh sách đơn hàng ({totalElement})</CardTitle>
+                <CardDescription>
+                  Quản lý tất cả đơn hàng trong cửa hàng
+                </CardDescription>
+                <div className="ml-auto flex items-center gap-2 w-1/2">
+                  <Input
+                    onChange={(e) => handleOnChange(e.target.value)}
+                  ></Input>
+                  <Search className="h-5 w-5 hover:cursor-pointer" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Đơn hàng</TableHead>
+                      <TableHead>Ngày đặt hàng</TableHead>
+                      <TableHead>Trạng thái</TableHead>
+                      <TableHead>Tổng tiền</TableHead>
+                      <TableHead className="hidden md:table-cell">
+                        <span className="sr-only">Hành động</span>
+                      </TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-            <CardFooter>
-              <div className="absolute right-1/2 translate-x-1/2">
-                <PaginationAdminTable
-                  currentPage={currentPage}
-                  handleNextPage={handleNextPage}
-                  handlePrevPage={handlePrevPage}
-                  totalPage={totalPage}
-                  setCurrentPage={setCurrentPage}
-                  hasNext={hasNext}
-                  hasPrevious={hasPrevious}
-                />
-              </div>
-            </CardFooter>
-          </Card>
-        </main>
+                  </TableHeader>
+                  <TableBody>
+                    {orders.map((order) => (
+                      <TableRow
+                        key={order.id}
+                        onClick={() => handleRowClick(order.id)}
+                      >
+                        <TableCell className="text-center">
+                          #{order.id}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {formatDate(order.createdAt)}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Badge variant="outline">
+                            {getStatusOrder(order.currentStatus)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {formatCurrency(order.total)}
+                        </TableCell>
+                        <TableCell className="md:table-cell text-center">
+                          {order.currentStatus === "PENDING" ||
+                          order.currentStatus === "CONFIRMED" ||
+                          order.currentStatus === "PREPARING" ? (
+                            <div>
+                              <Button
+                                aria-haspopup="true"
+                                size="icon"
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleUpdateButtonClick(order, order.id);
+                                }}
+                              >
+                                <CalendarCog className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCancelButtonClick(order, order.id);
+                                }}
+                              >
+                                <SquareX className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            ""
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+              <CardFooter>
+                <div className="absolute right-1/2 translate-x-1/2">
+                  <PaginationAdminTable
+                    currentPage={currentPage}
+                    handleNextPage={handleNextPage}
+                    handlePrevPage={handlePrevPage}
+                    totalPage={totalPage}
+                    setCurrentPage={setCurrentPage}
+                    hasNext={hasNext}
+                    hasPrevious={hasPrevious}
+                  />
+                </div>
+              </CardFooter>
+            </Card>
+          </main>
+        ) : (
+          <div className="flex flex-col items-center justify-center min-h-[700px]">
+            <Image
+              alt="ảnh trống"
+              className="mx-auto"
+              src={ReviewEmpty}
+              width={400}
+              height={400}
+            ></Image>
+            <Label className="text-xl text-gray-tertiary text-center m-2">
+              Hiện tại không có đơn hàng thuộc trạng thái này
+            </Label>
+          </div>
+        )}
       </div>
       {isDrawerOpen && (
         <ViewOrderDetailSeller

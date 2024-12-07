@@ -325,7 +325,7 @@ export default function ViewOrderDetailUser(props) {
                 <Label className="text-muted-foreground">
                   {lastUpdatedTimeOnHoldOrPending
                     ? formatDate(lastUpdatedTimeOnHoldOrPending)
-                    : "00:00:00 00-00-0000"}
+                    : ""}
                 </Label>
               </div>
               {hasStatus(["PICKED_UP"]) && (
@@ -341,7 +341,7 @@ export default function ViewOrderDetailUser(props) {
                 <Label className="text-muted-foreground">
                   {lastUpdatedTimePickedUp
                     ? formatDate(lastUpdatedTimePickedUp)
-                    : "00:00:00 00-00-0000"}
+                    : ""}
                 </Label>
               </div>
               {hasStatus(["DELIVERED"]) && (
@@ -357,7 +357,7 @@ export default function ViewOrderDetailUser(props) {
                 <Label className="text-muted-foreground">
                   {lastUpdatedTimeDelivered
                     ? formatDate(lastUpdatedTimeDelivered)
-                    : "00:00:00 00-00-0000"}
+                    : ""}
                 </Label>
               </div>
             </div>
@@ -543,11 +543,7 @@ export default function ViewOrderDetailUser(props) {
                           <p className="line-through">
                             {formatCurrency(item.price)}
                           </p>
-                          <p>
-                            {formatCurrency(
-                              item.price - item.discount
-                            )}
-                          </p>
+                          <p>{formatCurrency(item.price - item.discount)}</p>
                         </div>
                       </Card>
                     ))

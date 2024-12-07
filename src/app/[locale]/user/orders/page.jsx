@@ -16,12 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
-import {
-  ArrowUpDown,
-  CircleHelp,
-  Forklift,
-  Search,
-} from "lucide-react";
+import { ArrowUpDown, CircleHelp, Forklift, Search } from "lucide-react";
 import Image from "next/image";
 import {
   Tooltip,
@@ -571,6 +566,7 @@ export default function ManageOrderUser() {
           ) : (
             <div className="w-full min-h-[700px] flex flex-col justify-start m-2">
               <Image
+                alt="ảnh trống"
                 className="mx-auto"
                 src={ReviewEmpty}
                 width={400}

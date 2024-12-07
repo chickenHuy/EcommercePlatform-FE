@@ -17,6 +17,7 @@ import { setStore } from "@/store/features/userSearchSlice";
 import { get, post } from "@/lib/httpClient";
 import { setWishList } from "@/store/features/wishListSlice";
 import Loading from "@/components/loading";
+import { useToast } from "@/hooks/use-toast";
 
 const ReviewLazy = lazy(() => import("./reviewPage"));
 
@@ -25,6 +26,7 @@ export default function ProductDetail({ product }) {
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [availableOptions, setAvailableOptions] = useState({});
+  const { toast } = useToast();
 
   const initializeAvailableOptions = () => {
     const initialOptions = {};
@@ -360,7 +362,7 @@ export default function ProductDetail({ product }) {
 
         <div className="mx-auto px-4 bg-white-primary">
           <Suspense fallback={<Loading></Loading>}>
-            <ReviewLazy productId={product.id} />
+            <ReviewLazy productId={product.id} product={product}/>
           </Suspense>
         </div>
       </div>

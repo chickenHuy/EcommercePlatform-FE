@@ -43,6 +43,9 @@ import {
 import { useSelector } from "react-redux";
 import ViewOrderDetailAdmin from "./viewOrderDetailAdmin";
 import DialogUpdateOrderCancelOrderAdmin from "./dialogUpdateOrCancelOrderAdmin";
+import { Label } from "@/components/ui/label";
+import Image from "next/image";
+import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
 
 export default function ManageOrderAdmin() {
   const [orders, setOrders] = useState([]);
@@ -166,6 +169,7 @@ export default function ManageOrderAdmin() {
         searchTerm,
         filterTab
       );
+      console.log("Orders: ", response.result.data);
       setOrders(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
@@ -365,122 +369,138 @@ export default function ManageOrderAdmin() {
               </div>
             </div>
             <TabsContent value={filter}>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Danh sách đơn hàng ({totalElement})</CardTitle>
-                  <CardDescription>
-                    Quản lý tất cả đơn hàng trên hệ thống
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Đơn hàng</TableHead>
-                        <TableHead>Ngày đặt hàng</TableHead>
-                        <TableHead>Số điện thoại</TableHead>
-                        <TableHead>Địa chỉ</TableHead>
-                        <TableHead>Thanh toán</TableHead>
-                        <TableHead>Phương thức</TableHead>
-                        <TableHead>Trạng thái</TableHead>
-                        <TableHead>Tổng tiền</TableHead>
-                        <TableHead className="hidden md:table-cell">
-                          <span className="sr-only">Hành động</span>
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {orders.map((order) => (
-                        <TableRow
-                          key={order.id}
-                          onClick={() => handleRowClick(order.id)}
-                        >
-                          <TableCell className="text-center">
-                            #{order.id}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {formatDate(order.createdAt)}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {order.orderPhone}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {order.province}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <Badge variant="outline">
-                              {getTransactionStatusOrder(
-                                order.currentStatusTransaction
-                              )}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <Badge variant="outline">
-                              {getPaymentMethodOrder(order.paymentMethod)}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <Badge variant="outline">
-                              {getStatusOrder(order.currentStatus)}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {formatCurrency(order.total)}
-                          </TableCell>
-                          <TableCell className="md:table-cell text-center">
-                            <div>
-                              {order.currentStatus === "WAITING_FOR_SHIPPING" ||
-                              order.currentStatus === "PICKED_UP" ||
-                              order.currentStatus === "OUT_FOR_DELIVERY" ? (
-                                <Button
-                                  variant="outline"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleUpdateButtonClick(order, order.id);
-                                  }}
-                                >
-                                  <CalendarCog className="h-4 w-4" />
-                                </Button>
-                              ) : (
-                                ""
-                              )}
-                              {order.currentStatus === "DELIVERED" ||
-                              order.currentStatus === "CANCELLED" ? (
-                                ""
-                              ) : (
-                                <Button
-                                  aria-haspopup="true"
-                                  size="icon"
-                                  variant="ghost"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleCancelButtonClick(order, order.id);
-                                  }}
-                                >
-                                  <SquareX className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
-                          </TableCell>
+              {orders && orders.length > 0 ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Danh sách đơn hàng ({totalElement})</CardTitle>
+                    <CardDescription>
+                      Quản lý tất cả đơn hàng trên hệ thống
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Đơn hàng</TableHead>
+                          <TableHead>Ngày đặt hàng</TableHead>
+                          <TableHead>Số điện thoại</TableHead>
+                          <TableHead>Địa chỉ</TableHead>
+                          <TableHead>Thanh toán</TableHead>
+                          <TableHead>Phương thức</TableHead>
+                          <TableHead>Trạng thái</TableHead>
+                          <TableHead>Tổng tiền</TableHead>
+                          <TableHead className="hidden md:table-cell">
+                            <span className="sr-only">Hành động</span>
+                          </TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-                <CardFooter>
-                  <div className="absolute right-1/2 translate-x-1/2">
-                    <PaginationAdminTable
-                      currentPage={currentPage}
-                      handleNextPage={handleNextPage}
-                      handlePrevPage={handlePrevPage}
-                      totalPage={totalPage}
-                      setCurrentPage={setCurrentPage}
-                      hasNext={hasNext}
-                      hasPrevious={hasPrevious}
-                    />
-                  </div>
-                </CardFooter>
-              </Card>
+                      </TableHeader>
+                      <TableBody>
+                        {orders.map((order) => (
+                          <TableRow
+                            key={order.id}
+                            onClick={() => handleRowClick(order.id)}
+                          >
+                            <TableCell className="text-center">
+                              #{order.id}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {formatDate(order.createdAt)}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {order.orderPhone}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {order.province}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge variant="outline">
+                                {getTransactionStatusOrder(
+                                  order.currentStatusTransaction
+                                )}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge variant="outline">
+                                {getPaymentMethodOrder(order.paymentMethod)}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge variant="outline">
+                                {getStatusOrder(order.currentStatus)}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {formatCurrency(order.total)}
+                            </TableCell>
+                            <TableCell className="md:table-cell text-center">
+                              <div>
+                                {order.currentStatus ===
+                                  "WAITING_FOR_SHIPPING" ||
+                                order.currentStatus === "PICKED_UP" ||
+                                order.currentStatus === "OUT_FOR_DELIVERY" ? (
+                                  <Button
+                                    variant="outline"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleUpdateButtonClick(order, order.id);
+                                    }}
+                                  >
+                                    <CalendarCog className="h-4 w-4" />
+                                  </Button>
+                                ) : (
+                                  ""
+                                )}
+                                {order.currentStatus === "DELIVERED" ||
+                                order.currentStatus === "CANCELLED" ? (
+                                  ""
+                                ) : (
+                                  <Button
+                                    aria-haspopup="true"
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleCancelButtonClick(order, order.id);
+                                    }}
+                                  >
+                                    <SquareX className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                  <CardFooter>
+                    <div className="absolute right-1/2 translate-x-1/2">
+                      <PaginationAdminTable
+                        currentPage={currentPage}
+                        handleNextPage={handleNextPage}
+                        handlePrevPage={handlePrevPage}
+                        totalPage={totalPage}
+                        setCurrentPage={setCurrentPage}
+                        hasNext={hasNext}
+                        hasPrevious={hasPrevious}
+                      />
+                    </div>
+                  </CardFooter>
+                </Card>
+              ) : (
+                <div className="flex flex-col items-center justify-center border min-h-[700px] mt-6">
+                  <Image
+                    alt="ảnh trống"
+                    className="mx-auto"
+                    src={ReviewEmpty}
+                    width={400}
+                    height={400}
+                  ></Image>
+                  <Label className="text-xl text-gray-tertiary text-center m-2">
+                    Hiện tại không có đơn hàng thuộc trạng thái này
+                  </Label>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </main>

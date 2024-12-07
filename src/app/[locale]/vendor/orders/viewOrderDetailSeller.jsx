@@ -37,6 +37,7 @@ import { useCallback, useEffect, useState } from "react";
 import DialogUpdateOrCancelOrderSeller from "./dialogUpdateOrCancelOrderSeller";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 export default function ViewOrderDetailSeller(props) {
   const { isOpen, onClose, orderId } = props;
@@ -185,227 +186,201 @@ export default function ViewOrderDetailSeller(props) {
     <Drawer open={isOpen} onClose={onClose}>
       <DrawerTitle></DrawerTitle>
       <DrawerDescription></DrawerDescription>
-      <DrawerContent>
-        <ScrollArea className="p-4 max-h-screen overflow-auto">
-          <div className="flex flex-col sm:gap-4 sm:py-4 h-full">
-            <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-              <div className="mx-auto grid flex-1 auto-rows-max gap-4">
-                <div className="flex items-center gap-4 border-b pb-4">
-                  <DrawerClose>
-                    <Button variant="outline" size="icon" className="h-7 w-7">
-                      <ChevronLeft className="h-4 w-4" />
-                      <span className="sr-only">Quay lại</span>
-                    </Button>
-                  </DrawerClose>
-                  <Label className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
+      <DrawerContent className="h-full">
+        <ScrollArea className="p-4 mr-10 ml-10 overflow-auto min-h-full">
+          <div className="flex flex-col h-full">
+            <div className="flex flex-col space-y-4 items-start justify-center">
+              <div className="w-full flex items-center justify-between">
+                <DrawerClose className="flex items-center space-x-2 m-4">
+                  <Button variant="outline" size="icon" className="h-7 w-7">
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Label className="hover:cursor-pointer text-2xl">
                     Chi tiết đơn hàng
                   </Label>
-                  <div className="hidden items-center gap-2 md:ml-auto md:flex">
-                    <DrawerClose>
-                      <Button variant="outline" size="sm">
-                        Đóng
-                      </Button>
-                    </DrawerClose>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center w-full">
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <Label className="text-2xl font-bold">
-                          Mã đơn hàng: #{order?.id}
-                        </Label>
-                        <div className="flex items-center space-x-2">
-                          <Badge variant="outline">
-                            {getStatusOrder(order?.currentStatus)}
-                          </Badge>
-                        </div>
+                </DrawerClose>
+                <DrawerClose className="flex items-center space-x-2 m-4">
+                  <Button variant="outline" size="sm">
+                    Đóng
+                  </Button>
+                </DrawerClose>
+              </div>
+              <Separator></Separator>
+              <div className="w-full flex flex-col space-y-4">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Label className="text-2xl font-bold">
+                        Mã đơn hàng: #{order?.id}
+                      </Label>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline">
+                          {getStatusOrder(order?.currentStatus)}
+                        </Badge>
                       </div>
                     </div>
-                    <Label className="text-sm mt-2 ml-4">
-                      Ngày đặt hàng: {formatDate(order?.createdAt)}
-                    </Label>
                   </div>
-                  {order?.currentStatus === "PENDING" ||
-                  order?.currentStatus === "CONFIRMED" ||
-                  order?.currentStatus === "PREPARING" ? (
-                    <div className="space-x-4">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          handleCancelButtonClick(order, order.id);
-                        }}
-                      >
-                        <X className="h-4 x-4 mr-2" />
-                        Hủy đơn hàng
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          handleUpdateButtonClick(order, order.id);
-                        }}
-                      >
-                        <Pencil className="h-4 x-4 mr-2" />
-                        Cập nhật trạng thái
-                      </Button>
-                    </div>
-                  ) : (
-                    ""
-                  )}
+                  <Label className="text-sm mt-2 ml-4">
+                    Ngày đặt hàng: {formatDate(order?.createdAt)}
+                  </Label>
                 </div>
-                <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3 lg:gap-8">
-                  <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
-                    <Card className="grid gap-4 p-6">
-                      <p className="text-2xl font-bold">Sản phẩm</p>
-                      {order &&
-                        order.orderItems.map((item, index) => (
-                          <Card key={index}>
-                            <CardContent>
-                              <div className="flex items-center justify-between gap-4 mt-6">
-                                <div className="flex items-center space-x-4">
-                                  <Image
-                                    alt={item.productName}
-                                    src={item.productMainImageUrl}
-                                    height={100}
-                                    width={100}
-                                    className="rounded-md transition-transform duration-300 hover:scale-125 hover:mr-2 hover:cursor-pointer"
+                {order?.currentStatus === "PENDING" ||
+                order?.currentStatus === "CONFIRMED" ||
+                order?.currentStatus === "PREPARING" ? (
+                  <div className="flex justify-end space-x-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        handleCancelButtonClick(order, order.id);
+                      }}
+                    >
+                      <X className="h-4 x-4 mr-2" />
+                      Hủy đơn hàng
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        handleUpdateButtonClick(order, order.id);
+                      }}
+                    >
+                      <Pencil className="h-4 x-4 mr-2" />
+                      Cập nhật trạng thái
+                    </Button>
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
+              <div className="w-full flex justify-between space-x-8">
+                <div className="w-full flex flex-col space-y-8">
+                  <Card className="grid gap-4 p-6">
+                    <Label className="text-2xl font-bold">Sản phẩm</Label>
+                    {order &&
+                      order.orderItems.map((item, index) => (
+                        <Card key={index} className="mb-4">
+                          <CardContent>
+                            <div className="flex items-center justify-between mt-6">
+                              <div className="w-4/5 flex items-center space-x-4">
+                                <Image
+                                  alt={item.productName}
+                                  src={item.productMainImageUrl}
+                                  height={100}
+                                  width={100}
+                                  className="rounded-md transition-transform duration-300 hover:scale-125 hover:mr-2 hover:cursor-pointer"
+                                  onClick={() =>
+                                    handleOnClickViewProductDetail(
+                                      item.productSlug
+                                    )
+                                  }
+                                />
+                                <div className="flex flex-col space-y-2">
+                                  <Label
+                                    className="font-bold text-xl hover:text-2xl hover:cursor-pointer"
                                     onClick={() =>
                                       handleOnClickViewProductDetail(
                                         item.productSlug
                                       )
                                     }
-                                  />
-                                  <div className="flex flex-col space-y-2">
-                                    <Label
-                                      className="font-bold text-xl hover:text-2xl hover:cursor-pointer"
-                                      onClick={() =>
-                                        handleOnClickViewProductDetail(
-                                          item.productSlug
-                                        )
-                                      }
-                                    >
-                                      {item.productName}
-                                    </Label>
-                                    <Label>{item.productNameBrand}</Label>
-                                    <Label className="text-sm text-muted-foreground">
-                                      {item.values
-                                        ? item.values.join(" | ")
-                                        : ""}
-                                    </Label>
-                                  </div>
-                                </div>
-                                <div className="flex flex-col items-end justify-center text-right">
-                                  <div className="flex items-center">
-                                    <Label className="text-2xl font-bold mr-1">
-                                      {item.quantity}
-                                    </Label>
-                                    <Label>
-                                      x {formatCurrency(item.price)}
-                                    </Label>
-                                  </div>
-                                  <Label>
-                                    {formatCurrency(item.quantity * item.price)}
+                                  >
+                                    {item.productName}
+                                  </Label>
+                                  <Label>{item.productNameBrand}</Label>
+                                  <Label className="text-sm text-muted-foreground">
+                                    {item.values ? item.values.join(" | ") : ""}
                                   </Label>
                                 </div>
                               </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                    </Card>
-                    <Card className="lg:col-span-1">
-                      <CardHeader>
-                        <CardTitle className="text-2xl font-bold">
-                          Tóm tắt đơn hàng
-                        </CardTitle>
-                        <CardDescription>
-                          Tóm tắt chi tiết về đơn hàng #{order?.id}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-3 gap-x-2 items-center">
-                            <Label className="col-span-1">Tổng cộng</Label>
-                            <Label className="col-span-1 text-center">
-                              {`${order?.orderItems.length} item(s)`}
-                            </Label>
-                            <Label className="col-span-1 text-right">
-                              {formatCurrency(order?.total)}
-                            </Label>
-                          </div>
-                          <div className="grid grid-cols-2 items-center">
-                            <Label className="col-span-1">Giảm giá</Label>
-                            <Label className="col-span-1 text-right">
-                              {`- ${formatCurrency(order?.discount)}`}
-                            </Label>
-                          </div>
-                          <div className="grid grid-cols-3 gap-x-2 items-center font-bold">
-                            <Label className="col-span-2">
-                              Tổng thanh toán
-                            </Label>
-                            <Label className="col-span-1 text-right font-bold">
-                              {formatCurrency(order?.total - order?.discount)}
-                            </Label>
-                          </div>
+                              <div className="w-1/5 flex flex-col items-end justify-center text-right">
+                                <div className="flex items-center">
+                                  <Label className="text-2xl font-bold mr-1">
+                                    {item.quantity}
+                                  </Label>
+                                  <Label>x {formatCurrency(item.price)}</Label>
+                                </div>
+                                <Label>
+                                  {formatCurrency(item.quantity * item.price)}
+                                </Label>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                  </Card>
+                  <Card className="lg:col-span-1">
+                    <CardHeader>
+                      <CardTitle className="text-2xl font-bold">
+                        Tóm tắt đơn hàng
+                      </CardTitle>
+                      <CardDescription>
+                        Tóm tắt chi tiết về đơn hàng #{order?.id}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-3 gap-x-2 items-center">
+                          <Label className="col-span-1">Tổng cộng</Label>
+                          <Label className="col-span-1 text-center">
+                            {`${order?.orderItems.length} item(s)`}
+                          </Label>
+                          <Label className="col-span-1 text-right">
+                            {formatCurrency(order?.total)}
+                          </Label>
                         </div>
-                      </CardContent>
-                      <CardFooter className="flex justify-between items-center p-4 border-t">
-                        <Label className="text-sm text-muted-foreground">
-                          Xem lại đơn hàng nhanh chóng trên trang Đơn hàng
+                        <div className="grid grid-cols-2 items-center">
+                          <Label className="col-span-1">Giảm giá</Label>
+                          <Label className="col-span-1 text-right">
+                            {`- ${formatCurrency(order?.discount)}`}
+                          </Label>
+                        </div>
+                        <div className="grid grid-cols-3 gap-x-2 items-center font-bold">
+                          <Label className="col-span-2">Tổng thanh toán</Label>
+                          <Label className="col-span-1 text-right font-bold">
+                            {formatCurrency(order?.total - order?.discount)}
+                          </Label>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="flex flex-col space-y-8">
+                  <Card className="w-full md:w-96 overflow-hidden">
+                    <CardHeader>
+                      <CardTitle className="text-2xl font-bold">
+                        Khách hàng
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <UserRoundCog />
+                        <Label>{order?.accountName}</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Mail />
+                        <Label>{order?.userEmail || "(chưa có email)"}</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Phone />
+                        <Label>
+                          {order?.userPhone || "(chưa có số điện thoại)"}
                         </Label>
-
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            handleOnClickViewAllOrder();
-                          }}
-                        >
-                          Xem tất cả đơn hàng
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  </div>
-                  <div className="flex flex-col space-y-8">
-                    <Card className="w-full md:w-96 overflow-hidden">
-                      <CardHeader>
-                        <CardTitle className="text-2xl font-bold">
-                          Khách hàng
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        <div className="flex space-x-2">
-                          <UserRoundCog />
-                          <Label>{order?.accountName}</Label>
-                        </div>
-                        <div className="flex space-x-2">
-                          <Mail />
-                          <Label>{order?.userEmail}</Label>
-                        </div>
-                        {order?.userPhone ? (
-                          <div className="flex space-x-2">
-                            <Phone />
-                            <Label>{order?.userPhone}</Label>
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                      </CardContent>
-                    </Card>
-                    <Card className="w-full md:w-96 overflow-hidden">
-                      <CardHeader>
-                        <CardTitle className="text-2xl font-bold">
-                          Ghi chú
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <Label className="whitespace-normal">
-                          {order?.note ? order?.note : "(không có ghi chú)"}
-                        </Label>
-                      </CardContent>
-                    </Card>
-                  </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="w-full md:w-96 overflow-hidden">
+                    <CardHeader>
+                      <CardTitle className="text-2xl font-bold">
+                        Ghi chú
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Label className="whitespace-normal">
+                        {order?.note ? order?.note : "(không có ghi chú)"}
+                      </Label>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
-            </main>
+            </div>
             {isDialogUpdateOrderStatusOpen && (
               <DialogUpdateOrCancelOrderSeller
                 isOpen={isDialogUpdateOrderStatusOpen}
