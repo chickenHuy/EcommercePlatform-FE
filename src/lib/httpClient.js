@@ -62,7 +62,7 @@ const request = async (
       let errorMessage = `HTTP error! Status: ${response.status}`;
       if (response.status === 401 && reTryCount < 1) {
         await refreshToken();
-        return request(endpoint, { method, headers, body, signal, reTryCount: 1});
+        return request(endpoint, { method, headers, body, signal, reTryCount: 1 });
       }
       else {
         try {
@@ -97,8 +97,8 @@ const put = (endpoint, body, options = {}) => {
   return request(endpoint, { method: "PUT", body, ...options });
 };
 
-const del = (endpoint, options = {}) => {
-  return request(endpoint, { method: "DELETE", ...options });
+const del = (endpoint, body, options = {}) => {
+  return request(endpoint, { method: "DELETE", body, ...options });
 };
 
 const patch = (endpoint, body, options = {}) => {
