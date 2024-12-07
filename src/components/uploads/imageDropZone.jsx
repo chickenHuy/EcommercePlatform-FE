@@ -1,10 +1,12 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { Separator } from "@/components/ui/separator";
 import { X } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { deleteListProductImage } from "@/api/vendor/productRequest";
 
 const ImageDropzone = ({
   multiple = true,
@@ -12,10 +14,28 @@ const ImageDropzone = ({
   isPopup = false,
   maxFileSize = 10 * 1024 * 1024,
   maxFiles = 20,
+  isUpdate = false,
+  productId = null,
+  mainImageUrl = "",
+  listImageUrl = [],
 }) => {
   const [images, setImages] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [error, setError] = useState("");
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (isUpdate) {
+      if (!multiple && mainImageUrl) {
+        setImages([{ preview: mainImageUrl }]);
+      } else if (multiple && listImageUrl.length > 0) {
+        setImages(listImageUrl.map((image) => ({
+          id: image.id,
+          preview: image.url
+        })));
+      }
+    }
+  }, []);
 
   const onDrop = useCallback(
     (acceptedFiles) => {
@@ -56,7 +76,45 @@ const ImageDropzone = ({
     [onImageUpload, maxFileSize, maxFiles, images, multiple]
   );
 
-  const handleRemoveImage = (index) => {
+  const handleRemoveImage = async (index) => {
+    if (isUpdate && !multiple) {
+      toast({
+        variant: "destructive",
+        title: "Lỗi",
+        description: "Không thể xóa, vui lòng chọn ảnh thay thế!!!",
+      })
+      return;
+    }
+    if (isUpdate && multiple) {
+      if (images.length <= 1) {
+        toast({
+          variant: "destructive",
+          title: "Lỗi",
+          description: "Danh sách ảnh không thể để trống!!!",
+        })
+        return;
+      }
+      if (productId) {
+        try {
+          await deleteListProductImage({
+            "listImageIds": [
+              images[index].id
+            ]
+          }, productId);
+          toast({
+            title: "Thông báo",
+            description: "Xóa hình ảnh thành công!!!",
+          })
+        }
+        catch (error) {
+          toast({
+            variant: "destructive",
+            title: "Lỗi",
+            description: "Xóa hỉnh ảnh thất bại!!!",
+          })
+        }
+      }
+    }
     const newImages = images.filter((_, i) => i !== index);
     setImages(newImages);
     if (!isPopup) {
@@ -66,7 +124,12 @@ const ImageDropzone = ({
 
   const handleUploadImages = () => {
     if (onImageUpload) {
-      onImageUpload(images);
+      console.log('GGGGGGGGGGGGGGGGGGGGGGGG');
+      console.log(images);
+      // onImageUpload(images);
+      // onImageUpload((previous) => {
+      //   [...previous, ...images]
+      // });
     }
   };
 
@@ -83,9 +146,8 @@ const ImageDropzone = ({
 
   const renderContent = () => (
     <div
-      className={`h-fit bg-white-primary p-6 rounded-lg shadow-lg ${
-        isPopup ? "w-[40%] min-w-[400px] mx-auto" : "w-full min-w-[400px]"
-      }`}
+      className={`h-fit bg-white-primary p-6 rounded-lg shadow-lg ${isPopup ? "w-[40%] min-w-[400px] mx-auto" : "w-full min-w-[400px]"
+        }`}
     >
       {isPopup && (
         <>
@@ -124,9 +186,8 @@ const ImageDropzone = ({
       )}
 
       <div
-        className={`${
-          multiple ? "grid grid-cols-2 lg:grid-cols-3" : "grid grid-cols-1"
-        } gap-2 mt-4`}
+        className={`${multiple ? "overflow-auto max-h-[250px] grid grid-cols-2 lg:grid-cols-3" : "grid grid-cols-1"
+          } gap-2 mt-4`}
       >
         {images.map((image, index) => (
           <div key={index} className="h-32 border relative">
@@ -136,7 +197,7 @@ const ImageDropzone = ({
             />
             <img
               src={image.preview}
-              alt={image.name}
+              alt={`Image ${index}`}
               className="w-full h-full object-contain"
             />
           </div>
@@ -167,7 +228,7 @@ const ImageDropzone = ({
   );
 
   return (
-    <div className="w-full flex flex-col items-center bg-transparent-primary">
+    <div className="w-full flex flex-col items-center bg-transparent-primary max-h-[90%]">
       {isPopup ? (
         <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <Dialog.Trigger asChild>

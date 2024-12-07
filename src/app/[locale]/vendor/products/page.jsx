@@ -47,12 +47,15 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Search, Update, UpdateSharp } from "@mui/icons-material";
-import { ReloadIcon, UpdateIcon } from "@radix-ui/react-icons";
 import { toast } from "@/hooks/use-toast";
+import Loading from "@/components/loading";
+import { ProductUpdateDialog } from "@/app/[locale]/vendor/products/_update/productUpdateDialog";
 export default function ManageComponent() {
-  const pageSize = 10;
+  const [updated, setUpdated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [products, setProducts] = useState([]);
+  const [productSelected, setProductSelected] = useState(null);
   const [tab, setTab] = useState("available");
   const [totalPage, setTotalPage] = useState(1);
   const [sortBy, setSortBy] = useState("");
@@ -61,6 +64,7 @@ export default function ManageComponent() {
   const [totalElement, setTotalElement] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
+  const [isDialogUpdateOpen, setIsDialogUpdateOpen] = useState(false);
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
@@ -87,6 +91,7 @@ export default function ManageComponent() {
         description:
           (tab === "available" ? "Ẩn" : "Hiện") + " sản phẩm thành công",
       });
+      setUpdated(true);
     } catch (error) {
       toast({
         title: "Thất bại",
@@ -102,6 +107,7 @@ export default function ManageComponent() {
         title: "Thành công",
         description: "Xoá sản phẩm thành công",
       });
+      setUpdated(true);
     } catch (error) {
       toast({
         title: "Thất bại",
@@ -126,6 +132,7 @@ export default function ManageComponent() {
 
   const loadComponents = async (page, sortBy, order, tab, search) => {
     try {
+      setIsLoading(true);
       const response = await getProducts(page, sortBy, order, tab, search);
       const data = response.result;
       setTotalElement(data.totalElements);
@@ -135,8 +142,10 @@ export default function ManageComponent() {
       setHasPrevious(data.hasPrevious);
       setProducts(data.data);
       console.log(data.data);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error during get products:", error);
+      setIsLoading(false);
     }
   };
 
@@ -160,16 +169,10 @@ export default function ManageComponent() {
   }
 
   useEffect(() => {
+    setProductSelected(null);
     loadComponents(currentPage, sortBy, order, tab, search);
-  }, [
-    tab,
-    sortBy,
-    order,
-    search,
-    currentPage,
-    handleHideProduct,
-    handleDeleteProduct,
-  ]);
+    setUpdated(false);
+  }, [tab, sortBy, order, search, currentPage, updated]);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40 pt-[65px]">
@@ -258,159 +261,172 @@ export default function ManageComponent() {
                 </DropdownMenu>
               </div>
             </div>
-            <TabsContent value={tab}>
-              <Card x-chunk="dashboard-06-chunk-0">
-                <CardHeader>
-                  <CardTitle className="text-[18px] font-extrabold">
-                    Danh sách sản phẩm ({totalElement})
-                  </CardTitle>
-                  <div className="flex">
-                    <CardDescription className="text-black-primary font-bold text-[15px]">
-                      Quản lý tất cả các sản phẩm của cửa hàng
-                    </CardDescription>
-                    <div className="ml-auto flex items-center gap-2">
-                      <Input
-                        onChange={(e) => handleOnChange(e.target.value)}
-                      ></Input>
-                      <Search className="h-5 w-5" />
+            {isLoading ? (
+              <Loading />
+            ) : (
+              <TabsContent value={tab}>
+                <Card x-chunk="dashboard-06-chunk-0">
+                  <CardHeader>
+                    <CardTitle className="text-[18px] font-extrabold">
+                      Danh sách sản phẩm ({totalElement})
+                    </CardTitle>
+                    <div className="flex">
+                      <CardDescription className="text-black-primary font-bold text-[15px]">
+                        Quản lý tất cả các sản phẩm của cửa hàng
+                      </CardDescription>
+                      <div className="ml-auto flex items-center gap-2">
+                        <Input
+                          onChange={(e) => handleOnChange(e.target.value)}
+                        ></Input>
+                        <Search className="h-5 w-5" />
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>#</TableHead>
-                        <TableHead>Hình ảnh</TableHead>
-                        <TableHead>Tên sản phẩm</TableHead>
-                        <TableHead>Số lượng</TableHead>
-                        <TableHead className="hidden lg:table-cell">
-                          Giá bán
-                        </TableHead>
-                        <TableHead className="hidden lg:table-cell">
-                          Ngày tạo
-                        </TableHead>
-                        <TableHead className="hidden lg:table-cell">
-                          Đánh giá
-                        </TableHead>
-                        <TableHead>Hành động</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {products.map((product, index) => (
-                        <TableRow key={product.id}>
-                          <TableCell className="font-medium text-center">
-                            {index + 1 + (currentPage - 1) * 10}
-                          </TableCell>
-                          <TableCell className="flex justify-center items-center border-none">
-                            <Avatar>
-                              <AvatarImage
-                                src={product.mainImageUrl}
-                                alt={product.name}
-                              />
-                              <AvatarFallback>
-                                {product.name.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {product.name}
-                          </TableCell>
-                          <TableCell className="font-medium text-center">
-                            {product.quantity}
-                          </TableCell>
-                          <TableCell className="hidden lg:table-cell text-center">
-                            {formatCurrency(product.salePrice) + " đ"}
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell text-center">
-                            {new Date(product.createdAt).toLocaleString()}{" "}
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell text-center">
-                            {product.rating}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  aria-haspopup="true"
-                                  size="icon"
-                                  variant="ghost"
-                                >
-                                  <MoreHorizontal className="h-4 w-4" />
-                                  <span className="sr-only">Toggle menu</span>
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Hành động</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-
-                                {tab !== "blocked" && (
-                                  <>
-                                    <DropdownMenuItem
-                                      className="flex flex-row justify-between items-center cursor-pointer"
-                                      onClick={() =>
-                                        handleHideProduct(product.id)
-                                      }
-                                    >
-                                      {tab === "available" && (
-                                        <>
-                                          <span> Ẩn</span>
-                                          <CircleOff className="scale-75" />
-                                        </>
-                                      )}
-                                      {tab === "unAvailable" && (
-                                        <>
-                                          <span> Hiện</span>
-                                          <Eye className="scale-75" />
-                                        </>
-                                      )}
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                  </>
-                                )}
-
-                                <DropdownMenuItem
-                                  className="flex flex-row justify-between items-center cursor-pointer"
-                                  onClick={() =>
-                                    handleDeleteProduct(product.id)
-                                  }
-                                >
-                                  <span> Xoá</span>
-                                  <DeleteIcon className="scale-75" />
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  className="flex flex-row justify-between items-center cursor-pointer"
-                                  onClick={() =>
-                                    handleUpdateProduct(product.id)
-                                  }
-                                >
-                                  <span> Cập nhật</span>
-                                  <UpdateSharp className="scale-75" />
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>#</TableHead>
+                          <TableHead>Hình ảnh</TableHead>
+                          <TableHead>Tên sản phẩm</TableHead>
+                          <TableHead>Số lượng</TableHead>
+                          <TableHead className="hidden lg:table-cell">
+                            Giá bán
+                          </TableHead>
+                          <TableHead className="hidden lg:table-cell">
+                            Ngày tạo
+                          </TableHead>
+                          <TableHead className="hidden lg:table-cell">
+                            Đánh giá
+                          </TableHead>
+                          <TableHead>Hành động</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-                <CardFooter className="relative">
-                  <div className="absolute right-1/2 translate-x-1/2">
-                    <PaginationAdminTable
-                      currentPage={currentPage}
-                      handleNextPage={handleNextPage}
-                      handlePrevPage={handlePrevPage}
-                      totalPage={totalPage}
-                      setCurrentPage={setCurrentPage}
-                      hasNext={hasNext}
-                      hasPrevious={hasPrevious}
-                    />
-                  </div>
-                </CardFooter>
-              </Card>
-            </TabsContent>
+                      </TableHeader>
+                      <TableBody>
+                        {products.map((product, index) => (
+                          <TableRow key={product.id}>
+                            <TableCell className="font-medium text-center">
+                              {index + 1 + (currentPage - 1) * 10}
+                            </TableCell>
+                            <TableCell className="flex justify-center items-center border-none">
+                              <Avatar>
+                                <AvatarImage
+                                  src={product.mainImageUrl}
+                                  alt={product.name}
+                                />
+                                <AvatarFallback>
+                                  {product.name.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                            </TableCell>
+                            <TableCell className="font-medium">
+                              {product.name}
+                            </TableCell>
+                            <TableCell className="font-medium text-center">
+                              {product.quantity}
+                            </TableCell>
+                            <TableCell className="hidden lg:table-cell text-center">
+                              {formatCurrency(product.salePrice) + " đ"}
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell text-center">
+                              {new Date(product.createdAt).toLocaleString()}{" "}
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell text-center">
+                              {product.rating}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    aria-haspopup="true"
+                                    size="icon"
+                                    variant="ghost"
+                                  >
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    <span className="sr-only">Toggle menu</span>
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuLabel>
+                                    Hành động
+                                  </DropdownMenuLabel>
+                                  <DropdownMenuSeparator />
+
+                                  {tab !== "blocked" && (
+                                    <>
+                                      <DropdownMenuItem
+                                        className="flex flex-row justify-between items-center cursor-pointer"
+                                        onClick={() =>
+                                          handleHideProduct(product.id)
+                                        }
+                                      >
+                                        {tab === "available" && (
+                                          <>
+                                            <span> Ẩn</span>
+                                            <CircleOff className="scale-75" />
+                                          </>
+                                        )}
+                                        {tab === "unAvailable" && (
+                                          <>
+                                            <span> Hiện</span>
+                                            <Eye className="scale-75" />
+                                          </>
+                                        )}
+                                      </DropdownMenuItem>
+                                      <DropdownMenuSeparator />
+                                    </>
+                                  )}
+
+                                  <DropdownMenuItem
+                                    className="flex flex-row justify-between items-center cursor-pointer"
+                                    onClick={() =>
+                                      handleDeleteProduct(product.id)
+                                    }
+                                  >
+                                    <span> Xoá</span>
+                                    <DeleteIcon className="scale-75" />
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    className="flex flex-row justify-between items-center cursor-pointer"
+                                    onClick={() => {
+                                      setIsDialogUpdateOpen(true)
+                                      setProductSelected(product.id);
+                                    }}
+                                  >
+                                    <span>Cập nhật</span>
+                                    <UpdateSharp className="scale-75" />
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                  <ProductUpdateDialog
+                    productId={productSelected}
+                    isOpen={isDialogUpdateOpen}
+                    onClose={() => setIsDialogUpdateOpen(false)}
+                    setUpdated={setUpdated}
+                  />
+                  <CardFooter className="relative">
+                    <div className="absolute right-1/2 translate-x-1/2">
+                      <PaginationAdminTable
+                        currentPage={currentPage}
+                        handleNextPage={handleNextPage}
+                        handlePrevPage={handlePrevPage}
+                        totalPage={totalPage}
+                        setCurrentPage={setCurrentPage}
+                        hasNext={hasNext}
+                        hasPrevious={hasPrevious}
+                      />
+                    </div>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+            )}
           </Tabs>
         </main>
       </div>

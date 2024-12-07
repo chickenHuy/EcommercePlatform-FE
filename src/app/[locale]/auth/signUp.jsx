@@ -38,7 +38,7 @@ const AccountSchema = z
     path: ["passwordConfirmation"],
   });
 
-export default function SignUpNow() {
+export default function SignUpNow({setIsLogin = null}) {
   const t = useTranslations("AuthPage");
   const { toast } = useToast();
   const {
@@ -64,6 +64,9 @@ export default function SignUpNow() {
           title: "Đăng ký thành công, vui lòng đăng nhập.",
           description: response.message,
         })
+        if(setIsLogin){
+          setIsLogin(true);
+        }
       }
     } catch (error) {
       console.error("Error fetching users:", error.message);
@@ -144,7 +147,7 @@ export default function SignUpNow() {
           )}
         </div>
       </div>
-      <div className="mt-5 mb-4">
+      <div className="mt-5 mb-4 rounded-full">
         <Button
           type="submit"
           text={t("signUp")}
@@ -152,6 +155,7 @@ export default function SignUpNow() {
           height="h-14"
           backgroundColor="bg-black-primary"
           textColor="text-white-primary"
+          borderRadius="rounded-[70px]"
         />
       </div>
     </form>
