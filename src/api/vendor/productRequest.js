@@ -55,13 +55,22 @@ export const uploadMainProductImage = async (file, productId) => {
   }
 };
 
+export const deleteListProductImage = async (data, productId) => {
+  try {
+    const response = await del(`/api/v1/images/products/${productId}/list`, data);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const uploadListProductImage = async (listFile, productId) => {
   try {
     console.log(listFile);
     const formData = new FormData();
 
     listFile.forEach(file => {
-      formData.append("images", file); 
+      formData.append("images", file);
     });
 
     const response = await post(`/api/v1/images/products/${productId}/list`, formData);
@@ -71,6 +80,15 @@ export const uploadListProductImage = async (listFile, productId) => {
   }
 };
 
+export const getProductById = (id) => {
+  try {
+    const response = get(`/api/v1/products/${id}`);
+    return response;
+  } catch (error) {
+    console.error("Error during authentication:", error);
+    throw error;
+  }
+};
 
 export const uploadMainProductVideo = async (file, productId) => {
   try {
@@ -80,6 +98,16 @@ export const uploadMainProductVideo = async (file, productId) => {
     const response = await post(`/api/v1/videos/products/${productId}`, formData);
     return response;
   } catch (error) {
+    throw error;
+  }
+};
+
+export const updateProduct = (id, data) => {
+  try {
+    const response = patch(`/api/v1/products/${id}`, data);
+    return response;
+  } catch (error) {
+    console.error("Error during authentication:", error);
     throw error;
   }
 };
