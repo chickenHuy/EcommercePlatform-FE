@@ -229,7 +229,7 @@ export default function ViewOrderDetailAdmin(props) {
       <DrawerContent className="h-full z-[100]">
         <ScrollArea className="p-4 mr-10 ml-10 overflow-auto min-h-full">
           <div className="flex flex-col h-full">
-            <div className="flex flex-col space-y-4 items-start justify-center">
+            <div className="flex flex-col space-y-4 items-center justify-center">
               <div className="w-full flex items-center justify-between">
                 <DrawerClose className="flex items-center space-x-2 m-4">
                   <Button variant="outline" size="icon" className="h-7 w-7">
@@ -306,8 +306,8 @@ export default function ViewOrderDetailAdmin(props) {
                   )}
                 </div>
               </div>
-              <div className="flex justify-between space-x-8 mt-2">
-                <div className="flex flex-col space-y-8">
+              <div className="w-full flex justify-between space-x-8 mt-2">
+                <div className="flex flex-col space-y-8 w-full">
                   <Card className="grid gap-4 p-6">
                     <CardTitle className="flex justify-between items-center gap-4 m-4">
                       <Label className="text-2xl font-bold">Sản phẩm</Label>
