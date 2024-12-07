@@ -362,7 +362,7 @@ export default function ProductDetail({ product }) {
 
         <div className="mx-auto px-4 bg-white-primary">
           <Suspense fallback={<Loading></Loading>}>
-            <ReviewLazy productId={product.id} />
+            <ReviewLazy productId={product.id} product={product}/>
           </Suspense>
         </div>
       </div>

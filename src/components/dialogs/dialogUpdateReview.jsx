@@ -1,27 +1,32 @@
-"use client";
-
-import { useState } from "react";
-import Image from "next/image";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Star, Camera, Video, X } from "lucide-react";
+import { CircularProgress } from "@mui/material";
+import Image from "next/image";
+import { Camera, Star, Video, X } from "lucide-react";
 import {
-  createReview,
+  updateReview,
   uploadReviewListImage,
   uploadVideoReview,
 } from "@/api/user/reviewRequest";
-import { CircularProgress } from "@mui/material";
+import { useState } from "react";
 
-export function OrderReviewDialog({ order, toast }) {
-  const [isOpen, setIsOpen] = useState(false);
+export function UpdateReviewDialog({
+  reviewToUpdate,
+  product,
+  onOpen,
+  onClose,
+  toast,
+}) {
+  console.log("product: ", product);
+  console.log("reviewToUpdate: ", reviewToUpdate);
+
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [images, setImages] = useState([]);
@@ -29,11 +34,9 @@ export function OrderReviewDialog({ order, toast }) {
   const [errorStar, setErrorStar] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const products = order.orderItems;
-
-  const maxImageSize = 10 * 1024 * 1024; // 10MB
-  const maxVideoSize = 40 * 1024 * 1024; // 40MB
-  const maxVideoDuration = 180; // 3 phút (180 giây)
+  const maxImageSize = 10 * 1024 * 1024;
+  const maxVideoSize = 40 * 1024 * 1024;
+  const maxVideoDuration = 180;
 
   const handleImageUpload = (e) => {
     const files = e.target.files;
@@ -46,7 +49,7 @@ export function OrderReviewDialog({ order, toast }) {
           }
           return {
             file,
-            url: URL.createObjectURL(file), // Tạo URL tạm để hiển thị
+            url: URL.createObjectURL(file),
           };
         })
         .filter(Boolean);
@@ -72,7 +75,7 @@ export function OrderReviewDialog({ order, toast }) {
 
           return {
             file,
-            url: URL.createObjectURL(file), // Tạo URL tạm để hiển thị
+            url: URL.createObjectURL(file),
           };
         })
         .filter(Boolean);
@@ -108,6 +111,15 @@ export function OrderReviewDialog({ order, toast }) {
     }
   };
 
+  const handleRating = (star) => {
+    setRating(star);
+    setErrorStar("");
+  };
+
+  const handleComment = (comment) => {
+    setComment(comment);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -121,13 +133,12 @@ export function OrderReviewDialog({ order, toast }) {
     const reviewRequest = {
       rating: rating,
       comment: comment,
-      orderId: order.id,
     };
     const listImage = images.map((image) => image.file);
     const videoUrl = videos.length > 0 ? videos[0].file : null;
 
     try {
-      const review = await createReview(reviewRequest);
+      const review = await updateReview(reviewRequest, reviewToUpdate.id);
       if (listImage.length > 0) {
         await uploadReviewListImage(listImage, review.result.id);
       }
@@ -137,9 +148,8 @@ export function OrderReviewDialog({ order, toast }) {
       toast({
         variant: "success",
         title: "Thành công",
-        description: "Đánh giá sản phẩm thành công",
+        description: "Cập nhật đánh giá sản phẩm thành công",
       });
-      setIsOpen(false);
       setRating(0);
       setImages([]);
       setVideos([]);
@@ -154,15 +164,6 @@ export function OrderReviewDialog({ order, toast }) {
     }
   };
 
-  const handleRating = (star) => {
-    setRating(star);
-    setErrorStar("");
-  };
-
-  const handleComment = (comment) => {
-    setComment(comment);
-  };
-
   return (
     <>
       {isLoading && (
@@ -173,42 +174,27 @@ export function OrderReviewDialog({ order, toast }) {
           </p>
         </div>
       )}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline">Đánh Giá Đơn Hàng</Button>
-        </DialogTrigger>
+      <Dialog open={onOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
-              Đánh Giá Đơn Hàng #{order.id}
+              Cập Nhật Đánh Giá Sản Phẩm
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
-              <Label className="text-lg font-semibold">
-                Sản phẩm trong đơn hàng
-              </Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {products.map((product) => (
-                  <div
-                    key={product.id}
-                    className="flex items-center gap-4 p-2 border rounded-md"
-                  >
-                    <Image
-                      src={product.productMainImageUrl}
-                      alt={product.productName}
-                      width={50}
-                      height={50}
-                      className="rounded-md object-cover"
-                    />
-                    <div>
-                      <h3 className="font-medium">{product.productName}</h3>
-                      <p className="text-sm text-gray-500">
-                        {product.value ? product.values : ""}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+              <div className="flex items-center space-x-4">
+                <Image
+                  src={product.mainImageUrl}
+                  alt={product.name}
+                  width={100}
+                  height={100}
+                  className="rounded-md object-cover"
+                />
+                <div>
+                  <h3 className="font-medium">{product.name}</h3>
+                  <p className="text-sm text-gray-500">Phân loại hàng:Grey,L</p>
+                </div>
               </div>
             </div>
 
@@ -235,7 +221,6 @@ export function OrderReviewDialog({ order, toast }) {
               {errorStar && (
                 <p className="text-red-primary text-sm">{errorStar}</p>
               )}{" "}
-              {/* Hiển thị thông báo lỗi */}
             </div>
 
             <div className="space-y-2">
@@ -333,14 +318,12 @@ export function OrderReviewDialog({ order, toast }) {
             </div>
 
             <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsOpen(false)}
-              >
+              <Button type="button" variant="outline">
                 Hủy
               </Button>
-              <Button type="submit">Gửi Đánh Giá</Button>
+              <Button type="submit" variant="outline">
+                Cập nhật
+              </Button>
             </div>
           </form>
         </DialogContent>
