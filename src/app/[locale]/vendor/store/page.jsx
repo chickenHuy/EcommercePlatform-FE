@@ -45,7 +45,7 @@ export default function ManageStoreInfo() {
       formData.reset(response.result);
       if (response.result.defaultAddress === null) {
         setDefaultAddressToUpdate({
-          defaultAddressStr: "Chọn địa chỉ mặc định",
+          defaultAddressStr: "Chọn địa chỉ lấy hàng",
           defaultAddressId: null,
         });
       } else {
@@ -70,7 +70,7 @@ export default function ManageStoreInfo() {
 
   const handleUpdate = async (storeData) => {
     if (!defaultAddressToUpdate?.defaultAddressId) {
-      setAddressError("Vui lòng chọn địa chỉ mặc định");
+      setAddressError("Vui lòng chọn địa chỉ địa chỉ lấy hàng");
       return;
     }
     setAddressError("");
@@ -111,9 +111,7 @@ export default function ManageStoreInfo() {
           className="w-full space-y-4"
         >
           <div>
-            <Label htmlFor="name" className="block text-sm font-medium">
-              Tên cửa hàng
-            </Label>
+            <Label className="text-sm">Tên cửa hàng</Label>
             <div className="w-full space-y-2">
               <Input
                 {...formData.register("name")}
@@ -128,9 +126,7 @@ export default function ManageStoreInfo() {
             </div>
           </div>
           <div>
-            <Label htmlFor="bio" className="block text-sm font-medium">
-              Bio
-            </Label>
+            <Label className="text-sm">Bio</Label>
             <Textarea
               {...formData.register("bio")}
               placeholder="bio"
@@ -139,9 +135,7 @@ export default function ManageStoreInfo() {
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <Label htmlFor="rating" className="block text-sm font-medium">
-                Đánh giá
-              </Label>
+              <Label className="text-sm">Đánh giá</Label>
               <span>({store?.rating ? store?.rating.toFixed(1) : "0.0"})</span>
             </div>
             <Rating
@@ -152,23 +146,13 @@ export default function ManageStoreInfo() {
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <Label
-                htmlFor="totalProduct"
-                className="block text-sm font-medium"
-              >
-                Tổng số sản phẩm :
-              </Label>
+              <Label className="text-sm">Tổng số sản phẩm :</Label>
               <p>{store?.totalProduct ? store?.totalProduct : 0}</p>
             </div>
           </div>
 
-          <div>
-            <Label
-              htmlFor="defaultAddressId"
-              className="block text-sm font-medium"
-            >
-              Địa chỉ mặc định
-            </Label>
+          <div className="flex flex-col space-y-1">
+            <Label className="text-sm">Địa chỉ lấy hàng</Label>
             <CbbAddresses
               defaultAddressToUpdate={defaultAddressToUpdate}
               onAddressSelect={setDefaultAddressToUpdate}

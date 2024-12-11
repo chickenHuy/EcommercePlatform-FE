@@ -51,8 +51,8 @@ export default function ManageOrderAdmin() {
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const [sortType, setSortType] = useState("");
-  const [orderType, setOrderType] = useState("");
+  const [sortType, setSortType] = useState("createdAt");
+  const [orderType, setOrderType] = useState("desc");
   const [totalElement, setTotalElement] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);

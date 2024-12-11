@@ -18,7 +18,6 @@ import {
   Minus,
   PiggyBank,
   Plus,
-  Recycle,
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
@@ -34,7 +33,6 @@ import { useDispatch } from "react-redux";
 import { setCheckout } from "@/store/features/checkoutSlice";
 import CommonHeader from "@/components/headers/commonHeader";
 import { Separator } from "@/components/ui/separator";
-import { Remove } from "@mui/icons-material";
 
 export default function ManageCartUser() {
   const [carts, setCarts] = useState([]);
@@ -78,12 +76,13 @@ export default function ManageCartUser() {
         title: "Thành công",
         description: `Bạn đã cập nhật số lượng thành công`,
       });
-      updateCartQuantityUI(cartItemId, quantityUpdate);
+      fetchAllCart();
       updateSelectedCartItems(cartItemId, quantityUpdate);
     } catch (error) {
       toast({
-        title: "Thất bại",
+        title: "Cập nhật số lượng thất bại",
         description: error.message,
+        variant: "destructive",
       });
     }
   };
@@ -97,19 +96,19 @@ export default function ManageCartUser() {
     }
   };
 
-  const updateCartQuantityUI = (cartItemId, quantityUpdate) => {
-    setCarts((prevCarts) => {
-      return prevCarts.map((cart) => ({
-        ...cart,
-        items: cart.items.map((item) => {
-          if (item.id === cartItemId) {
-            return { ...item, quantity: quantityUpdate };
-          }
-          return item;
-        }),
-      }));
-    });
-  };
+  // const updateCartQuantityUI = (cartItemId, quantityUpdate) => {
+  //   setCarts((prevCarts) => {
+  //     return prevCarts.map((cart) => ({
+  //       ...cart,
+  //       items: cart.items.map((item) => {
+  //         if (item.id === cartItemId) {
+  //           return { ...item, quantity: quantityUpdate };
+  //         }
+  //         return item;
+  //       }),
+  //     }));
+  //   });
+  // };
 
   const updateSelectedCartItems = (cartItemId, quantityUpdate) => {
     setSelectedCartItems((prevItems) =>
@@ -168,6 +167,7 @@ export default function ManageCartUser() {
       toast({
         title: "Thất bại",
         description: `Vui lòng chọn sản phẩm`,
+        variant: "destructive",
       });
     }
   };
@@ -192,6 +192,10 @@ export default function ManageCartUser() {
   };
 
   const handleSelectCartItem = (cartItem, isChecked) => {
+    if (cartItem.available === false) {
+      return;
+    }
+
     if (isChecked) {
       setSelectedCartItems([...selectedCartItems, cartItem]);
     } else {
@@ -203,8 +207,10 @@ export default function ManageCartUser() {
   };
 
   const handleSelectCart = (cart, isChecked) => {
+    const availableItems = cart.items.filter((item) => item.available === true);
+
     if (isChecked) {
-      const newSelectedItems = cart.items.filter(
+      const newSelectedItems = availableItems.filter(
         (item) =>
           !selectedCartItems.find((selectedItem) => selectedItem.id === item.id)
       );
@@ -213,42 +219,70 @@ export default function ManageCartUser() {
       setSelectedCartItems(
         selectedCartItems.filter(
           (selectedItem) =>
-            !cart.items.find((item) => item.id === selectedItem.id)
+            !availableItems.find((item) => item.id === selectedItem.id)
         )
       );
     }
   };
 
-  const handleSelectAllCartAndCartItem = (isChecked) => {
+  const handleSelectCartAndCartItem = (isChecked) => {
     if (isChecked) {
-      const allItems = carts.reduce((all, cart) => [...all, ...cart.items], []);
-      setSelectedCartItems(allItems);
+      const allAvailableItems = carts.reduce(
+        (all, cart) => [
+          ...all,
+          ...cart.items.filter((item) => item.available === true),
+        ],
+        []
+      );
+      setSelectedCartItems(allAvailableItems);
     } else {
       setSelectedCartItems([]);
     }
   };
 
   const isSelectedCartItem = (cartItem) => {
-    return selectedCartItems.some(
-      (selectedItem) => selectedItem.id === cartItem.id
+    return (
+      cartItem.available === true &&
+      selectedCartItems.some((selectedItem) => selectedItem.id === cartItem.id)
     );
+  };
+
+  const isCartItemAvailable = (cartItem) => {
+    return cartItem.available === true;
   };
 
   const isSelectedCart = (cart) => {
-    return cart.items.every((item) =>
-      selectedCartItems.some((selectedItem) => selectedItem.id === item.id)
+    const availableItems = cart.items.filter((item) => item.available === true);
+    return (
+      availableItems.length > 0 &&
+      availableItems.every((item) =>
+        selectedCartItems.some((selectedItem) => selectedItem.id === item.id)
+      )
     );
   };
 
+  const isCartAvailable = (cart) => {
+    return cart.items.some((item) => item.available === true);
+  };
+
   const isSelectedCartAndCartItem = () => {
-    const totalItems = carts.reduce(
-      (count, cart) => count + cart.items.length,
+    const totalAvailableItems = carts.reduce(
+      (count, cart) =>
+        count + cart.items.filter((item) => item.available === true).length,
       0
     );
+    const selectedAvailableItems = selectedCartItems.filter(
+      (item) => item.available === true
+    ).length;
     return (
-      selectedCartItems.length > 0 && selectedCartItems.length === totalItems
+      selectedAvailableItems > 0 &&
+      selectedAvailableItems === totalAvailableItems
     );
   };
+
+  const isCartandCartItemAvailable = carts.some((cart) =>
+    isCartAvailable(cart)
+  );
 
   const handleOnclickViewShop = (storeId) => {
     router.push("/search");
@@ -285,21 +319,24 @@ export default function ManageCartUser() {
   }, [fetchAllCart, totalPage, totalElement]);
 
   const calculateTotalSavings = (cartItems) => {
-    return cartItems.reduce((totalSavings, cartItem) => {
-      const savings =
-        cartItem.quantity * (cartItem.originalPrice - cartItem.salePrice);
-      return totalSavings + savings;
-    }, 0);
+    return cartItems
+      .filter((cartItem) => cartItem.available === true)
+      .reduce((totalSavings, cartItem) => {
+        const savings =
+          cartItem.quantity * (cartItem.originalPrice - cartItem.salePrice);
+        return totalSavings + savings;
+      }, 0);
   };
 
-  const calculateTotalPriceSelectedCartItem = (cartItems) => {
+  const calculateTotalPriceSelectedAllCartItem = (cartItems) => {
     return cartItems.reduce((totalPrice, cartItem) => {
       const price = cartItem.quantity * cartItem.salePrice;
       return totalPrice + price;
     }, 0);
   };
 
-  const calculateTotalSavingSelectedCartItem = (cartItems) => {
+  const calculateTotalSavingSelectedOneCartItem = (cartItems) => {
+    console.log("cartItems: ", cartItems);
     return cartItems.reduce((totalSavings, cartItem) => {
       const savings =
         cartItem.quantity * (cartItem.originalPrice - cartItem.salePrice);
@@ -325,7 +362,7 @@ export default function ManageCartUser() {
         ),
       }))
       .filter((cart) => cart.items.length > 0);
-
+    console.log("selectedCartWithItem: ", selectedCartWithItem);
     if (selectedCartWithItem.length === 0) {
       toast({
         title: "Thất bại",
@@ -345,11 +382,14 @@ export default function ManageCartUser() {
       <div className="flex items-center justify-between bg-white-primary my-4 mx-40 shadow-xl border-1 py-2">
         <div className="w-1/2 flex items-center">
           {/*Checkbox cart và cartItem*/}
-          <Checkbox
-            className="w-1/6"
-            checked={isSelectedCartAndCartItem()}
-            onChange={(e) => handleSelectAllCartAndCartItem(e.target.checked)}
-          />
+          <div className="w-1/6 flex items-center justify-center">
+            {isCartandCartItemAvailable && (
+              <Checkbox
+                checked={isSelectedCartAndCartItem()}
+                onChange={(e) => handleSelectCartAndCartItem(e.target.checked)}
+              />
+            )}
+          </div>
           <Label className="w-5/6">Sản phẩm</Label>
         </div>
         <div className="w-1/2 flex items-center justify-between">
@@ -367,56 +407,67 @@ export default function ManageCartUser() {
           </div>
         </div>
       </div>
-      <div className="my-4 mx-40 space-y-4">
+      <div className="my-4 mx-40 space-y-4 h-full mb-[100px]">
         {carts.length > 0 ? (
-          carts.map((cart, index) => (
-            <Card key={index} className="rounded-none">
-              <CardTitle className="flex items-center pt-4 pb-4 bg-gradient-to-r from-white-primary to-white-secondary">
-                {/*Checkbox (cart)*/}
-                <Checkbox
-                  className="w-1/12"
-                  checked={isSelectedCart(cart)}
-                  onChange={(e) => handleSelectCart(cart, e.target.checked)}
-                />
-                <div
-                  className="w-11/12 flex items-center space-x-2 hover:cursor-pointer"
-                  onClick={() => handleOnclickViewShop(cart.storeId)}
-                >
-                  <Image
-                    alt="avatar store"
-                    src={cart.avatarStore || storeEmpty}
-                    height={30}
-                    width={30}
-                    unoptimized={true}
-                    className="rounded-full transition-transform duration-300"
-                  />
-                  <Label className="text-xl hover:cursor-pointer">
-                    {cart.storeName}
-                  </Label>
-                  <Rating
-                    value={cart.ratingStore}
-                    precision={0.1}
-                    readOnly
-                  ></Rating>
-                </div>
-              </CardTitle>
-              <Separator className="mx-auto w-full" />
-              <CardContent className="w-full flex flex-col items-center min-h-[150px] pr-0 pl-0 pt-4 pb-4">
-                {cart.items && cart.items.length > 0 ? (
-                  cart.items.map((item) => (
-                    <div key={item.id} className="w-full flex flex-col relative">
+          carts.map((cart, index) =>
+            cart.items && cart.items.length > 0 ? (
+              <Card key={index} className="rounded-none">
+                <CardTitle className="flex items-center pt-4 pb-4 bg-gradient-to-r from-white-primary to-white-secondary">
+                  {/*Checkbox (cart)*/}
+                  <div className="w-1/12 flex items-center justify-center">
+                    {isCartAvailable(cart) ? (
+                      <Checkbox
+                        checked={isSelectedCart(cart)}
+                        onChange={(e) =>
+                          handleSelectCart(cart, e.target.checked)
+                        }
+                      />
+                    ) : null}
+                  </div>
+                  <div
+                    className="flex items-center space-x-2 hover:cursor-pointer"
+                    onClick={() => handleOnclickViewShop(cart.storeId)}
+                  >
+                    <Image
+                      alt="avatar store"
+                      src={cart.avatarStore || storeEmpty}
+                      height={30}
+                      width={30}
+                      unoptimized={true}
+                      className="rounded-full transition-transform duration-300"
+                    />
+                    <Label className="text-xl hover:cursor-pointer">
+                      {cart.storeName}
+                    </Label>
+                    <Rating
+                      value={cart.ratingStore}
+                      precision={0.1}
+                      readOnly
+                    ></Rating>
+                  </div>
+                </CardTitle>
+                <Separator className="mx-auto w-full" />
+                <CardContent className="w-full flex flex-col items-center min-h-[150px] pr-0 pl-0 pt-4 pb-4">
+                  {cart.items.map((item) => (
+                    <div
+                      key={item.id}
+                      className="w-full flex flex-col relative"
+                    >
                       <div className="flex items-center">
                         <div className="w-1/2 flex items-center">
-                          {/*Checkbox (cartItem)*/}
-                          <Checkbox
-                            className="w-1/6"
-                            checked={isSelectedCartItem(item)}
-                            onChange={(e) =>
-                              handleSelectCartItem(item, e.target.checked)
-                            }
-                          />
+                          <div className="w-1/6 relative flex items-center justify-center">
+                            {/*Checkbox (cartItem)*/}
+                            {isCartItemAvailable(item) && (
+                              <Checkbox
+                                checked={isSelectedCartItem(item)}
+                                onChange={(e) =>
+                                  handleSelectCartItem(item, e.target.checked)
+                                }
+                              />
+                            )}
+                          </div>
                           <div className="w-5/6 flex items-center">
-                            <div className="w-2/3 flex items-center space-x-4 min-h-[72px]">
+                            <div className="w-2/3 flex items-center relative">
                               <Image
                                 alt="ảnh sản phẩm"
                                 src={item.image || storeEmpty}
@@ -424,7 +475,7 @@ export default function ManageCartUser() {
                                 width={68}
                                 className="mt-4 mb-4 max-w-[68px] max-h-[68px] rounded-md"
                               />
-                              <div className="flex-1 min-w-0 space-y-4">
+                              <div className="flex-1 min-w-0 space-y-4 ml-4">
                                 <Label className="line-clamp-2 text-xl">
                                   {item.name}
                                 </Label>
@@ -440,15 +491,22 @@ export default function ManageCartUser() {
                                   <Label>{item.brand}</Label>
                                 </div>
                               </div>
+                              {!isCartItemAvailable(item) && (
+                                <div className="absolute bg-gray-primary bg-opacity-50 w-full h-full flex items-center justify-center rounded-2xl">
+                                  <Label className="text-3xl text-center font-bold font-sans truncate text-red-primary text-opacity-80 -rotate-[8deg] bg-black-primary p-2 rounded-2xl bg-opacity-5">
+                                    Số lượng không đủ
+                                  </Label>
+                                </div>
+                              )}
                             </div>
-                            <div className="w-1/3 flex flex-col relative">
+                            <div className="w-1/3 flex flex-col items-center justify-center relative">
                               <Button
                                 variant="outline"
-                                className="w-full h-full flex flex-col items-start truncate hover:cursor-default"
+                                className="w-5/6 h-full flex flex-col items-center justify-center space-y-1 truncate hover:cursor-default"
                               >
                                 <div className="flex items-center space-x-1">
-                                  <Label>Phân loại hàng:</Label>
-                                  {isOpenArrow && <ArrowDown />}
+                                  <Label className="text-black-primary text-opacity-75">Phân loại hàng</Label>
+                                  {!isOpenArrow && <ArrowDown />}
                                   {!isOpenArrow && <ArrowUp />}
                                 </div>
                                 <Label>
@@ -503,32 +561,33 @@ export default function ManageCartUser() {
                             </Label>
                           </div>
                           <div className="w-1/4 flex items-center justify-center">
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => handleOnClickButtonMinus(item)}
-                            >
-                              <Minus className="h-4 w-4" />
-                            </Button>
-
-                            <Input
-                              value={item.quantity}
-                              onChange={(e) =>
-                                handleInputQuantityChange(
-                                  item.id,
-                                  e.target.value
-                                )
-                              }
-                              type="number"
-                              className="w-1/3 text-xl text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                            />
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => handleOnClickButtonPlus(item)}
-                            >
-                              <Plus className="h-4 w-4" />
-                            </Button>
+                            <div className="flex items-center justify-center">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => handleOnClickButtonMinus(item)}
+                              >
+                                <Minus className="h-4 w-4" />
+                              </Button>
+                              <Input
+                                value={item.quantity}
+                                onChange={(e) =>
+                                  handleInputQuantityChange(
+                                    item.id,
+                                    e.target.value
+                                  )
+                                }
+                                type="number"
+                                className="w-1/3 text-xl text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => handleOnClickButtonPlus(item)}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
                           <div className="w-1/4 flex items-center justify-center">
                             <Label>
@@ -547,29 +606,22 @@ export default function ManageCartUser() {
                           </div>
                         </div>
                       </div>
-                      {/* <div className="bg-black-primary bg-opacity-50 flex items-center justify-center absolute w-1/2 h-full">
-                        <Label className="text-4xl text-red-primary">Hết hàng</Label>
-                      </div> */}
-                      <Separator className="mx-auto"></Separator>
+                      <Separator className="mx-auto mt-4 mb-4"></Separator>
                     </div>
-                  ))
-                ) : (
-                  <Label className="text-2xl text-center">
-                    Không có sản phẩm
-                  </Label>
-                )}
-              </CardContent>
-              <CardFooter className="mb-8 p-0">
-                <PiggyBank className="w-1/12 text-error-dark" />
-                <div className="w-11/12 flex items-center space-x-2">
-                  <Label>Tiết kiệm ngay</Label>
-                  <Label className="text-xl font-bold text-red-primary">
-                    {formatCurrency(calculateTotalSavings(cart.items))}
-                  </Label>
-                </div>
-              </CardFooter>
-            </Card>
-          ))
+                  ))}
+                </CardContent>
+                <CardFooter className="mb-8 p-0">
+                  <PiggyBank className="w-1/12 text-error-dark" />
+                  <div className="w-11/12 flex items-center space-x-2">
+                    <Label>Tiết kiệm ngay</Label>
+                    <Label className="text-xl font-bold text-red-primary">
+                      {formatCurrency(calculateTotalSavings(cart.items))}
+                    </Label>
+                  </div>
+                </CardFooter>
+              </Card>
+            ) : null
+          )
         ) : (
           <div className="flex items-center justify-center">
             <Image
@@ -593,13 +645,16 @@ export default function ManageCartUser() {
           hasPrevious={hasPrevious}
         ></PaginationAdminTable>
       </div>
-      <div className="flex items-center sticky justify-between bg-gradient-to-r from-black-tertiary to-black-primary text-white-primary min-h-[80px] mt-4 w-full bottom-0 border-t-2 ">
-        {/*Checkbox cart và cartItem*/}
-        <Checkbox
-          className="w-1/12"
-          checked={isSelectedCartAndCartItem()}
-          onChange={(e) => handleSelectAllCartAndCartItem(e.target.checked)}
-        />
+      <div className="flex items-center fixed bottom-0 justify-between bg-gradient-to-r from-black-tertiary to-black-primary text-white-primary min-h-[80px] w-full border-t-2">
+        <div className="w-1/12 flex items-center justify-center">
+          {/*Checkbox cart và cartItem*/}
+          {isCartandCartItemAvailable && (
+            <Checkbox
+              checked={isSelectedCartAndCartItem()}
+              onChange={(e) => handleSelectCartAndCartItem(e.target.checked)}
+            />
+          )}
+        </div>
         <div className="w-11/12 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Button variant="outline" className="text-black-primary">
@@ -617,14 +672,14 @@ export default function ManageCartUser() {
           <Label variant="outline">
             Tiết kiệm ngay:{" "}
             {formatCurrency(
-              calculateTotalSavingSelectedCartItem(selectedCartItems)
+              calculateTotalSavingSelectedOneCartItem(selectedCartItems)
             )}
           </Label>
           <div className="flex items-center space-x-4">
             <Label>Tổng sản phẩm ({selectedCartItems.length} sản phẩm):</Label>
             <Label className="text-2xl font-bold">
               {formatCurrency(
-                calculateTotalPriceSelectedCartItem(selectedCartItems)
+                calculateTotalPriceSelectedAllCartItem(selectedCartItems)
               )}
             </Label>
           </div>

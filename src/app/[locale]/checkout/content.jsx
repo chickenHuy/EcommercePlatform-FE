@@ -41,7 +41,7 @@ export default function CheckoutContent(props) {
     });
     return discount;
   };
-  
+
   const dispatch = useDispatch();
 
   const subtotal = calculateSubtotal(stores);
@@ -85,9 +85,7 @@ export default function CheckoutContent(props) {
       note: note,
     };
 
-
     try {
-
       const res = await checkoutOrders(orderData);
       dispatch(setCheckout([]));
       if (paymentMethod === "VN_PAY") {
@@ -101,13 +99,10 @@ export default function CheckoutContent(props) {
         description: error.message,
         variant: "destructive",
       });
-    }
-    finally {
-      
+    } finally {
       setOnSubmit(false);
     }
   };
-
 
   return (
     <div>
@@ -142,7 +137,7 @@ export default function CheckoutContent(props) {
                         <h4 className="font-medium">{product.name}</h4>
                         {product.value ? (
                           <p className="text-sm text-muted-foreground">
-                            Loại: {product.value}
+                            Loại: {product.value.join(" | ")}
                           </p>
                         ) : null}
                       </div>
@@ -274,7 +269,12 @@ export default function CheckoutContent(props) {
               Điều khoản HK Uptech
             </a>
           </p>
-          <Button className="w-full" size="lg" onClick={(e) => handleSubmit(e)} disabled={onSubmit}>
+          <Button
+            className="w-full"
+            size="lg"
+            onClick={(e) => handleSubmit(e)}
+            disabled={onSubmit}
+          >
             {onSubmit ? "Đang xử lý..." : "Đặt hàng"}
           </Button>
         </div>
