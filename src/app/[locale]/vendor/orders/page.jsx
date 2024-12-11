@@ -346,6 +346,7 @@ export default function ManageOrderSeller() {
                 <div className="ml-auto flex items-center gap-2 w-1/2">
                   <Input
                     onChange={(e) => handleOnChange(e.target.value)}
+                    placeholder="Tìm kiếm đơn hàng theo mã đơn hàng..."
                   ></Input>
                   <Search className="h-5 w-5 hover:cursor-pointer" />
                 </div>
