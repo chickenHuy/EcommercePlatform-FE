@@ -84,7 +84,7 @@ export default function ManageProfile() {
       const updated = await updateProfile(profile.id, payload);
       toast({
         title: "Thành công",
-        description: "Thông tin hồ sơ đã được cập nhật.",
+        description: "Thông tin hồ sơ đã được cập nhật",
       });
       setProfile(updated.result);
       fetchProfile();

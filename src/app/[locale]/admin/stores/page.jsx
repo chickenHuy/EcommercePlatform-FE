@@ -28,16 +28,15 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
-import { Dialog, Rating } from "@mui/material";
+import { Rating } from "@mui/material";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { changeStatus, getAllStore } from "@/api/admin/storeRequest";
 import DrawerStoreDetail from "./drawerStoreDetail";
 import { useSelector } from "react-redux";
 import { Label } from "@/components/ui/label";
-import DialogConfirm from "@/components/dialogs/dialogConfirm";
-import { set } from "react-hook-form";
 import DialogConfirmSecond from "@/components/dialogs/dialogConfirmSecond";
+import { formatDate, roundToNearest } from "@/utils/commonUtils";
 
 export default function ManageStores() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -74,22 +73,23 @@ export default function ManageStores() {
   };
 
   const handleChangeBanned = () => {
-    changeStatus(selectedStoreId).then((res) => {
-      toast({
-        title: "Thành công",
-        description: "Thay đổi trạng thái cửa hàng thành công",
-        variant: "success",
+    changeStatus(selectedStoreId)
+      .then((res) => {
+        toast({
+          title: "Thành công",
+          description: "Thay đổi trạng thái cửa hàng thành công",
+          variant: "success",
+        });
+        setConfirmDialogOpen(false);
+        fetchStore();
+      })
+      .catch((error) => {
+        toast({
+          title: "Thất bại",
+          description: error.message,
+          variant: "destructive",
+        });
       });
-      setConfirmDialogOpen(false);
-      fetchStore();
-    }).catch((error) => {
-      toast({
-        title: "Thất bại",
-        description: error.message,
-        variant: "destructive",
-      });
-    });
-
   };
 
   const handleCloseDrawer = () => {
@@ -231,33 +231,53 @@ export default function ManageStores() {
                             {store.username}
                           </TableCell>
                           <TableCell className="font-medium text-center">
-                            {new Date(store.created_at).toLocaleString()}{" "}
+                            {formatDate(store.created_at)}
                           </TableCell>
                           <TableCell className="flex items-center space-x-2 justify-center border-none">
                             <Rating
-                              value={store?.rating ? store?.rating : 0}
+                              value={
+                                store?.rating
+                                  ? roundToNearest(store?.rating, 1)
+                                  : 0
+                              }
                               precision={0.1}
                               readOnly
                             />
-                            <Label>({store?.rating ? store?.rating : 0})</Label>
+                            <Label>
+                              (
+                              {store?.rating
+                                ? roundToNearest(store?.rating, 1)
+                                : 0}
+                              )
+                            </Label>
                           </TableCell>
 
                           <TableCell className="hidden md:table-cell text-center">
                             <Button
                               aria-haspopup="true"
                               size="icon"
-                              variant="ghost" onClick={
-                                (e) => {
-                                  e.stopPropagation();
-                                  setSelectedStoreId(store.id);
-                                  setConfirmDialogOpen(true);
-                                }
-                              }
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedStoreId(store.id);
+                                setConfirmDialogOpen(true);
+                              }}
                             >
-                              {tab === "active" ? (<><Lock className="h-4 w-4" />
-                                <span className="sr-only">Khoá tài khoản</span></>) :
-                                (<><Unlock className="h-4 w-4" />
-                                  <span className="sr-only">Khoá tài khoản</span></>)}
+                              {tab === "active" ? (
+                                <>
+                                  <Lock className="h-4 w-4" />
+                                  <span className="sr-only">
+                                    Khoá tài khoản
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <Unlock className="h-4 w-4" />
+                                  <span className="sr-only">
+                                    Khoá tài khoản
+                                  </span>
+                                </>
+                              )}
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -289,11 +309,14 @@ export default function ManageStores() {
           storeId={selectedStoreId}
         />
       )}
-      <DialogConfirmSecond isOpen={confirmDialogOpen}
+      <DialogConfirmSecond
+        isOpen={confirmDialogOpen}
         onClose={() => setConfirmDialogOpen(false)}
         onConfirm={handleChangeBanned}
-        title={`Xác nhận ${tab === 'active' ? 'khóa' : 'mở khóa'} cửa hàng`}
-        content={`Bạn có chắc chắn muốn ${tab === 'active' ? 'khóa' : 'mở khóa'} cửa hàng này không?`}
+        title={`Xác nhận ${tab === "active" ? "khóa" : "mở khóa"} cửa hàng`}
+        content={`Bạn có chắc chắn muốn ${
+          tab === "active" ? "khóa" : "mở khóa"
+        } cửa hàng này không?`}
       />
     </div>
   );

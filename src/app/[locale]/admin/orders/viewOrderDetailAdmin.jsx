@@ -460,6 +460,57 @@ export default function ViewOrderDetailAdmin(props) {
                   <Card className="w-full md:w-96 overflow-hidden">
                     <CardHeader>
                       <CardTitle className="text-2xl font-bold">
+                        Địa chỉ lấy hàng
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2 flex flex-col">
+                      <div className="flex items-center space-x-2">
+                        <UserRound />
+                        <Label>{order?.storeAccountName}</Label>
+                      </div>
+                      {order?.orderPhone ? (
+                        <div className="flex items-center space-x-2">
+                          <Phone />
+                          <Label>
+                            {order?.storePhone ||
+                              "(người bán chưa có số điện thoại)"}
+                          </Label>
+                        </div>
+                      ) : (
+                        ""
+                      )}
+                      <div>
+                        {order?.storeDetailLocate ? (
+                          <Label>{`${order?.storeDetailLocate}, `}</Label>
+                        ) : (
+                          ""
+                        )}
+                        <Label>
+                          {order?.storeDetailAddress
+                            ? `${order?.storeDetailAddress}`
+                            : "số nhà tên đường, "}
+                        </Label>
+                      </div>
+                      <Label>
+                        {order?.storeSubDistrict
+                          ? order?.storeSubDistrict
+                          : "xã/phường, "}
+                      </Label>
+                      <Label>
+                        {order?.storeDistrict
+                          ? order?.storeDistrict
+                          : "quận/huyện, "}
+                      </Label>
+                      <Label>
+                        {order?.storeProvince
+                          ? order?.storeProvince
+                          : "tỉnh/thành phố"}
+                      </Label>
+                    </CardContent>
+                  </Card>
+                  <Card className="w-full md:w-96 overflow-hidden">
+                    <CardHeader>
+                      <CardTitle className="text-2xl font-bold">
                         Khách hàng
                       </CardTitle>
                     </CardHeader>

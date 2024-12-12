@@ -17,6 +17,7 @@ import {
 import { useState, useEffect } from "react";
 import { getAddressOfStore } from "@/api/vendor/storeRequest";
 import { toast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
 
 export default function CbbAddresses({
   onAddressSelect,
@@ -34,9 +35,8 @@ export default function CbbAddresses({
       } catch (error) {
         console.error("Failed to fetch addresses:", error);
         toast({
-          title: "Thất bại",
+          title: "Nhắc nhở",
           description: error.message,
-          variant: "destructive",
         });
       }
     };
@@ -55,27 +55,31 @@ export default function CbbAddresses({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[300px] justify-between"
+          className="w-1/2 flex items-center justify-between"
         >
-          <span>{defaultAddressToUpdate?.defaultAddressStr}</span>
-          <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <Label className="text-black-primary hover:cursor-pointer">
+            {defaultAddressToUpdate?.defaultAddressStr}
+          </Label>
+          <CaretSortIcon />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0">
-        <Command>
-          <CommandInput placeholder="Tìm địa chỉ..." className="h-9" />
-          <CommandList>
-            {addresses.map((address) => (
-              <CommandItem
-                key={address.defaultAddressId}
-                onSelect={() => handleSelect(address)}
-              >
-                {address.defaultAddressStr}
-              </CommandItem>
-            ))}
-          </CommandList>
-        </Command>
-      </PopoverContent>
+      <div className="bg-yellow-primary">
+        <PopoverContent className="p-0">
+          <Command>
+            <CommandInput placeholder="Tìm địa chỉ..." />
+            <CommandList>
+              {addresses.map((address) => (
+                <CommandItem
+                  key={address.defaultAddressId}
+                  onSelect={() => handleSelect(address)}
+                >
+                  {address.defaultAddressStr}
+                </CommandItem>
+              ))}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </div>
     </Popover>
   );
 }

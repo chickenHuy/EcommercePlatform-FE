@@ -46,13 +46,14 @@ import DialogUpdateOrderCancelOrderAdmin from "./dialogUpdateOrCancelOrderAdmin"
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
+import { formatDate } from "@/utils/commonUtils";
 
 export default function ManageOrderAdmin() {
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const [sortType, setSortType] = useState("");
-  const [orderType, setOrderType] = useState("");
+  const [sortType, setSortType] = useState("createdAt");
+  const [orderType, setOrderType] = useState("desc");
   const [totalElement, setTotalElement] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
@@ -251,21 +252,6 @@ export default function ManageOrderAdmin() {
     }
   }
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-
-    const hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const seconds = date.getSeconds().toString().padStart(2, "0");
-
-    const timePart = `${hours
-      .toString()
-      .padStart(2, "0")}:${minutes}:${seconds}`;
-    const datePart = date.toLocaleDateString("vi-VN").replace(/\//g, "-");
-
-    return `${timePart} ${datePart}`;
-  }
-
   const listOrderStatus = [
     { label: "Tất cả", filterKey: "" },
     { label: "Chờ thanh toán", filterKey: "ON_HOLD" },
@@ -368,7 +354,7 @@ export default function ManageOrderAdmin() {
                 )}
               </div>
             </div>
-            <TabsContent value={filter}>
+            <TabsContent value={filter} className="pt-2">
               {orders && orders.length > 0 ? (
                 <Card>
                   <CardHeader>

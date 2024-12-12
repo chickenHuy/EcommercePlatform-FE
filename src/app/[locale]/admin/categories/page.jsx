@@ -35,6 +35,7 @@ import { deleteCategory, getAllCategory } from "@/api/admin/categoryRequest";
 import EditCategory from "./editCategories";
 import DialogConfirm from "@/components/dialogs/dialogConfirm";
 import { useSelector } from "react-redux";
+import { formatDate } from "@/utils/commonUtils";
 
 export default function ManageCategories() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -144,7 +145,7 @@ export default function ManageCategories() {
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <Toaster />
       <div className="flex flex-col sm:gap-4 sm:py-4">
-        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-4">
           <div className="ml-auto flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -174,7 +175,7 @@ export default function ManageCategories() {
                   onClick={() => handleSortChange("oldest")}
                   checked={sortType === "oldest"}
                 >
-                  Lâu nhất
+                  Cũ nhất
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
                   onClick={() => handleSortChange("za")}
@@ -236,20 +237,19 @@ export default function ManageCategories() {
                           </AvatarFallback>
                         </Avatar>
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-center">
                         {category.name}
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-center">
                         {category.slug}
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-center">
                         {category.parentName ? category.parentName : "Không"}
                       </TableCell>
-                      <TableCell className="font-medium">
-                        {new Date(category.createdAt).toLocaleString()}{" "}
-                        {/* Format date */}
+                      <TableCell className="font-medium text-center">
+                        {formatDate(category.createdAt)}
                       </TableCell>
-                      <TableCell className=" md:table-cell">
+                      <TableCell className=" md:table-cell text-center">
                         <Button
                           aria-haspopup="true"
                           size="icon"

@@ -53,8 +53,8 @@ export default function ManageOrderSeller() {
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const [sortType, setSortType] = useState("");
-  const [orderType, setOrderType] = useState("");
+  const [sortType, setSortType] = useState("createdAt");
+  const [orderType, setOrderType] = useState("desc");
   const [totalElement, setTotalElement] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
@@ -346,6 +346,7 @@ export default function ManageOrderSeller() {
                 <div className="ml-auto flex items-center gap-2 w-1/2">
                   <Input
                     onChange={(e) => handleOnChange(e.target.value)}
+                    placeholder="Tìm kiếm đơn hàng theo mã đơn hàng..."
                   ></Input>
                   <Search className="h-5 w-5 hover:cursor-pointer" />
                 </div>

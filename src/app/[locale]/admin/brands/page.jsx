@@ -41,7 +41,8 @@ import iconNotFound from "../../../../../public/images/iconNotFound.png";
 import DialogImageBrand from "@/components/dialogs/dialogImageBrand";
 import DialogConfirm from "@/components/dialogs/dialogConfirm";
 import { useSelector } from "react-redux";
-import BrandEmpty from "@/assets/images/brandEmpty.jpg"
+import BrandEmpty from "@/assets/images/brandEmpty.jpg";
+import { formatDate } from "@/utils/commonUtils";
 
 export default function ManageBrand() {
   const [isDialogAddEditOpen, setIsDialogAddEditOpen] = useState(false);
@@ -124,7 +125,7 @@ export default function ManageBrand() {
     setIsDialogAddEditOpen(true);
     setDialogAddEditTitle("Thêm mới thương hiệu");
     setDialogAddEditDescription(
-      "Nhập đầy đủ thông tin để thêm thương hiệu mới"
+      "Nhập đầy đủ các thông tin cần thiết để thêm mới thương hiệu"
     );
     setDialogAddEditNameButton("Thêm mới");
   };
@@ -289,7 +290,7 @@ export default function ManageBrand() {
                         {brand.description || "(trống)"}
                       </TableCell>
                       <TableCell className="hidden md:table-cell text-center">
-                        {new Date(brand.createdAt).toLocaleString()}{" "}
+                        {formatDate(brand.createdAt)}
                       </TableCell>
                       <TableCell className="text-center">
                         <DropdownMenu>
