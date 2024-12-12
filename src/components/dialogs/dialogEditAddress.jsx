@@ -233,7 +233,9 @@ export default function AddressForm({ open, onOpenChange, id, setHasNew, hasNew 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="recipientName">Họ và tên</Label>
+              <Label htmlFor="recipientName">Họ và tên
+                <span className="text-error-dark"> (*)</span>
+              </Label>
               <Input
                 id="recipientName"
                 {...register("recipientName")}
@@ -250,7 +252,9 @@ export default function AddressForm({ open, onOpenChange, id, setHasNew, hasNew 
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Số điện thoại</Label>
+              <Label htmlFor="phone">Số điện thoại
+                <span className="text-error-dark"> (*)</span>
+              </Label>
               <Input
                 id="phone"
                 {...register("phone")}
@@ -269,7 +273,9 @@ export default function AddressForm({ open, onOpenChange, id, setHasNew, hasNew 
           </div>
 
           <div className="space-y-2">
-            <Label>Địa chỉ</Label>
+            <Label>Địa chỉ
+              <span className="text-error-dark"> (*)</span>
+            </Label>
             <Popover
               open={isAddressPopoverOpen}
               onOpenChange={setIsAddressPopoverOpen}
@@ -357,7 +363,9 @@ export default function AddressForm({ open, onOpenChange, id, setHasNew, hasNew 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="detailAddress">Địa chỉ cụ thể</Label>
+            <Label htmlFor="detailAddress">Địa chỉ cụ thể
+              <span className="text-error-dark"> (*)</span>
+            </Label>
             <Textarea
               id="detailAddress"
               {...register("detailAddress")}
