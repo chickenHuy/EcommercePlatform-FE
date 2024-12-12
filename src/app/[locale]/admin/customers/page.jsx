@@ -49,7 +49,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useSelector } from "react-redux";
 import DrawerCustomerDetail from "./drawerUserDetail";
-import Loading from "@/components/loading";
+import { formatDate } from "@/utils/commonUtils";
 
 export default function ManageCustomer() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -123,7 +123,6 @@ export default function ManageCustomer() {
   };
 
   const fetchCustomer = useCallback(async () => {
-    
     try {
       const response = await getAllCustomer(
         currentPage,
@@ -137,7 +136,6 @@ export default function ManageCustomer() {
       setHasNext(response.result.hasNext);
       setHasPrevious(response.result.hasPrevious);
     } catch (error) {}
-    
   }, [toast, currentPage, tab, sortType, searchTerm]);
 
   useEffect(() => {
@@ -233,7 +231,7 @@ export default function ManageCustomer() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {!isLoading && (
+                      {!isLoading &&
                         customers.map((customer) => (
                           <TableRow
                             key={customer.id}
@@ -259,8 +257,7 @@ export default function ManageCustomer() {
                               {customer.name}
                             </TableCell>
                             <TableCell className="font-medium text-center">
-                              {new Date(customer.created_at).toLocaleString()}{" "}
-                              {/* Format date */}
+                              {formatDate(customer.created_at)}
                             </TableCell>
                             <TableCell className="hidden md:table-cell text-center">
                               <Dialog>
@@ -355,8 +352,7 @@ export default function ManageCustomer() {
                               </Dialog>
                             </TableCell>
                           </TableRow>
-                        ))
-                      )}
+                        ))}
                     </TableBody>
                   </Table>
                 </CardContent>

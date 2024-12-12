@@ -45,7 +45,7 @@ import {
 import Loading from "@/components/loading";
 import { formatDate } from "@/utils/commonUtils";
 import { useToast } from "@/hooks/use-toast";
-import { useSelector } from "react-redux";
+import DialogConfirm from "@/components/dialogs/dialogConfirm";
 
 export default function ManageComponent() {
   const { toast } = useToast();
@@ -70,6 +70,9 @@ export default function ManageComponent() {
   });
   const [sortOption, setSortOption] = useState("newest");
   const [requirementOption, setRequirementOption] = useState("all");
+  const [isDialogConfirmOpen, setIsDialogConfirmOpen] = useState(false);
+  const [componentToDelete, setComponentToDelete] = useState(null);
+  const [componentTableName, setComponentTableName] = useState(null);
 
   const loadComponents = async (page) => {
     setListComponents(null);
@@ -168,23 +171,31 @@ export default function ManageComponent() {
       });
   };
 
-  const handleRemoveComponent = (id) => {
-    removeComponent(id)
-      .then(() => {
-        loadComponents(currentPage);
+  const handleClickButtonRemoveComponent = (component) => {
+    setComponentToDelete(component);
+    setIsDialogConfirmOpen(true);
+    setComponentTableName("thông số kỹ thuật");
+  };
+
+  const confirmDelete = async () => {
+    if (componentToDelete) {
+      try {
+        await removeComponent(componentToDelete.id);
         toast({
           title: "Thành công",
-          description: "Xóa thành phần thành công",
+          description: `Thông số kỹ thuật "${componentToDelete.name}" đã được xóa`,
         });
-      })
-      .catch((error) => {
+        loadComponents(currentPage);
+        setIsDialogConfirmOpen(false);
+        setComponentTableName(null);
+      } catch (error) {
         toast({
-          variant: "destructive",
           title: "Thất bại",
           description: error.message,
+          variant: "destructive",
         });
-        console.log(error);
-      });
+      }
+    }
   };
 
   return (
@@ -241,12 +252,6 @@ export default function ManageComponent() {
                     </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button size="sm" variant="outline" className="h-7 gap-1">
-                  <File className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Export
-                  </span>
-                </Button>
                 <DialogEditComponent
                   name={"Thêm thành phần"}
                   content={"Thêm thành phần mới"}
@@ -260,7 +265,7 @@ export default function ManageComponent() {
                 />
               </div>
             </div>
-            <TabsContent value="all">
+            <TabsContent value="all" className="mt-4">
               <Card x-chunk="dashboard-06-chunk-0">
                 <CardHeader>
                   <CardTitle className="text-[18px] font-extrabold">
@@ -346,7 +351,9 @@ export default function ManageComponent() {
                                     <DropdownMenuItem
                                       className="flex flex-row justify-between items-center cursor-pointer"
                                       onClick={() =>
-                                        handleRemoveComponent(component.id)
+                                        handleClickButtonRemoveComponent(
+                                          component
+                                        )
                                       }
                                     >
                                       <span>Xoá</span>
@@ -391,6 +398,15 @@ export default function ManageComponent() {
           </Tabs>
         </main>
       </div>
+      {isDialogConfirmOpen && (
+        <DialogConfirm
+          isOpen={isDialogConfirmOpen}
+          onClose={() => setIsDialogConfirmOpen(false)}
+          onConfirm={confirmDelete}
+          tableName={componentTableName}
+          objectName={componentToDelete.name}
+        />
+      )}
     </div>
   );
 }
