@@ -416,7 +416,7 @@ export default function ManageOrderAdmin() {
                               </Badge>
                             </TableCell>
                             <TableCell className="text-center">
-                              {formatCurrency(order.total)}
+                              {formatCurrency(order.grandTotal)}
                             </TableCell>
                             <TableCell className="md:table-cell text-center">
                               <div>

@@ -26,6 +26,15 @@ export const roundToNearest = (num, decimalPlaces) => {
   return Math.round(num * factor) / factor;
 };
 
+export const formatCurrency = (value) => {
+  return Number(value).toLocaleString("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+};
+
 // export const formatDate = (isoString) => {
 //   const date = new Date(isoString);
 
