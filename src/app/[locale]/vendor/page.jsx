@@ -1,15 +1,15 @@
 "use client";
 
-import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/utils/commonUtils";
 import { getStoreStatistic } from "@/api/vendor/storeStatisticRequest";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
+import ChartSeller from "./chart";
 
 export default function Dashboard() {
-  const [storeStatistic, setStoreStatistic] = React.useState({
+  const [storeStatistic, setStoreStatistic] = useState({
     dailyRevenue: 0,
     numberOfOrdersCancelled: 0,
     numberOfOrdersConfirmed: 0,
@@ -22,7 +22,7 @@ export default function Dashboard() {
   });
   const { toast } = useToast();
 
-  const fetchStoreStatistic = React.useCallback(async () => {
+  const fetchStoreStatistic = useCallback(async () => {
     try {
       const response = await getStoreStatistic();
       setStoreStatistic(response.result);
@@ -37,10 +37,6 @@ export default function Dashboard() {
       });
     }
   }, [toast]);
-
-  useEffect(() => {
-    console.log("storeStatistic: ", storeStatistic);
-  }, [storeStatistic]);
 
   useEffect(() => {
     fetchStoreStatistic();
@@ -91,11 +87,18 @@ export default function Dashboard() {
     },
   ];
 
-  const storeSalesLastSevenDays = storeStatistic.storeSalesLastSevenDays;
-  console.log(
-    "storeSalesLastSevenDays: ",
+  const chartData =
     storeStatistic.storeSalesLastSevenDays
-  );
+      ?.map((sale) => {
+        const [year, month, day] = sale.date.split("-");
+        const formattedDate = `${day}-${month}-${year}`;
+        return {
+          date: formattedDate,
+          revenue: sale.revenue,
+        };
+      })
+      ?.reverse() || [];
+  console.log("chartData: ", chartData);
 
   return (
     <div className="p-6 space-y-8">
@@ -154,17 +157,7 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent>
           <Card className="mb-6 border rounded-lg shadow-md">
-            <CardHeader>
-              <CardTitle className="text-lg">
-                Biểu đồ doanh số trong ngày
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="h-[300px] flex items-center justify-center">
-              {/* Placeholder for chart */}
-              <p className="text-gray-500">
-                Biểu đồ doanh số sẽ hiển thị ở đây
-              </p>
-            </CardContent>
+            <ChartSeller chartData={chartData} />
           </Card>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {salesAnalysis.map((item, index) => (
