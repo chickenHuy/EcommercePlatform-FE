@@ -101,7 +101,7 @@ export default function Dashboard() {
   console.log("chartData: ", chartData);
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-6 pt-20 space-y-8">
       {/* To-Do List */}
       <Card className="shadow-lg border rounded-lg">
         <CardHeader>
