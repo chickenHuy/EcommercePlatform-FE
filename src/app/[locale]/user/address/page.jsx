@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, PlusCircle } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,7 @@ import {
 } from "@/api/user/addressRequest";
 import { toast } from "@/hooks/use-toast";
 import Loading from "@/components/loading";
+import DialogConfirm from "@/components/dialogs/dialogConfirm";
 
 export default function Component() {
   const [addresses, setAddresses] = useState([]);
@@ -22,6 +23,9 @@ export default function Component() {
   const currentPage = 1;
   const itemsPerPage = 10;
   const [id, setId] = useState(null);
+  const [isDialogConfirmOpen, setIsDialogConfirmOpen] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState(null);
+  const [addressTableName, setAddressTableName] = useState(null);
   const handleDefaultAddress = (id) => {
     setDefaultAddress(id)
       .then((response) => {
@@ -41,23 +45,33 @@ export default function Component() {
       });
   };
 
-  const handleDeleteAddress = (id) => {
-    deleteAddress(id)
-      .then((response) => {
+  const handleDeleteAddress = (address) => {
+    console.log(address);
+    setAddressToDelete(address);
+    setIsDialogConfirmOpen(true);
+    setAddressTableName("địa chỉ");
+  };
+
+  const confirmDelete = async () => {
+    if (addressToDelete) {
+      try {
+        await deleteAddress(addressToDelete.id);
         toast({
           title: "Thành công",
-          description: "Xóa địa chỉ thành công",
-          variant: "success",
+          description: `Địa chỉ "${`${addressToDelete?.first_line} + ${addressToDelete?.second_line}`}" đã được xóa thành công`,
         });
         fetchAddresses();
-      })
-      .catch((error) => {
+        setAddressToDelete(null);
+        setIsDialogConfirmOpen(false);
+        setAddressTableName(null);
+      } catch (error) {
         toast({
           title: "Thất bại",
           description: error.message,
           variant: "destructive",
         });
-      });
+      }
+    }
   };
 
   const fetchAddresses = useCallback(async () => {
@@ -113,7 +127,7 @@ export default function Component() {
                     <Button
                       variant="link"
                       onClick={() => {
-                        handleDeleteAddress(address?.id);
+                        handleDeleteAddress(address);
                       }}
                     >
                       Xóa
@@ -168,6 +182,15 @@ export default function Component() {
         onOpenChange={setShowAddressForm}
         id={id}
       />
+      {isDialogConfirmOpen && (
+        <DialogConfirm
+          isOpen={isDialogConfirmOpen}
+          onClose={() => setIsDialogConfirmOpen(false)}
+          onConfirm={confirmDelete}
+          tableName={addressTableName}
+          objectName={`${addressToDelete?.first_line} + ${addressToDelete?.second_line}`}
+        />
+      )}
     </div>
   );
 }

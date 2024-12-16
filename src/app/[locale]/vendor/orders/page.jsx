@@ -382,7 +382,7 @@ export default function ManageOrderSeller() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-center">
-                          {formatCurrency(order.total)}
+                          {formatCurrency(order.total - order.discount)}
                         </TableCell>
                         <TableCell className="md:table-cell text-center">
                           {order.currentStatus === "PENDING" ||
