@@ -1,5 +1,5 @@
 "use client";
-import { File, ListFilter, MoreHorizontal } from "lucide-react";
+import { File, ListFilter, MoreHorizontal, SearchIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import EditIcon from "@mui/icons-material/Edit";
@@ -46,9 +46,11 @@ import Loading from "@/components/loading";
 import { formatDate } from "@/utils/commonUtils";
 import { useToast } from "@/hooks/use-toast";
 import DialogConfirm from "@/components/dialogs/dialogConfirm";
+import { useSelector } from "react-redux";
 
 export default function ManageComponent() {
   const { toast } = useToast();
+  const searchTerm = useSelector((state) => state.searchReducer.searchTerm);
   const pageSize = 20;
   const [listComponents, setListComponents] = useState(null);
   let currentPageGlobal = 1;
@@ -77,7 +79,7 @@ export default function ManageComponent() {
   const loadComponents = async (page) => {
     setListComponents(null);
 
-    const response = await getComponent(page, pageSize);
+    const response = await getComponent(page, pageSize, searchTerm);
     let data = response?.result?.data || [];
 
     currentPageGlobal = response.result.currentPage;
@@ -134,6 +136,10 @@ export default function ManageComponent() {
   useEffect(() => {
     loadComponents(currentPageGlobal);
   }, [sortOption, requirementOption]);
+
+  useEffect(() => {
+    loadComponents(currentPageGlobal);
+  }, [searchTerm]);
 
   const handleCreateComponent = (data) => {
     createComponent(data)

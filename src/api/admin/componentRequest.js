@@ -1,8 +1,8 @@
 import { del, get, post, put } from "@/lib/httpClient";
 
-const getComponent = async (page, size) => {
+const getComponent = async (page, size, search) => {
   try {
-    const response = await get(`/api/v1/components?page=${page}&size=${size}`);
+    const response = await get(`/api/v1/components?page=${page}&size=${size}&search=${search}`);
     return response;
   } catch (error) {
     throw error;
