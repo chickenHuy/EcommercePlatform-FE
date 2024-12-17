@@ -154,6 +154,9 @@ const BasicInformation = ({
             <div>
               Nhập thông tin mô tả của sản phẩm
               <span className="px-3 text-error font-[900]">( * )</span>
+              {
+                productDescription.trim().length > 255 && (<span className="text-error italic">Tối đa 255 ký tự</span>)
+              }
             </div>
             <Textarea
               placeholder="Nhập thông tin mô tả của sản phẩm"
@@ -210,7 +213,7 @@ const BasicInformation = ({
           content="Chọn thương hiệu của sản phẩm."
         />
         <CompleteNotify
-          isComplete={productDescription !== ""}
+          isComplete={productDescription !== "" && productDescription.trim().length <= 255}
           content="Cung cấp thông tin mô tả của sản phẩm."
         />
         <CompleteNotify
