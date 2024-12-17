@@ -51,18 +51,18 @@ export default function ManageComponent() {
   const { toast } = useToast();
   const pageSize = 20;
   const [listComponents, setListComponents] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  let currentPageGlobal = 1;
   const [paginationData, setPaginationData] = useState({
     hasNext: false,
     hasPrevious: false,
-    currentPage: currentPage,
+    currentPage: currentPageGlobal,
     totalPage: 1,
     totalElements: 0,
     handleNextPage: () => {
-      loadComponents(currentPage + 1);
+      loadComponents(currentPageGlobal + 1);
     },
     handlePrevPage: () => {
-      loadComponents(currentPage + 1);
+      loadComponents(currentPageGlobal - 1);
     },
     setCurrentPage: (page) => {
       loadComponents(page);
@@ -80,15 +80,16 @@ export default function ManageComponent() {
     const response = await getComponent(page, pageSize);
     let data = response?.result?.data || [];
 
-    setCurrentPage(response?.result?.currentPage || 1);
-    setPaginationData({
-      ...paginationData,
+    currentPageGlobal = response.result.currentPage;
+    setPaginationData((prevData) => ({
+      ...prevData,
       hasNext: response?.result?.hasNext || false,
       hasPrevious: response?.result?.hasPrevious || false,
       totalPage: response?.result?.totalPages || 1,
       currentPage: response?.result?.currentPage || 1,
       totalElements: response?.result?.totalElements || 0,
-    });
+    }));
+
 
     data = sortData(data, sortOption);
     data = filterData(data, requirementOption);
@@ -131,13 +132,13 @@ export default function ManageComponent() {
   };
 
   useEffect(() => {
-    loadComponents(currentPage);
+    loadComponents(currentPageGlobal);
   }, [sortOption, requirementOption]);
 
   const handleCreateComponent = (data) => {
     createComponent(data)
       .then(() => {
-        loadComponents(currentPage);
+        loadComponents(currentPageGlobal);
         toast({
           title: "Thành công",
           description: "Thêm thông số sản phẩm thành công",
@@ -155,7 +156,7 @@ export default function ManageComponent() {
   const handleUpdateComponent = (id, data) => {
     updateComponent(data, id)
       .then(() => {
-        loadComponents(currentPage);
+        loadComponents(currentPageGlobal);
         toast({
           title: "Thành công",
           description: "Cập nhật thành phần thành công",
@@ -299,7 +300,7 @@ export default function ManageComponent() {
                           return (
                             <TableRow key={index}>
                               <TableCell className="text-center">
-                                {index + pageSize * (currentPage - 1) + 1}
+                                {index + pageSize * (currentPageGlobal - 1) + 1}
                               </TableCell>
                               <TableCell>{component.name}</TableCell>
                               <TableCell className="text-center">
@@ -374,9 +375,9 @@ export default function ManageComponent() {
                     Hiển thị{" "}
                     <strong>
                       {1 +
-                        pageSize * (currentPage - 1) +
+                        pageSize * (currentPageGlobal - 1) +
                         " - " +
-                        pageSize * currentPage}
+                        pageSize * currentPageGlobal}
                     </strong>{" "}
                     trong <strong>{paginationData.totalElements}</strong> thành
                     phần
