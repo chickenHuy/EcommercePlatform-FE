@@ -19,15 +19,17 @@ import { useRouter } from "next/navigation";
 import SignUpNow from "@/app/[locale]/auth/signUp";
 import Cookies from "js-cookie";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 const AuthPage = () => {
   const [isSignIn, setIsSignIn] = useState(true);
   const t = useTranslations("AuthPage");
+  const { toast } = useToast();
 
   const loginData = useSelector((state) => state.loginReducer);
   const router = useRouter();
 
   const handleLogin = () => {
-    if (!loginData.username || !loginData.password) {
+    if (!loginData.username && !loginData.password) {
       toast({
         variant: "destructive",
         title: "Lỗi",
@@ -47,7 +49,7 @@ const AuthPage = () => {
       toast({
         variant: "destructive",
         title: "Lỗi",
-        description: "Vui lòng nhập thông tin Username",
+        description: "Vui lòng nhập thông tin Password",
       })
       return;
     }
