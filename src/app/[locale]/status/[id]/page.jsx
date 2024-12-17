@@ -5,12 +5,15 @@ import { get } from "@/lib/httpClient";
 import { Card } from "@/components/ui/card";
 import { Typography } from "@mui/material";
 import { Button } from "@/components/ui/button";
+import { useDispatch } from "react-redux";
+import { setCheckout } from "@/store/features/checkoutSlice";
 
 const StatusPage = ({ params }) => {
     const [statusData, setStatusData] = useState(null);
     const [message, setMessage] = useState("");
     const [statusType, setStatusType] = useState("");
-
+    const dispatch = useDispatch();
+    dispatch(setCheckout([]));
     const formatVND = (amount) => {
         return new Intl.NumberFormat("vi-VN", {
             style: "currency",

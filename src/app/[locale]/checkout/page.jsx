@@ -8,9 +8,8 @@ import { useState } from "react";
 export default function CheckoutPage() {
     const stores = useSelector((state) => state.checkoutReducer.stores);
     const [selectedAddress, setSelectedAddress] = useState(null);
-    const [isCheckout, setIsCheckout] = useState(false);
 
-    if (stores.length === 0 && isCheckout === false) {
+    if (stores.length === 0) {
         return (
             <div className="container min-w-full min-h-screen flex justify-center items-center ">
                 <div className="bg-blue-primary min-w-[360px] min-h-[200px] p-4 shadow-xl flex items-center flex-col justify-center m-2 rounded-xl">
