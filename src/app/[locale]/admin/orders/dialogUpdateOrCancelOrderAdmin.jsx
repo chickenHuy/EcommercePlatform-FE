@@ -30,7 +30,7 @@ export default function DialogUpdateOrCancelOrderAdmin(props) {
       : `Bạn có chắc chắn muốn hủy đơn hàng #${orderId}?`;
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[400px]">
+      <DialogContent className="sm:max-w-[400px] z-[150]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>

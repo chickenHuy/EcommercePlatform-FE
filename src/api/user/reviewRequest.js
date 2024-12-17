@@ -1,8 +1,19 @@
-import { get, post } from "@/lib/httpClient";
+import { get, post, put } from "@/lib/httpClient";
 
 export const createReview = (reviewRequest) => {
   try {
     const response = post(`/api/v1/reviews`, reviewRequest);
+    return response;
+  } catch (error) {
+    console.error("Error during authentication:", error);
+    throw error;
+  }
+};
+
+export const updateReview = (reviewRequest, reviewId) => {
+  try {
+    console.log("reviewId: ", reviewId);
+    const response = put(`/api/v1/reviews/${reviewId}`, reviewRequest);
     return response;
   } catch (error) {
     console.error("Error during authentication:", error);

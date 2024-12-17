@@ -16,12 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
-import {
-  ArrowUpDown,
-  CircleHelp,
-  Forklift,
-  Search,
-} from "lucide-react";
+import { ArrowUpDown, CircleHelp, Forklift, Search } from "lucide-react";
 import Image from "next/image";
 import {
   Tooltip,
@@ -49,8 +44,8 @@ export default function ManageOrderUser() {
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const [sortType, setSortType] = useState("");
-  const [orderType, setOrderType] = useState("");
+  const [sortType, setSortType] = useState("createdAt");
+  const [orderType, setOrderType] = useState("desc");
   const [totalElement, setTotalElement] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
@@ -151,6 +146,7 @@ export default function ManageOrderUser() {
         search,
         filterTab
       );
+      console.log("Orders: ", response.result.data);
       setOrders(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
@@ -571,6 +567,7 @@ export default function ManageOrderUser() {
           ) : (
             <div className="w-full min-h-[700px] flex flex-col justify-start m-2">
               <Image
+                alt="ảnh trống"
                 className="mx-auto"
                 src={ReviewEmpty}
                 width={400}

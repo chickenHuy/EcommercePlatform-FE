@@ -315,7 +315,7 @@ export default function ViewOrderDetailUser(props) {
             </div>
             <Separator></Separator>
             <div className="flex items-center justify-between">
-              <div className="flex flex-col items-center space-y-1 m-4">
+              <div className="flex flex-col items-center w-1/5 space-y-1 m-4">
                 <div
                   className={`flex justify-center items-center w-28 h-28 rounded-full border-4 ${bookTextBorderClass}`}
                 >
@@ -325,13 +325,15 @@ export default function ViewOrderDetailUser(props) {
                 <Label className="text-muted-foreground">
                   {lastUpdatedTimeOnHoldOrPending
                     ? formatDate(lastUpdatedTimeOnHoldOrPending)
-                    : "00:00:00 00-00-0000"}
+                    : ""}
                 </Label>
               </div>
-              {hasStatus(["PICKED_UP"]) && (
+              {hasStatus(["PICKED_UP"]) ? (
                 <div className="w-1/5 border-t-4 border-success-dark"></div>
+              ) : (
+                <div className="w-1/5 border-t-4 border-none"></div>
               )}
-              <div className="flex flex-col items-center space-y-1 m-4">
+              <div className="flex flex-col items-center w-1/5 space-y-1 m-4">
                 <div
                   className={`flex justify-center items-center w-28 h-28 rounded-full border-4 ${forkliftBorderClass}`}
                 >
@@ -341,13 +343,15 @@ export default function ViewOrderDetailUser(props) {
                 <Label className="text-muted-foreground">
                   {lastUpdatedTimePickedUp
                     ? formatDate(lastUpdatedTimePickedUp)
-                    : "00:00:00 00-00-0000"}
+                    : ""}
                 </Label>
               </div>
-              {hasStatus(["DELIVERED"]) && (
+              {hasStatus(["DELIVERED"]) ? (
                 <div className="w-1/5 border-t-4 border-success-dark"></div>
+              ) : (
+                <div className="w-1/5 border-t-4 border-none"></div>
               )}
-              <div className="flex flex-col items-center space-y-1 m-4">
+              <div className="flex flex-col items-center w-1/5 space-y-1 m-4">
                 <div
                   className={`flex justify-center items-center w-28 h-28 rounded-full border-4 ${importBorderClass}`}
                 >
@@ -357,7 +361,7 @@ export default function ViewOrderDetailUser(props) {
                 <Label className="text-muted-foreground">
                   {lastUpdatedTimeDelivered
                     ? formatDate(lastUpdatedTimeDelivered)
-                    : "00:00:00 00-00-0000"}
+                    : ""}
                 </Label>
               </div>
             </div>
@@ -403,24 +407,24 @@ export default function ViewOrderDetailUser(props) {
               )}
             </div>
             <Separator></Separator>
-            <div className="space-y-4">
+            <div className="space-y-4 pb-10">
               <Label className="text-2xl m-4">Địa Chỉ Nhận Hàng</Label>
-              <div className="flex items-center justify-between m-4">
-                <div>
-                  <div className="flex flex-col space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <UserPlus />
-                      <Label>{order?.recipientName}</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Phone />
-                      <Label>{order?.orderPhone}</Label>
-                    </div>
-                    <Label>{order?.defaultAddressStr}</Label>
+              <div className="flex items-start justify-between m-4 h-fit">
+                <div className="flex flex-col space-y-2 w-2/5 pt-10">
+                  <div className="flex items-center space-x-2">
+                    <UserPlus />
+                    <Label>{order?.recipientName}</Label>
                   </div>
+                  <div className="flex items-center space-x-2">
+                    <Phone />
+                    <Label>{order?.orderPhone}</Label>
+                  </div>
+                  <Label>{order?.defaultAddressStr}</Label>
                 </div>
-                <div className="w-[1px] h-40 bg-black-secondary"></div>
-                <Timeline position="right">
+                <Timeline
+                  position="right"
+                  className="border-l-[1px] border-black-primary border-opacity-25 w-3/5"
+                >
                   {listOrderStatusHistory?.map((item, index) => (
                     <TimelineItem key={item.id}>
                       <TimelineOppositeContent
@@ -543,11 +547,7 @@ export default function ViewOrderDetailUser(props) {
                           <p className="line-through">
                             {formatCurrency(item.price)}
                           </p>
-                          <p>
-                            {formatCurrency(
-                              item.price - item.discount
-                            )}
-                          </p>
+                          <p>{formatCurrency(item.price - item.discount)}</p>
                         </div>
                       </Card>
                     ))

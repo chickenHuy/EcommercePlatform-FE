@@ -1,23 +1,23 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { BaggageClaim, MessageCircle, StoreIcon, Wallet } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import VnPay from "@/assets/images/vnpay.png";
-import { useSelector } from "react-redux";
 import { Separator } from "@/components/ui/separator";
 import EmptyImage from "@/assets/images/brandEmpty.jpg";
-import Link from "next/link";
 import { Textarea } from "@/components/ui/textarea";
 import { checkoutOrders } from "@/api/user/checkout";
 import { toast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { useRouter } from "next/navigation";
+import { set } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { setCheckout } from "@/store/features/checkoutSlice";
+import { on } from "events";
 
 export default function CheckoutContent(props) {
   const route = useRouter();
@@ -42,9 +42,12 @@ export default function CheckoutContent(props) {
     return discount;
   };
 
+  const dispatch = useDispatch();
+
   const subtotal = calculateSubtotal(stores);
   const shippingFee = 24000 * stores.length;
   const discount = calculateDiscount(stores);
+  const [onSubmit, setOnSubmit] = useState(false);
 
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const total = subtotal + shippingFee - discount;
@@ -55,6 +58,8 @@ export default function CheckoutContent(props) {
   };
 
   const handleSubmit = async (e) => {
+    if (onSubmit) return;
+    setOnSubmit(true);
     if (selectedAddress === undefined) {
       return toast({
         title: "Vui lòng chọn địa chỉ giao hàng",
@@ -80,7 +85,6 @@ export default function CheckoutContent(props) {
       note: note,
     };
 
-
     try {
       const res = await checkoutOrders(orderData);
       if (paymentMethod === "VN_PAY") {
@@ -94,6 +98,8 @@ export default function CheckoutContent(props) {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setOnSubmit(false);
     }
   };
 
@@ -130,7 +136,7 @@ export default function CheckoutContent(props) {
                         <h4 className="font-medium">{product.name}</h4>
                         {product.value ? (
                           <p className="text-sm text-muted-foreground">
-                            Loại: {product.value}
+                            Loại: {product.value.join(" | ")}
                           </p>
                         ) : null}
                       </div>
@@ -262,8 +268,13 @@ export default function CheckoutContent(props) {
               Điều khoản HK Uptech
             </a>
           </p>
-          <Button className="w-full" size="lg" onClick={(e) => handleSubmit(e)}>
-            Đặt hàng
+          <Button
+            className="w-full"
+            size="lg"
+            onClick={(e) => handleSubmit(e)}
+            disabled={onSubmit}
+          >
+            {onSubmit ? "Đang xử lý..." : "Đặt hàng"}
           </Button>
         </div>
       </div>

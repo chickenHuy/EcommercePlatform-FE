@@ -62,7 +62,10 @@ export default function DialogEditComponent(props) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         {typeDisplay === "button" ? (
-          <Button className="w-full h-fit flex flex-row justify-between items-center">
+          <Button
+            variant="outline"
+            className="w-full h-fit flex flex-row justify-between items-center"
+          >
             <span className="block w-full">{name}</span>
             <span className="scale-75">{icon}</span>
           </Button>

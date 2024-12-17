@@ -46,6 +46,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import DrawerAdminDetail from "./drawerAdminDetail";
 import { useSelector } from "react-redux";
+import { formatDate } from "@/utils/commonUtils";
 
 export default function ManageAdmin() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -262,7 +263,7 @@ export default function ManageAdmin() {
                             {admin.name}
                           </TableCell>
                           <TableCell className="font-medium text-center">
-                            {new Date(admin.created_at).toLocaleString()}{" "}
+                            {formatDate(admin.created_at)}
                           </TableCell>
                           <TableCell className="hidden md:table-cell text-center">
                             <Dialog>

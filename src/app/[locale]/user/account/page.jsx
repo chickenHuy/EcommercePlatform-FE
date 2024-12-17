@@ -124,7 +124,7 @@ export default function ManageAccount() {
   };
 
   return (
-    <div>
+    <>
       <Card className="shadow-lg rounded-lg ">
         <CardHeader className="text-center border-b py-6">
           <CardTitle className="text-2xl font-bold">
@@ -132,14 +132,12 @@ export default function ManageAccount() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 mt-4">
-          <div className="flex items-center justify-start mb-8">
-            <Label className="w-1/5 font-medium mr-2">Tên đăng nhập</Label>
-            <span className="flex-grow">
-              {username || "chưa có tên đăng nhập"}
-            </span>
+          <div className="flex items-center justify-start min-h-8 mb-8">
+            <Label className="w-1/5">Tên đăng nhập</Label>
+            <Label>{username || "chưa có tên đăng nhập"}</Label>
           </div>
-          <div className="flex items-center justify-start mb-8">
-            <Label className="w-1/5 font-medium mr-2">Email</Label>
+          <div className="flex items-center justify-start min-h-8 mb-8">
+            <Label className="w-1/5 mr-8">Email</Label>
             <Input
               value={email || "bạn chưa có email"}
               onChange={(e) => setEmail(e.target.value)}
@@ -157,10 +155,8 @@ export default function ManageAccount() {
               <Button onClick={handleSendMailValidation}>Xác thực email</Button>
             </div>
           )}
-          <div className="flex items-center justify-start mb-8">
-            <Label htmlFor="phone" className="w-1/5 font-medium mr-2">
-              Số điện thoại
-            </Label>
+          <div className="flex items-center justify-start min-h-8 mb-8">
+            <Label className="w-1/5 mr-8">Số điện thoại</Label>
             <Input
               value={phone || "bạn chưa có số điện thoại"}
               onChange={(e) => setPhone(e.target.value)}
@@ -172,7 +168,6 @@ export default function ManageAccount() {
           </div>
         </CardContent>
       </Card>
-
       {isDialogOpen && (
         <Dialog
           open={isDialogOpen}
@@ -236,6 +231,6 @@ export default function ManageAccount() {
           </DialogContent>
         </Dialog>
       )}
-    </div>
+    </>
   );
 }

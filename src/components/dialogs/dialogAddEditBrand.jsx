@@ -141,7 +141,9 @@ export default function DialogAddEditBrand(props) {
             </div>
           )}
           <DialogFooter>
-            <Button type="submit">{nameButton}</Button>
+            <Button type="submit" variant="outline">
+              {nameButton}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
