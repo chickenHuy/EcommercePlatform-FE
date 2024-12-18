@@ -37,7 +37,7 @@ export default function RevenueStatisticsAdmin({
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="text-2xl font-bold">
-                {formatCurrency(adminStatistic.dailyRevenue)}
+                {formatCurrency(adminStatistic.dailyRevenue || 0)}
               </div>
               <div>
                 <span className="text-xs">So với hôm qua</span>
@@ -45,16 +45,16 @@ export default function RevenueStatisticsAdmin({
                   <div className="text-sm font-bold text-muted-foreground">
                     {adminStatistic.revenueIncreaseCompareYesterday >= 0
                       ? `+ ${formatCurrency(
-                          adminStatistic.revenueIncreaseCompareYesterday
+                          adminStatistic.revenueIncreaseCompareYesterday || 0
                         )}`
                       : formatCurrency(
-                          adminStatistic.revenueIncreaseCompareYesterday
+                          adminStatistic.revenueIncreaseCompareYesterday || 0
                         )}
                   </div>
                   <div className="text-sm font-bold text-muted-foreground">
                     {adminStatistic.dailyRevenueGrowthRate >= 0
-                      ? `+ ${adminStatistic.dailyRevenueGrowthRate}%`
-                      : `- ${-adminStatistic.dailyRevenueGrowthRate}%`}
+                      ? `+ ${adminStatistic.dailyRevenueGrowthRate || 0}%`
+                      : `- ${-adminStatistic.dailyRevenueGrowthRate || 0}%`}
                   </div>
                 </div>
               </div>
@@ -69,7 +69,7 @@ export default function RevenueStatisticsAdmin({
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="text-2xl font-bold">
-                {formatCurrency(adminStatistic.weeklyRevenue)}
+                {formatCurrency(adminStatistic.weeklyRevenue || 0)}
               </div>
               <div>
                 <span className="text-xs">So với tuần trước</span>
@@ -77,16 +77,16 @@ export default function RevenueStatisticsAdmin({
                   <div className="text-sm font-bold text-muted-foreground">
                     {adminStatistic.revenueIncreaseCompareLastWeek >= 0
                       ? `+ ${formatCurrency(
-                          adminStatistic.revenueIncreaseCompareLastWeek
+                          adminStatistic.revenueIncreaseCompareLastWeek || 0
                         )}`
                       : formatCurrency(
-                          adminStatistic.revenueIncreaseCompareLastWeek
+                          adminStatistic.revenueIncreaseCompareLastWeek || 0
                         )}
                   </div>
                   <div className="text-sm font-bold text-muted-foreground">
                     {adminStatistic.weeklyRevenueGrowthRate >= 0
-                      ? `+ ${adminStatistic.weeklyRevenueGrowthRate}%`
-                      : `- ${-adminStatistic.weeklyRevenueGrowthRate}%`}
+                      ? `+ ${adminStatistic.weeklyRevenueGrowthRate || 0}%`
+                      : `- ${-adminStatistic.weeklyRevenueGrowthRate || 0}%`}
                   </div>
                 </div>
               </div>
@@ -101,7 +101,7 @@ export default function RevenueStatisticsAdmin({
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="text-2xl font-bold">
-                {formatCurrency(adminStatistic.monthlyRevenue)}
+                {formatCurrency(adminStatistic.monthlyRevenue || 0)}
               </div>
               <div>
                 <span className="text-xs">So với tháng trước</span>
@@ -109,16 +109,16 @@ export default function RevenueStatisticsAdmin({
                   <div className="text-sm font-bold text-muted-foreground">
                     {adminStatistic.revenueIncreaseCompareLastMonth >= 0
                       ? `+ ${formatCurrency(
-                          adminStatistic.revenueIncreaseCompareLastMonth
+                          adminStatistic.revenueIncreaseCompareLastMonth || 0
                         )}`
                       : formatCurrency(
-                          adminStatistic.revenueIncreaseCompareLastMonth
+                          adminStatistic.revenueIncreaseCompareLastMonth || 0
                         )}
                   </div>
                   <div className="text-sm font-bold text-muted-foreground">
                     {adminStatistic.monthlyRevenueGrowthRate >= 0
-                      ? `+ ${adminStatistic.monthlyRevenueGrowthRate}%`
-                      : `- ${-adminStatistic.monthlyRevenueGrowthRate}%`}
+                      ? `+ ${adminStatistic.monthlyRevenueGrowthRate || 0}%`
+                      : `- ${-adminStatistic.monthlyRevenueGrowthRate || 0}%`}
                   </div>
                 </div>
               </div>
@@ -133,7 +133,7 @@ export default function RevenueStatisticsAdmin({
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="text-2xl font-bold">
-                {formatCurrency(adminStatistic.yearlyRevenue)}
+                {formatCurrency(adminStatistic.yearlyRevenue || 0)}
               </div>
               <div>
                 <span className="text-xs">So với năm trước</span>
@@ -141,16 +141,16 @@ export default function RevenueStatisticsAdmin({
                   <div className="text-sm font-bold text-muted-foreground">
                     {adminStatistic.revenueIncreaseCompareLastYear >= 0
                       ? `+ ${formatCurrency(
-                          adminStatistic.revenueIncreaseCompareLastYear
+                          adminStatistic.revenueIncreaseCompareLastYear || 0
                         )}`
                       : formatCurrency(
-                          adminStatistic.revenueIncreaseCompareLastYear
+                          adminStatistic.revenueIncreaseCompareLastYear || 0
                         )}
                   </div>
                   <div className="text-sm font-bold text-muted-foreground">
                     {adminStatistic.yearlyRevenueGrowthRate >= 0
-                      ? `+ ${adminStatistic.yearlyRevenueGrowthRate}%`
-                      : `- ${-adminStatistic.yearlyRevenueGrowthRate}%`}
+                      ? `+ ${adminStatistic.yearlyRevenueGrowthRate || 0}%`
+                      : `- ${-adminStatistic.yearlyRevenueGrowthRate || 0}%`}
                   </div>
                 </div>
               </div>

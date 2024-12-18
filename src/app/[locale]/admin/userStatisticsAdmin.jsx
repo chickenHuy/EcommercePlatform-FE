@@ -18,7 +18,7 @@ export default function UserStatisticsAdmin({ adminStatistic }) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {adminStatistic.totalNumberOfCustomers}
+                {adminStatistic.totalNumberOfCustomers || 0}
               </div>
             </CardContent>
           </Card>
@@ -31,7 +31,7 @@ export default function UserStatisticsAdmin({ adminStatistic }) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {adminStatistic.totalNumberOfSellers}
+                {adminStatistic.totalNumberOfSellers || 0}
               </div>
             </CardContent>
           </Card>
@@ -44,7 +44,7 @@ export default function UserStatisticsAdmin({ adminStatistic }) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {adminStatistic.totalNumberOfAdmins}
+                {adminStatistic.totalNumberOfAdmins || 0}
               </div>
             </CardContent>
           </Card>
@@ -66,7 +66,7 @@ export default function UserStatisticsAdmin({ adminStatistic }) {
                   <CardContent>
                     <div className="text-2xl font-bold">
                       +{" "}
-                      {adminStatistic.numberOfCustomersIncreaseCompareYesterday}
+                      {adminStatistic.numberOfCustomersIncreaseCompareYesterday || 0}
                     </div>
                   </CardContent>
                 </Card>
@@ -80,7 +80,7 @@ export default function UserStatisticsAdmin({ adminStatistic }) {
                   <CardContent>
                     <div className="text-2xl font-bold">
                       +{" "}
-                      {adminStatistic.numberOfCustomersIncreaseCompareLastWeek}
+                      {adminStatistic.numberOfCustomersIncreaseCompareLastWeek || 0}
                     </div>
                   </CardContent>
                 </Card>
@@ -94,7 +94,7 @@ export default function UserStatisticsAdmin({ adminStatistic }) {
                   <CardContent>
                     <div className="text-2xl font-bold">
                       +{" "}
-                      {adminStatistic.numberOfCustomersIncreaseCompareLastMonth}
+                      {adminStatistic.numberOfCustomersIncreaseCompareLastMonth || 0}
                     </div>
                   </CardContent>
                 </Card>
@@ -108,7 +108,7 @@ export default function UserStatisticsAdmin({ adminStatistic }) {
                   <CardContent>
                     <div className="text-2xl font-bold">
                       +{" "}
-                      {adminStatistic.numberOfCustomersIncreaseCompareLastYear}
+                      {adminStatistic.numberOfCustomersIncreaseCompareLastYear || 0}
                     </div>
                   </CardContent>
                 </Card>

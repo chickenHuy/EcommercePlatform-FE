@@ -23,7 +23,7 @@ export default function OrderStatisticsAdmin({ adminStatistic }) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {adminStatistic.numberOfOrdersWaitingForShipping}
+                {adminStatistic.numberOfOrdersWaitingForShipping || 0}
               </div>
             </CardContent>
           </Card>
@@ -36,7 +36,7 @@ export default function OrderStatisticsAdmin({ adminStatistic }) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {adminStatistic.numberOfOrdersPickedUp}
+                {adminStatistic.numberOfOrdersPickedUp || 0}
               </div>
             </CardContent>
           </Card>
@@ -49,7 +49,7 @@ export default function OrderStatisticsAdmin({ adminStatistic }) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {adminStatistic.numberOfOrdersOutForDelivery}
+                {adminStatistic.numberOfOrdersOutForDelivery || 0}
               </div>
             </CardContent>
           </Card>
@@ -62,7 +62,7 @@ export default function OrderStatisticsAdmin({ adminStatistic }) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {adminStatistic.numberOfOrdersDelivered}
+                {adminStatistic.numberOfOrdersDelivered || 0}
               </div>
             </CardContent>
           </Card>
@@ -77,7 +77,7 @@ export default function OrderStatisticsAdmin({ adminStatistic }) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {adminStatistic.numberOfOrdersPending}
+                {adminStatistic.numberOfOrdersPending || 0}
               </div>
             </CardContent>
           </Card>
@@ -88,7 +88,7 @@ export default function OrderStatisticsAdmin({ adminStatistic }) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {adminStatistic.numberOfOrdersCancelled}
+                {adminStatistic.numberOfOrdersCancelled || 0}
               </div>
             </CardContent>
           </Card>
