@@ -27,12 +27,14 @@ export const roundToNearest = (num, decimalPlaces) => {
 };
 
 export const formatCurrency = (value) => {
-  return Number(value).toLocaleString("vi-VN", {
+  const absoluteValue = Math.abs(Number(value));
+  const formatted = absoluteValue.toLocaleString("vi-VN", {
     style: "currency",
     currency: "VND",
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   });
+  return value < 0 ? `- ${formatted}` : formatted;
 };
 
 // export const formatDate = (isoString) => {

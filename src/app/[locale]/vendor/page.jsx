@@ -6,7 +6,7 @@ import { formatCurrency } from "@/utils/commonUtils";
 import { getStoreStatistic } from "@/api/vendor/storeStatisticRequest";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState, useCallback } from "react";
-import ChartSeller from "./chart";
+import ChartSeller from "./chartSeller";
 
 export default function Dashboard() {
   const [storeStatistic, setStoreStatistic] = useState({
