@@ -87,7 +87,6 @@ export default function CheckoutContent(props) {
 
     try {
       const res = await checkoutOrders(orderData);
-      dispatch(setCheckout([]));
       if (paymentMethod === "VN_PAY") {
         window.location.href = res.result.paymentUrl;
       } else {

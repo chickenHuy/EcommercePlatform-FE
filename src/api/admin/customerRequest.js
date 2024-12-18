@@ -24,7 +24,7 @@ export const getUserById = (userId) => {
 
 export const handleAccountCustomer = (accountId, password) => {
   try {
-    const data = { password: password, id: accountId };
+    const data = { password: password ? password : "" , id: accountId };
     console.log(data);
 
     const response = put(`/api/v1/users/customers`, data);

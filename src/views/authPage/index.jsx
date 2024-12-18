@@ -19,14 +19,40 @@ import { useRouter } from "next/navigation";
 import SignUpNow from "@/app/[locale]/auth/signUp";
 import Cookies from "js-cookie";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 const AuthPage = () => {
   const [isSignIn, setIsSignIn] = useState(true);
   const t = useTranslations("AuthPage");
+  const { toast } = useToast();
 
   const loginData = useSelector((state) => state.loginReducer);
   const router = useRouter();
 
   const handleLogin = () => {
+    if (!loginData.username && !loginData.password) {
+      toast({
+        variant: "destructive",
+        title: "Lỗi",
+        description: "Vui lòng nhập đầy đủ thông tin",
+      })
+      return;
+    }
+    if (!loginData.username) {
+      toast({
+        variant: "destructive",
+        title: "Lỗi",
+        description: "Vui lòng nhập thông tin Username",
+      })
+      return;
+    }
+    if (!loginData.password) {
+      toast({
+        variant: "destructive",
+        title: "Lỗi",
+        description: "Vui lòng nhập thông tin Password",
+      })
+      return;
+    }
     const data = {
       username: loginData.username,
       password: loginData.password,
@@ -78,9 +104,8 @@ const AuthPage = () => {
       <div className="w-fit h-fit flex flex-col justify-center items-center lg:flex-row lg:gap-5">
         <div className="relative w-full lg:w-[45%] h-fit">
           <div
-            className={`w-full h-fit py-24 lg:py-0 px-4 absolute lg:top-1/2 lg:-translate-y-1/2 duration-500 ${
-              isSignIn ? "scale-100 opacity-100" : "scale-0 opacity-0"
-            }`}
+            className={`w-full h-fit py-24 lg:py-0 px-4 absolute lg:top-1/2 lg:-translate-y-1/2 duration-500 ${isSignIn ? "scale-100 opacity-100" : "scale-0 opacity-0"
+              }`}
           >
             <div className="flex flex-row justify-center items-center mb-2">
               <Logo width={"70"} />
@@ -181,9 +206,8 @@ const AuthPage = () => {
           </div>
 
           <div
-            className={`w-full h-fit py-24 lg:py-0 px-4 duration-500 ${
-              !isSignIn ? "scale-100 opacity-100" : "scale-0 opacity-0"
-            }`}
+            className={`w-full h-fit py-24 lg:py-0 px-4 duration-500 ${!isSignIn ? "scale-100 opacity-100" : "scale-0 opacity-0"
+              }`}
           >
             <div className="flex flex-row justify-center items-center mb-2">
               <Logo width={"70"} />

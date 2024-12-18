@@ -51,6 +51,7 @@ export default function Content() {
       productCategory !== "" &&
       productBrand !== "" &&
       productDetails.trim() !== "" &&
+      productDescription.trim().length <= 255 &&
       productDescription.trim() !== "";
 
     setIsCompleteBasic(isComplete);
