@@ -22,6 +22,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { formatCurrency } from "@/utils/commonUtils";
 
 const chartConfig = {
   revenue: {
@@ -52,7 +53,12 @@ function generateMonthOptions() {
   });
 }
 
-export function ChartAdmin({ chartData, setYear, setMonth }) {
+export function ChartAdmin({
+  chartData,
+  totalRevenueOneYear,
+  setYear,
+  setMonth,
+}) {
   const [selectedYear, setSelectedYear] = useState(() =>
     new Date().getFullYear().toString()
   );
@@ -74,12 +80,6 @@ export function ChartAdmin({ chartData, setYear, setMonth }) {
     () => filteredChartData.reduce((acc, curr) => acc + (curr.revenue || 0), 0),
     [filteredChartData]
   );
-
-  const yearlyTotal = useMemo(() => {
-    return chartData
-      .filter((item) => item.date.startsWith(selectedYear))
-      .reduce((acc, curr) => acc + (curr.revenue || 0), 0);
-  }, [selectedYear, chartData]);
 
   const handleYearChange = (value) => {
     setSelectedYear(value);
@@ -133,18 +133,16 @@ export function ChartAdmin({ chartData, setYear, setMonth }) {
             <span className="text-xl font-bold text-muted-foreground">
               {monthOptions.find((m) => m.value === selectedMonth)?.label}:
             </span>
-            <span className="text-2xl font-bold">
-              {total.toLocaleString()} đ
-            </span>
+            <span className="text-2xl font-bold">{formatCurrency(total)}</span>
           </div>
-          {/* <div className="mb-4 flex items-center space-x-2">
+          <div className="mb-4 flex items-center space-x-2">
             <span className="text-xl font-bold text-muted-foreground">
               Năm {selectedYear}:
             </span>
             <span className="text-2xl font-bold">
-              {yearlyTotal.toLocaleString()} đ
+              {formatCurrency(totalRevenueOneYear)}
             </span>
-          </div> */}
+          </div>
         </div>
         <ChartContainer
           config={chartConfig}
