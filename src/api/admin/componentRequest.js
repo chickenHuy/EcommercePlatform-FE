@@ -27,7 +27,7 @@ const updateComponent = async (id, data) => {
   }
 }
 
-const removeComponent = async (id, data) => {
+const removeComponent = async (id) => {
   try {
     const response = await del(`/api/v1/components/${id}`);
     return response;

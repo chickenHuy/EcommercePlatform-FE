@@ -197,7 +197,7 @@ export default function ManageComponent() {
           title: "Thành công",
           description: `Thông số kỹ thuật "${componentToDelete.name}" đã được xóa`,
         });
-        loadComponents(currentPage);
+        loadComponents(currentPageGlobal);
         setIsDialogConfirmOpen(false);
         setComponentTableName(null);
       } catch (error) {

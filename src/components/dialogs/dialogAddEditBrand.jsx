@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { createBrand, updateBrand } from "@/api/admin/brandRequest";
+import { Textarea } from "../ui/textarea";
 
 const brandSchema = z.object({
   name: z
@@ -124,7 +125,7 @@ export default function DialogAddEditBrand(props) {
             <Label htmlFor="description" className="text-right">
               Mô tả
             </Label>
-            <Input
+            <Textarea
               placeholder="mô tả"
               className="col-span-3"
               {...brandForm.register("description")}

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import iconNotFound from "../../../public/images/iconNotFound.png";
+import brandEmpty from "@/assets/images/brandEmpty.jpg";
 import { uploadBrandLogo } from "@/api/admin/brandRequest";
 import { useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -27,10 +27,11 @@ export default function DialogImageBrand(props) {
     description,
     nameButton,
     tableName,
+    setLoading,
   } = props;
   const [file, setFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(
-    brandImage.logoUrl || iconNotFound
+    brandImage.logoUrl || brandEmpty
   );
   const { toast } = useToast();
   const fileInputRef = useRef(null);
@@ -65,6 +66,7 @@ export default function DialogImageBrand(props) {
     }
 
     try {
+      setLoading(true);
       await uploadBrandLogo(brandImage.id, file);
       toast({
         title: "Thành công",
@@ -79,6 +81,8 @@ export default function DialogImageBrand(props) {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -102,12 +106,12 @@ export default function DialogImageBrand(props) {
               alt="Logo thương hiệu"
               className="aspect-square rounded-md object-cover"
               src={imagePreview}
-              width="384"
-              height="384"
+              width={250}
+              height={250}
               unoptimized
               priority
             />
-            <div className="w-full">
+            <div className="w-full flex items-center justify-center">
               <Input
                 ref={fileInputRef}
                 type="file"
@@ -118,7 +122,7 @@ export default function DialogImageBrand(props) {
               <Button
                 onClick={handleFileInputClick}
                 variant="outline"
-                className="w-full text-sm font-bold"
+                className="w-2/3 text-sm font-bold"
               >
                 Chọn Ảnh
               </Button>

@@ -91,7 +91,12 @@ export default function ManageBrand() {
 
   const fetchBrand = useCallback(async () => {
     try {
-      const response = await getAllBrand(currentPage, pageSize, sortType, searchTerm);
+      const response = await getAllBrand(
+        currentPage,
+        pageSize,
+        sortType,
+        searchTerm
+      );
       setBrands(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
@@ -136,6 +141,7 @@ export default function ManageBrand() {
   };
 
   const handleEditButtonClick = (brand) => {
+    console.log("handleEditButtonClick: ", brand);
     setSelectedBrand(brand);
     setIsDialogAddEditOpen(true);
     setDialogAddEditTitle("Sửa thương hiệu");
@@ -284,7 +290,7 @@ export default function ManageBrand() {
                     <TableBody>
                       {brands.map((brand) => (
                         <TableRow key={brand.id}>
-                          <TableCell className="hidden sm:table-cell">
+                          <TableCell className="font-medium hidden sm:table-cell">
                             <div className="flex items-center justify-center">
                               <Image
                                 alt={brand.name}
@@ -297,16 +303,16 @@ export default function ManageBrand() {
                               />
                             </div>
                           </TableCell>
-                          <TableCell className="text-center">
+                          <TableCell className="font-medium text-center">
                             {brand.name}
                           </TableCell>
-                          <TableCell className="text-center">
+                          <TableCell className="font-medium text-center">
                             {brand.description || "(trống)"}
                           </TableCell>
-                          <TableCell className="hidden md:table-cell text-center">
+                          <TableCell className="font-medium hidden md:table-cell text-center">
                             {formatDate(brand.createdAt)}
                           </TableCell>
-                          <TableCell className="text-center">
+                          <TableCell className="font-medium text-center">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button
@@ -403,6 +409,7 @@ export default function ManageBrand() {
           brandImage={selectedBrand}
           refreshPage={refreshPage}
           tableName={brandTableName}
+          setLoading={setIsLoading}
         />
       )}
       {isDialogConfirmOpen && (

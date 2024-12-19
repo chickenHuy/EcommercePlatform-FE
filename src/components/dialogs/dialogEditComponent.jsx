@@ -26,9 +26,14 @@ import {
 } from "@/components/ui/tooltip";
 
 const FormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
+  name: z
+    .string()
+    .min(3, {
+      message: "Tên thông số kỹ thuật phải từ 2 đến 100 ký tự",
+    })
+    .max(100, {
+      message: "Tên thông số kỹ thuật phải từ 2 đến 100 ký tự",
+    }),
   required: z.boolean(),
 });
 

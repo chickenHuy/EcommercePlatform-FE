@@ -14,9 +14,7 @@ export const getAllBrand = (page, size, sortType, search) => {
 
 export const getListAllBrand = () => {
   try {
-    const response = get(
-      `/api/v1/brands/all`
-    );
+    const response = get(`/api/v1/brands/all`);
     return response;
   } catch (error) {
     console.error("Error during get all brand:", error);
