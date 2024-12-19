@@ -19,10 +19,18 @@ import { useEffect } from "react";
 import { createBrand, updateBrand } from "@/api/admin/brandRequest";
 
 const brandSchema = z.object({
-  name: z.string().trim().min(1, {
-    message: "Tên thương hiệu không được để trống",
+  name: z
+    .string()
+    .trim()
+    .min(2, {
+      message: "Tên thương hiệu phải từ 2 đến 30 ký tự",
+    })
+    .max(30, {
+      message: "Tên thương hiệu phải từ 2 đến 30 ký tự",
+    }),
+  description: z.string().trim().max(255, {
+    message: "Mô tả không được vượt quá 255 ký tự",
   }),
-  description: z.string().trim(),
 });
 
 export default function DialogAddEditBrand(props) {
@@ -60,24 +68,16 @@ export default function DialogAddEditBrand(props) {
     }
   }, [brandDataEdit, brandForm]);
 
-  const handleSubmit = async (brandData) => {
+  const onSubmit = async (brandData) => {
     try {
-      const payload = {
-        name: brandData.name.trim(),
-        description:
-          brandData.description.trim() === ""
-            ? null
-            : brandData.description.trim(),
-      };
-
-      if (brandDataEdit && brandDataEdit.id) {
-        await updateBrand(brandDataEdit.id, payload);
+      if (brandDataEdit) {
+        await updateBrand(brandDataEdit.id, brandData);
         toast({
           title: "Thành công",
           description: "Thương hiệu đã được cập nhật",
         });
       } else {
-        await createBrand(payload);
+        await createBrand(brandData);
         toast({
           title: "Thành công",
           description: "Thương hiệu mới đã được thêm",
@@ -102,10 +102,7 @@ export default function DialogAddEditBrand(props) {
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <form
-          onSubmit={brandForm.handleSubmit(handleSubmit)}
-          className="space-y-4"
-        >
+        <form onSubmit={brandForm.handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="text-right">
               Tên TH

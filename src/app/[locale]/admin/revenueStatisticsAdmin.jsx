@@ -25,7 +25,7 @@ export default function RevenueStatisticsAdmin({
 }) {
   return (
     <div className="space-y-4 border p-6 rounded-2xl bg-gray-primary bg-opacity-10">
-      <span className="ml-4">Phân tích doanh thu</span>
+      <span className="ml-4 text-xl font-bold">Phân tích doanh thu</span>
       <div className="space-y-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
@@ -185,7 +185,7 @@ export default function RevenueStatisticsAdmin({
                   </TableBody>
                 </Table>
               ) : (
-                <div className="min-h-[200px] flex flex-col justify-center items-center space-y-2">
+                <div className="min-h-[200px] flex flex-col justify-center items-center space-y-4">
                   <Image
                     alt="ảnh trống"
                     className="mx-auto"

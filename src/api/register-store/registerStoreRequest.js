@@ -15,7 +15,7 @@ export const registerStore = async (data) => {
     const response = await post("/api/v1/stores/register-store", data);
     return response;
   } catch (error) {
-    console.error("Error during creating brand:", error);
+    console.error("Error during register store:", error);
     throw error;
   }
 };

@@ -1,5 +1,5 @@
 "use client";
-import { File, ListFilter, MoreHorizontal, SearchIcon } from "lucide-react";
+import { ListFilter, MoreHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import EditIcon from "@mui/icons-material/Edit";
@@ -42,16 +42,19 @@ import {
   removeComponent,
   updateComponent,
 } from "@/api/admin/componentRequest";
-import Loading from "@/components/loading";
 import { formatDate } from "@/utils/commonUtils";
 import { useToast } from "@/hooks/use-toast";
 import DialogConfirm from "@/components/dialogs/dialogConfirm";
 import { useSelector } from "react-redux";
+import { CircularProgress } from "@mui/material";
+import Image from "next/image";
+import { Label } from "@/components/ui/label";
+import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
 
 export default function ManageComponent() {
   const { toast } = useToast();
   const searchTerm = useSelector((state) => state.searchReducer.searchTerm);
-  const pageSize = 20;
+  const pageSize = 10;
   const [listComponents, setListComponents] = useState(null);
   let currentPageGlobal = 1;
   const [paginationData, setPaginationData] = useState({
@@ -75,6 +78,7 @@ export default function ManageComponent() {
   const [isDialogConfirmOpen, setIsDialogConfirmOpen] = useState(false);
   const [componentToDelete, setComponentToDelete] = useState(null);
   const [componentTableName, setComponentTableName] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const loadComponents = async (page) => {
     setListComponents(null);
@@ -92,10 +96,10 @@ export default function ManageComponent() {
       totalElements: response?.result?.totalElements || 0,
     }));
 
-
     data = sortData(data, sortOption);
     data = filterData(data, requirementOption);
     setListComponents(data);
+    setIsLoading(false);
   };
 
   const filterData = (data, filter) => {
@@ -159,6 +163,7 @@ export default function ManageComponent() {
         console.log(error);
       });
   };
+
   const handleUpdateComponent = (id, data) => {
     updateComponent(data, id)
       .then(() => {
@@ -210,199 +215,224 @@ export default function ManageComponent() {
       <Toaster />
       <div className="flex flex-col sm:gap-4 sm:py-4">
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-          <Tabs defaultValue="all">
-            <div className="flex items-center">
-              <div className="ml-auto flex items-center gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-7 gap-1">
-                      <ListFilter className="h-3.5 w-3.5" />
-                      <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        Lọc
-                      </span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Lọc bởi</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuRadioGroup
-                      value={sortOption}
-                      onValueChange={setSortOption}
-                    >
-                      <DropdownMenuRadioItem value="newest">
-                        Mới nhất
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="oldest">
-                        Cũ nhất
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="az">
-                        A - Z
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="za">
-                        Z - A
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuRadioGroup
-                      value={requirementOption}
-                      onValueChange={setRequirementOption}
-                    >
-                      <DropdownMenuRadioItem value="all">
-                        Tất cả
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="required">
-                        Bắt buộc
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="notRequired">
-                        Không bắt buộc
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <DialogEditComponent
-                  name={"Thêm thành phần"}
-                  content={"Thêm thành phần mới"}
-                  description={
-                    "Sản phẩm thuộc danh mục có thành phần này sẽ có thể điền nội dung vào"
-                  }
-                  nameButton={"Thêm mới"}
-                  typeDisplay={"button"}
-                  icon={<AddCircleOutlineIcon />}
-                  handleSaveChange={handleCreateComponent}
-                />
-              </div>
+          {isLoading ? (
+            <div className="fixed inset-0 flex flex-col justify-center items-center z-[100] space-y-4 bg-black-secondary">
+              <CircularProgress />
+              <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
             </div>
-            <TabsContent value="all" className="mt-4">
-              <Card x-chunk="dashboard-06-chunk-0">
-                <CardHeader>
-                  <CardTitle className="text-[18px] font-extrabold">
-                    Thành Phần Thông Số Kỹ Thuật
-                  </CardTitle>
-                  <CardDescription className="text-black-primary font-bold text-[15px]">
-                    Quản lý các thành phần thông số kỹ thuật của sản phẩm.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>#</TableHead>
-                        <TableHead>Tên thành phần</TableHead>
-                        <TableHead>Bắt buộc</TableHead>
-                        <TableHead className="hidden lg:table-cell">
-                          Ngày tạo
-                        </TableHead>
-                        <TableHead className="hidden lg:table-cell">
-                          Ngày cập nhật
-                        </TableHead>
-                        <TableHead className="hidden md:table-cell">
-                          Hành động
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {listComponents !== null &&
-                        listComponents.map((component, index) => {
-                          return (
-                            <TableRow key={index}>
-                              <TableCell className="text-center">
-                                {index + pageSize * (currentPageGlobal - 1) + 1}
-                              </TableCell>
-                              <TableCell>{component.name}</TableCell>
-                              <TableCell className="text-center">
-                                <Badge
-                                  variant="outline"
-                                  className="px-5 text-[14px] font-bold"
-                                >
-                                  {component.required ? "Có" : "Không"}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="hidden lg:table-cell text-center">
-                                {formatDate(component.createdAt)}
-                              </TableCell>
-                              <TableCell className="hidden lg:table-cell text-center">
-                                {formatDate(component.lastUpdatedAt)}
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      aria-haspopup="true"
-                                      size="icon"
-                                      variant="ghost"
+          ) : (
+            <Tabs defaultValue="all">
+              <div className="flex items-center">
+                <div className="ml-auto flex items-center gap-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-7 gap-1">
+                        <ListFilter className="h-3.5 w-3.5" />
+                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                          Lọc
+                        </span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Lọc bởi</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuRadioGroup
+                        value={sortOption}
+                        onValueChange={setSortOption}
+                      >
+                        <DropdownMenuRadioItem value="newest">
+                          Mới nhất
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="oldest">
+                          Cũ nhất
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="az">
+                          A - Z
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="za">
+                          Z - A
+                        </DropdownMenuRadioItem>
+                      </DropdownMenuRadioGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuRadioGroup
+                        value={requirementOption}
+                        onValueChange={setRequirementOption}
+                      >
+                        <DropdownMenuRadioItem value="all">
+                          Tất cả
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="required">
+                          Bắt buộc
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="notRequired">
+                          Không bắt buộc
+                        </DropdownMenuRadioItem>
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <DialogEditComponent
+                    name={"Thêm thành phần"}
+                    content={"Thêm thành phần mới"}
+                    description={
+                      "Sản phẩm thuộc danh mục có thành phần này sẽ có thể điền nội dung vào"
+                    }
+                    nameButton={"Thêm mới"}
+                    typeDisplay={"button"}
+                    icon={<AddCircleOutlineIcon />}
+                    handleSaveChange={handleCreateComponent}
+                  />
+                </div>
+              </div>
+              <TabsContent value="all" className="mt-4">
+                {listComponents && listComponents.length > 0 ? (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-[18px] font-extrabold">
+                        Thành Phần Thông Số Kỹ Thuật
+                      </CardTitle>
+                      <CardDescription className="text-black-primary font-bold text-[15px]">
+                        Quản lý các thành phần thông số kỹ thuật của sản phẩm.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>#</TableHead>
+                            <TableHead>Tên thành phần</TableHead>
+                            <TableHead>Bắt buộc</TableHead>
+                            <TableHead className="hidden lg:table-cell">
+                              Ngày tạo
+                            </TableHead>
+                            <TableHead className="hidden lg:table-cell">
+                              Ngày cập nhật
+                            </TableHead>
+                            <TableHead className="hidden md:table-cell">
+                              Hành động
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {listComponents !== null &&
+                            listComponents.map((component, index) => {
+                              return (
+                                <TableRow key={index}>
+                                  <TableCell className="text-center">
+                                    {index +
+                                      pageSize * (currentPageGlobal - 1) +
+                                      1}
+                                  </TableCell>
+                                  <TableCell>{component.name}</TableCell>
+                                  <TableCell className="text-center">
+                                    <Badge
+                                      variant="outline"
+                                      className="px-5 text-[14px] font-bold"
                                     >
-                                      <MoreHorizontal className="h-4 w-4" />
-                                      <span className="sr-only">
-                                        Toggle menu
-                                      </span>
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>
-                                      Hành động
-                                    </DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem
-                                      onSelect={(e) => e.preventDefault()}
-                                    >
-                                      <DialogEditComponent
-                                        id={component.id}
-                                        initValue={component.name}
-                                        name={"Sửa"}
-                                        icon={<EditIcon />}
-                                        content={"Sửa thành phần"}
-                                        nameButton={"Lưu thay đổi"}
-                                        handleSaveChange={handleUpdateComponent}
-                                      />
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      className="flex flex-row justify-between items-center cursor-pointer"
-                                      onClick={() =>
-                                        handleClickButtonRemoveComponent(
-                                          component
-                                        )
-                                      }
-                                    >
-                                      <span>Xoá</span>
-                                      <DeleteIcon className="scale-75" />
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                    </TableBody>
-                  </Table>
-                  {listComponents === null && <Loading />}
-                </CardContent>
-                <CardFooter className="relative">
-                  <div className="w-full text-xs text-muted-foreground">
-                    Hiển thị{" "}
-                    <strong>
-                      {1 +
-                        pageSize * (currentPageGlobal - 1) +
-                        " - " +
-                        pageSize * currentPageGlobal}
-                    </strong>{" "}
-                    trong <strong>{paginationData.totalElements}</strong> thành
-                    phần
-                  </div>
-                  <div className="absolute right-1/2 translate-x-1/2">
-                    <PaginationAdminTable
-                      hasNext={paginationData.hasNext}
-                      hasPrevious={paginationData.hasPrevious}
-                      handleNextPage={paginationData.handleNextPage}
-                      handlePrevPage={paginationData.handlePrevPage}
-                      currentPage={paginationData.currentPage}
-                      totalPage={paginationData.totalPage}
-                      setCurrentPage={paginationData.setCurrentPage}
+                                      {component.required ? "Có" : "Không"}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="hidden lg:table-cell text-center">
+                                    {formatDate(component.createdAt)}
+                                  </TableCell>
+                                  <TableCell className="hidden lg:table-cell text-center">
+                                    {formatDate(component.lastUpdatedAt)}
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                        <Button
+                                          aria-haspopup="true"
+                                          size="icon"
+                                          variant="ghost"
+                                        >
+                                          <MoreHorizontal className="h-4 w-4" />
+                                          <span className="sr-only">
+                                            Toggle menu
+                                          </span>
+                                        </Button>
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent align="end">
+                                        <DropdownMenuLabel>
+                                          Hành động
+                                        </DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem
+                                          onSelect={(e) => e.preventDefault()}
+                                        >
+                                          <DialogEditComponent
+                                            id={component.id}
+                                            initValue={component.name}
+                                            name={"Sửa"}
+                                            icon={<EditIcon />}
+                                            content={"Sửa thành phần"}
+                                            nameButton={"Lưu thay đổi"}
+                                            handleSaveChange={
+                                              handleUpdateComponent
+                                            }
+                                          />
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                          className="flex flex-row justify-between items-center cursor-pointer"
+                                          onClick={() =>
+                                            handleClickButtonRemoveComponent(
+                                              component
+                                            )
+                                          }
+                                        >
+                                          <span>Xoá</span>
+                                          <DeleteIcon className="scale-75" />
+                                        </DropdownMenuItem>
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                    <CardFooter className="relative">
+                      <div className="w-full text-xs text-muted-foreground">
+                        Hiển thị{" "}
+                        <strong>
+                          {1 +
+                            pageSize * (currentPageGlobal - 1) +
+                            " - " +
+                            pageSize * currentPageGlobal}
+                        </strong>{" "}
+                        trong <strong>{paginationData.totalElements}</strong>{" "}
+                        thành phần
+                      </div>
+                      <div className="absolute right-1/2 translate-x-1/2">
+                        <PaginationAdminTable
+                          hasNext={paginationData.hasNext}
+                          hasPrevious={paginationData.hasPrevious}
+                          handleNextPage={paginationData.handleNextPage}
+                          handlePrevPage={paginationData.handlePrevPage}
+                          currentPage={paginationData.currentPage}
+                          totalPage={paginationData.totalPage}
+                          setCurrentPage={paginationData.setCurrentPage}
+                        />
+                      </div>
+                    </CardFooter>
+                  </Card>
+                ) : (
+                  <div className="flex flex-col items-center justify-center border rounded-lg min-h-[400px] mt-6">
+                    <Image
+                      alt="ảnh trống"
+                      className="mx-auto"
+                      src={ReviewEmpty}
+                      width={200}
+                      height={200}
                     />
+                    <Label className="text-xl text-gray-tertiary text-center m-2">
+                      Hiện tại chưa có thông số kỹ thuật nào
+                    </Label>
                   </div>
-                </CardFooter>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                )}
+              </TabsContent>
+            </Tabs>
+          )}
         </main>
       </div>
       {isDialogConfirmOpen && (

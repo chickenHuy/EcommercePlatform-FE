@@ -1,9 +1,9 @@
 import { del, get, post, put } from "@/lib/httpClient";
 
-export const getAllCategory = (page, sortType, search = "") => {
+export const getAllCategory = (page, size, sortType, search) => {
   try {
     const response = get(
-      `/api/v1/categories?page=${page}&size=8&sort=${sortType}&search=${search}`
+      `/api/v1/categories?page=${page}&size=${size}&sort=${sortType}&search=${search}`
     );
     return response;
   } catch (error) {

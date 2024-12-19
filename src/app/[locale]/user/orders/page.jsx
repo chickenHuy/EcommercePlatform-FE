@@ -39,6 +39,7 @@ import { Badge } from "@/components/ui/badge";
 import { OrderReviewDialog } from "@/components/dialogs/dialogReview";
 import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
 import StoreEmpty from "@/assets/images/storeEmpty.jpg";
+import { formatCurrency } from "@/utils/commonUtils";
 
 export default function ManageOrderUser() {
   const [orders, setOrders] = useState([]);
@@ -172,15 +173,6 @@ export default function ManageOrderUser() {
   useEffect(() => {
     fetchAllOrderByUser();
   }, [fetchAllOrderByUser]);
-
-  function formatCurrency(value) {
-    return Number(value).toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
-  }
 
   function getStatusOrder(status) {
     switch (status) {

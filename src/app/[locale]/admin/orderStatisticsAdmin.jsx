@@ -11,7 +11,7 @@ import {
 export default function OrderStatisticsAdmin({ adminStatistic }) {
   return (
     <div className="space-y-4 border p-6 rounded-2xl bg-gray-primary bg-opacity-10">
-      <span className="ml-4">Danh sách đơn hàng</span>
+      <span className="ml-4 text-xl font-bold">Danh sách đơn hàng</span>
       <div className="space-y-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
