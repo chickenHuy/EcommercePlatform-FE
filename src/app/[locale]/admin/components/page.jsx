@@ -317,27 +317,27 @@ export default function ManageComponent() {
                             listComponents.map((component, index) => {
                               return (
                                 <TableRow key={index}>
-                                  <TableCell className="text-center">
+                                  <TableCell className="font-medium text-center">
                                     {index +
                                       pageSize * (currentPageGlobal - 1) +
                                       1}
                                   </TableCell>
-                                  <TableCell>{component.name}</TableCell>
-                                  <TableCell className="text-center">
+                                  <TableCell className="font-medium">{component.name}</TableCell>
+                                  <TableCell className="font-medium text-center">
                                     <Badge
                                       variant="outline"
-                                      className="px-5 text-[14px] font-bold"
+                                      className="px-5 text-[14px] font-medium"
                                     >
                                       {component.required ? "Có" : "Không"}
                                     </Badge>
                                   </TableCell>
-                                  <TableCell className="hidden lg:table-cell text-center">
+                                  <TableCell className="font-medium hidden lg:table-cell text-center">
                                     {formatDate(component.createdAt)}
                                   </TableCell>
-                                  <TableCell className="hidden lg:table-cell text-center">
+                                  <TableCell className="font-medium hidden lg:table-cell text-center">
                                     {formatDate(component.lastUpdatedAt)}
                                   </TableCell>
-                                  <TableCell className="text-center">
+                                  <TableCell className="font-medium text-center">
                                     <DropdownMenu>
                                       <DropdownMenuTrigger asChild>
                                         <Button

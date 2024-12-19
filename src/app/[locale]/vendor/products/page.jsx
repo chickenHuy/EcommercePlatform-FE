@@ -50,6 +50,7 @@ import { Search, Update, UpdateSharp } from "@mui/icons-material";
 import { toast } from "@/hooks/use-toast";
 import Loading from "@/components/loading";
 import { ProductUpdateDialog } from "@/app/[locale]/vendor/products/_update/productUpdateDialog";
+import { formatDate } from "@/utils/commonUtils";
 export default function ManageComponent() {
   const [updated, setUpdated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -325,14 +326,14 @@ export default function ManageComponent() {
                             <TableCell className="font-medium text-center">
                               {product.quantity}
                             </TableCell>
-                            <TableCell className="hidden lg:table-cell text-center">
+                            <TableCell className="font-medium hidden lg:table-cell text-center">
                               {formatCurrency(product.salePrice) + " đ"}
                             </TableCell>
-                            <TableCell className="hidden md:table-cell text-center">
-                              {new Date(product.createdAt).toLocaleString()}{" "}
+                            <TableCell className="font-medium hidden md:table-cell text-center">
+                              {formatDate(product.createdAt)}
                             </TableCell>
-                            <TableCell className="hidden md:table-cell text-center">
-                              {product.rating}
+                            <TableCell className="font-medium hidden md:table-cell text-center">
+                              {product.rating || 0}
                             </TableCell>
                             <TableCell className="text-center">
                               <DropdownMenu>
@@ -390,7 +391,7 @@ export default function ManageComponent() {
                                   <DropdownMenuItem
                                     className="flex flex-row justify-between items-center cursor-pointer"
                                     onClick={() => {
-                                      setIsDialogUpdateOpen(true)
+                                      setIsDialogUpdateOpen(true);
                                       setProductSelected(product.id);
                                     }}
                                   >

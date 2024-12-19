@@ -1,9 +1,9 @@
 import { get, put } from "@/lib/httpClient";
 
-export const getAllAdmin = (page, tab, sortType, search = "") => {
+export const getAllAdmin = (page, size, tab, sortType, search = "") => {
   try {
     const response = get(
-      `/api/v1/users/manages?page=${page}&size=8&tab=${tab}&sort=${sortType}&search=${search}`
+      `/api/v1/users/manages?page=${page}&size=${size}&tab=${tab}&sort=${sortType}&search=${search}`
     );
     return response;
   } catch (error) {

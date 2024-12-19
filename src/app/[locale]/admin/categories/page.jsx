@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ListFilter, PlusCircle, Trash } from "lucide-react";
+import { ListFilter, PlusCircle } from "lucide-react";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -91,7 +92,12 @@ export default function ManageCategories() {
 
   const fetchCategory = useCallback(async () => {
     try {
-      const response = await getAllCategory(currentPage, pageSize, sortType, searchTerm);
+      const response = await getAllCategory(
+        currentPage,
+        pageSize,
+        sortType,
+        searchTerm
+      );
       setCategories(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
@@ -278,7 +284,7 @@ export default function ManageCategories() {
                                 handleDeleteButtonClick(category);
                               }}
                             >
-                              <Trash className="h-4 w-4 text-error-dark" />
+                              <DeleteIcon className="h-4 w-4" />
                               <span className="sr-only">Xoá</span>
                             </Button>
                           </TableCell>

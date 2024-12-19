@@ -1,4 +1,5 @@
 "use client";
+
 import { useCallback, useEffect, useState } from "react";
 import { ListFilter, Lock, Unlock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,7 +29,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
-import { Rating } from "@mui/material";
+import { CircularProgress, Rating } from "@mui/material";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { changeStatus, getAllStore } from "@/api/admin/storeRequest";
@@ -37,8 +38,11 @@ import { useSelector } from "react-redux";
 import { Label } from "@/components/ui/label";
 import DialogConfirmSecond from "@/components/dialogs/dialogConfirmSecond";
 import { formatDate, roundToNearest } from "@/utils/commonUtils";
+import Image from "next/image";
+import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
 
 export default function ManageStores() {
+  const pageSize = 10;
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [stores, setStores] = useState([]);
@@ -47,14 +51,14 @@ export default function ManageStores() {
   const [totalPage, setTotalPage] = useState(1);
   const { toast } = useToast();
   const [tab, setTab] = useState("active");
-  const [sortType, setSortType] = useState("");
+  const [sortType, setSortType] = useState("newest");
   const [totalElement, setTotalElement] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
   var searchTerm = useSelector((state) => state.searchReducer.searchTerm);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleNextPage = () => {
-    console.log("Current page:", currentPage, "Total page:", totalPage);
     if (currentPage < totalPage) {
       setCurrentPage(currentPage + 1);
     }
@@ -64,7 +68,6 @@ export default function ManageStores() {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
-    console.log("Current page:", currentPage, "Total page:", totalPage);
   };
 
   const handleRowClick = (storeId) => {
@@ -105,6 +108,7 @@ export default function ManageStores() {
     try {
       const response = await getAllStore(
         currentPage,
+        pageSize,
         tab,
         sortType,
         searchTerm
@@ -132,176 +136,199 @@ export default function ManageStores() {
   }, [searchTerm]);
 
   useEffect(() => {
+    setIsLoading(true);
     fetchStore();
+    setIsLoading(false);
   }, [fetchStore, totalPage, totalElement]);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <Toaster />
-      <div className="flex flex-col sm:gap-4 sm:py-4">
-        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-          <Tabs defaultValue="active">
-            <div className="flex items-center">
-              <TabsList>
-                <TabsTrigger value="active" onClick={() => setTab("active")}>
-                  Hoạt động
-                </TabsTrigger>
-                <TabsTrigger
-                  value="blocked"
-                  onClick={() => setTab("blocked")}
-                  className="hidden sm:flex"
-                >
-                  Đã khoá
-                </TabsTrigger>
-              </TabsList>
-              <div className="ml-auto flex items-center gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-7 gap-1">
-                      <ListFilter className="h-3.5 w-3.5" />
-                      <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        Sắp xếp
-                      </span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Sắp xếp theo</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuCheckboxItem
-                      onClick={() => handleSortChange("newest")}
-                      checked={sortType === "newest"}
-                    >
-                      Mới nhất
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      onClick={() => handleSortChange("az")}
-                      checked={sortType === "az"}
-                    >
-                      A - Z
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      onClick={() => handleSortChange("oldest")}
-                      checked={sortType === "oldest"}
-                    >
-                      Lâu nhất
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      onClick={() => handleSortChange("za")}
-                      checked={sortType === "za"}
-                    >
-                      Z - A
-                    </DropdownMenuCheckboxItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+      {isLoading ? (
+        <div className="fixed inset-0 flex flex-col justify-center items-center z-[100] space-y-4 bg-black-secondary">
+          <CircularProgress />
+          <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
+        </div>
+      ) : (
+        <div className="flex flex-col sm:gap-4 sm:py-4">
+          <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+            <Tabs defaultValue="active">
+              <div className="flex items-center">
+                <TabsList>
+                  <TabsTrigger value="active" onClick={() => setTab("active")}>
+                    Hoạt động
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="blocked"
+                    onClick={() => setTab("blocked")}
+                    className="hidden sm:flex"
+                  >
+                    Đã khoá
+                  </TabsTrigger>
+                </TabsList>
+                <div className="ml-auto flex items-center gap-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-7 gap-1">
+                        <ListFilter className="h-3.5 w-3.5" />
+                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                          Sắp xếp
+                        </span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Sắp xếp theo</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuCheckboxItem
+                        onClick={() => handleSortChange("newest")}
+                        checked={sortType === "newest"}
+                      >
+                        Mới nhất
+                      </DropdownMenuCheckboxItem>
+                      <DropdownMenuCheckboxItem
+                        onClick={() => handleSortChange("az")}
+                        checked={sortType === "az"}
+                      >
+                        A - Z
+                      </DropdownMenuCheckboxItem>
+                      <DropdownMenuCheckboxItem
+                        onClick={() => handleSortChange("oldest")}
+                        checked={sortType === "oldest"}
+                      >
+                        Lâu nhất
+                      </DropdownMenuCheckboxItem>
+                      <DropdownMenuCheckboxItem
+                        onClick={() => handleSortChange("za")}
+                        checked={sortType === "za"}
+                      >
+                        Z - A
+                      </DropdownMenuCheckboxItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
-            </div>
-            <TabsContent value={tab}>
-              <Card x-chunk="dashboard-06-chunk-0">
-                <CardHeader>
-                  <CardTitle>Danh sách cửa hàng ({totalElement})</CardTitle>
-                  <CardDescription>
-                    Quản lý tất cả cửa hàng trong hệ thống
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Tên cửa hàng</TableHead>
-                        <TableHead>Người dùng</TableHead>
-                        <TableHead>Ngày tạo</TableHead>
-                        <TableHead className="hidden md:table-cell">
-                          Đánh giá
-                        </TableHead>
-                        <TableHead>
-                          <span className="sr-only">Hành động</span>
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {stores.map((store) => (
-                        <TableRow
-                          key={store.id}
-                          onClick={() => handleRowClick(store.id)}
-                        >
-                          <TableCell className="font-medium text-center">
-                            {store.name}
-                          </TableCell>
-                          <TableCell className="font-medium text-center">
-                            {store.username}
-                          </TableCell>
-                          <TableCell className="font-medium text-center">
-                            {formatDate(store.created_at)}
-                          </TableCell>
-                          <TableCell className="flex items-center space-x-2 justify-center border-none">
-                            <Rating
-                              value={
-                                store?.rating
-                                  ? roundToNearest(store?.rating, 1)
-                                  : 0
-                              }
-                              precision={0.1}
-                              readOnly
-                            />
-                            <Label>
-                              (
-                              {store?.rating
-                                ? roundToNearest(store?.rating, 1)
-                                : 0}
-                              )
-                            </Label>
-                          </TableCell>
-
-                          <TableCell className="hidden md:table-cell text-center">
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedStoreId(store.id);
-                                setConfirmDialogOpen(true);
-                              }}
+              <TabsContent value={tab}>
+                {stores && stores.length > 0 ? (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Danh sách cửa hàng ({totalElement})</CardTitle>
+                      <CardDescription>
+                        Quản lý tất cả cửa hàng trong hệ thống
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Tên cửa hàng</TableHead>
+                            <TableHead>Người dùng</TableHead>
+                            <TableHead>Ngày tạo</TableHead>
+                            <TableHead className="hidden md:table-cell">
+                              Đánh giá
+                            </TableHead>
+                            <TableHead>
+                              <span className="sr-only">Hành động</span>
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {stores.map((store) => (
+                            <TableRow
+                              key={store.id}
+                              onClick={() => handleRowClick(store.id)}
                             >
-                              {tab === "active" ? (
-                                <>
-                                  <Lock className="h-4 w-4" />
-                                  <span className="sr-only">
-                                    Khoá tài khoản
-                                  </span>
-                                </>
-                              ) : (
-                                <>
-                                  <Unlock className="h-4 w-4" />
-                                  <span className="sr-only">
-                                    Khoá tài khoản
-                                  </span>
-                                </>
-                              )}
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-                <CardFooter>
-                  <PaginationAdminTable
-                    currentPage={currentPage}
-                    handleNextPage={handleNextPage}
-                    handlePrevPage={handlePrevPage}
-                    totalPage={totalPage}
-                    setCurrentPage={setCurrentPage}
-                    hasNext={hasNext}
-                    hasPrevious={hasPrevious}
-                  />
-                </CardFooter>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </main>
-      </div>
-      {/* DrawerStoreDetail Component */}
+                              <TableCell className="font-medium text-center">
+                                {store.name}
+                              </TableCell>
+                              <TableCell className="font-medium text-center">
+                                {store.username}
+                              </TableCell>
+                              <TableCell className="font-medium text-center">
+                                {formatDate(store.created_at)}
+                              </TableCell>
+                              <TableCell className="flex items-center space-x-2 justify-center border-none">
+                                <Rating
+                                  value={
+                                    store?.rating
+                                      ? roundToNearest(store?.rating, 1)
+                                      : 0
+                                  }
+                                  precision={0.1}
+                                  readOnly
+                                />
+                                <Label>
+                                  (
+                                  {store?.rating
+                                    ? roundToNearest(store?.rating, 1)
+                                    : 0}
+                                  )
+                                </Label>
+                              </TableCell>
+
+                              <TableCell className="hidden md:table-cell text-center">
+                                <Button
+                                  aria-haspopup="true"
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedStoreId(store.id);
+                                    setConfirmDialogOpen(true);
+                                  }}
+                                >
+                                  {tab === "active" ? (
+                                    <>
+                                      <Lock className="h-4 w-4" />
+                                      <span className="sr-only">
+                                        Khoá tài khoản
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Unlock className="h-4 w-4" />
+                                      <span className="sr-only">
+                                        Khoá tài khoản
+                                      </span>
+                                    </>
+                                  )}
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                    <CardFooter>
+                      <PaginationAdminTable
+                        currentPage={currentPage}
+                        handleNextPage={handleNextPage}
+                        handlePrevPage={handlePrevPage}
+                        totalPage={totalPage}
+                        setCurrentPage={setCurrentPage}
+                        hasNext={hasNext}
+                        hasPrevious={hasPrevious}
+                      />
+                    </CardFooter>
+                  </Card>
+                ) : (
+                  <div className="flex flex-col items-center justify-center border rounded-lg min-h-[400px] mt-6">
+                    <Image
+                      alt="ảnh trống"
+                      className="mx-auto"
+                      src={ReviewEmpty}
+                      width={200}
+                      height={200}
+                    />
+                    <Label className="text-xl text-gray-tertiary text-center m-2">
+                      Hiện tại chưa có cửa hàng nào
+                    </Label>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </main>
+        </div>
+      )}
       {isDrawerOpen && (
         <DrawerStoreDetail
           isOpen={isDrawerOpen}

@@ -1,9 +1,9 @@
 import { get, patch } from "@/lib/httpClient";
 
-export const getAllStore = (page, tab, sortType, search = "") => {
+export const getAllStore = (page, size, tab, sortType, search) => {
   try {
     const response = get(
-      `/api/v1/stores?page=${page}&size=8&tab=${tab}&sort=${sortType}&search=${search}`
+      `/api/v1/stores?page=${page}&size=${size}&tab=${tab}&sort=${sortType}&search=${search}`
     );
     return response;
   } catch (error) {
