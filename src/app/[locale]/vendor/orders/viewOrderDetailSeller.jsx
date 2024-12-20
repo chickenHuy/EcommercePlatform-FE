@@ -37,7 +37,7 @@ import DialogUpdateOrCancelOrderSeller from "./dialogUpdateOrCancelOrderSeller";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { formatCurrency } from "@/utils/commonUtils";
+import { formatCurrency, formatDate } from "@/utils/commonUtils";
 
 export default function ViewOrderDetailSeller(props) {
   const { isOpen, onClose, orderId } = props;
@@ -154,21 +154,6 @@ export default function ViewOrderDetailSeller(props) {
     }
   }
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-
-    const hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const seconds = date.getSeconds().toString().padStart(2, "0");
-
-    const timePart = `${hours
-      .toString()
-      .padStart(2, "0")}:${minutes}:${seconds}`;
-    const datePart = date.toLocaleDateString("vi-VN").replace(/\//g, "-");
-
-    return `${timePart} ${datePart}`;
-  }
-
   return (
     <Drawer open={isOpen} onClose={onClose}>
       <DrawerTitle></DrawerTitle>
@@ -239,7 +224,7 @@ export default function ViewOrderDetailSeller(props) {
                 )}
               </div>
               <div className="w-full flex justify-between space-x-8">
-                <div className="w-full flex flex-col space-y-8">
+                <div className="w-full flex flex-col space-y-8 mb-4">
                   <Card className="grid gap-4 p-6">
                     <Label className="text-2xl font-bold">Sản phẩm</Label>
                     {order &&

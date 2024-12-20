@@ -26,7 +26,7 @@ export default function ProductDetail({ product }) {
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [availableOptions, setAvailableOptions] = useState({});
-  const {toast} = useToast();
+  const { toast } = useToast();
 
   const initializeAvailableOptions = () => {
     const initialOptions = {};
@@ -177,7 +177,13 @@ export default function ProductDetail({ product }) {
       <div className="mx-auto px-4 bg-white-primary mt-20 w-3/4">
         <div className="grid gap-8 md:grid-cols-2 mt-2">
           <ProductMediaViewer product={product} />
-          <div className={`space-y-6 mt-2` +  product.quantity===0 ? "opacity-50 pointer-events-none relative" : ""} >
+          <div
+            className={
+              `space-y-6 mt-2` + product.quantity === 0
+                ? "opacity-50 pointer-events-none relative"
+                : ""
+            }
+          >
             {product.quantity === 0 && (
               <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
                 <div className="bg-red-primary text-white-primary font-bold text-3xl py-1 px-3 rounded-lg shadow-md transform rotate-45">
@@ -186,7 +192,6 @@ export default function ProductDetail({ product }) {
               </div>
             )}
 
-
             <div>
               <h1 className="text-3xl font-bold">{product.name}</h1>
               <div className="mt-2 flex items-center space-x-2">
@@ -194,10 +199,11 @@ export default function ProductDetail({ product }) {
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
-                      className={`h-5 w-5 ${star <= (product.rating || 0)
-                        ? "text-yellow-primary fill-current"
-                        : "text-gray-secondary"
-                        }`}
+                      className={`h-5 w-5 ${
+                        star <= (product.rating || 0)
+                          ? "text-yellow-primary fill-current"
+                          : "text-gray-secondary"
+                      }`}
                     />
                   ))}
                 </div>
@@ -256,7 +262,6 @@ export default function ProductDetail({ product }) {
                 </div>
               </div>
             ))}
-
 
             <div className="mt-1">
               <h3 className="font-semibold">Số lượng</h3>
@@ -329,9 +334,13 @@ export default function ProductDetail({ product }) {
               />
               <div>
                 <h3 className="font-semibold">{product.store.name}</h3>
-                <p className="text-sm text-black-tertiary">
-                  Đánh giá: {product.store.rating?.toFixed(1)}/5.0
-                </p>
+                {product.store.rating ? (
+                  <p className="text-sm text-black-tertiary">
+                    Đánh giá: {product.store.rating?.toFixed(1)}/5.0
+                  </p>
+                ) : (
+                  "(0 đánh giá)"
+                )}
               </div>
               <Button
                 className="mt-4 mr-auto"
@@ -362,7 +371,7 @@ export default function ProductDetail({ product }) {
 
         <div className="mx-auto px-4 bg-white-primary">
           <Suspense fallback={<Loading></Loading>}>
-            <ReviewLazy productId={product.id} product={product}/>
+            <ReviewLazy productId={product.id} product={product} />
           </Suspense>
         </div>
       </div>

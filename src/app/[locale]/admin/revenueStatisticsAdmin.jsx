@@ -163,7 +163,7 @@ export default function RevenueStatisticsAdmin({
               <CardTitle>Top 5 cửa hàng đạt doanh thu cao nhất</CardTitle>
             </CardHeader>
             <CardContent>
-              {adminStatistic.top5StoresByRevenue === null ? (
+              {adminStatistic.top5StoresByRevenue !== null ? (
                 <Table>
                   <TableHeader>
                     <TableRow>

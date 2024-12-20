@@ -22,7 +22,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import storeEmpty from "@/assets/images/storeEmpty.jpg";
 import { Toaster } from "@/components/ui/toaster";
 import DialogConfirmDeleteCartItem from "./dialogConfirmDeleteCartItem";
 import DialogConfirmSelectCartItem from "./dialogConfirmSelectCartItem";
@@ -33,6 +32,9 @@ import { useDispatch } from "react-redux";
 import { setCheckout } from "@/store/features/checkoutSlice";
 import CommonHeader from "@/components/headers/commonHeader";
 import { Separator } from "@/components/ui/separator";
+import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
+import storeEmpty from "@/assets/images/storeEmpty.jpg";
+import { formatCurrency } from "@/utils/commonUtils";
 
 export default function ManageCartUser() {
   const [carts, setCarts] = useState([]);
@@ -344,15 +346,6 @@ export default function ManageCartUser() {
     }, 0);
   };
 
-  function formatCurrency(value) {
-    return Number(value).toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
-  }
-
   const handleCheckout = () => {
     const selectedCartWithItem = carts
       .map((cart) => ({
@@ -379,7 +372,7 @@ export default function ManageCartUser() {
     <div className="flex flex-col min-h-screen w-full bg-muted/4 bg-blue-primary">
       <Toaster />
       <CommonHeader />
-      <div className="flex items-center justify-between bg-white-primary my-4 mx-40 shadow-xl border-1 py-2">
+      <div className="flex items-center justify-between bg-white-primary my-4 mx-40 shadow-xl border-1 py-2 min-h-[40px]">
         <div className="w-1/2 flex items-center">
           {/*Checkbox cart và cartItem*/}
           <div className="w-1/6 flex items-center justify-center">
@@ -407,8 +400,9 @@ export default function ManageCartUser() {
           </div>
         </div>
       </div>
+
       <div className="my-4 mx-40 space-y-4 h-full mb-[100px]">
-        {carts.length > 0 ? (
+        {carts && carts.length > 0 ? (
           carts.map((cart, index) =>
             cart.items && cart.items.length > 0 ? (
               <Card key={index} className="rounded-none">
@@ -505,7 +499,9 @@ export default function ManageCartUser() {
                                 className="w-5/6 h-full flex flex-col items-center justify-center space-y-1 truncate hover:cursor-default"
                               >
                                 <div className="flex items-center space-x-1">
-                                  <Label className="text-black-primary text-opacity-75">Phân loại hàng</Label>
+                                  <Label className="text-black-primary text-opacity-75">
+                                    Phân loại hàng
+                                  </Label>
                                   {!isOpenArrow && <ArrowDown />}
                                   {!isOpenArrow && <ArrowUp />}
                                 </div>
@@ -623,27 +619,31 @@ export default function ManageCartUser() {
             ) : null
           )
         ) : (
-          <div className="flex items-center justify-center">
+          <div className="flex flex-col items-center justify-center rounded-lg min-h-[400px] mt-6 space-y-6">
             <Image
-              alt="avatar store"
-              src={storeEmpty}
-              height={1000}
-              width={1000}
-              unoptimized={true}
-              className="rounded-md transition-transform duration-300"
+              alt="ảnh trống"
+              className="mx-auto"
+              src={ReviewEmpty}
+              width={300}
+              height={300}
             />
+            <Label className="text-xl text-gray-tertiary text-center">
+              Giỏ hàng trống
+            </Label>
           </div>
         )}
 
-        <PaginationAdminTable
-          currentPage={currentPage}
-          handleNextPage={handleNextPage}
-          handlePrevPage={handlePrevPage}
-          totalPage={totalPage}
-          setCurrentPage={setCurrentPage}
-          hasNext={hasNext}
-          hasPrevious={hasPrevious}
-        ></PaginationAdminTable>
+        {carts && carts.length > 0 && (
+          <PaginationAdminTable
+            currentPage={currentPage}
+            handleNextPage={handleNextPage}
+            handlePrevPage={handlePrevPage}
+            totalPage={totalPage}
+            setCurrentPage={setCurrentPage}
+            hasNext={hasNext}
+            hasPrevious={hasPrevious}
+          ></PaginationAdminTable>
+        )}
       </div>
       <div className="flex items-center fixed bottom-0 justify-between bg-gradient-to-r from-black-tertiary to-black-primary text-white-primary min-h-[80px] w-full border-t-2">
         <div className="w-1/12 flex items-center justify-center">

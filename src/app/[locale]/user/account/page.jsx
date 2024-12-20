@@ -20,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { CircularProgress } from "@mui/material";
 
 export default function ManageAccount() {
   const [email, setEmail] = useState("");
@@ -31,19 +32,19 @@ export default function ManageAccount() {
   const [phoneError, setPhoneError] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editField, setEditField] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   const fetchAccount = useCallback(async () => {
     try {
       const response = await getAccount();
-      console.log("Account: ", response.result);
       setEmail(response.result.email);
       setPhone(response.result.phone);
       setEmailValidationStatus(response.result.emailValidationStatus);
       setUsername(response.result.username);
       setUserId(response.result.id);
+      setIsLoading(false);
     } catch (error) {
-      console.error("fetchAccount thất bại: ", error);
       toast({
         title: "Thất bại",
         description: error.message,
@@ -125,49 +126,62 @@ export default function ManageAccount() {
 
   return (
     <>
-      <Card className="shadow-lg rounded-lg ">
-        <CardHeader className="text-center border-b py-6">
-          <CardTitle className="text-2xl font-bold">
-            Tài khoản của tôi
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 mt-4">
-          <div className="flex items-center justify-start min-h-8 mb-8">
-            <Label className="w-1/5">Tên đăng nhập</Label>
-            <Label>{username || "chưa có tên đăng nhập"}</Label>
-          </div>
-          <div className="flex items-center justify-start min-h-8 mb-8">
-            <Label className="w-1/5 mr-8">Email</Label>
-            <Input
-              value={email || "bạn chưa có email"}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              disabled={true}
-              className="flex-grow mr-4 border-none"
-            ></Input>
-            {emailValidationStatus === "VERIFIED" && (
-              <CircleCheck className="mr-4" />
-            )}
-            <Button onClick={() => handleOpenDialog("email")}>Thay đổi</Button>
-          </div>
-          {emailValidationStatus !== "VERIFIED" && (
-            <div className="flex justify-start mb-8">
-              <Button onClick={handleSendMailValidation}>Xác thực email</Button>
+      {isLoading ? (
+        <div className="fixed inset-0 flex flex-col justify-center items-center z-[100] space-y-4 bg-black-secondary">
+          <CircularProgress />
+          <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
+        </div>
+      ) : (
+        <Card className="shadow-lg rounded-lg ">
+          <CardHeader className="text-center border-b py-6">
+            <CardTitle className="text-2xl font-bold">
+              Tài khoản của tôi
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 mt-4">
+            <div className="flex items-center justify-start min-h-8 mb-8">
+              <Label className="w-1/5">Tên đăng nhập</Label>
+              <Label>{username || "chưa có tên đăng nhập"}</Label>
             </div>
-          )}
-          <div className="flex items-center justify-start min-h-8 mb-8">
-            <Label className="w-1/5 mr-8">Số điện thoại</Label>
-            <Input
-              value={phone || "bạn chưa có số điện thoại"}
-              onChange={(e) => setPhone(e.target.value)}
-              type="text"
-              disabled={true}
-              className="flex-grow mr-4 border-none"
-            ></Input>
-            <Button onClick={() => handleOpenDialog("phone")}>Thay đổi</Button>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="flex items-center justify-start min-h-8 mb-8">
+              <Label className="w-1/5 mr-8">Email</Label>
+              <Input
+                value={email || "bạn chưa có email"}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                disabled={true}
+                className="flex-grow mr-4 border-none"
+              ></Input>
+              {emailValidationStatus === "VERIFIED" && (
+                <CircleCheck className="mr-4" />
+              )}
+              <Button onClick={() => handleOpenDialog("email")}>
+                Thay đổi
+              </Button>
+            </div>
+            {emailValidationStatus !== "VERIFIED" && (
+              <div className="flex justify-start mb-8">
+                <Button onClick={handleSendMailValidation}>
+                  Xác thực email
+                </Button>
+              </div>
+            )}
+            <div className="flex items-center justify-start min-h-8 mb-8">
+              <Label className="w-1/5 mr-8">Số điện thoại</Label>
+              <Input
+                value={phone || "bạn chưa có số điện thoại"}
+                onChange={(e) => setPhone(e.target.value)}
+                type="text"
+                disabled={true}
+                className="flex-grow mr-4 border-none"
+              ></Input>
+              <Button onClick={() => handleOpenDialog("phone")}>
+                Thay đổi
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
       {isDialogOpen && (
         <Dialog
           open={isDialogOpen}

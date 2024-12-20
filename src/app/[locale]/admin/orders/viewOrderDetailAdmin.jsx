@@ -11,7 +11,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -37,7 +36,6 @@ import {
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import DialogUpdateOrCancelOrderAdmin from "./dialogUpdateOrCancelOrderAdmin";
-import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { Rating } from "@mui/material";
@@ -51,7 +49,7 @@ import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 import { Separator } from "@/components/ui/separator";
 import { useDispatch } from "react-redux";
 import { setStore } from "@/store/features/userSearchSlice";
-import { formatCurrency } from "@/utils/commonUtils";
+import { formatCurrency, formatDate } from "@/utils/commonUtils";
 
 export default function ViewOrderDetailAdmin(props) {
   const { isOpen, onClose, orderId } = props;
@@ -97,8 +95,6 @@ export default function ViewOrderDetailAdmin(props) {
   }, [fetchOneOrderByAdmin]);
 
   const handleUpdateButtonClick = (order, orderId) => {
-    console.log("Update order: ", order);
-    console.log("Update order: ", orderId);
     setIsDialogUpdateOrderStatusOpen(true);
     setOrderToUpdate(order);
     setSelectedOrder(orderId);
@@ -197,21 +193,6 @@ export default function ViewOrderDetailAdmin(props) {
       default:
         return "N/A";
     }
-  }
-
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-
-    const hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const seconds = date.getSeconds().toString().padStart(2, "0");
-
-    const timePart = `${hours
-      .toString()
-      .padStart(2, "0")}:${minutes}:${seconds}`;
-    const datePart = date.toLocaleDateString("vi-VN").replace(/\//g, "-");
-
-    return `${timePart} ${datePart}`;
   }
 
   return (
@@ -448,7 +429,7 @@ export default function ViewOrderDetailAdmin(props) {
                     </CardContent>
                   </Card>
                 </div>
-                <div className="flex flex-col space-y-8">
+                <div className="flex flex-col space-y-8 mb-4">
                   <Card className="w-full md:w-96 overflow-hidden">
                     <CardHeader>
                       <CardTitle className="text-2xl font-bold">

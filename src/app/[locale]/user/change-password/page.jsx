@@ -1,13 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updatePassword } from "@/api/user/changePassword";
@@ -82,7 +76,7 @@ export default function ManageChangePassword() {
   };
 
   return (
-    <Card x-chunk="dashboard-04-chunk-1" className="shadow-lg rounded-lg">
+    <Card className="shadow-lg rounded-lg">
       <CardHeader className="text-center border-b py-6">
         <CardTitle className="text-2xl font-bold">Đổi mật khẩu</CardTitle>
       </CardHeader>
