@@ -30,12 +30,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
-import {
-  ArrowUpDown,
-  CalendarIcon as CalendarCog,
-  ListFilter,
-  SquareX,
-} from "lucide-react";
+import { ArrowUpDown, CalendarCog, ListFilter, SquareX } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { useCallback, useEffect, useState } from "react";
@@ -53,7 +48,6 @@ import Image from "next/image";
 import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
 import { formatCurrency, formatDate } from "@/utils/commonUtils";
 import { CircularProgress } from "@mui/material";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ManageOrderAdmin() {
   const [orders, setOrders] = useState([]);
@@ -269,113 +263,116 @@ export default function ManageOrderAdmin() {
       <Toaster />
       {isLoading ? (
         <div className="fixed inset-0 flex flex-col justify-center items-center z-[100] space-y-4 bg-black-secondary">
-          <CircularProgress />
+          <CircularProgress></CircularProgress>
           <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-4 p-4 sm:p-6 md:p-8">
-          <Tabs value={filter} className="w-full">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
-              <ScrollArea className="w-full sm:w-auto">
-                <TabsList className="h-auto justify-start sm:justify-center p-1">
+        <div className="flex flex-col sm:gap-4 sm:py-4">
+          <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-4">
+            <Tabs value={filter}>
+              <div className="flex items-center">
+                <TabsList>
                   {listOrderStatus.map((item) => (
                     <TabsTrigger
                       key={item.filterKey}
                       value={item.filterKey}
                       onClick={() => handleOnclickTabsTrigger(item.filterKey)}
-                      className="px-2 py-1 text-xs sm:text-sm"
                     >
                       {item.label}
                     </TabsTrigger>
                   ))}
                 </TabsList>
-              </ScrollArea>
-              <div className="flex items-center gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-8 gap-1">
-                      <ArrowUpDown className="h-3.5 w-3.5" />
-                      <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        Sắp xếp
-                      </span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Sắp xếp</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuRadioGroup
-                      value={orderType}
-                      onValueChange={(value) => handleOrderChange(value)}
-                    >
-                      <DropdownMenuRadioItem value="asc">
-                        Tăng dần
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="desc">
-                        Giảm dần
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuRadioGroup
-                      value={sortType}
-                      onValueChange={(value) => handleSortChange(value)}
-                    >
-                      <DropdownMenuRadioItem value="createdAt">
-                        Ngày đặt hàng
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => {
-                        setSortType("");
-                        setOrderType("");
-                      }}
-                    >
-                      Không sắp xếp
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                {filter === "" && (
+                <div className="ml-auto flex items-center gap-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="h-8 gap-1">
-                        <ListFilter className="h-3.5 w-3.5" />
-                        <span className="sr-only sm:not-sr-only">Lọc</span>
+                      <Button variant="outline" size="sm" className="h-7 gap-1">
+                        <ArrowUpDown className="h-3.5 w-3.5" />
+                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                          Sắp xếp
+                        </span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Lọc theo trạng thái</DropdownMenuLabel>
+                      <DropdownMenuLabel>Sắp xếp</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      {listOrderStatus.map((item) => (
-                        <DropdownMenuCheckboxItem
-                          key={item.filterKey}
-                          onClick={() => handleFilterChange(item.filterKey)}
-                          checked={filterTab === item.filterKey}
-                        >
-                          {item.label}
-                        </DropdownMenuCheckboxItem>
-                      ))}
+                      <DropdownMenuRadioGroup
+                        value={orderType}
+                        onValueChange={(value) => handleOrderChange(value)}
+                      >
+                        <DropdownMenuRadioItem value="asc">
+                          Tăng dần
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="desc">
+                          Giảm dần
+                        </DropdownMenuRadioItem>
+                      </DropdownMenuRadioGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuRadioGroup
+                        value={sortType}
+                        onValueChange={(value) => handleSortChange(value)}
+                      >
+                        <DropdownMenuRadioItem value="createdAt">
+                          Ngày đặt hàng
+                        </DropdownMenuRadioItem>
+                      </DropdownMenuRadioGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSortType("");
+                          setOrderType("");
+                        }}
+                      >
+                        Không sắp xếp
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                )}
+                  {filter === "" && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 gap-1"
+                        >
+                          <ListFilter className="h-3.5 w-3.5" />
+                          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                            Lọc
+                          </span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>
+                          Lọc theo trạng thái
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {listOrderStatus.map((item) => (
+                          <DropdownMenuCheckboxItem
+                            key={item.filterKey}
+                            onClick={() => handleFilterChange(item.filterKey)}
+                            checked={filterTab === item.filterKey}
+                          >
+                            {item.label}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </div>
               </div>
-            </div>
-            <TabsContent value={filter} className="pt-2">
-              {orders && orders.length > 0 ? (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Danh sách đơn hàng ({totalElement})</CardTitle>
-                    <CardDescription>
-                      Quản lý tất cả đơn hàng trên hệ thống
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="overflow-x-auto">
+              <TabsContent value={filter} className="pt-2">
+                {orders && orders.length > 0 ? (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Danh sách đơn hàng ({totalElement})</CardTitle>
+                      <CardDescription>
+                        Quản lý tất cả đơn hàng trên hệ thống
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="w-[100px]">
-                              Đơn hàng
-                            </TableHead>
+                            <TableHead>Đơn hàng</TableHead>
                             <TableHead>Ngày đặt hàng</TableHead>
                             <TableHead>Số điện thoại</TableHead>
                             <TableHead>Địa chỉ</TableHead>
@@ -383,119 +380,127 @@ export default function ManageOrderAdmin() {
                             <TableHead>Phương thức</TableHead>
                             <TableHead>Trạng thái</TableHead>
                             <TableHead>Tổng tiền</TableHead>
-                            <TableHead className="text-right">
-                              Hành động
+                            <TableHead className="hidden md:table-cell">
+                              <span className="sr-only">Hành động</span>
                             </TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {orders.map((order) => (
-                            <TableRow key={order.id}>
-                              <TableCell className="font-medium">
+                            <TableRow
+                              key={order.id}
+                              onClick={() => handleRowClick(order.id)}
+                            >
+                              <TableCell className="text-center">
                                 #{order.id}
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="text-center">
                                 {formatDate(order.createdAt)}
                               </TableCell>
-                              <TableCell>{order.orderPhone}</TableCell>
-                              <TableCell className="max-w-[200px] truncate">
+                              <TableCell className="text-center">
+                                {order.orderPhone}
+                              </TableCell>
+                              <TableCell className="text-center">
                                 {order.province}
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="text-center">
                                 <Badge variant="outline">
                                   {getTransactionStatusOrder(
                                     order.currentStatusTransaction
                                   )}
                                 </Badge>
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="text-center">
                                 <Badge variant="outline">
                                   {getPaymentMethodOrder(order.paymentMethod)}
                                 </Badge>
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="text-center">
                                 <Badge variant="outline">
                                   {getStatusOrder(order.currentStatus)}
                                 </Badge>
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="text-center">
                                 {formatCurrency(order.grandTotal)}
                               </TableCell>
-                              <TableCell className="text-right">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleRowClick(order.id)}
-                                >
-                                  <CalendarCog className="h-4 w-4" />
-                                  <span className="sr-only">View</span>
-                                </Button>
-                                {(order.currentStatus ===
-                                  "WAITING_FOR_SHIPPING" ||
+                              <TableCell className="md:table-cell text-center">
+                                <div>
+                                  {order.currentStatus ===
+                                    "WAITING_FOR_SHIPPING" ||
                                   order.currentStatus === "PICKED_UP" ||
-                                  order.currentStatus ===
-                                    "OUT_FOR_DELIVERY") && (
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() =>
-                                      handleUpdateButtonClick(order, order.id)
-                                    }
-                                  >
-                                    <CalendarCog className="h-4 w-4" />
-                                    <span className="sr-only">Update</span>
-                                  </Button>
-                                )}
-                                {order.currentStatus !== "DELIVERED" &&
-                                  order.currentStatus !== "CANCELLED" && (
+                                  order.currentStatus === "OUT_FOR_DELIVERY" ? (
                                     <Button
-                                      variant="ghost"
+                                      variant="outline"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleUpdateButtonClick(
+                                          order,
+                                          order.id
+                                        );
+                                      }}
+                                    >
+                                      <CalendarCog className="h-4 w-4" />
+                                    </Button>
+                                  ) : (
+                                    ""
+                                  )}
+                                  {order.currentStatus === "DELIVERED" ||
+                                  order.currentStatus === "CANCELLED" ? (
+                                    ""
+                                  ) : (
+                                    <Button
+                                      aria-haspopup="true"
                                       size="icon"
-                                      onClick={() =>
-                                        handleCancelButtonClick(order, order.id)
-                                      }
+                                      variant="ghost"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCancelButtonClick(
+                                          order,
+                                          order.id
+                                        );
+                                      }}
                                     >
                                       <SquareX className="h-4 w-4" />
-                                      <span className="sr-only">Cancel</span>
                                     </Button>
                                   )}
+                                </div>
                               </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
                       </Table>
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <div className="w-full flex justify-center">
-                      <PaginationAdminTable
-                        currentPage={currentPage}
-                        handleNextPage={handleNextPage}
-                        handlePrevPage={handlePrevPage}
-                        totalPage={totalPage}
-                        setCurrentPage={setCurrentPage}
-                        hasNext={hasNext}
-                        hasPrevious={hasPrevious}
-                      />
-                    </div>
-                  </CardFooter>
-                </Card>
-              ) : (
-                <div className="flex flex-col items-center justify-center border rounded-lg min-h-[400px] mt-6">
-                  <Image
-                    alt="ảnh trống"
-                    className="mx-auto"
-                    src={ReviewEmpty}
-                    width={200}
-                    height={200}
-                  />
-                  <Label className="text-xl text-gray-tertiary text-center m-2">
-                    Hiện tại không có đơn hàng thuộc trạng thái này
-                  </Label>
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
+                    </CardContent>
+                    <CardFooter>
+                      <div className="absolute right-1/2 translate-x-1/2">
+                        <PaginationAdminTable
+                          currentPage={currentPage}
+                          handleNextPage={handleNextPage}
+                          handlePrevPage={handlePrevPage}
+                          totalPage={totalPage}
+                          setCurrentPage={setCurrentPage}
+                          hasNext={hasNext}
+                          hasPrevious={hasPrevious}
+                        />
+                      </div>
+                    </CardFooter>
+                  </Card>
+                ) : (
+                  <div className="flex flex-col items-center justify-center border min-h-[700px] mt-6">
+                    <Image
+                      alt="ảnh trống"
+                      className="mx-auto"
+                      src={ReviewEmpty}
+                      width={400}
+                      height={400}
+                    ></Image>
+                    <Label className="text-xl text-gray-tertiary text-center m-2">
+                      Hiện tại không có đơn hàng thuộc trạng thái này
+                    </Label>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </main>
         </div>
       )}
       {isDrawerOpen && (
