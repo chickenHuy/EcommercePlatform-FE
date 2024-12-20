@@ -3,7 +3,6 @@ import {
   CircleOff,
   DeleteIcon,
   Eye,
-  File,
   ListFilter,
   MoreHorizontal,
 } from "lucide-react";
@@ -24,7 +23,6 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuSubContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -46,11 +44,15 @@ import {
 } from "@/api/vendor/productRequest";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { Search, Update, UpdateSharp } from "@mui/icons-material";
+import { Search, UpdateSharp } from "@mui/icons-material";
 import { toast } from "@/hooks/use-toast";
 import Loading from "@/components/loading";
 import { ProductUpdateDialog } from "@/app/[locale]/vendor/products/_update/productUpdateDialog";
 import { formatDate } from "@/utils/commonUtils";
+import { Label } from "@/components/ui/label";
+import Image from "next/image";
+import ProductPlaceholder from "@/assets/images/productPlaceholder.png";
+
 export default function ManageComponent() {
   const [updated, setUpdated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -266,166 +268,183 @@ export default function ManageComponent() {
               <Loading />
             ) : (
               <TabsContent value={tab}>
-                <Card x-chunk="dashboard-06-chunk-0">
-                  <CardHeader>
-                    <CardTitle className="text-[18px] font-extrabold">
-                      Danh sách sản phẩm ({totalElement})
-                    </CardTitle>
-                    <div className="flex">
-                      <CardDescription className="text-black-primary font-bold text-[15px]">
-                        Quản lý tất cả các sản phẩm của cửa hàng
-                      </CardDescription>
-                      <div className="ml-auto flex items-center gap-2">
-                        <Input
-                          onChange={(e) => handleOnChange(e.target.value)}
-                        ></Input>
-                        <Search className="h-5 w-5" />
+                {products && products.length > 0 ? (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-[18px] font-extrabold">
+                        Danh sách sản phẩm ({totalElement})
+                      </CardTitle>
+                      <div className="flex">
+                        <CardDescription className="text-black-primary font-bold text-[15px]">
+                          Quản lý tất cả các sản phẩm của cửa hàng
+                        </CardDescription>
+                        <div className="ml-auto flex items-center gap-2">
+                          <Input
+                            onChange={(e) => handleOnChange(e.target.value)}
+                          ></Input>
+                          <Search className="h-5 w-5" />
+                        </div>
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>#</TableHead>
-                          <TableHead>Hình ảnh</TableHead>
-                          <TableHead>Tên sản phẩm</TableHead>
-                          <TableHead>Số lượng</TableHead>
-                          <TableHead className="hidden lg:table-cell">
-                            Giá bán
-                          </TableHead>
-                          <TableHead className="hidden lg:table-cell">
-                            Ngày tạo
-                          </TableHead>
-                          <TableHead className="hidden lg:table-cell">
-                            Đánh giá
-                          </TableHead>
-                          <TableHead>Hành động</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {products.map((product, index) => (
-                          <TableRow key={product.id}>
-                            <TableCell className="font-medium text-center">
-                              {index + 1 + (currentPage - 1) * 10}
-                            </TableCell>
-                            <TableCell className="flex justify-center items-center border-none">
-                              <Avatar>
-                                <AvatarImage
-                                  src={product.mainImageUrl}
-                                  alt={product.name}
-                                />
-                                <AvatarFallback>
-                                  {product.name.charAt(0)}
-                                </AvatarFallback>
-                              </Avatar>
-                            </TableCell>
-                            <TableCell className="font-medium">
-                              {product.name}
-                            </TableCell>
-                            <TableCell className="font-medium text-center">
-                              {product.quantity}
-                            </TableCell>
-                            <TableCell className="font-medium hidden lg:table-cell text-center">
-                              {formatCurrency(product.salePrice) + " đ"}
-                            </TableCell>
-                            <TableCell className="font-medium hidden md:table-cell text-center">
-                              {formatDate(product.createdAt)}
-                            </TableCell>
-                            <TableCell className="font-medium hidden md:table-cell text-center">
-                              {product.rating || 0}
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    aria-haspopup="true"
-                                    size="icon"
-                                    variant="ghost"
-                                  >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                    <span className="sr-only">Toggle menu</span>
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuLabel>
-                                    Hành động
-                                  </DropdownMenuLabel>
-                                  <DropdownMenuSeparator />
-
-                                  {tab !== "blocked" && (
-                                    <>
-                                      <DropdownMenuItem
-                                        className="flex flex-row justify-between items-center cursor-pointer"
-                                        onClick={() =>
-                                          handleHideProduct(product.id)
-                                        }
-                                      >
-                                        {tab === "available" && (
-                                          <>
-                                            <span> Ẩn</span>
-                                            <CircleOff className="scale-75" />
-                                          </>
-                                        )}
-                                        {tab === "unAvailable" && (
-                                          <>
-                                            <span> Hiện</span>
-                                            <Eye className="scale-75" />
-                                          </>
-                                        )}
-                                      </DropdownMenuItem>
-                                      <DropdownMenuSeparator />
-                                    </>
-                                  )}
-
-                                  <DropdownMenuItem
-                                    className="flex flex-row justify-between items-center cursor-pointer"
-                                    onClick={() =>
-                                      handleDeleteProduct(product.id)
-                                    }
-                                  >
-                                    <span> Xoá</span>
-                                    <DeleteIcon className="scale-75" />
-                                  </DropdownMenuItem>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem
-                                    className="flex flex-row justify-between items-center cursor-pointer"
-                                    onClick={() => {
-                                      setIsDialogUpdateOpen(true);
-                                      setProductSelected(product.id);
-                                    }}
-                                  >
-                                    <span>Cập nhật</span>
-                                    <UpdateSharp className="scale-75" />
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </TableCell>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>#</TableHead>
+                            <TableHead>Hình ảnh</TableHead>
+                            <TableHead>Tên sản phẩm</TableHead>
+                            <TableHead>Số lượng</TableHead>
+                            <TableHead className="hidden lg:table-cell">
+                              Giá bán
+                            </TableHead>
+                            <TableHead className="hidden lg:table-cell">
+                              Ngày tạo
+                            </TableHead>
+                            <TableHead className="hidden lg:table-cell">
+                              Đánh giá
+                            </TableHead>
+                            <TableHead>Hành động</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                  <ProductUpdateDialog
-                    productId={productSelected}
-                    isOpen={isDialogUpdateOpen}
-                    onClose={() => setIsDialogUpdateOpen(false)}
-                    setUpdated={setUpdated}
-                  />
-                  <CardFooter className="relative">
-                    <div className="absolute right-1/2 translate-x-1/2">
-                      <PaginationAdminTable
-                        currentPage={currentPage}
-                        handleNextPage={handleNextPage}
-                        handlePrevPage={handlePrevPage}
-                        totalPage={totalPage}
-                        setCurrentPage={setCurrentPage}
-                        hasNext={hasNext}
-                        hasPrevious={hasPrevious}
-                      />
-                    </div>
-                  </CardFooter>
-                </Card>
+                        </TableHeader>
+                        <TableBody>
+                          {products.map((product, index) => (
+                            <TableRow key={product.id}>
+                              <TableCell className="font-medium text-center">
+                                {index + 1 + (currentPage - 1) * 10}
+                              </TableCell>
+                              <TableCell className="flex justify-center items-center border-none">
+                                <Avatar>
+                                  <AvatarImage
+                                    src={product.mainImageUrl}
+                                    alt={product.name}
+                                  />
+                                  <AvatarFallback>
+                                    {product.name.charAt(0)}
+                                  </AvatarFallback>
+                                </Avatar>
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                {product.name}
+                              </TableCell>
+                              <TableCell className="font-medium text-center">
+                                {product.quantity}
+                              </TableCell>
+                              <TableCell className="font-medium hidden lg:table-cell text-center">
+                                {formatCurrency(product.salePrice) + " đ"}
+                              </TableCell>
+                              <TableCell className="font-medium hidden md:table-cell text-center">
+                                {formatDate(product.createdAt)}
+                              </TableCell>
+                              <TableCell className="font-medium hidden md:table-cell text-center">
+                                {product.rating || 0}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      aria-haspopup="true"
+                                      size="icon"
+                                      variant="ghost"
+                                    >
+                                      <MoreHorizontal className="h-4 w-4" />
+                                      <span className="sr-only">
+                                        Toggle menu
+                                      </span>
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>
+                                      Hành động
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+
+                                    {tab !== "blocked" && (
+                                      <>
+                                        <DropdownMenuItem
+                                          className="flex flex-row justify-between items-center cursor-pointer"
+                                          onClick={() =>
+                                            handleHideProduct(product.id)
+                                          }
+                                        >
+                                          {tab === "available" && (
+                                            <>
+                                              <span> Ẩn</span>
+                                              <CircleOff className="scale-75" />
+                                            </>
+                                          )}
+                                          {tab === "unAvailable" && (
+                                            <>
+                                              <span> Hiện</span>
+                                              <Eye className="scale-75" />
+                                            </>
+                                          )}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                      </>
+                                    )}
+
+                                    <DropdownMenuItem
+                                      className="flex flex-row justify-between items-center cursor-pointer"
+                                      onClick={() =>
+                                        handleDeleteProduct(product.id)
+                                      }
+                                    >
+                                      <span> Xoá</span>
+                                      <DeleteIcon className="scale-75" />
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                      className="flex flex-row justify-between items-center cursor-pointer"
+                                      onClick={() => {
+                                        setIsDialogUpdateOpen(true);
+                                        setProductSelected(product.id);
+                                      }}
+                                    >
+                                      <span>Cập nhật</span>
+                                      <UpdateSharp className="scale-75" />
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                    <ProductUpdateDialog
+                      productId={productSelected}
+                      isOpen={isDialogUpdateOpen}
+                      onClose={() => setIsDialogUpdateOpen(false)}
+                      setUpdated={setUpdated}
+                    />
+                    <CardFooter className="relative">
+                      <div className="absolute right-1/2 translate-x-1/2">
+                        <PaginationAdminTable
+                          currentPage={currentPage}
+                          handleNextPage={handleNextPage}
+                          handlePrevPage={handlePrevPage}
+                          totalPage={totalPage}
+                          setCurrentPage={setCurrentPage}
+                          hasNext={hasNext}
+                          hasPrevious={hasPrevious}
+                        />
+                      </div>
+                    </CardFooter>
+                  </Card>
+                ) : (
+                  <div className="flex flex-col items-center justify-center border rounded-lg min-h-[400px] mt-6">
+                    <Image
+                      alt="ảnh trống"
+                      className="mx-auto"
+                      src={ProductPlaceholder}
+                      width={200}
+                      height={200}
+                    />
+                    <Label className="text-xl text-gray-tertiary text-center m-2">
+                      Hiện tại chưa có sản phẩm nào
+                    </Label>
+                  </div>
+                )}
               </TabsContent>
             )}
           </Tabs>
