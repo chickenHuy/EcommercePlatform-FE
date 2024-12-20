@@ -374,13 +374,15 @@ export default function ManageOrderAdmin() {
                           <TableRow>
                             <TableHead>Đơn hàng</TableHead>
                             <TableHead>Ngày đặt hàng</TableHead>
-                            <TableHead>Số điện thoại</TableHead>
-                            <TableHead>Địa chỉ</TableHead>
-                            <TableHead>Thanh toán</TableHead>
-                            <TableHead>Phương thức</TableHead>
+                            <TableHead className="hidden sm:table-cell">
+                              Số điện thoại
+                            </TableHead>
+                            <TableHead className="hidden sm:table-cell">Địa chỉ</TableHead>
+                            <TableHead className="hidden sm:table-cell">Thanh toán</TableHead>
+                            <TableHead className="hidden sm:table-cell">Phương thức</TableHead>
                             <TableHead>Trạng thái</TableHead>
                             <TableHead>Tổng tiền</TableHead>
-                            <TableHead className="hidden md:table-cell">
+                            <TableHead>
                               <span className="sr-only">Hành động</span>
                             </TableHead>
                           </TableRow>
@@ -391,39 +393,39 @@ export default function ManageOrderAdmin() {
                               key={order.id}
                               onClick={() => handleRowClick(order.id)}
                             >
-                              <TableCell className="text-center">
+                              <TableCell className="font-medium text-center">
                                 #{order.id}
                               </TableCell>
-                              <TableCell className="text-center">
+                              <TableCell className="font-medium text-center">
                                 {formatDate(order.createdAt)}
                               </TableCell>
-                              <TableCell className="text-center">
+                              <TableCell className="hidden sm:table-cell font-medium text-center">
                                 {order.orderPhone}
                               </TableCell>
-                              <TableCell className="text-center">
+                              <TableCell className="hidden sm:table-cell font-medium text-center">
                                 {order.province}
                               </TableCell>
-                              <TableCell className="text-center">
+                              <TableCell className="hidden sm:table-cell font-medium text-center">
                                 <Badge variant="outline">
                                   {getTransactionStatusOrder(
                                     order.currentStatusTransaction
                                   )}
                                 </Badge>
                               </TableCell>
-                              <TableCell className="text-center">
+                              <TableCell className="hidden sm:table-cell font-medium text-center">
                                 <Badge variant="outline">
                                   {getPaymentMethodOrder(order.paymentMethod)}
                                 </Badge>
                               </TableCell>
-                              <TableCell className="text-center">
+                              <TableCell className="font-medium text-center">
                                 <Badge variant="outline">
                                   {getStatusOrder(order.currentStatus)}
                                 </Badge>
                               </TableCell>
-                              <TableCell className="text-center">
+                              <TableCell className="font-medium text-center">
                                 {formatCurrency(order.grandTotal)}
                               </TableCell>
-                              <TableCell className="md:table-cell text-center">
+                              <TableCell className="font-medium text-center">
                                 <div>
                                   {order.currentStatus ===
                                     "WAITING_FOR_SHIPPING" ||

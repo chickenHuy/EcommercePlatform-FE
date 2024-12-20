@@ -11,7 +11,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -38,6 +37,7 @@ import DialogUpdateOrCancelOrderSeller from "./dialogUpdateOrCancelOrderSeller";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { formatCurrency } from "@/utils/commonUtils";
 
 export default function ViewOrderDetailSeller(props) {
   const { isOpen, onClose, orderId } = props;
@@ -53,10 +53,6 @@ export default function ViewOrderDetailSeller(props) {
   const router = useRouter();
   const handleOnClickViewProductDetail = (slug) => {
     router.push(`/${slug}`);
-  };
-
-  const handleOnClickViewAllOrder = () => {
-    router.push("/vendor/orders");
   };
 
   const fetchOneOrderBySeller = useCallback(async () => {
@@ -132,15 +128,6 @@ export default function ViewOrderDetailSeller(props) {
       }
     }
   };
-
-  function formatCurrency(value) {
-    return Number(value).toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
-  }
 
   function getStatusOrder(status) {
     switch (status) {

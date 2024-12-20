@@ -43,6 +43,8 @@ import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { setStore } from "@/store/features/userSearchSlice";
 import StoreEmpty from "@/assets/images/storeEmpty.jpg";
+import { formatCurrency } from "@/utils/commonUtils";
+import { OrderReviewDialog } from "@/components/dialogs/dialogReview";
 
 export default function ViewOrderDetailUser(props) {
   const { isOpen, onClose, orderId } = props;
@@ -59,6 +61,10 @@ export default function ViewOrderDetailUser(props) {
   const handleOnclickViewShop = (storeId) => {
     router.push("/search");
     dispatch(setStore(storeId));
+  };
+
+  const handleOnClickViewProductDetail = (slug) => {
+    router.push(`/${slug}`);
   };
 
   const handleCancelButtonClick = (order, orderId) => {
@@ -225,15 +231,6 @@ export default function ViewOrderDetailUser(props) {
     ? listOrderStatusHistory.length - 1
     : -1;
 
-  function formatCurrency(value) {
-    return Number(value).toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
-  }
-
   const statusExists = (statusArray) => {
     return listOrderStatusHistory?.some((status) =>
       statusArray.includes(status.orderStatusName)
@@ -369,13 +366,20 @@ export default function ViewOrderDetailUser(props) {
             <div className="flex items-center justify-center">
               {order?.currentStatus === "DELIVERED" ||
               order?.currentStatus === "CANCELLED" ? (
-                <Button variant="outline" className="m-4">
+                <Button
+                  variant="outline"
+                  className="m-4"
+                  onClick={() => handleOnclickViewShop(order?.storeId)}
+                >
                   Mua lại
                 </Button>
               ) : (
                 ""
               )}
-              {order?.currentStatus === "PICKED_UP" ||
+              {order?.currentStatus === "CONFIRMED" ||
+              order?.currentStatus === "PREPARING" ||
+              order?.currentStatus === "WAITING_FOR_SHIPPING" ||
+              order?.currentStatus === "PICKED_UP" ||
               order?.currentStatus === "OUT_FOR_DELIVERY" ||
               order?.currentStatus === "DELIVERED" ||
               order?.currentStatus === "CANCELLED" ? (
@@ -393,9 +397,7 @@ export default function ViewOrderDetailUser(props) {
                 </Button>
               )}
               {order?.currentStatus === "DELIVERED" ? (
-                <Button variant="outline" className="m-4">
-                  Xem đánh giá shop
-                </Button>
+                <OrderReviewDialog order={order} toast={toast} />
               ) : (
                 ""
               )}
@@ -510,10 +512,11 @@ export default function ViewOrderDetailUser(props) {
                         className="flex w-full justify-between items-center gap-4 mt-4"
                       >
                         <div className="flex items-center gap-4 mb-6 ml-6">
-                          <Link
-                            href="/user/orders"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOnClickViewProductDetail(item.productSlug);
+                            }}
                           >
                             <Image
                               alt={item.productName}
@@ -523,18 +526,20 @@ export default function ViewOrderDetailUser(props) {
                               unoptimized={true}
                               className="mt-6 rounded-md transition-transform duration-300 hover:scale-125 hover:mr-4"
                             />
-                          </Link>
+                          </div>
                           <div>
-                            <Link
-                              href="/user/orders"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="hover:underline"
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOnClickViewProductDetail(
+                                  item.productSlug
+                                );
+                              }}
                             >
                               <p className="text-xl font-bold hover:text-2xl">
                                 {item.productName}
                               </p>
-                            </Link>
+                            </div>
                             <p className="text-muted-foreground">
                               {item.values
                                 ? `Phân loại hàng ${item.values.join(" | ")}`

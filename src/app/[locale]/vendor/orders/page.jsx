@@ -359,7 +359,7 @@ export default function ManageOrderSeller() {
                       <TableHead>Ngày đặt hàng</TableHead>
                       <TableHead>Trạng thái</TableHead>
                       <TableHead>Tổng tiền</TableHead>
-                      <TableHead className="hidden md:table-cell">
+                      <TableHead>
                         <span className="sr-only">Hành động</span>
                       </TableHead>
                     </TableRow>
@@ -370,21 +370,21 @@ export default function ManageOrderSeller() {
                         key={order.id}
                         onClick={() => handleRowClick(order.id)}
                       >
-                        <TableCell className="text-center">
+                        <TableCell className="font-medium text-center">
                           #{order.id}
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="font-medium text-center">
                           {formatDate(order.createdAt)}
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="font-medium text-center">
                           <Badge variant="outline">
                             {getStatusOrder(order.currentStatus)}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="font-medium text-center">
                           {formatCurrency(order.total - order.discount)}
                         </TableCell>
-                        <TableCell className="md:table-cell text-center">
+                        <TableCell className="font-medium text-center">
                           {order.currentStatus === "PENDING" ||
                           order.currentStatus === "CONFIRMED" ||
                           order.currentStatus === "PREPARING" ? (

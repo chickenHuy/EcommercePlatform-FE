@@ -51,6 +51,7 @@ import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 import { Separator } from "@/components/ui/separator";
 import { useDispatch } from "react-redux";
 import { setStore } from "@/store/features/userSearchSlice";
+import { formatCurrency } from "@/utils/commonUtils";
 
 export default function ViewOrderDetailAdmin(props) {
   const { isOpen, onClose, orderId } = props;
@@ -150,15 +151,6 @@ export default function ViewOrderDetailAdmin(props) {
       }
     }
   };
-
-  function formatCurrency(value) {
-    return Number(value).toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
-  }
 
   function getStatusOrder(status) {
     switch (status) {

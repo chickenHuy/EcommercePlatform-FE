@@ -526,11 +526,19 @@ export default function ManageOrderUser() {
                     <div className="flex items-center gap-2">
                       {order.currentStatus === "DELIVERED" ||
                       order.currentStatus === "CANCELLED" ? (
-                        <Button variant="outline">Mua lại</Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => handleOnclickViewShop(order?.storeId)}
+                        >
+                          Mua lại
+                        </Button>
                       ) : (
                         ""
                       )}
-                      {order.currentStatus === "PICKED_UP" ||
+                      {order.currentStatus === "CONFIRMED" ||
+                      order.currentStatus === "PREPARING" ||
+                      order.currentStatus === "WAITING_FOR_SHIPPING" ||
+                      order.currentStatus === "PICKED_UP" ||
                       order.currentStatus === "OUT_FOR_DELIVERY" ||
                       order.currentStatus === "DELIVERED" ||
                       order.currentStatus === "CANCELLED" ? (
