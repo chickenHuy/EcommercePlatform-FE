@@ -93,13 +93,12 @@ export default function CheckoutContent(props) {
         route.push(`/status/${res.result.paymentId}`);
       }
     } catch (error) {
+      setOnSubmit(false);
       toast({
         title: "Đã xãy ra lỗi trong quá trình đặt hàng, vui lòng thử lại",
         description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setOnSubmit(false);
     }
   };
 
