@@ -172,7 +172,7 @@ export default function RevenueStatisticsAdmin({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {adminStatistic.top5StoresByRevenue.map((store) => (
+                    {adminStatistic.top5StoresByRevenue?.map((store) => (
                       <TableRow key={store.storeId}>
                         <TableCell className="text-center">
                           {store.storeName}
