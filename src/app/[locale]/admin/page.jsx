@@ -17,11 +17,12 @@ export default function AdminDashboard() {
   const [totalRevenueOneYear, setTotalRevenueOneYear] = useState(0);
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth() + 1);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const fecthAdminStatistic = useCallback(async () => {
     try {
+      setIsLoading(true);
       const response = await getAdminStatistic();
       const responseROY = await getRevenueOneYear(year, month);
       setAdminStatistic(response.result);
@@ -37,6 +38,7 @@ export default function AdminDashboard() {
             : error.message,
         variant: "destructive",
       });
+      setIsLoading(false);
     }
   }, [toast, year, month]);
 
