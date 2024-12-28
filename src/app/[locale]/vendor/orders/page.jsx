@@ -47,7 +47,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setFilter } from "@/store/features/orderFilterSlice";
 import Image from "next/image";
 import { Label } from "@/components/ui/label";
-import ReviewEmpty from "@/assets/images/reviewEmpty.png";
+import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
 import { formatCurrency, formatDate } from "@/utils/commonUtils";
 import { CircularProgress } from "@mui/material";
 
