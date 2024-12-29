@@ -102,7 +102,7 @@ function VendorHeader() {
     <header className="fixed top-0 z-20 flex w-full h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 bg-black-primary">
       {/* Logo */}
       <div className="flex flex-row justify-center items-center cursor-pointer ml-3">
-        <span className="text-white-secondary text-[19px]">
+        <span className="text-white-secondary text-[19px]" onClick={() => router.push("/vendor")}>
           {t("vendorTitle")}
         </span>
       </div>
