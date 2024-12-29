@@ -1,7 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Home from "@/assets/images/home.png";
 import shopNow from "@/assets/images/shopNow.png";
 import { Button } from "@/components/ui/button";
+import ProductGrid from "./search/productGrid";
 
 export default function HomePage() {
   return (
@@ -21,6 +24,9 @@ export default function HomePage() {
           className="w-auto h-auto rounded-lg"
           layout="intrinsic"
         />
+      </div>
+      <div className="w-full md:px-20 px-0">
+        <ProductGrid />
       </div>
     </main>
   );
