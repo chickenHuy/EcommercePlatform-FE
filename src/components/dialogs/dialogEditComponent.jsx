@@ -28,11 +28,11 @@ import {
 const FormSchema = z.object({
   name: z
     .string()
-    .min(3, {
-      message: "Tên thông số kỹ thuật phải từ 2 đến 100 ký tự",
+    .min(2, {
+      message: "Tên thông số kỹ thuật phải từ 2 đến 50 ký tự",
     })
-    .max(100, {
-      message: "Tên thông số kỹ thuật phải từ 2 đến 100 ký tự",
+    .max(50, {
+      message: "Tên thông số kỹ thuật phải từ 2 đến 50 ký tự",
     }),
   required: z.boolean(),
 });

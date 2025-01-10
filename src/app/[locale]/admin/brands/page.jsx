@@ -1,6 +1,10 @@
 "use client";
 
-import { ListFilter, MoreHorizontal, PlusCircle } from "lucide-react";
+import {
+  ArrowUpDown,
+  MoreHorizontal,
+  PlusCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,10 +19,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import UploadIcon from "@mui/icons-material/Upload";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -52,11 +57,12 @@ export default function ManageBrand() {
   const [dialogAddEditTitle, setDialogAddEditTitle] = useState("");
   const [dialogAddEditDescription, setDialogAddEditDescription] = useState("");
   const [dialogAddEditNameButton, setDialogAddEditNameButton] = useState("");
-  const [brands, setBrands] = useState([]);
+  const [listBrand, setListBrand] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const [sortType, setSortType] = useState("newest");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [orderBy, setOrderBy] = useState("desc");
   const [totalElement, setTotalElement] = useState(0);
   const { toast } = useToast();
   const [isDialogImageOpen, setIsDialogImageOpen] = useState(false);
@@ -72,7 +78,6 @@ export default function ManageBrand() {
   const [isLoading, setIsLoading] = useState(true);
 
   const handleNextPage = () => {
-    console.log("Current page:", currentPage, "Total page:", totalPage);
     if (currentPage < totalPage) {
       setCurrentPage(currentPage + 1);
     }
@@ -82,11 +87,14 @@ export default function ManageBrand() {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
-    console.log("Current page:", currentPage, "Total page:", totalPage);
   };
 
-  const handleSortChange = (type) => {
-    setSortType(sortType === type ? "" : type);
+  const handleSortChange = (value) => {
+    setSortBy(value);
+  };
+
+  const handleOrderChange = (value) => {
+    setOrderBy(value);
   };
 
   const fetchBrand = useCallback(async () => {
@@ -94,17 +102,17 @@ export default function ManageBrand() {
       const response = await getAllBrand(
         currentPage,
         pageSize,
-        sortType,
+        sortBy,
+        orderBy,
         searchTerm
       );
-      setBrands(response.result.data);
+      setListBrand(response.result.data);
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
       setHasNext(response.result.hasNext);
       setHasPrevious(response.result.hasPrevious);
       setIsLoading(false);
     } catch (error) {
-      console.error("Error fetching brands:", error);
       toast({
         title: "Thất bại",
         description:
@@ -114,7 +122,7 @@ export default function ManageBrand() {
         variant: "destructive",
       });
     }
-  }, [toast, currentPage, sortType, searchTerm]);
+  }, [toast, currentPage, sortBy, orderBy, searchTerm]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -215,39 +223,47 @@ export default function ManageBrand() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="h-7 gap-1">
-                    <ListFilter className="h-3.5 w-3.5" />
+                    <ArrowUpDown className="h-3.5 w-3.5" />
                     <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                       Sắp xếp
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Sắp xếp theo</DropdownMenuLabel>
+                  <DropdownMenuLabel>Sắp xếp</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuCheckboxItem
-                    onClick={() => handleSortChange("newest")}
-                    checked={sortType === "newest"}
+                  <DropdownMenuRadioGroup
+                    value={sortBy}
+                    onValueChange={(value) => handleSortChange(value)}
                   >
-                    Mới nhất
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    onClick={() => handleSortChange("az")}
-                    checked={sortType === "az"}
+                    <DropdownMenuRadioItem value="createdAt">
+                      Ngày tạo
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="name">
+                      Tên TH
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuRadioGroup
+                    value={orderBy}
+                    onValueChange={(value) => handleOrderChange(value)}
                   >
-                    A - Z
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    onClick={() => handleSortChange("oldest")}
-                    checked={sortType === "oldest"}
+                    <DropdownMenuRadioItem value="asc">
+                      Tăng dần
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="desc">
+                      Giảm dần
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setSortBy("");
+                      setOrderBy("");
+                    }}
                   >
-                    Lâu nhất
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    onClick={() => handleSortChange("za")}
-                    checked={sortType === "za"}
-                  >
-                    Z - A
-                  </DropdownMenuCheckboxItem>
+                    Không sắp xếp
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button
@@ -262,7 +278,7 @@ export default function ManageBrand() {
                 </span>
               </Button>
             </div>
-            {brands && brands.length > 0 ? (
+            {listBrand && listBrand.length > 0 ? (
               <Card>
                 <CardHeader>
                   <CardTitle>
@@ -288,7 +304,7 @@ export default function ManageBrand() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {brands.map((brand) => (
+                      {listBrand.map((brand) => (
                         <TableRow key={brand.id}>
                           <TableCell className="font-medium hidden sm:table-cell">
                             <div className="flex items-center justify-center">

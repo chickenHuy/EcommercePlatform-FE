@@ -1,9 +1,9 @@
 import { get, post, put, del } from "@/lib/httpClient";
 
-export const getAllBrand = (page, size, sortType, search) => {
+export const getAllBrand = (page, size, sortBy, orderBy, search) => {
   try {
     const response = get(
-      `/api/v1/brands?page=${page}&size=${size}&tab=all&sort=${sortType}&search=${search}`
+      `/api/v1/brands?page=${page}&size=${size}&sortBy=${sortBy}&orderBy=${orderBy}&search=${search}`
     );
     return response;
   } catch (error) {
