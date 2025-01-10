@@ -15,9 +15,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
-import { createBrand, updateBrand } from "@/api/admin/brandRequest";
+import { useEffect, useRef, useState } from "react";
+import {
+  createBrand,
+  updateBrand,
+  uploadBrandLogo,
+} from "@/api/admin/brandRequest";
 import { Textarea } from "../ui/textarea";
+import Image from "next/image";
+import brandEmpty from "@/assets/images/brandEmpty.jpg";
 
 const brandSchema = z.object({
   name: z
@@ -39,11 +45,18 @@ export default function DialogAddEditBrand(props) {
     title,
     description,
     nameButton,
-    isOpen,
+    onOpen,
     onClose,
     onSuccess,
-    brandDataEdit,
+    brandEdit,
+    setIsLoading,
   } = props;
+
+  const [imagePreview, setImagePreview] = useState(
+    brandEdit?.logoUrl || brandEmpty
+  );
+  const fileInputRef = useRef(null);
+  const [file, setFile] = useState(null);
 
   const { toast } = useToast();
 
@@ -56,10 +69,10 @@ export default function DialogAddEditBrand(props) {
   });
 
   useEffect(() => {
-    if (brandDataEdit) {
+    if (brandEdit) {
       brandForm.reset({
-        name: brandDataEdit.name || "",
-        description: brandDataEdit.description || "",
+        name: brandEdit.name || "",
+        description: brandEdit.description || "",
       });
     } else {
       brandForm.reset({
@@ -67,18 +80,43 @@ export default function DialogAddEditBrand(props) {
         description: "",
       });
     }
-  }, [brandDataEdit, brandForm]);
+  }, [brandEdit, brandForm]);
 
   const onSubmit = async (brandData) => {
     try {
-      if (brandDataEdit) {
-        await updateBrand(brandDataEdit.id, brandData);
+      setIsLoading(true);
+
+      if (!brandEdit && !file) {
+        toast({
+          title: "Thất bại",
+          description: "Vui lòng chọn một logo thương hiệu để thêm mới",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const validTypes = ["image/jpg", "image/jpeg", "image/png", "image/webp"];
+      if (file != null && !validTypes.includes(file.type)) {
+        toast({
+          title: "Thất bại",
+          description: "Chỉ chấp nhận các file jpg, jpeg, png, webp",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (brandEdit) {
+        await updateBrand(brandEdit.id, brandData);
+        if (file != null) {
+          await uploadBrandLogo(brandEdit.id, file);
+        }
         toast({
           title: "Thành công",
           description: "Thương hiệu đã được cập nhật",
         });
       } else {
-        await createBrand(brandData);
+        const brandCreated = await createBrand(brandData);
+        await uploadBrandLogo(brandCreated.result.id, file);
         toast({
           title: "Thành công",
           description: "Thương hiệu mới đã được thêm",
@@ -93,21 +131,34 @@ export default function DialogAddEditBrand(props) {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const handleFileChange = (event) => {
+    const tempFile = event.target.files[0];
+    if (tempFile) {
+      setFile(tempFile);
+      const objectUrl = URL.createObjectURL(tempFile);
+      setImagePreview(objectUrl);
+    }
+  };
+
+  const handleFileInputClick = () => {
+    fileInputRef.current.click();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[450px]">
+    <Dialog open={onOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-[550px] z-[100]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <form onSubmit={brandForm.handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Tên TH
-            </Label>
+            <Label className="text-right">Tên TH</Label>
             <Input
               placeholder="tên thương hiệu"
               className="col-span-3"
@@ -122,12 +173,10 @@ export default function DialogAddEditBrand(props) {
             </div>
           )}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="description" className="text-right">
-              Mô tả
-            </Label>
+            <Label className="text-right">Mô tả</Label>
             <Textarea
               placeholder="mô tả"
-              className="col-span-3"
+              className="col-span-3 min-h-[100px]"
               {...brandForm.register("description")}
             />
           </div>
@@ -138,6 +187,28 @@ export default function DialogAddEditBrand(props) {
               </p>
             </div>
           )}
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label className="text-right">Logo</Label>
+            <div className="col-start-2 min-h-[200px] min-w-[200px] hover:cursor-pointer">
+              <Image
+                alt="Logo thương hiệu"
+                className="aspect-square rounded-md object-cover"
+                src={imagePreview}
+                width={200}
+                height={200}
+                unoptimized
+                priority
+                onClick={handleFileInputClick}
+              />
+              <Input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileChange(e)}
+                style={{ display: "none" }}
+              />
+            </div>
+          </div>
           <DialogFooter>
             <Button type="submit" variant="outline">
               {nameButton}

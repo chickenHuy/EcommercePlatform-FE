@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  ArrowUpDown,
-  MoreHorizontal,
-  PlusCircle,
-} from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -42,7 +38,6 @@ import { deleteBrand, getAllBrand } from "@/api/admin/brandRequest";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import DialogAddEditBrand from "@/components/dialogs/dialogAddEditBrand";
-import DialogImageBrand from "@/components/dialogs/dialogImageBrand";
 import DialogConfirm from "@/components/dialogs/dialogConfirm";
 import { useSelector } from "react-redux";
 import BrandEmpty from "@/assets/images/brandEmpty.jpg";
@@ -65,10 +60,6 @@ export default function ManageBrand() {
   const [orderBy, setOrderBy] = useState("desc");
   const [totalElement, setTotalElement] = useState(0);
   const { toast } = useToast();
-  const [isDialogImageOpen, setIsDialogImageOpen] = useState(false);
-  const [dialogImageTitle, setDiaLogImageTitle] = useState("");
-  const [dialogImageDescription, setDiaLogImageDescription] = useState("");
-  const [dialogImageNameButton, setDiaLogImageNameButton] = useState("");
   const [isDialogConfirmOpen, setIsDialogConfirmOpen] = useState(false);
   const [brandToDelete, setBrandToDelete] = useState(null);
   const [brandTableName, setBrandTableName] = useState(null);
@@ -135,7 +126,6 @@ export default function ManageBrand() {
   const refreshPage = () => {
     fetchBrand();
     setIsDialogAddEditOpen(false);
-    setIsDialogImageOpen(false);
   };
 
   const handleAddButtonClick = () => {
@@ -143,39 +133,25 @@ export default function ManageBrand() {
     setIsDialogAddEditOpen(true);
     setDialogAddEditTitle("Thêm mới thương hiệu");
     setDialogAddEditDescription(
-      "Nhập đầy đủ các thông tin cần thiết để thêm mới thương hiệu"
+      "Nhập thông tin cần thiết để thêm mới thương hiệu"
     );
     setDialogAddEditNameButton("Thêm mới");
   };
 
   const handleEditButtonClick = (brand) => {
-    console.log("handleEditButtonClick: ", brand);
     setSelectedBrand(brand);
     setIsDialogAddEditOpen(true);
-    setDialogAddEditTitle("Sửa thương hiệu");
+    setDialogAddEditTitle("Chỉnh sửa thương hiệu");
     setDialogAddEditDescription(
-      "Nhập đầy đủ thông tin để chỉnh sửa thương hiệu"
+      "Nhập thông tin cần thiết để chỉnh sửa thương hiệu"
     );
     setDialogAddEditNameButton("Lưu thay đổi");
-  };
-
-  const handleUploadImageClick = (brand) => {
-    setSelectedBrand(brand);
-    setIsDialogImageOpen(true);
-    setDiaLogImageTitle("Cập nhật logo thương hiệu");
-    setDiaLogImageDescription("Chọn ảnh logo thương hiệu phù hợp để cập nhật");
-    setDiaLogImageNameButton("Cập nhật");
-    setBrandTableName("Thương hiệu");
   };
 
   const isCloseDialogAddEdit = () => {
     setIsDialogAddEditOpen(false);
   };
 
-  const isCloseDialogImage = () => {
-    setIsDialogImageOpen(false);
-    setBrandTableName(null);
-  };
 
   const isCloseDialogComfirm = () => {
     setIsDialogConfirmOpen(false);
@@ -212,7 +188,7 @@ export default function ManageBrand() {
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <Toaster />
       {isLoading ? (
-        <div className="fixed inset-0 flex flex-col justify-center items-center z-[100] space-y-4 bg-black-secondary">
+        <div className="fixed inset-0 flex flex-col justify-center items-center z-[150] space-y-4 bg-black-secondary">
           <CircularProgress />
           <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
         </div>
@@ -409,23 +385,11 @@ export default function ManageBrand() {
           title={dialogAddEditTitle}
           description={dialogAddEditDescription}
           nameButton={dialogAddEditNameButton}
-          isOpen={isDialogAddEditOpen}
+          onOpen={isDialogAddEditOpen}
           onClose={isCloseDialogAddEdit}
           onSuccess={refreshPage}
-          brandDataEdit={selectedBrand}
-        />
-      )}
-      {isDialogImageOpen && (
-        <DialogImageBrand
-          title={dialogImageTitle}
-          description={dialogImageDescription}
-          nameButton={dialogImageNameButton}
-          isOpen={isDialogImageOpen}
-          onClose={isCloseDialogImage}
-          brandImage={selectedBrand}
-          refreshPage={refreshPage}
-          tableName={brandTableName}
-          setLoading={setIsLoading}
+          brandEdit={selectedBrand}
+          setIsLoading={setIsLoading}
         />
       )}
       {isDialogConfirmOpen && (
