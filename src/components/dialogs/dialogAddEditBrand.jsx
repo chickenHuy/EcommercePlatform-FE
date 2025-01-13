@@ -24,6 +24,9 @@ import {
 import { Textarea } from "../ui/textarea";
 import Image from "next/image";
 import brandEmpty from "@/assets/images/brandEmpty.jpg";
+import { X } from "lucide-react";
+
+const validImageTypes = ["image/jpg", "image/jpeg", "image/png", "image/webp"];
 
 const brandSchema = z.object({
   name: z
@@ -36,8 +39,21 @@ const brandSchema = z.object({
       message: "Tên thương hiệu phải từ 2 đến 30 ký tự",
     }),
   description: z.string().trim().max(255, {
-    message: "Mô tả không được vượt quá 255 ký tự",
+    message: "Mô tả phải không vượt quá 255 ký tự",
   }),
+  logoUrl: z
+    .any()
+    .refine(
+      (file) => {
+        if (!file) return false;
+        if (typeof file === "string") return true;
+        return validImageTypes.includes(file.type);
+      },
+      {
+        message: "Hình ảnh phải có dạng jpg, jpeg, png hoặc webp",
+      }
+    )
+    .optional(),
 });
 
 export default function DialogAddEditBrand(props) {
@@ -47,16 +63,13 @@ export default function DialogAddEditBrand(props) {
     nameButton,
     onOpen,
     onClose,
-    onSuccess,
+    refreshPage,
     brandEdit,
     setIsLoading,
   } = props;
 
-  const [imagePreview, setImagePreview] = useState(
-    brandEdit?.logoUrl || brandEmpty
-  );
   const fileInputRef = useRef(null);
-  const [file, setFile] = useState(null);
+  const [fileLogoUrl, setFileLogoUrl] = useState(null);
 
   const { toast } = useToast();
 
@@ -65,19 +78,16 @@ export default function DialogAddEditBrand(props) {
     defaultValues: {
       name: "",
       description: "",
+      logoUrl: brandEmpty,
     },
   });
 
   useEffect(() => {
     if (brandEdit) {
       brandForm.reset({
-        name: brandEdit.name || "",
-        description: brandEdit.description || "",
-      });
-    } else {
-      brandForm.reset({
-        name: "",
-        description: "",
+        name: brandEdit.name,
+        description: brandEdit.description,
+        logoUrl: brandEdit.logoUrl,
       });
     }
   }, [brandEdit, brandForm]);
@@ -86,7 +96,7 @@ export default function DialogAddEditBrand(props) {
     try {
       setIsLoading(true);
 
-      if (!brandEdit && !file) {
+      if (!brandEdit && !fileLogoUrl) {
         toast({
           title: "Thất bại",
           description: "Vui lòng chọn một logo thương hiệu để thêm mới",
@@ -95,35 +105,23 @@ export default function DialogAddEditBrand(props) {
         return;
       }
 
-      const validTypes = ["image/jpg", "image/jpeg", "image/png", "image/webp"];
-      if (file != null && !validTypes.includes(file.type)) {
-        toast({
-          title: "Thất bại",
-          description: "Chỉ chấp nhận các file jpg, jpeg, png, webp",
-          variant: "destructive",
-        });
-        return;
-      }
-
       if (brandEdit) {
         await updateBrand(brandEdit.id, brandData);
-        if (file != null) {
-          await uploadBrandLogo(brandEdit.id, file);
+        if (fileLogoUrl) {
+          await uploadBrandLogo(brandEdit.id, fileLogoUrl);
         }
         toast({
-          title: "Thành công",
-          description: "Thương hiệu đã được cập nhật",
+          description: `Chỉnh sửa thương hiệu "${brandData.name}" thành công`,
         });
       } else {
         const brandCreated = await createBrand(brandData);
-        await uploadBrandLogo(brandCreated.result.id, file);
+        await uploadBrandLogo(brandCreated.result.id, fileLogoUrl);
         toast({
-          title: "Thành công",
-          description: "Thương hiệu mới đã được thêm",
+          description: `Thêm mới thương hiệu "${brandData.name}" thành công`,
         });
       }
 
-      onSuccess();
+      refreshPage();
       onClose();
     } catch (error) {
       toast({
@@ -139,9 +137,9 @@ export default function DialogAddEditBrand(props) {
   const handleFileChange = (event) => {
     const tempFile = event.target.files[0];
     if (tempFile) {
-      setFile(tempFile);
-      const objectUrl = URL.createObjectURL(tempFile);
-      setImagePreview(objectUrl);
+      setFileLogoUrl(tempFile);
+      brandForm.setValue("logoUrl", tempFile);
+      brandForm.trigger("logoUrl");
     }
   };
 
@@ -151,7 +149,7 @@ export default function DialogAddEditBrand(props) {
 
   return (
     <Dialog open={onOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[550px] z-[100]">
+      <DialogContent className="z-[200] max-w-[550px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
@@ -189,16 +187,22 @@ export default function DialogAddEditBrand(props) {
           )}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Logo</Label>
-            <div className="col-start-2 min-h-[200px] min-w-[200px] hover:cursor-pointer">
+            <div
+              className="col-start-2 min-h-[200px] min-w-[200px] hover:cursor-pointer"
+              onClick={handleFileInputClick}
+            >
               <Image
                 alt="Logo thương hiệu"
                 className="aspect-square rounded-md object-cover"
-                src={imagePreview}
+                src={
+                  fileLogoUrl
+                    ? URL.createObjectURL(fileLogoUrl)
+                    : brandForm.watch("logoUrl")
+                }
                 width={200}
                 height={200}
                 unoptimized
                 priority
-                onClick={handleFileInputClick}
               />
               <Input
                 ref={fileInputRef}
@@ -209,6 +213,13 @@ export default function DialogAddEditBrand(props) {
               />
             </div>
           </div>
+          {brandForm.formState.errors.logoUrl && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <p className="text-sm text-error col-start-2 col-span-3">
+                {brandForm.formState.errors.logoUrl.message}
+              </p>
+            </div>
+          )}
           <DialogFooter>
             <Button type="submit" variant="outline">
               {nameButton}

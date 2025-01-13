@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import UploadIcon from "@mui/icons-material/Upload";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -88,7 +87,7 @@ export default function ManageBrand() {
     setOrderBy(value);
   };
 
-  const fetchBrand = useCallback(async () => {
+  const fetchAllBrand = useCallback(async () => {
     try {
       const response = await getAllBrand(
         currentPage,
@@ -103,28 +102,19 @@ export default function ManageBrand() {
       setHasNext(response.result.hasNext);
       setHasPrevious(response.result.hasPrevious);
       setIsLoading(false);
-    } catch (error) {
-      toast({
-        title: "Thất bại",
-        description:
-          error.message === "Unauthenticated"
-            ? "Phiên làm việc hết hạn. Vui lòng đăng nhập lại!!!"
-            : error.message,
-        variant: "destructive",
-      });
-    }
-  }, [toast, currentPage, sortBy, orderBy, searchTerm]);
+    } catch (error) {}
+  }, [currentPage, sortBy, orderBy, searchTerm]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
 
   useEffect(() => {
-    fetchBrand();
-  }, [fetchBrand, totalPage, totalElement]);
+    fetchAllBrand();
+  }, [fetchAllBrand, totalPage, totalElement]);
 
   const refreshPage = () => {
-    fetchBrand();
+    fetchAllBrand();
     setIsDialogAddEditOpen(false);
   };
 
@@ -135,7 +125,7 @@ export default function ManageBrand() {
     setDialogAddEditDescription(
       "Nhập thông tin cần thiết để thêm mới thương hiệu"
     );
-    setDialogAddEditNameButton("Thêm mới");
+    setDialogAddEditNameButton("Lưu");
   };
 
   const handleEditButtonClick = (brand) => {
@@ -145,13 +135,12 @@ export default function ManageBrand() {
     setDialogAddEditDescription(
       "Nhập thông tin cần thiết để chỉnh sửa thương hiệu"
     );
-    setDialogAddEditNameButton("Lưu thay đổi");
+    setDialogAddEditNameButton("Lưu");
   };
 
   const isCloseDialogAddEdit = () => {
     setIsDialogAddEditOpen(false);
   };
-
 
   const isCloseDialogComfirm = () => {
     setIsDialogConfirmOpen(false);
@@ -168,10 +157,9 @@ export default function ManageBrand() {
       try {
         await deleteBrand(brandToDelete.id);
         toast({
-          title: "Thành công",
-          description: `Thương hiệu "${brandToDelete.name}" đã được xóa`,
+          description: `Xóa thương hiệu "${brandToDelete.name}" thành công`,
         });
-        fetchBrand();
+        fetchAllBrand();
         setIsDialogConfirmOpen(false);
         setBrandTableName(null);
       } catch (error) {
@@ -185,12 +173,14 @@ export default function ManageBrand() {
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+    <div className="flex flex-col bg-muted/40">
       <Toaster />
       {isLoading ? (
-        <div className="fixed inset-0 flex flex-col justify-center items-center z-[150] space-y-4 bg-black-secondary">
+        <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] space-y-4 bg-black-secondary">
           <CircularProgress />
-          <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
+          <Label className="text-2xl text-white-primary">
+            Đang tải dữ liệu...
+          </Label>
         </div>
       ) : (
         <div className="flex flex-col sm:gap-4 sm:py-4">
@@ -200,9 +190,9 @@ export default function ManageBrand() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="h-7 gap-1">
                     <ArrowUpDown className="h-3.5 w-3.5" />
-                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                    <Label className="truncate sr-only sm:not-sr-only hover:cursor-pointer">
                       Sắp xếp
-                    </span>
+                    </Label>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -249,29 +239,31 @@ export default function ManageBrand() {
                 onClick={handleAddButtonClick}
               >
                 <PlusCircle className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                <Label className="truncate sr-only sm:not-sr-only hover:cursor-pointer">
                   Thêm mới
-                </span>
+                </Label>
               </Button>
             </div>
             {listBrand && listBrand.length > 0 ? (
               <Card>
                 <CardHeader>
                   <CardTitle>
-                    Danh sách các thương hiệu ({totalElement})
+                    Danh sách tất cả thương hiệu ({totalElement})
                   </CardTitle>
                   <CardDescription>
-                    Quản lý các thương hiệu của sản phẩm trong hệ thống
+                    Quản lý tất cả thương hiệu của các nhà sản xuất trong hệ thống
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="min-h-[600px]">
                   <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead></TableHead>
                         <TableHead>Tên thương hiệu</TableHead>
-                        <TableHead>Mô tả</TableHead>
                         <TableHead className="hidden md:table-cell">
+                          Mô tả
+                        </TableHead>
+                        <TableHead className="hidden sm:table-cell">
                           Ngày tạo
                         </TableHead>
                         <TableHead>
@@ -282,7 +274,7 @@ export default function ManageBrand() {
                     <TableBody>
                       {listBrand.map((brand) => (
                         <TableRow key={brand.id}>
-                          <TableCell className="font-medium hidden sm:table-cell">
+                          <TableCell className="font-medium">
                             <div className="flex items-center justify-center">
                               <Image
                                 alt={brand.name}
@@ -298,10 +290,10 @@ export default function ManageBrand() {
                           <TableCell className="font-medium text-center">
                             {brand.name}
                           </TableCell>
-                          <TableCell className="font-medium text-center">
+                          <TableCell className="font-medium text-center min-w-[200px] max-w-[300px] hidden md:table-cell">
                             {brand.description || "(trống)"}
                           </TableCell>
-                          <TableCell className="font-medium hidden md:table-cell text-center">
+                          <TableCell className="font-medium text-center truncate hidden sm:table-cell">
                             {formatDate(brand.createdAt)}
                           </TableCell>
                           <TableCell className="font-medium text-center">
@@ -313,7 +305,6 @@ export default function ManageBrand() {
                                   variant="ghost"
                                 >
                                   <MoreHorizontal className="h-4 w-4" />
-                                  <span className="sr-only">Toggle menu</span>
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
@@ -326,7 +317,6 @@ export default function ManageBrand() {
                                   Sửa
                                   <EditIcon />
                                 </DropdownMenuItem>
-
                                 <DropdownMenuItem
                                   onSelect={(e) => e.preventDefault()}
                                   onClick={() => handleDeleteButtonClick(brand)}
@@ -334,14 +324,6 @@ export default function ManageBrand() {
                                 >
                                   Xoá
                                   <DeleteIcon />
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onSelect={(e) => e.preventDefault()}
-                                  onClick={() => handleUploadImageClick(brand)}
-                                  className="flex items-center justify-between cursor-pointer"
-                                >
-                                  Tải Logo
-                                  <UploadIcon />
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -364,7 +346,7 @@ export default function ManageBrand() {
                 </CardFooter>
               </Card>
             ) : (
-              <div className="flex flex-col items-center justify-center border rounded-lg min-h-[400px] mt-6">
+              <div className="flex flex-col items-center justify-center border rounded-lg min-h-[750px]">
                 <Image
                   alt="ảnh trống"
                   className="mx-auto"
@@ -381,16 +363,19 @@ export default function ManageBrand() {
         </div>
       )}
       {isDialogAddEditOpen && (
-        <DialogAddEditBrand
-          title={dialogAddEditTitle}
-          description={dialogAddEditDescription}
-          nameButton={dialogAddEditNameButton}
-          onOpen={isDialogAddEditOpen}
-          onClose={isCloseDialogAddEdit}
-          onSuccess={refreshPage}
-          brandEdit={selectedBrand}
-          setIsLoading={setIsLoading}
-        />
+        <>
+          <div className="fixed inset-0 bg-black-primary bg-opacity-85 z-[150]" />
+          <DialogAddEditBrand
+            title={dialogAddEditTitle}
+            description={dialogAddEditDescription}
+            nameButton={dialogAddEditNameButton}
+            onOpen={isDialogAddEditOpen}
+            onClose={isCloseDialogAddEdit}
+            refreshPage={refreshPage}
+            brandEdit={selectedBrand}
+            setIsLoading={setIsLoading}
+          />
+        </>
       )}
       {isDialogConfirmOpen && (
         <DialogConfirm
