@@ -35,9 +35,9 @@ import {
 import VendorHeader from "../headers/vendorHeader";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  setActiveItem,
+  setFilterTab,
   setFilter,
-  setShowFilter,
+  setActiveItem,
 } from "@/store/features/orderFilterSlice";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -154,9 +154,9 @@ export default function VendorNavigate({ vendorContent }) {
     (state) => state.orderFilterReducer.activeItem
   );
 
-  const handleSetFilter = (filterKey, url, showFilter, activeKey) => {
+  const handleSetFilter = (filterKey, activeKey, url) => {
+    dispatch(setFilterTab(filterKey));
     dispatch(setFilter(filterKey));
-    dispatch(setShowFilter(showFilter));
     dispatch(setActiveItem(activeKey));
     router.push(url);
   };
@@ -206,14 +206,13 @@ export default function VendorNavigate({ vendorContent }) {
                                 className={`w-full hover:cursor-pointer ${
                                   activeItem === subItem.activeKey
                                     ? "font-bold"
-                                    : "font-normal"
+                                    : null
                                 }`}
                                 onClick={() =>
                                   handleSetFilter(
                                     subItem.filterKey,
-                                    subItem.url,
-                                    subItem.filterKey === "",
-                                    subItem.activeKey
+                                    subItem.activeKey,
+                                    subItem.url
                                   )
                                 }
                               >

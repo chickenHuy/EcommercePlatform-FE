@@ -1,121 +1,83 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Toaster } from "@/components/ui/toaster";
-import { ArrowUpDown, CircleHelp, Forklift, Search } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CircularProgress, Rating } from "@mui/material";
+import { CircleHelp, Forklift, Search } from "lucide-react";
 import Image from "next/image";
+import StoreEmpty from "@/assets/images/storeEmpty.jpg";
+import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
+import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { PaginationAdminTable } from "@/components/paginations/pagination";
+import { Badge } from "@/components/ui/badge";
+import { formatCurrency, formatDate } from "@/utils/commonUtils";
+import { OrderReviewDialog } from "@/components/dialogs/dialogReview";
 import { useToast } from "@/hooks/use-toast";
 import { useCallback, useEffect, useState } from "react";
 import { cancelOrderByUser, getAllOrderByUser } from "@/api/user/orderRequest";
-import { TabsContent } from "@radix-ui/react-tabs";
-import DialogCancelOrderUser from "./dialogCancelOrderUser";
-import ViewOrderDetailUser from "./viewOrderDetailUser";
-import { CircularProgress, Rating } from "@mui/material";
+import { Toaster } from "@/components/ui/toaster";
 import { useRouter } from "next/navigation";
-import { setStore } from "@/store/features/userSearchSlice";
 import { useDispatch } from "react-redux";
-import { Badge } from "@/components/ui/badge";
-import { OrderReviewDialog } from "@/components/dialogs/dialogReview";
-import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
-import StoreEmpty from "@/assets/images/storeEmpty.jpg";
-import { formatCurrency } from "@/utils/commonUtils";
+import DialogUpdateOrCancelOrder from "@/components/dialogs/dialogUpdateOrCancelOrder";
+import { setStore } from "@/store/features/userSearchSlice";
+import { useInView } from "react-intersection-observer";
 
-export default function ManageOrderUser() {
-  const [orders, setOrders] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(1);
-  const [sortType, setSortType] = useState("createdAt");
-  const [orderType, setOrderType] = useState("desc");
-  const [totalElement, setTotalElement] = useState(0);
+export default function OrderUserManage() {
+  const pageSize = 4;
+  const sortBy = "createdAt";
+  const orderBy = "desc";
+  const [nextPage, setNextPage] = useState(1);
+  const [listOrder, setListOrder] = useState([]);
   const [hasNext, setHasNext] = useState(false);
-  const [hasPrevious, setHasPrevious] = useState(false);
   const [filter, setFilter] = useState("");
-  const [filterTab, setFilterTab] = useState("");
   const [search, setSearch] = useState("");
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [isDialogCancelOrderOpen, setIsDialogCancelOrderOpen] = useState(false);
+  const [orderCounts, setOrderCounts] = useState({});
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [actionType, setActionType] = useState("");
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [loadListOrder, setLoadListOrder] = useState(false);
+  const [loadPage, setLoadPage] = useState(true);
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
 
-  const handleNextPage = () => {
-    if (currentPage < totalPage) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
+  const { ref: loadRef, inView } = useInView();
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleSortChange = (value) => {
-    setSortType(value);
-  };
-
-  const handleOrderChange = (value) => {
-    setOrderType(value);
-  };
-
-  const handleFilterChange = (value) => {
-    setFilterTab(value);
-  };
-
-  const handleOnclickTabsTrigger = (value) => {
+  const handleFilter = (value) => {
     setFilter(value);
-    setFilterTab(value);
   };
 
-  const handleOnChange = (value) => {
+  const handleSerach = (value) => {
     setSearch(value);
-    setCurrentPage(1);
-  };
-
-  const handleCancelButtonClick = (order, orderId) => {
-    setIsDialogCancelOrderOpen(true);
-    setOrderToCancel(order);
-    setSelectedOrder(orderId);
-    setActionType("cancel");
+    setNextPage(1);
   };
 
   const handleOnClickViewOrderDetail = (orderId) => {
-    setIsDrawerOpen(true);
-    setSelectedOrder(orderId);
+    router.push(`orders/detail/${orderId}`);
   };
 
-  const router = useRouter();
   const handleOnClickViewProductDetail = (slug) => {
     router.push(`/${slug}`);
   };
 
-  const dispatch = useDispatch();
   const handleOnclickViewShop = (storeId) => {
     router.push("/search");
     dispatch(setStore(storeId));
+  };
+
+  const handleCancelButtonClick = (order) => {
+    setIsDialogOpen(true);
+    setOrderToCancel(order);
+    setSelectedOrder(order);
+    setActionType("cancel");
   };
 
   const confirmCancelOrder = async () => {
@@ -123,11 +85,10 @@ export default function ManageOrderUser() {
       try {
         await cancelOrderByUser(orderToCancel.id);
         toast({
-          title: "Thành công",
-          description: `Đơn hàng "#${orderToCancel.id}" đã được hủy`,
+          description: `Đơn hàng "${orderToCancel.id}" đã được hủy thành công`,
         });
-        fetchAllOrderByUser();
-        setIsDialogCancelOrderOpen(false);
+        fetchAllOrderByUser(true);
+        setIsDialogOpen(false);
       } catch (error) {
         toast({
           title: "Thất bại",
@@ -138,41 +99,139 @@ export default function ManageOrderUser() {
     }
   };
 
-  const fetchAllOrderByUser = useCallback(async () => {
+  const fetchAllOrderByUser = useCallback(
+    async (isInitialLoad = false) => {
+      if (isInitialLoad) {
+        setLoadPage(false);
+      }
+
+      setLoadListOrder(true);
+      try {
+        if (!isInitialLoad) {
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+
+        const response = await getAllOrderByUser(
+          isInitialLoad ? 1 : nextPage,
+          pageSize,
+          sortBy,
+          orderBy,
+          search,
+          filter
+        );
+
+        const newListOrder = response.result.data;
+
+        if (newListOrder.length === 0) {
+          setListOrder(newListOrder);
+          setNextPage(response.result.nextPage);
+          setHasNext(response.result.hasNext);
+          setTotalElements(response.result.totalElements);
+        }
+
+        if (newListOrder.length > 0) {
+          setListOrder((prevListOrder) =>
+            isInitialLoad ? newListOrder : [...prevListOrder, ...newListOrder]
+          );
+          setNextPage(response.result.nextPage);
+          setHasNext(response.result.hasNext);
+          setTotalElements(response.result.totalElements);
+        }
+      } catch (error) {
+        console.error("Error fetching all order by user:", error);
+      } finally {
+        setLoadListOrder(false);
+      }
+    },
+    [nextPage, search, filter]
+  );
+
+  const fetchOrderCounts = useCallback(async () => {
     try {
-      const response = await getAllOrderByUser(
-        currentPage,
-        sortType,
-        orderType,
-        search,
-        filterTab
+      const response = await Promise.all(
+        listOrderStatus.map((status) =>
+          getAllOrderByUser(1, 1, sortBy, orderBy, "", status.filterKey)
+        )
       );
-      console.log("Orders: ", response.result.data);
-      setOrders(response.result.data);
-      setTotalPage(response.result.totalPages);
-      setTotalElement(response.result.totalElements);
-      setHasNext(response.result.hasNext);
-      setHasPrevious(response.result.hasPrevious);
-      setIsLoading(false);
+
+      const counts = response.reduce((acc, res, index) => {
+        acc[listOrderStatus[index].filterKey] = res.result.totalElements;
+        return acc;
+      }, {});
+
+      setOrderCounts(counts);
     } catch (error) {
-      toast({
-        title: "Thất bại",
-        description:
-          error.message === "Unauthenticated"
-            ? "Phiên làm việc hết hạn. Vui lòng đăng nhập lại!!!"
-            : error.message,
-        variant: "destructive",
-      });
+      console.error("Error fetching order counts:", error);
     }
-  }, [toast, currentPage, sortType, orderType, search, filterTab]);
+  }, []);
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [filterTab, search]);
+    fetchOrderCounts();
+  }, []);
 
   useEffect(() => {
-    fetchAllOrderByUser();
-  }, [fetchAllOrderByUser]);
+    if (search === "" && filter === "") {
+      fetchAllOrderByUser(true);
+    } else if (search !== "" || filter !== "") {
+      fetchAllOrderByUser(true);
+    }
+  }, [search, filter]);
+
+  useEffect(() => {
+    if (inView && hasNext) {
+      fetchAllOrderByUser();
+    }
+  }, [inView, hasNext]);
+
+  const listOrderStatus = [
+    { label: "Tất cả", filterKey: "" },
+    { label: "Chờ thanh toán", filterKey: "ON_HOLD" },
+    { label: "Vận chuyển", filterKey: "IN_TRANSIT" },
+    { label: "Chờ giao hàng", filterKey: "WAITING_DELIVERY" },
+    { label: "Hoàn thành", filterKey: "DELIVERED" },
+    { label: "Đã hủy", filterKey: "CANCELLED" },
+  ];
+
+  function getMessageOrder(status) {
+    switch (status) {
+      case "ON_HOLD":
+        return "Đơn hàng đang chờ thanh toán";
+      case "PENDING":
+        return "Đơn hàng đang chờ người bán xác nhận";
+      case "CONFIRMED":
+        return "Người bán đã xác nhận đơn hàng";
+      case "PREPARING":
+        return "Người bán đang chuẩn bị hàng";
+      case "WAITING_FOR_SHIPPING":
+        return "Đơn hàng chờ giao cho ĐVVC";
+      case "PICKED_UP":
+        return "Đơn hàng đã được giao cho ĐVVC";
+      case "OUT_FOR_DELIVERY":
+        return "Đơn hàng đang trên đường giao đến bạn, vui lòng chú ý điện thoại";
+      case "DELIVERED":
+        return "Đơn hàng đã được giao thành công";
+      case "CANCELLED":
+        return "Đơn hàng đã bị hủy";
+    }
+  }
+
+  function getPaymentMethodOrder(status) {
+    switch (status) {
+      case "COD":
+        return "Thanh toán khi nhận hàng";
+      case "VN_PAY":
+        return "Thanh toán VN PAY";
+    }
+  }
+
+  function getTransactionStatusOrder(status) {
+    switch (status) {
+      case "WAITING":
+        return "Chờ thanh toán";
+      case "SUCCESS":
+        return "Đã thanh toán";
+    }
+  }
 
   function getStatusOrder(status) {
     switch (status) {
@@ -194,202 +253,42 @@ export default function ManageOrderUser() {
         return "HOÀN THÀNH";
       case "CANCELLED":
         return "ĐÃ HỦY";
-      default:
-        return "N/A";
     }
   }
-
-  function getMessageOrder(status) {
-    switch (status) {
-      case "ON_HOLD":
-        return "Đơn hàng đang chờ thanh toán";
-      case "PENDING":
-        return "Đơn hàng đang chờ người bán xác nhận";
-      case "CONFIRMED":
-        return "Người bán đã xác nhận đơn hàng";
-      case "PREPARING":
-        return "Người bán đang chuẩn bị hàng";
-      case "WAITING_FOR_SHIPPING":
-        return "Chờ giao hàng cho ĐVVC";
-      case "PICKED_UP":
-        return "Đơn hàng đã được giao cho ĐVVC";
-      case "OUT_FOR_DELIVERY":
-        return "Đơn hàng đang trên đường giao tới bạn, vui lòng chú ý điện thoại";
-      case "DELIVERED":
-        return "Đơn hàng đã được giao thành công";
-      case "CANCELLED":
-        return "Đơn hàng đã bị hủy";
-      default:
-        return "N/A";
-    }
-  }
-
-  function getTransactionStatusOrder(status) {
-    switch (status) {
-      case "WAITING":
-        return "Chờ thanh toán";
-      case "SUCCESS":
-        return "Đã thanh toán";
-      default:
-        return "N/A";
-    }
-  }
-
-  function getPaymentMethodOrder(status) {
-    switch (status) {
-      case "COD":
-        return "Thanh toán khi nhận hàng";
-      case "VN_PAY":
-        return "Thanh toán VN PAY";
-      default:
-        return "N/A";
-    }
-  }
-
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-
-    const hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const seconds = date.getSeconds().toString().padStart(2, "0");
-
-    const timePart = `${hours
-      .toString()
-      .padStart(2, "0")}:${minutes}:${seconds}`;
-    const datePart = date.toLocaleDateString("vi-VN").replace(/\//g, "-");
-
-    return `${timePart} ${datePart}`;
-  }
-
-  const listOrderStatus = [
-    { label: "Tất cả", filterKey: "" },
-    { label: "Chờ thanh toán", filterKey: "ON_HOLD" },
-    { label: "Chờ xác nhận", filterKey: "PENDING" },
-    { label: "Đã xác nhận", filterKey: "CONFIRMED" },
-    { label: "Chuẩn bị hàng", filterKey: "PREPARING" },
-    { label: "Chờ giao cho ĐVVC", filterKey: "WAITING_FOR_SHIPPING" },
-    { label: "Đã giao cho ĐVVC", filterKey: "PICKED_UP" },
-    { label: "Đang giao hàng", filterKey: "OUT_FOR_DELIVERY" },
-    { label: "Hoàn thành", filterKey: "DELIVERED" },
-    { label: "Đã hủy", filterKey: "CANCELLED" },
-  ];
 
   return (
-    <div className="flex flex-col space-y-4 bg-white-primary p-2">
+    <>
       <Toaster />
-      {isLoading && (
-        <div className="fixed inset-0 flex flex-col justify-center items-center z-50 space-y-4 bg-black-secondary">
-          <CircularProgress></CircularProgress>
-          <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
-        </div>
-      )}
-      <Tabs value={filter}>
-        <div className="flex flex-col space-y-4">
-          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-            <TabsList className="inline-flex flex-wrap h-10 items-center justify-start rounded-lg bg-muted p-1 text-muted-foreground overflow-x-auto">
-              {[
-                listOrderStatus[0],
-                listOrderStatus[1],
-                listOrderStatus[2],
-                listOrderStatus[3],
-                listOrderStatus[8],
-                listOrderStatus[9],
-              ].map((item) => (
-                <TabsTrigger
-                  key={item.filterKey}
-                  value={item.filterKey}
-                  onClick={() => handleOnclickTabsTrigger(item.filterKey)}
-                  className="ring-offset-background focus-visible:ring-ring data-[state=active]:bg-background data-[state=active]:text-foreground whitespace-nowrap"
-                >
-                  {item.label}
-                </TabsTrigger>
-              ))}
-              <div value="more" className="text-primary font-bold">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="ml-2">
-                      Thêm
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {listOrderStatus.map((item) => (
-                      <DropdownMenuItem
-                        key={item.filterKey}
-                        onClick={() => handleOnclickTabsTrigger(item.filterKey)}
-                      >
-                        {item.label}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </TabsList>
-
-            <div className="flex items-center space-x-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8">
-                    <ArrowUpDown className="h-4 w-4 m-2" />
-                    Sắp xếp
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuLabel>Sắp xếp</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuRadioGroup
-                    value={orderType}
-                    onValueChange={handleOrderChange}
-                  >
-                    <DropdownMenuRadioItem value="asc">
-                      Tăng dần
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="desc">
-                      Giảm dần
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuRadioGroup
-                    value={sortType}
-                    onValueChange={handleSortChange}
-                  >
-                    <DropdownMenuRadioItem value="createdAt">
-                      Ngày đặt hàng
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setSortType("");
-                      setOrderType("");
-                    }}
-                  >
-                    Không sắp xếp
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-2">
+      <Tabs
+        value={filter}
+        className="min-h-screen border rounded-lg px-8 py-4 mb-4"
+      >
+        <TabsList className="w-full flex items-center justify-between">
+          {listOrderStatus.map((item, index) => (
+            <TabsTrigger
+              key={index}
+              value={item.filterKey}
+              onClick={() => handleFilter(item.filterKey)}
+            >
+              {item.label} ({orderCounts[item.filterKey] || 0})
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <TabsContent value={filter} className="flex flex-col space-y-8">
+          <div className="w-full flex items-center relative">
+            <Search className="absolute left-3 top-3 h-7 w-7 hover:cursor-pointer" />
             <Input
-              placeholder="Tìm kiếm đơn hàng theo mã đơn hàng, tên cửa hàng, tên sản phẩm"
-              className="flex-1"
-              onChange={(e) => handleOnChange(e.target.value)}
+              placeholder="Bạn có thể tìm kiếm đơn hàng theo Mã đơn hàng, Tên cửa hàng hoặc Tên sản phẩm"
+              className="pl-12 h-[50px]"
+              onChange={(e) => handleSerach(e.target.value)}
             />
-            <Button size="icon" variant="ghost">
-              <Search className="h-4 w-4" />
-            </Button>
           </div>
-        </div>
-
-        <TabsContent value={filter} className="mt-4 space-y-4">
-          {orders.length > 0 ? (
-            orders.map((order) => (
-              <Card key={order.id} className="w-full">
-                {console.log(order)}
-                <CardTitle className="flex justify-between items-center gap-4 m-4">
+          {listOrder.length > 0 &&
+            listOrder.map((order) => (
+              <Card key={order.id} className="flex flex-col">
+                <CardTitle className="flex items-center justify-between px-8 py-4 space-x-4">
                   <div
-                    className="flex items-center gap-4 hover:cursor-pointer"
+                    className="flex items-center space-x-4 hover:cursor-pointer"
                     onClick={() => handleOnclickViewShop(order.storeId)}
                   >
                     <Image
@@ -398,21 +297,23 @@ export default function ManageOrderUser() {
                       height={30}
                       width={30}
                       unoptimized={true}
+                      priority
                       className="rounded-full transition-transform duration-300"
                     />
-                    <Label className="text-xl hover:cursor-pointer">
+                    <Label className="text-xl text-center hover:cursor-pointer">
                       {order.storeName}
                     </Label>
                     <Rating
                       value={order.ratingStore}
                       precision={0.1}
                       readOnly
-                    ></Rating>
+                    />
                   </div>
-                  <div className="flex items-center gap-4">
+
+                  <div className="flex items-center space-x-4">
                     <Button
                       variant="outline"
-                      className="flex items-center gap-2"
+                      className="flex items-center space-x-2"
                       onClick={() => handleOnClickViewOrderDetail(order.id)}
                     >
                       <Forklift />
@@ -425,190 +326,170 @@ export default function ManageOrderUser() {
                         <TooltipTrigger>
                           <CircleHelp className="cursor-default" />
                         </TooltipTrigger>
-                        <TooltipContent className="flex flex-col gap-2">
+                        <TooltipContent className="flex flex-col space-y-2">
                           <Label>Cập Nhật Mới Nhất</Label>
                           <Label>{formatDate(order.lastUpdatedAt)}</Label>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
-                    <Badge variant="outline">
+                    <Badge variant="outline" className="text-center">
                       {getPaymentMethodOrder(order.paymentMethod)}
                     </Badge>
-                    <Badge variant="outline">
+                    <Badge variant="outline" className="text-center">
                       {getTransactionStatusOrder(
                         order.currentStatusTransaction
                       )}
                     </Badge>
                     <div className="w-[1px] h-7 bg-black-primary"></div>
-                    <Label className="text-error-dark font-bold">
+                    <Label className="text-sm text-center font-bold text-error-dark">
                       {getStatusOrder(order.currentStatus)}
                     </Label>
                   </div>
                 </CardTitle>
+
                 <CardContent
-                  className="flex flex-col items-center justify-center min-h-[150px] space-y-4 border-t hover:cursor-pointer"
+                  className="flex flex-col items-center justify-center p-8 space-y-8 border-t"
                   onClick={() => handleOnClickViewOrderDetail(order.id)}
                 >
-                  {order.orderItems && order.orderItems.length > 0 ? (
-                    order.orderItems.map((item, index) => (
-                      <Card
-                        key={index}
-                        className="flex w-full justify-between items-center gap-4 mt-4"
-                      >
-                        <div className="flex items-center gap-4 mb-6 ml-6">
-                          <div
+                  {order?.orderItems.map((item) => (
+                    <Card
+                      key={item.id}
+                      className="w-full flex items-center justify-between p-4 hover:cursor-pointer"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <Image
+                          alt={item.productName}
+                          src={item.productMainImageUrl || ProductNotFound}
+                          height={100}
+                          width={100}
+                          unoptimized={true}
+                          priority
+                          className="rounded-md transition-transform duration-300 hover:scale-125"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOnClickViewProductDetail(item.productSlug);
+                          }}
+                        />
+                        <div className="flex flex-col space-y-2">
+                          <Label
+                            className="text-xl font-bold hover:text-2xl hover:cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleOnClickViewProductDetail(item.productSlug);
                             }}
                           >
-                            <Image
-                              alt={item.productName}
-                              src={item.productMainImageUrl}
-                              height={100}
-                              width={100}
-                              unoptimized={true}
-                              className="mt-6 rounded-md transition-transform duration-300 hover:scale-125 hover:mr-4"
-                            />
-                          </div>
-                          <div className="flex flex-col space-y-2">
-                            <div
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOnClickViewProductDetail(
-                                  item.productSlug
-                                );
-                              }}
-                            >
-                              <Label className="text-xl font-bold hover:text-2xl hover:cursor-pointer">
-                                {item.productName}
-                              </Label>
-                            </div>
-                            <Label className="text-muted-foreground">
-                              {item.values
-                                ? `Phân loại hàng ${item.values.join(" | ")}`
-                                : ""}
-                            </Label>
-                            <Label>x{item.quantity}</Label>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4 mr-6">
-                          <Label className="line-through text-muted-foreground">
-                            {formatCurrency(item.price)}
+                            {item.productName}
                           </Label>
-                          <Label>
-                            {formatCurrency(item.price - item.discount)}
+                          <Label className="text-sm text-muted-foreground hover:cursor-pointer">
+                            {item.values
+                              ? `Phân loại hàng: ${item.values.join(" | ")}`
+                              : ""}
+                          </Label>
+                          <Label className="text-sm hover:cursor-pointer">
+                            x {item.quantity}
                           </Label>
                         </div>
-                      </Card>
-                    ))
-                  ) : (
-                    <Label className="text-2xl text-error-dark text-center">
-                      Đơn hàng không có sản phẩm
-                    </Label>
-                  )}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Label className="line-through text-sm text-black-primary text-opacity-50 hover:cursor-pointer">
+                          {formatCurrency(item.price)}
+                        </Label>
+                        <Label className="text-sm hover:cursor-pointer">
+                          {formatCurrency(item.price - item.discount)}
+                        </Label>
+                      </div>
+                    </Card>
+                  ))}
                 </CardContent>
-                <CardFooter className="flex flex-col border-t-2">
-                  <div className="flex w-full items-center justify-end gap-2 m-4">
-                    <Label>Thành tiền: </Label>
+
+                <CardFooter className="flex flex-col px-8 py-4 space-y-4 border-t">
+                  <div className="w-full flex items-center justify-end space-x-4">
+                    <Label className="text-sm">Thành tiền: </Label>
                     <Label className="text-2xl font-bold">
                       {formatCurrency(order?.grandTotal)}
                     </Label>
                   </div>
-                  <div className="flex justify-between w-full items-center gap-2 m-4">
-                    <div>
-                      <Label>
-                        {order.note
-                          ? `Ghi chú của bạn: ${order.note}`
-                          : "(không có ghi chú)"}
-                      </Label>
-                    </div>
-                    <div className="flex items-center gap-2">
+                  <div className="w-full flex items-center justify-between">
+                    <Label className="w-3/5 text-sm">
+                      {order.note
+                        ? `Ghi chú của bạn: ${order.note}`
+                        : "(không có ghi chú)"}
+                    </Label>
+                    <div className="flex items-center space-x-4">
                       {order.currentStatus === "DELIVERED" ||
                       order.currentStatus === "CANCELLED" ? (
                         <Button
                           variant="outline"
-                          onClick={() => handleOnclickViewShop(order?.storeId)}
+                          onClick={() => handleOnclickViewShop(order.storeId)}
                         >
                           Mua lại
                         </Button>
-                      ) : (
-                        ""
-                      )}
-                      {order.currentStatus === "CONFIRMED" ||
-                      order.currentStatus === "PREPARING" ||
-                      order.currentStatus === "WAITING_FOR_SHIPPING" ||
-                      order.currentStatus === "PICKED_UP" ||
-                      order.currentStatus === "OUT_FOR_DELIVERY" ||
-                      order.currentStatus === "DELIVERED" ||
-                      order.currentStatus === "CANCELLED" ? (
-                        ""
-                      ) : (
+                      ) : null}
+                      {order.currentStatus === "ON_HOLD" ? (
                         <Button
                           variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCancelButtonClick(order, order.id);
+                          onClick={() => {
+                            handleCancelButtonClick(order);
                           }}
                         >
                           Hủy đơn hàng
                         </Button>
-                      )}
+                      ) : null}
                       {order.currentStatus === "DELIVERED" ? (
                         <OrderReviewDialog order={order} toast={toast} />
-                      ) : (
-                        ""
-                      )}
+                      ) : null}
                     </div>
                   </div>
                 </CardFooter>
               </Card>
-            ))
-          ) : (
-            <div className="w-full min-h-[700px] flex flex-col justify-start m-2">
+            ))}
+          {listOrder.length === 0 && (
+            <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
               <Image
                 alt="ảnh trống"
-                className="mx-auto"
                 src={ReviewEmpty}
-                width={400}
-                height={400}
-              ></Image>
-              <Label className="text-xl text-gray-tertiary text-center m-2">
-                Hiện tại bạn không có đơn hàng thuộc trạng thái này
+                style={{ height: "auto", width: "auto" }}
+                unoptimized={true}
+                priority
+              />
+              <Label className="text-xl text-center text-gray-tertiary">
+                Hiện tại không có đơn hàng nào thuộc trạng thái này
               </Label>
             </div>
           )}
         </TabsContent>
-        {orders.length > 0 ? (
-          <PaginationAdminTable
-            currentPage={currentPage}
-            handleNextPage={handleNextPage}
-            handlePrevPage={handlePrevPage}
-            totalPage={totalPage}
-            setCurrentPage={setCurrentPage}
-            hasNext={hasNext}
-            hasPrevious={hasPrevious}
-          ></PaginationAdminTable>
-        ) : (
-          ""
+
+        {loadListOrder && (
+          <div className="w-full h-16 flex items-center justify-center">
+            <div className="flex space-x-4">
+              <div className="w-4 h-4 bg-red-primary rounded-full animate-bounce"></div>
+              <div className="w-4 h-4 bg-red-primary rounded-full animate-bounce [animation-delay:-.1s]"></div>
+              <div className="w-4 h-4 bg-red-primary rounded-full animate-bounce [animation-delay:-.5s]"></div>
+            </div>
+          </div>
         )}
       </Tabs>
-      {isDrawerOpen && (
-        <ViewOrderDetailUser
-          isOpen={isDrawerOpen}
-          onClose={() => setIsDrawerOpen(false)}
-          orderId={selectedOrder}
-        />
+      {!loadListOrder && hasNext && (
+        <div ref={loadRef} className="w-full h-24"></div>
       )}
-      {isDialogCancelOrderOpen && (
-        <DialogCancelOrderUser
-          isOpen={isDialogCancelOrderOpen}
-          onClose={() => setIsDialogCancelOrderOpen(false)}
-          onCancelOrder={confirmCancelOrder}
-          orderId={selectedOrder}
-          actionType={actionType}
-        />
+      {isDialogOpen && (
+        <>
+          <div className="fixed inset-0 bg-black-primary bg-opacity-85 z-[150]" />
+          <DialogUpdateOrCancelOrder
+            onOpen={isDialogOpen}
+            onClose={() => setIsDialogOpen(false)}
+            onCancelOrder={confirmCancelOrder}
+            selectedOrder={selectedOrder}
+            actionType={actionType}
+          />
+        </>
       )}
-    </div>
+      {loadPage && (
+        <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] space-y-4 bg-black-secondary">
+          <CircularProgress></CircularProgress>
+          <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
+        </div>
+      )}
+    </>
   );
 }

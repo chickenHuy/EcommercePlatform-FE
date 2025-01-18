@@ -202,10 +202,16 @@ export default function ManageBrand() {
                     value={sortBy}
                     onValueChange={(value) => handleSortChange(value)}
                   >
-                    <DropdownMenuRadioItem value="createdAt">
+                    <DropdownMenuRadioItem
+                      value="createdAt"
+                      className="hover:cursor-pointer"
+                    >
                       Ngày tạo
                     </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="name">
+                    <DropdownMenuRadioItem
+                      value="name"
+                      className="hover:cursor-pointer"
+                    >
                       Tên TH
                     </DropdownMenuRadioItem>
                   </DropdownMenuRadioGroup>
@@ -214,11 +220,17 @@ export default function ManageBrand() {
                     value={orderBy}
                     onValueChange={(value) => handleOrderChange(value)}
                   >
-                    <DropdownMenuRadioItem value="asc">
-                      Tăng dần
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="desc">
+                    <DropdownMenuRadioItem
+                      value="desc"
+                      className="hover:cursor-pointer"
+                    >
                       Giảm dần
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      value="asc"
+                      className="hover:cursor-pointer"
+                    >
+                      Tăng dần
                     </DropdownMenuRadioItem>
                   </DropdownMenuRadioGroup>
                   <DropdownMenuSeparator />
@@ -227,6 +239,7 @@ export default function ManageBrand() {
                       setSortBy("");
                       setOrderBy("");
                     }}
+                    className="hover:cursor-pointer"
                   >
                     Không sắp xếp
                   </DropdownMenuItem>
@@ -251,7 +264,8 @@ export default function ManageBrand() {
                     Danh sách tất cả thương hiệu ({totalElement})
                   </CardTitle>
                   <CardDescription>
-                    Quản lý tất cả thương hiệu của các nhà sản xuất trong hệ thống
+                    Quản lý tất cả thương hiệu của các nhà sản xuất trong hệ
+                    thống
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="min-h-[600px]">
@@ -266,9 +280,7 @@ export default function ManageBrand() {
                         <TableHead className="hidden sm:table-cell">
                           Ngày tạo
                         </TableHead>
-                        <TableHead>
-                          <span className="sr-only">Hành động</span>
-                        </TableHead>
+                        <TableHead></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

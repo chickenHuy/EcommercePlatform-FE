@@ -3,16 +3,16 @@ import { createSlice } from "@reduxjs/toolkit";
 export const orderFilter = createSlice({
   name: "orderSearch",
   initialState: {
+    filterTab: "",
     filter: "",
-    showFilter: true,
     activeItem: "",
   },
   reducers: {
+    setFilterTab: (state, action) => {
+      state.filterTab = action.payload;
+    },
     setFilter: (state, action) => {
       state.filter = action.payload;
-    },
-    setShowFilter: (state, action) => {
-      state.showFilter = action.payload;
     },
     setActiveItem: (state, action) => {
       state.activeItem = action.payload;
@@ -20,6 +20,6 @@ export const orderFilter = createSlice({
   },
 });
 
-export const { setFilter, setShowFilter, setActiveItem } = orderFilter.actions;
+export const { setFilterTab, setFilter, setActiveItem } = orderFilter.actions;
 
 export default orderFilter.reducer;

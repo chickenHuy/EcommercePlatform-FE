@@ -7,8 +7,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { CircularProgress, Rating } from "@mui/material";
-import { EditIcon, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import StoreEmpty from "@/assets/images/storeEmpty.jpg";
@@ -16,6 +15,7 @@ import ReviewEmpty from "@/assets/images/reviewEmpty.png";
 import Loading from "@/components/loading";
 import { useInView } from "react-intersection-observer";
 import { UpdateReviewDialog } from "@/components/dialogs/dialogUpdateReview";
+import { formatDate } from "@/utils/commonUtils";
 
 export default function Reviews({ productId, product }) {
   const [listreviews, setListReviews] = useState([]);
@@ -135,21 +135,6 @@ export default function Reviews({ productId, product }) {
       fetchReviewOneProduct();
     }
   }, [fetchReviewOneProduct, inView]);
-
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-
-    const hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const seconds = date.getSeconds().toString().padStart(2, "0");
-
-    const timePart = `${hours
-      .toString()
-      .padStart(2, "0")}:${minutes}:${seconds}`;
-    const datePart = date.toLocaleDateString("vi-VN").replace(/\//g, "-");
-
-    return `${timePart} ${datePart}`;
-  }
 
   return (
     <>

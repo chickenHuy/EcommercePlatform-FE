@@ -2,18 +2,19 @@ import { get, put } from "@/lib/httpClient";
 
 export const getAllOrderByAdmin = (
   page,
-  sortType,
-  orderType,
+  size,
+  sortBy,
+  orderBy,
   search,
   filter
 ) => {
   try {
     const response = get(
-      `/api/v1/orders/admin?sort=${sortType}&order=${orderType}&page=${page}&size=8&search=${search}&filter=${filter}`
+      `/api/v1/orders/admin?page=${page}&size=${size}&sortBy=${sortBy}&orderBy=${orderBy}&search=${search}&filter=${filter}`
     );
     return response;
   } catch (error) {
-    console.error("Error during authentication:", error);
+    console.error("Error during get all order by admin:", error);
     throw error;
   }
 };
@@ -23,7 +24,7 @@ export const getOneOrderByAdmin = (orderId) => {
     const response = get(`/api/v1/orders/${orderId}/admin`);
     return response;
   } catch (error) {
-    console.error("Error during authentication:", error);
+    console.error("Error during get one order by admin:", error);
     throw error;
   }
 };
