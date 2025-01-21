@@ -29,7 +29,7 @@ export const getOneOrderByAdmin = (orderId) => {
   }
 };
 
-export const updateOrderStatusByAdmin = (orderId) => {
+export const updateOneOrderByAdmin = (orderId) => {
   try {
     const response = put(`/api/v1/orders/${orderId}/update-status/admin`);
     return response;
@@ -39,12 +39,36 @@ export const updateOrderStatusByAdmin = (orderId) => {
   }
 };
 
-export const cancelOrderByAdmin = (orderId) => {
+export const cancelOneOrderByAdmin = (orderId) => {
   try {
     const response = put(`/api/v1/orders/${orderId}/cancel/admin`);
     return response;
   } catch (error) {
-    console.error("Error during authentication:", error);
+    console.error("Error during cancelOneOrderByAdmin:", error);
+    throw error;
+  }
+};
+
+export const cancelListOrderByAdmin = (listOrderId) => {
+  try {
+    const response = put(`/api/v1/orders/list/cancel/admin`, {
+      listOrderId: listOrderId,
+    });
+    return response;
+  } catch (error) {
+    console.error("Error during cancelListOrderByAdmin:", error);
+    throw error;
+  }
+};
+
+export const updateListOrderByAdmin = (listOrderId) => {
+  try {
+    const response = put(`/api/v1/orders/list/update-status/admin`, {
+      listOrderId: listOrderId,
+    });
+    return response;
+  } catch (error) {
+    console.error("Error during updateStatusListOrderByAdmin:", error);
     throw error;
   }
 };

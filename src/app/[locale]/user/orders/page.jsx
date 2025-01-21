@@ -274,7 +274,7 @@ export default function OrderUserManage() {
             </TabsTrigger>
           ))}
         </TabsList>
-        <TabsContent value={filter} className="flex flex-col space-y-8">
+        <TabsContent value={filter} className="flex flex-col space-y-8 pb-4">
           <div className="w-full flex items-center relative">
             <Search className="absolute left-3 top-3 h-7 w-7 hover:cursor-pointer" />
             <Input
@@ -285,7 +285,10 @@ export default function OrderUserManage() {
           </div>
           {listOrder.length > 0 &&
             listOrder.map((order) => (
-              <Card key={order.id} className="flex flex-col">
+              <Card
+                key={order.id}
+                className="flex flex-col border-2 border-black-primary border-opacity-15"
+              >
                 <CardTitle className="flex items-center justify-between px-8 py-4 space-x-4">
                   <div
                     className="flex items-center space-x-4 hover:cursor-pointer"
@@ -448,7 +451,8 @@ export default function OrderUserManage() {
               <Image
                 alt="ảnh trống"
                 src={ReviewEmpty}
-                style={{ height: "auto", width: "auto" }}
+                width={200}
+                height={200}
                 unoptimized={true}
                 priority
               />

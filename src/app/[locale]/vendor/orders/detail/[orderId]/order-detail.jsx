@@ -5,14 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/toaster";
 import { formatCurrency, formatDate } from "@/utils/commonUtils";
-import {
-  ChevronLeft,
-  Mail,
-  Pencil,
-  Phone,
-  UserRoundCog,
-  X,
-} from "lucide-react";
+import { ChevronLeft, Mail, Phone, UserRoundCog } from "lucide-react";
 import Image from "next/image";
 import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 import DialogUpdateOrCancelOrder from "@/components/dialogs/dialogUpdateOrCancelOrder";
@@ -20,9 +13,10 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import {
-  cancelOrderBySeller,
-  updateOrderStatusBySeller,
+  cancelOneOrderBySeller,
+  updateOneOrderBySeller,
 } from "@/api/vendor/orderRequest";
+import { EditCalendar, EventBusy } from "@mui/icons-material";
 
 export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -32,14 +26,14 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
   const [actionType, setActionType] = useState("");
   const { toast } = useToast();
 
-  const handleCancelButtonClick = (orderDetail) => {
+  const handleClickButtonCancel = (orderDetail) => {
     setIsDialogOpen(true);
     setOrderToCancel(orderDetail);
     setSelectedOrder(orderDetail);
     setActionType("cancel");
   };
 
-  const handleUpdateButtonClick = (orderDetail) => {
+  const handleClickButtonUpdate = (orderDetail) => {
     setIsDialogOpen(true);
     setOrderToUpdate(orderDetail);
     setSelectedOrder(orderDetail);
@@ -55,10 +49,10 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
     router.push("/vendor/orders");
   };
 
-  const confirmCancelOrder = async () => {
+  const confirmCancel = async () => {
     if (orderToCancel) {
       try {
-        await cancelOrderBySeller(orderToCancel.id);
+        await cancelOneOrderBySeller(orderToCancel.id);
         toast({
           description: `Đơn hàng "${orderToCancel.id}" đã được hủy thành công`,
         });
@@ -74,10 +68,10 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
     }
   };
 
-  const confirmUpdateOrderStatus = async () => {
+  const confirmUpdate = async () => {
     if (orderToUpdate) {
       try {
-        await updateOrderStatusBySeller(orderToUpdate.id);
+        await updateOneOrderBySeller(orderToUpdate.id);
         toast({
           description: `Đơn hàng "${orderToUpdate.id}" đã được cập nhật trạng thái`,
         });
@@ -93,7 +87,7 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
     }
   };
 
-  function getStatusOrder(status) {
+  function getCurrentStatus(status) {
     switch (status) {
       case "ON_HOLD":
         return "Chờ thanh toán";
@@ -134,8 +128,8 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
 
   return (
     <>
+      <Toaster />
       <div className="min-h-screen ml-8 mr-8 mt-16">
-        <Toaster />
         <div className="flex items-center justify-between space-x-4 pt-4 pb-4">
           <div
             className="flex items-center space-x-2 hover:cursor-pointer"
@@ -156,7 +150,7 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
               </Label>
               <div className="flex items-center space-x-2">
                 <Badge variant="outline" className="truncate">
-                  {getStatusOrder(orderDetail?.currentStatus)}
+                  {getCurrentStatus(orderDetail?.currentStatus)}
                 </Badge>
               </div>
             </div>
@@ -164,33 +158,33 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
         </div>
         <Separator></Separator>
         <div className="flex items-center justify-center space-x-4 pt-4 pb-4">
-          {orderDetail?.currentStatus === "ON_HOLD" ||
-          orderDetail?.currentStatus === "PENDING" ||
-          orderDetail?.currentStatus === "CONFIRMED" ||
-          orderDetail?.currentStatus === "PREPARING" ? (
+          {(orderDetail?.currentStatus === "ON_HOLD" ||
+            orderDetail?.currentStatus === "PENDING" ||
+            orderDetail?.currentStatus === "CONFIRMED" ||
+            orderDetail?.currentStatus === "PREPARING") && (
             <Button
               variant="outline"
               onClick={() => {
-                handleCancelButtonClick(orderDetail);
+                handleClickButtonCancel(orderDetail);
               }}
             >
-              <X className="h-4 x-4 mr-2" />
+              <EventBusy className="h-6 w-6 mr-2" />
               Hủy đơn hàng
             </Button>
-          ) : null}
-          {orderDetail?.currentStatus === "PENDING" ||
-          orderDetail?.currentStatus === "CONFIRMED" ||
-          orderDetail?.currentStatus === "PREPARING" ? (
+          )}
+          {(orderDetail?.currentStatus === "PENDING" ||
+            orderDetail?.currentStatus === "CONFIRMED" ||
+            orderDetail?.currentStatus === "PREPARING") && (
             <Button
               variant="outline"
               onClick={() => {
-                handleUpdateButtonClick(orderDetail);
+                handleClickButtonUpdate(orderDetail);
               }}
             >
-              <Pencil className="h-4 x-4 mr-2" />
+              <EditCalendar className="h-6 w-6 mr-2" />
               Cập nhật trạng thái
             </Button>
-          ) : null}
+          )}
           {renderStatusBadge(orderDetail?.currentStatus)}
         </div>
         <Separator></Separator>
@@ -323,8 +317,8 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
           <DialogUpdateOrCancelOrder
             onOpen={isDialogOpen}
             onClose={() => setIsDialogOpen(false)}
-            onUpdateOrderStatus={confirmUpdateOrderStatus}
-            onCancelOrder={confirmCancelOrder}
+            onUpdateOrderStatus={confirmUpdate}
+            onCancelOrder={confirmCancel}
             selectedOrder={selectedOrder}
             actionType={actionType}
           />

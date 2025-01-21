@@ -6,7 +6,6 @@ import {
   CardContent,
   CardDescription,
   CardFooter,
-  CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import {
@@ -30,15 +29,25 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
-import { ArrowUpDown, CalendarCog, ListFilter, SquareX } from "lucide-react";
+import {
+  ArrowUpDown,
+  Ban,
+  CalendarCog,
+  Check,
+  ListFilter,
+  SquareX,
+  X,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import {
-  cancelOrderByAdmin,
   getAllOrderByAdmin,
-  updateOrderStatusByAdmin,
+  cancelListOrderByAdmin,
+  cancelOneOrderByAdmin,
+  updateListOrderByAdmin,
+  updateOneOrderByAdmin,
 } from "@/api/admin/orderRequest";
 import { useSelector } from "react-redux";
 import { Label } from "@/components/ui/label";
@@ -48,8 +57,11 @@ import { formatCurrency, formatDate } from "@/utils/commonUtils";
 import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
 import DialogUpdateOrCancelOrder from "@/components/dialogs/dialogUpdateOrCancelOrder";
+import { Checkbox } from "@/components/ui/checkbox";
+import DialogConfirmListOrderAdmin from "@/components/dialogs/dialogConfirmListOrderAdmin";
+import { EditCalendar, EventAvailable, EventBusy } from "@mui/icons-material";
 
-export default function ManageOrderAdmin() {
+export default function ManageOrderByAdmin() {
   const pageSize = 10;
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -69,6 +81,14 @@ export default function ManageOrderAdmin() {
   var searchTerm = useSelector((state) => state.searchReducer.searchTerm);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+
+  const [listOrderId, setListOrderId] = useState([]);
+  const [isDialogListOpen, setIsDialogListOpen] = useState(false);
+  const [selectedListOrder, setSelectedListOrder] = useState([]);
+
+  const [isDefaultChecked, setIsDefaultChecked] = useState(true);
+  const [isUpdateChecked, setIsUpdateChecked] = useState(false);
+  const [isCancelChecked, setIsCancelChecked] = useState(false);
 
   const handleNextPage = () => {
     if (currentPage < totalPage) {
@@ -96,38 +116,40 @@ export default function ManageOrderAdmin() {
   };
 
   const router = useRouter();
-  const handleOnClickViewOrderDetail = (orderId) => {
+  const handleClickViewOrderDetail = (orderId) => {
     router.push(`orders/detail/${orderId}`);
   };
 
-  const handleUpdateButtonClick = (order) => {
+  const handleClickUpdateStatus = (order) => {
     setIsDialogOpen(true);
     setOrderToUpdate(order);
     setSelectedOrder(order);
     setActionType("update");
   };
 
-  const handleCancelButtonClick = (order) => {
+  const handleClickButtonCancel = (order) => {
     setIsDialogOpen(true);
     setOrderToCancel(order);
     setSelectedOrder(order);
     setActionType("cancel");
   };
 
-  const handleOnclickTabsTrigger = (value) => {
+  const handleClickTabsTrigger = (value) => {
     setFilter(value);
     setFilterTab(value);
   };
 
-  const confirmUpdateOrderStatus = async () => {
+  const confirmUpdate = async () => {
     if (orderToUpdate) {
       try {
-        await updateOrderStatusByAdmin(orderToUpdate.id);
+        await updateOneOrderByAdmin(orderToUpdate.id);
         toast({
           description: `Đơn hàng "${orderToUpdate.id}" đã được cập nhật trạng thái`,
         });
-        fetchAllOrderByAdmin();
         setIsDialogOpen(false);
+        setSelectedOrder(null);
+        setOrderToUpdate(null);
+        fetchAllOrderByAdmin();
       } catch (error) {
         toast({
           title: "Thất bại",
@@ -138,15 +160,17 @@ export default function ManageOrderAdmin() {
     }
   };
 
-  const confirmCancelOrder = async () => {
+  const confirmCancel = async () => {
     if (orderToCancel) {
       try {
-        await cancelOrderByAdmin(orderToCancel.id);
+        await cancelOneOrderByAdmin(orderToCancel.id);
         toast({
           description: `Đơn hàng "${orderToCancel.id}" đã được hủy thành công`,
         });
-        fetchAllOrderByAdmin();
         setIsDialogOpen(false);
+        setOrderToCancel(null);
+        setSelectedOrder(null);
+        fetchAllOrderByAdmin();
       } catch (error) {
         toast({
           title: "Thất bại",
@@ -155,6 +179,141 @@ export default function ManageOrderAdmin() {
         });
       }
     }
+  };
+
+  const handleCheckboxOption = (type) => {
+    switch (type) {
+      case "default":
+        setIsDefaultChecked(true);
+        setIsUpdateChecked(false);
+        setIsCancelChecked(false);
+        setListOrderId([]);
+        setSelectedListOrder([]);
+        break;
+      case "update":
+        setIsDefaultChecked(false);
+        setIsUpdateChecked(true);
+        setIsCancelChecked(false);
+        setListOrderId([]);
+        setSelectedListOrder([]);
+        break;
+      case "cancel":
+        setIsDefaultChecked(false);
+        setIsUpdateChecked(false);
+        setIsCancelChecked(true);
+        setListOrderId([]);
+        setSelectedListOrder([]);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleCheckboxOrder = (order, isChecked) => {
+    setListOrderId((prev) => {
+      if (isChecked) {
+        return [...prev, order.id];
+      } else {
+        return prev.filter((id) => id !== order.id);
+      }
+    });
+
+    setSelectedListOrder((prev) => {
+      if (isChecked) {
+        return [...prev, order];
+      } else {
+        return prev.filter((selectedOrder) => selectedOrder.id !== order.id);
+      }
+    });
+
+    setOrders((prevOrders) =>
+      prevOrders.map((o) =>
+        o.id === order.id ? { ...o, isChecked: isChecked } : o
+      )
+    );
+  };
+
+  const handleClickButtonCancelList = () => {
+    if (listOrderId.length === 0) {
+      toast({
+        title: "Thất bại",
+        description: "Vui lòng chọn ít nhất một đơn hàng để hủy",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsDialogListOpen(true);
+    setActionType("cancel");
+  };
+
+  const handleClickButtonUpdateList = () => {
+    if (listOrderId.length === 0) {
+      toast({
+        title: "Thất bại",
+        description:
+          "Vui lòng chọn ít nhất một đơn hàng để cập nhật trạng thái",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsDialogListOpen(true);
+    setActionType("update");
+  };
+
+  const confirmCancelList = async () => {
+    try {
+      await cancelListOrderByAdmin(listOrderId);
+      toast({
+        description: `Đã hủy ${listOrderId.length} đơn hàng thành công`,
+      });
+      setListOrderId([]);
+      setSelectedListOrder([]);
+      setIsDialogListOpen(false);
+      fetchAllOrderByAdmin();
+    } catch (error) {
+      toast({
+        title: "Thất bại",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const confirmUpdateList = async () => {
+    try {
+      await updateListOrderByAdmin(listOrderId);
+      toast({
+        description: `Đã cập nhật trạng thái ${listOrderId.length} đơn hàng thành công`,
+      });
+      setListOrderId([]);
+      setSelectedListOrder([]);
+      setIsDialogListOpen(false);
+      fetchAllOrderByAdmin();
+    } catch (error) {
+      toast({
+        title: "Thất bại",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRemoveOrder = (orderId) => {
+    setListOrderId((prev) => prev.filter((id) => id !== orderId));
+
+    setSelectedListOrder((prev) => {
+      const updatedList = prev.filter((order) => order.id !== orderId);
+      if (updatedList.length === 0) {
+        setIsDialogListOpen(false);
+      }
+      return updatedList;
+    });
+
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === orderId ? { ...order, isChecked: false } : order
+      )
+    );
   };
 
   const fetchAllOrderByAdmin = useCallback(async () => {
@@ -243,293 +402,413 @@ export default function ManageOrderAdmin() {
     { label: "Đã hủy", filterKey: "CANCELLED" },
   ];
 
-  if (isLoading) {
-    return (
-      <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] space-y-4 bg-black-secondary">
-        <CircularProgress></CircularProgress>
-        <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
-      </div>
-    );
-  }
-
   return (
     <>
-      <div className="min-h-screen w-full flex flex-col bg-muted/40">
-        <Toaster />
-        <div className="flex flex-col sm:gap-4 sm:py-4">
-          <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-4">
-            <Tabs value={filter}>
-              <div className="flex items-center">
-                <TabsList>
+      <Toaster />
+      <Tabs value={filter} className="min-h-screen rounded-lg px-8 py-4 mb-4">
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center justify-between space-x-8">
+            <div className="flex items-center space-x-4">
+              <div
+                className={`flex items-center border-2 p-2 rounded-lg space-x-2`}
+              >
+                <Label className="text-sm text-center">Mặc định</Label>
+                {/*Checkbox Mặc định */}
+                <Checkbox
+                  checked={isDefaultChecked}
+                  onCheckedChange={() => handleCheckboxOption("default")}
+                />
+              </div>
+              <div
+                className={`flex items-center border-2 p-2 rounded-lg space-x-2`}
+              >
+                <Label className="text-sm text-center">Cập nhật (nhiều)</Label>
+                {/*Checkbox Cập nhật (nhiều) */}
+                <Checkbox
+                  checked={isUpdateChecked}
+                  onCheckedChange={() => handleCheckboxOption("update")}
+                />
+              </div>
+              <div
+                className={`flex items-center border-2 p-2 rounded-lg space-x-2`}
+              >
+                <Label className="text-sm text-center">Hủy (nhiều)</Label>
+                {/*Checkbox Hủy (nhiều) */}
+                <Checkbox
+                  checked={isCancelChecked}
+                  onCheckedChange={() => handleCheckboxOption("cancel")}
+                />
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="space-x-1">
+                    <ArrowUpDown className="h-4 w-4" />
+                    <Label className="truncate sr-only sm:not-sr-only hover:cursor-pointer">
+                      Sắp xếp
+                    </Label>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Sắp xếp</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuRadioGroup
+                    value={sortBy}
+                    onValueChange={(value) => handleSortChange(value)}
+                  >
+                    <DropdownMenuRadioItem
+                      value="id"
+                      className="hover:cursor-pointer"
+                    >
+                      Mã đơn hàng
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      value="createdAt"
+                      className="hover:cursor-pointer"
+                    >
+                      Ngày đặt hàng
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      value="phone"
+                      className="hover:cursor-pointer"
+                    >
+                      Số điện thoại
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      value="province"
+                      className="hover:cursor-pointer"
+                    >
+                      Địa chỉ
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      value="grandTotal"
+                      className="hover:cursor-pointer"
+                    >
+                      Tổng tiền
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuRadioGroup
+                    value={orderBy}
+                    onValueChange={(value) => handleOrderChange(value)}
+                  >
+                    <DropdownMenuRadioItem
+                      value="desc"
+                      className="hover:cursor-pointer"
+                    >
+                      Giảm dần
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      value="asc"
+                      className="hover:cursor-pointer"
+                    >
+                      Tăng dần
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setSortBy("");
+                      setOrderBy("");
+                    }}
+                    className="hover:cursor-pointer"
+                  >
+                    Không sắp xếp
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="space-x-1">
+                    <ListFilter className="h-4 w-4" />
+                    <Label className="truncate sr-only sm:not-sr-only hover:cursor-pointer">
+                      Lọc
+                    </Label>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Lọc theo trạng thái</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
                   {listOrderStatus.map((item) => (
-                    <TabsTrigger
+                    <DropdownMenuCheckboxItem
                       key={item.filterKey}
-                      value={item.filterKey}
-                      onClick={() => handleOnclickTabsTrigger(item.filterKey)}
+                      onClick={() => handleFilterChange(item.filterKey)}
+                      checked={filterTab === item.filterKey}
+                      className="hover:cursor-pointer"
                     >
                       {item.label}
-                    </TabsTrigger>
+                    </DropdownMenuCheckboxItem>
                   ))}
-                </TabsList>
-                <div className="ml-auto flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="h-7 gap-1">
-                        <ArrowUpDown className="h-3.5 w-3.5" />
-                        <Label className="truncate sr-only sm:not-sr-only hover:cursor-pointer">
-                          Sắp xếp
-                        </Label>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Sắp xếp</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuRadioGroup
-                        value={sortBy}
-                        onValueChange={(value) => handleSortChange(value)}
-                      >
-                        <DropdownMenuRadioItem
-                          value="id"
-                          className="hover:cursor-pointer"
-                        >
-                          Mã đơn hàng
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem
-                          value="createdAt"
-                          className="hover:cursor-pointer"
-                        >
-                          Ngày đặt hàng
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem
-                          value="phone"
-                          className="hover:cursor-pointer"
-                        >
-                          Số điện thoại
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem
-                          value="province"
-                          className="hover:cursor-pointer"
-                        >
-                          Địa chỉ
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem
-                          value="grandTotal"
-                          className="hover:cursor-pointer"
-                        >
-                          Tổng tiền
-                        </DropdownMenuRadioItem>
-                      </DropdownMenuRadioGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuRadioGroup
-                        value={orderBy}
-                        onValueChange={(value) => handleOrderChange(value)}
-                      >
-                        <DropdownMenuRadioItem
-                          value="desc"
-                          className="hover:cursor-pointer"
-                        >
-                          Giảm dần
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem
-                          value="asc"
-                          className="hover:cursor-pointer"
-                        >
-                          Tăng dần
-                        </DropdownMenuRadioItem>
-                      </DropdownMenuRadioGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSortBy("");
-                          setOrderBy("");
-                        }}
-                        className="hover:cursor-pointer"
-                      >
-                        Không sắp xếp
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="h-7 gap-1">
-                        <ListFilter className="h-3.5 w-3.5" />
-                        <Label className="truncate sr-only sm:not-sr-only hover:cursor-pointer">
-                          Lọc
-                        </Label>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Lọc theo trạng thái</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      {listOrderStatus.map((item) => (
-                        <DropdownMenuCheckboxItem
-                          key={item.filterKey}
-                          onClick={() => handleFilterChange(item.filterKey)}
-                          checked={filterTab === item.filterKey}
-                          className="hover:cursor-pointer"
-                        >
-                          {item.label}
-                        </DropdownMenuCheckboxItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-              <TabsContent value={filter} className="pt-2">
-                {orders && orders.length > 0 ? (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        Danh sách tất cả đơn hàng ({totalElement})
-                      </CardTitle>
-                      <CardDescription>
-                        Quản lý tất cả đơn hàng có trên hệ thống
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="min-h-[600px]">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Mã đơn hàng</TableHead>
-                            <TableHead>Ngày đặt hàng</TableHead>
-                            <TableHead className="hidden sm:table-cell">
-                              Số điện thoại
-                            </TableHead>
-                            <TableHead className="hidden sm:table-cell">
-                              Địa chỉ
-                            </TableHead>
-                            <TableHead className="hidden sm:table-cell">
-                              Thanh toán
-                            </TableHead>
-                            <TableHead className="hidden sm:table-cell">
-                              Phương thức
-                            </TableHead>
-                            <TableHead>Trạng thái</TableHead>
-                            <TableHead>Tổng tiền</TableHead>
-                            <TableHead></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {orders.map((order) => (
-                            <TableRow
-                              key={order.id}
-                              onClick={() =>
-                                handleOnClickViewOrderDetail(order.id)
-                              }
-                              className="h-[50px] hover:cursor-pointer"
-                            >
-                              <TableCell className="font-medium text-center">
-                                {order.id}
-                              </TableCell>
-                              <TableCell className="font-medium text-center">
-                                {formatDate(order.createdAt)}
-                              </TableCell>
-                              <TableCell className="hidden sm:table-cell font-medium text-center">
-                                {order.phone}
-                              </TableCell>
-                              <TableCell className="hidden sm:table-cell font-medium text-center">
-                                {order.province}
-                              </TableCell>
-                              <TableCell className="hidden sm:table-cell font-medium text-center">
-                                <Badge variant="outline">
-                                  {getTransactionStatusOrder(
-                                    order.currentStatusTransaction
-                                  )}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="hidden sm:table-cell font-medium text-center">
-                                <Badge variant="outline">
-                                  {getPaymentMethodOrder(order.paymentMethod)}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="font-medium text-center">
-                                <Badge variant="outline">
-                                  {getCurrentStatusOrder(order.currentStatus)}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="font-medium text-center">
-                                {formatCurrency(order.grandTotal)}
-                              </TableCell>
-                              <TableCell className="font-medium text-center">
-                                <div className="truncate space-x-2 min-w-[40px]">
-                                  {order.currentStatus ===
-                                    "WAITING_FOR_SHIPPING" ||
-                                  order.currentStatus === "PICKED_UP" ||
-                                  order.currentStatus === "OUT_FOR_DELIVERY" ? (
-                                    <Button
-                                      variant="outline"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleUpdateButtonClick(order);
-                                      }}
-                                    >
-                                      <CalendarCog className="h-4 w-4" />
-                                    </Button>
-                                  ) : null}
-                                  {order.currentStatus === "DELIVERED" ||
-                                  order.currentStatus === "CANCELLED" ? null : (
-                                    <Button
-                                      variant="outline"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleCancelButtonClick(order);
-                                      }}
-                                    >
-                                      <SquareX className="h-4 w-4" />
-                                    </Button>
-                                  )}
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                    <CardFooter>
-                      <div className="absolute right-1/2 translate-x-1/2">
-                        <PaginationAdminTable
-                          currentPage={currentPage}
-                          handleNextPage={handleNextPage}
-                          handlePrevPage={handlePrevPage}
-                          totalPage={totalPage}
-                          setCurrentPage={setCurrentPage}
-                          hasNext={hasNext}
-                          hasPrevious={hasPrevious}
-                        />
-                      </div>
-                    </CardFooter>
-                  </Card>
-                ) : (
-                  <div className="flex flex-col items-center justify-center border rounded-lg min-h-[750px]">
-                    <Image
-                      alt="ảnh trống"
-                      className="mx-auto"
-                      src={ReviewEmpty}
-                      width={200}
-                      height={200}
-                    />
-                    <Label className="text-xl text-gray-tertiary text-center m-2">
-                      Hiện tại không có đơn hàng thuộc trạng thái này
-                    </Label>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
-          </main>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+          <TabsList className="w-full h-auto flex flex-wrap items-start justify-start gap-2">
+            {listOrderStatus.map((item) => (
+              <TabsTrigger
+                key={item.filterKey}
+                value={item.filterKey}
+                onClick={() => handleClickTabsTrigger(item.filterKey)}
+              >
+                {item.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
         </div>
-      </div>
+        <TabsContent value={filter} className="py-4">
+          {orders.length > 0 && (
+            <Card>
+              <div className="flex items-center justify-between space-x-8 px-8 py-4 border-b">
+                <div className="flex flex-col space-y-2">
+                  <CardTitle>
+                    Danh sách tất cả đơn hàng ({totalElement})
+                  </CardTitle>
+                  <CardDescription>
+                    Quản lý tất cả đơn hàng có trên hệ thống
+                  </CardDescription>
+                </div>
+                {/* Button cập nhật nhiều */}
+                {isUpdateChecked && (
+                  <Button
+                    className="flex items-center space-x-2"
+                    variant="outline"
+                    onClick={handleClickButtonUpdateList}
+                  >
+                    <Label className="text-sm text-center hover:cursor-pointer">
+                      Cập nhật
+                    </Label>
+                    <EditCalendar className="h-6 w-6" />
+                  </Button>
+                )}
+                {/* Button hủy nhiều */}
+                {isCancelChecked && (
+                  <Button
+                    className="flex items-center space-x-2"
+                    variant="outline"
+                    onClick={handleClickButtonCancelList}
+                  >
+                    <Label className="text-sm text-center hover:cursor-pointer">
+                      Hủy
+                    </Label>
+                    <EventBusy className="h-6 w-6" />
+                  </Button>
+                )}
+              </div>
+              <CardContent className="min-h-[600px] mt-8">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="dark:text-gray-primary"></TableHead>
+                      <TableHead className="dark:text-gray-primary">
+                        Mã đơn hàng
+                      </TableHead>
+                      <TableHead className="dark:text-gray-primary">
+                        Ngày đặt hàng
+                      </TableHead>
+                      <TableHead className="hidden sm:table-cell dark:text-gray-primary">
+                        Số điện thoại
+                      </TableHead>
+                      <TableHead className="hidden sm:table-cell dark:text-gray-primary">
+                        Địa chỉ
+                      </TableHead>
+                      <TableHead className="hidden sm:table-cell dark:text-gray-primary">
+                        Thanh toán
+                      </TableHead>
+                      <TableHead className="hidden sm:table-cell dark:text-gray-primary">
+                        Phương thức
+                      </TableHead>
+                      <TableHead className="dark:text-gray-primary">
+                        Trạng thái
+                      </TableHead>
+                      <TableHead className="dark:text-gray-primary">
+                        Tổng tiền
+                      </TableHead>
+                      <TableHead className="dark:text-gray-primary"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {orders.map((order) => (
+                      <TableRow
+                        key={order.id}
+                        onClick={() => handleClickViewOrderDetail(order.id)}
+                        className="h-[65px] hover:cursor-pointer"
+                      >
+                        <TableCell
+                          className="font-medium text-center min-w-16"
+                          onClick={(e) => {
+                            if (isUpdateChecked || isCancelChecked) {
+                              e.stopPropagation();
+                            }
+                          }}
+                        >
+                          {/*Checkbox cập nhật nhiều Order */}
+                          {isUpdateChecked &&
+                            (order.currentStatus === "WAITING_FOR_SHIPPING" ||
+                              order.currentStatus === "PICKED_UP" ||
+                              order.currentStatus === "OUT_FOR_DELIVERY") && (
+                              <Checkbox
+                                className="m-4"
+                                checked={order.isChecked || false}
+                                onCheckedChange={(checked) =>
+                                  handleCheckboxOrder(order, checked)
+                                }
+                              />
+                            )}
+                          {/*Checkbox hủy nhiều Order */}
+                          {isCancelChecked &&
+                            order.currentStatus !== "DELIVERED" &&
+                            order.currentStatus !== "CANCELLED" && (
+                              <Checkbox
+                                className="m-4"
+                                checked={order.isChecked || false}
+                                onCheckedChange={(checked) =>
+                                  handleCheckboxOrder(order, checked)
+                                }
+                              />
+                            )}
+                          {isDefaultChecked && (
+                            <div className="w-full flex justify-center">
+                              <Ban className="h-6 w-6 text-error-dark" />
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell className="font-medium text-center">
+                          {order.id}
+                        </TableCell>
+                        <TableCell className="font-medium text-center">
+                          {formatDate(order.createdAt)}
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell font-medium text-center">
+                          {order.phone}
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell font-medium text-center">
+                          {order.province}
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell font-medium text-center">
+                          <Badge variant="outline">
+                            {getTransactionStatusOrder(
+                              order.currentStatusTransaction
+                            )}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell font-medium text-center">
+                          <Badge variant="outline">
+                            {getPaymentMethodOrder(order.paymentMethod)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="font-medium text-center">
+                          <Badge variant="outline">
+                            {getCurrentStatusOrder(order.currentStatus)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="font-medium text-center">
+                          {formatCurrency(order.grandTotal)}
+                        </TableCell>
+                        <TableCell className="font-medium text-center">
+                          <div className="min-w-16 flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                            {(order.currentStatus === "WAITING_FOR_SHIPPING" ||
+                              order.currentStatus === "PICKED_UP" ||
+                              order.currentStatus === "OUT_FOR_DELIVERY") && (
+                              <Button
+                                variant="outline"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleClickUpdateStatus(order);
+                                }}
+                                className="w-full sm:w-auto"
+                              >
+                                <EditCalendar />
+                              </Button>
+                            )}
+                            {order.currentStatus !== "DELIVERED" &&
+                              order.currentStatus !== "CANCELLED" && (
+                                <Button
+                                  variant="outline"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleClickButtonCancel(order);
+                                  }}
+                                  className="w-full sm:w-auto"
+                                >
+                                  <EventBusy />
+                                </Button>
+                              )}
+                            {order.currentStatus === "DELIVERED" && (
+                              <Check className="w-full sm:w-auto" />
+                            )}
+                            {order.currentStatus === "CANCELLED" && (
+                              <X className="w-full sm:w-auto" />
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+              <CardFooter>
+                <PaginationAdminTable
+                  currentPage={currentPage}
+                  handleNextPage={handleNextPage}
+                  handlePrevPage={handlePrevPage}
+                  totalPage={totalPage}
+                  setCurrentPage={setCurrentPage}
+                  hasNext={hasNext}
+                  hasPrevious={hasPrevious}
+                />
+              </CardFooter>
+            </Card>
+          )}
+          {orders.length === 0 && (
+            <div className="min-h-screen flex flex-col items-center justify-center space-y-4 border-2 rounded-lg">
+              <Image
+                alt="ảnh trống"
+                src={ReviewEmpty}
+                width={200}
+                height={200}
+                unoptimized={true}
+                priority
+              />
+              <Label className="text-xl text-center text-gray-tertiary">
+                Hiện tại không có đơn hàng nào thuộc trạng thái này
+              </Label>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
       {isDialogOpen && (
         <>
           <div className="fixed inset-0 bg-black-primary bg-opacity-85 z-[150]" />
           <DialogUpdateOrCancelOrder
             onOpen={isDialogOpen}
             onClose={() => setIsDialogOpen(false)}
-            onUpdateOrderStatus={confirmUpdateOrderStatus}
-            onCancelOrder={confirmCancelOrder}
+            onUpdateOrderStatus={confirmUpdate}
+            onCancelOrder={confirmCancel}
             selectedOrder={selectedOrder}
             actionType={actionType}
           />
         </>
+      )}
+      {isDialogListOpen && (
+        <>
+          <div className="fixed inset-0 bg-black-primary bg-opacity-85 z-[150]" />
+          <DialogConfirmListOrderAdmin
+            onOpen={isDialogListOpen}
+            onClose={() => setIsDialogListOpen(false)}
+            onUpdateListOrder={confirmUpdateList}
+            onCancelListOrder={confirmCancelList}
+            selectedListOrder={selectedListOrder}
+            onRemoveOrder={handleRemoveOrder}
+            actionType={actionType}
+          />
+        </>
+      )}
+      {isLoading && (
+        <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] space-y-4 bg-black-secondary">
+          <CircularProgress></CircularProgress>
+          <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
+        </div>
       )}
     </>
   );

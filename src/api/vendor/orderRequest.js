@@ -29,22 +29,46 @@ export const getOneOrderBySeller = (orderId) => {
   }
 };
 
-export const updateOrderStatusBySeller = (orderId) => {
+export const updateOneOrderBySeller = (orderId) => {
   try {
     const response = put(`/api/v1/orders/${orderId}/update-status/seller`);
     return response;
   } catch (error) {
-    console.error("Error during authentication:", error);
+    console.error("Error during updateOneOrderBySeller:", error);
     throw error;
   }
 };
 
-export const cancelOrderBySeller = (orderId) => {
+export const updateListOrderBySeller = (listOrderId) => {
+  try {
+    const response = put(`/api/v1/orders/list/update-status/seller`, {
+      listOrderId: listOrderId,
+    });
+    return response;
+  } catch (error) {
+    console.error("Error during updateListOrderBySeller:", error);
+    throw error;
+  }
+};
+
+export const cancelOneOrderBySeller = (orderId) => {
   try {
     const response = put(`/api/v1/orders/${orderId}/cancel/seller`);
     return response;
   } catch (error) {
-    console.error("Error during authentication:", error);
+    console.error("Error during cancelOneOrderBySeller:", error);
+    throw error;
+  }
+};
+
+export const cancelListOrderBySeller = (listOrderId) => {
+  try {
+    const response = put(`/api/v1/orders/list/cancel/seller`, {
+      listOrderId: listOrderId,
+    });
+    return response;
+  } catch (error) {
+    console.error("Error during cancelListOrderBySeller:", error);
     throw error;
   }
 };

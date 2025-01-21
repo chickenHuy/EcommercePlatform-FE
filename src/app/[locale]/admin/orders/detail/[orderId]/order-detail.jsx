@@ -15,11 +15,9 @@ import {
   ChevronLeft,
   CircleHelpIcon,
   Mail,
-  Pencil,
   Phone,
   UserRound,
   UserRoundCog,
-  X,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -29,11 +27,12 @@ import { useRouter } from "next/navigation";
 import { setStore } from "@/store/features/userSearchSlice";
 import { useToast } from "@/hooks/use-toast";
 import {
-  cancelOrderByAdmin,
-  updateOrderStatusByAdmin,
+  cancelOneOrderByAdmin,
+  updateOneOrderByAdmin,
 } from "@/api/admin/orderRequest";
 import { Toaster } from "@/components/ui/toaster";
 import DialogUpdateOrCancelOrder from "@/components/dialogs/dialogUpdateOrCancelOrder";
+import { EditCalendar, EventBusy } from "@mui/icons-material";
 
 export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -43,14 +42,14 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
   const [actionType, setActionType] = useState("");
   const { toast } = useToast();
 
-  const handleCancelButtonClick = (orderDetail) => {
+  const handleClickButtonCancel = (orderDetail) => {
     setIsDialogOpen(true);
     setOrderToCancel(orderDetail);
     setSelectedOrder(orderDetail);
     setActionType("cancel");
   };
 
-  const handleUpdateButtonClick = (orderDetail) => {
+  const handleClickButtonUpdate = (orderDetail) => {
     setIsDialogOpen(true);
     setOrderToUpdate(orderDetail);
     setSelectedOrder(orderDetail);
@@ -63,19 +62,19 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
   };
 
   const dispatch = useDispatch();
-  const handleOnclickViewShop = (storeId) => {
+  const handleClickViewShop = (storeId) => {
     router.push("/search");
     dispatch(setStore(storeId));
   };
 
-  const handleOnClickComback = () => {
+  const handleClickComback = () => {
     router.push("/admin/orders");
   };
 
-  const confirmCancelOrder = async () => {
+  const confirmCancel = async () => {
     if (orderToCancel) {
       try {
-        await cancelOrderByAdmin(orderToCancel.id);
+        await cancelOneOrderByAdmin(orderToCancel.id);
         toast({
           description: `Đơn hàng "${orderToCancel.id}" đã được hủy thành công`,
         });
@@ -91,10 +90,10 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
     }
   };
 
-  const confirmUpdateOrderStatus = async () => {
+  const confirmUpdate = async () => {
     if (orderToUpdate) {
       try {
-        await updateOrderStatusByAdmin(orderToUpdate.id);
+        await updateOneOrderByAdmin(orderToUpdate.id);
         toast({
           description: `Đơn hàng "${orderToUpdate.id}" đã được cập nhật trạng thái`,
         });
@@ -110,7 +109,7 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
     }
   };
 
-  function getStatusOrder(status) {
+  function getCurrentStatus(status) {
     switch (status) {
       case "ON_HOLD":
         return "Chờ thanh toán";
@@ -133,7 +132,7 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
     }
   }
 
-  function getTransactionStatusOrder(status) {
+  function getTransactionStatus(status) {
     switch (status) {
       case "WAITING":
         return "Chờ thanh toán";
@@ -142,7 +141,7 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
     }
   }
 
-  function getPaymentMethodOrder(status) {
+  function getPaymentMethod(status) {
     switch (status) {
       case "COD":
         return "COD";
@@ -171,7 +170,7 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
         <div className="flex items-center justify-between space-x-4 pt-4 pb-4">
           <div
             className="flex items-center space-x-2 hover:cursor-pointer"
-            onClick={() => handleOnClickComback()}
+            onClick={() => handleClickComback()}
           >
             <ChevronLeft className="h-7 w-7" />
             <Label className="truncate text-xl hover:cursor-pointer">
@@ -188,15 +187,13 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
               </Label>
               <div className="flex items-center space-x-2">
                 <Badge variant="outline" className="truncate">
-                  {getStatusOrder(orderDetail?.currentStatus)}
+                  {getCurrentStatus(orderDetail?.currentStatus)}
                 </Badge>
                 <Badge variant="outline" className="truncate">
-                  {getTransactionStatusOrder(
-                    orderDetail?.currentStatusTransaction
-                  )}
+                  {getTransactionStatus(orderDetail?.currentStatusTransaction)}
                 </Badge>
                 <Badge variant="outline" className="truncate">
-                  {getPaymentMethodOrder(orderDetail?.paymentMethod)}
+                  {getPaymentMethod(orderDetail?.paymentMethod)}
                 </Badge>
               </div>
             </div>
@@ -204,31 +201,31 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
         </div>
         <Separator></Separator>
         <div className="flex items-center justify-center space-x-4 pt-4 pb-4">
-          {orderDetail?.currentStatus === "DELIVERED" ||
-          orderDetail?.currentStatus === "CANCELLED" ? null : (
+          {orderDetail?.currentStatus !== "DELIVERED" &&
+            orderDetail?.currentStatus !== "CANCELLED" && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  handleClickButtonCancel(orderDetail);
+                }}
+              >
+                <EventBusy className="h-6 w-6 mr-2" />
+                Hủy đơn hàng
+              </Button>
+            )}
+          {(orderDetail?.currentStatus === "WAITING_FOR_SHIPPING" ||
+            orderDetail?.currentStatus === "PICKED_UP" ||
+            orderDetail?.currentStatus === "OUT_FOR_DELIVERY") && (
             <Button
               variant="outline"
               onClick={() => {
-                handleCancelButtonClick(orderDetail);
+                handleClickButtonUpdate(orderDetail);
               }}
             >
-              <X className="h-4 x-4 mr-2" />
-              Hủy đơn hàng
-            </Button>
-          )}
-          {orderDetail?.currentStatus === "WAITING_FOR_SHIPPING" ||
-          orderDetail?.currentStatus === "PICKED_UP" ||
-          orderDetail?.currentStatus === "OUT_FOR_DELIVERY" ? (
-            <Button
-              variant="outline"
-              onClick={() => {
-                handleUpdateButtonClick(orderDetail);
-              }}
-            >
-              <Pencil className="h-4 x-4 mr-2" />
+              <EditCalendar className="h-6 w-6 mr-2" />
               Cập nhật trạng thái
             </Button>
-          ) : null}
+          )}
           {renderStatusBadge(orderDetail?.currentStatus)}
         </div>
         <Separator></Separator>
@@ -240,7 +237,7 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
                 <div className="flex items-center space-x-8">
                   <div
                     className="flex items-center gap-4 hover:cursor-pointer"
-                    onClick={() => handleOnclickViewShop(orderDetail?.storeId)}
+                    onClick={() => handleClickViewShop(orderDetail?.storeId)}
                   >
                     <Image
                       alt="ảnh shop"
@@ -497,8 +494,8 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
           <DialogUpdateOrCancelOrder
             onOpen={isDialogOpen}
             onClose={() => setIsDialogOpen(false)}
-            onUpdateOrderStatus={confirmUpdateOrderStatus}
-            onCancelOrder={confirmCancelOrder}
+            onUpdateOrderStatus={confirmUpdate}
+            onCancelOrder={confirmCancel}
             selectedOrder={selectedOrder}
             actionType={actionType}
           />
