@@ -5,6 +5,7 @@ import Home from "@/assets/images/home.png";
 import shopNow from "@/assets/images/shopNow.png";
 import { Button } from "@/components/ui/button";
 import ProductGrid from "./search/productGrid";
+import ProductBestSelling from "@/components/user/home/product-best-selling";
 
 export default function HomePage() {
   return (
@@ -28,6 +29,7 @@ export default function HomePage() {
       <div className="w-full md:px-20 px-0">
         <ProductGrid />
       </div>
+      <ProductBestSelling />
     </main>
   );
 }

@@ -161,6 +161,8 @@ export default function ManageOrderBySeller() {
         setIsDialogOpen(false);
         setOrderToUpdate(null);
         setSelectedOrder(null);
+        setListOrderId([]);
+        setSelectedListOrder([]);
         fetchAllOrderBySeller();
       } catch (error) {
         toast({
@@ -182,6 +184,8 @@ export default function ManageOrderBySeller() {
         setIsDialogOpen(false);
         setOrderToCancel(null);
         setSelectedOrder(null);
+        setListOrderId([]);
+        setSelectedListOrder([]);
         fetchAllOrderBySeller();
       } catch (error) {
         toast({

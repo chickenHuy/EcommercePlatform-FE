@@ -32,10 +32,8 @@ import { Toaster } from "@/components/ui/toaster";
 import {
   ArrowUpDown,
   Ban,
-  CalendarCog,
   Check,
   ListFilter,
-  SquareX,
   X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -59,13 +57,13 @@ import { useRouter } from "next/navigation";
 import DialogUpdateOrCancelOrder from "@/components/dialogs/dialogUpdateOrCancelOrder";
 import { Checkbox } from "@/components/ui/checkbox";
 import DialogConfirmListOrderAdmin from "@/components/dialogs/dialogConfirmListOrderAdmin";
-import { EditCalendar, EventAvailable, EventBusy } from "@mui/icons-material";
+import { EditCalendar, EventBusy } from "@mui/icons-material";
 
 export default function ManageOrderByAdmin() {
   const pageSize = 10;
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(0);
   const [sortBy, setSortBy] = useState("createdAt");
   const [orderBy, setOrderBy] = useState("desc");
   const [totalElement, setTotalElement] = useState(0);
@@ -149,6 +147,8 @@ export default function ManageOrderByAdmin() {
         setIsDialogOpen(false);
         setSelectedOrder(null);
         setOrderToUpdate(null);
+        setListOrderId([]);
+        setSelectedListOrder([]);
         fetchAllOrderByAdmin();
       } catch (error) {
         toast({
@@ -170,6 +170,8 @@ export default function ManageOrderByAdmin() {
         setIsDialogOpen(false);
         setOrderToCancel(null);
         setSelectedOrder(null);
+        setListOrderId([]);
+        setSelectedListOrder([]);
         fetchAllOrderByAdmin();
       } catch (error) {
         toast({
