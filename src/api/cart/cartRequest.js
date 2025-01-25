@@ -1,11 +1,11 @@
 import { get, put, del } from "@/lib/httpClient";
 
-export const getAllCart = (page) => {
+export const getAllCart = (page, size) => {
   try {
-    const response = get(`/api/v1/carts?page=${page}&size=8&sort=createdAt&order=desc`);
+    const response = get(`/api/v1/carts?page=${page}&size=${size}`);
     return response;
   } catch (error) {
-    console.error("Error during authentication:", error);
+    console.error("Error during getAllCart:", error);
     throw error;
   }
 };
@@ -18,7 +18,7 @@ export const changeQuantity = (cartItemId, quantityUpdate) => {
     );
     return response;
   } catch (error) {
-    console.error("Error during authentication:", error);
+    console.error("Error during changeQuantity:", error);
     throw error;
   }
 };
@@ -28,7 +28,7 @@ export const deleteCartItem = (cartItemId) => {
     const response = del(`/api/v1/cartItems/${cartItemId}`);
     return response;
   } catch (error) {
-    console.error("Error during authentication:", error);
+    console.error("Error during deleteCartItem:", error);
     throw error;
   }
 };

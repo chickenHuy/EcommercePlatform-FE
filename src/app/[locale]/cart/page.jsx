@@ -1,119 +1,248 @@
 "use client";
 
+import CommonHeader from "@/components/headers/commonHeader";
+import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import Image from "next/image";
+import StoreEmpty from "@/assets/images/storeEmpty.jpg";
+import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
+import { CircularProgress, Rating } from "@mui/material";
+import { formatCurrency } from "@/utils/commonUtils";
+import { Button } from "@/components/ui/button";
+import { Minus, PiggyBank, Plus, Trash } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useCallback, useEffect, useState } from "react";
 import {
   changeQuantity,
   deleteCartItem,
   getAllCart,
 } from "@/api/cart/cartRequest";
-import { PaginationAdminTable } from "@/components/paginations/pagination";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useInView } from "react-intersection-observer";
 import { useToast } from "@/hooks/use-toast";
-import { Checkbox, Rating } from "@mui/material";
-import {
-  ArrowDown,
-  ArrowUp,
-  Minus,
-  PiggyBank,
-  Plus,
-  Trash2,
-} from "lucide-react";
-import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import DialogConfirmDeleteCartItem from "./dialogConfirmDeleteCartItem";
-import DialogConfirmSelectCartItem from "./dialogConfirmSelectCartItem";
-import ManageCartUserSkeleton from "./skeletonCart";
 import { useRouter } from "next/navigation";
-import { setStore } from "@/store/features/userSearchSlice";
 import { useDispatch } from "react-redux";
+import { setStore } from "@/store/features/userSearchSlice";
+import { Toaster } from "@/components/ui/toaster";
 import { setCheckout } from "@/store/features/checkoutSlice";
-import CommonHeader from "@/components/headers/commonHeader";
-import { Separator } from "@/components/ui/separator";
-import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
-import storeEmpty from "@/assets/images/storeEmpty.jpg";
-import { formatCurrency } from "@/utils/commonUtils";
+import DialogConfirmCart from "@/components/dialogs/dialogConfirmCart";
 
-export default function ManageCartUser() {
-  const [carts, setCarts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(1);
-  const [totalElement, setTotalElement] = useState(0);
+export default function CartUser() {
+  const [listCart, setListCart] = useState([]);
+  const [nextPage, setNextPage] = useState(1);
+  const pageSize = 10;
   const [hasNext, setHasNext] = useState(false);
-  const [hasPrevious, setHasPrevious] = useState(false);
-  const [isOpenArrow, setIsOpenArrow] = useState(true);
-  const [isOpenVariant, setIsVariant] = useState(false);
-  const [isOpenDialogConfirm, setIsOpenDialogConfirm] = useState(false);
-  const [cartItemToDelete, setCartItemToDelete] = useState(null);
-  const [selectedCartItems, setSelectedCartItems] = useState([]);
-  const [isOpenDialogConfirmSelected, setIsOpenDialogConfirmSelected] =
-    useState(false);
+  const [loadPage, setLoadPage] = useState(true);
+  const [loadListCart, setLoadListCart] = useState(false);
+  const { ref: loadRef, inView } = useInView();
+
+  const [selectedListCartItem, setSelectedListCartItem] = useState([]);
+
   const { toast } = useToast();
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const handleNextPage = () => {
-    if (currentPage < totalPage) {
-      setCurrentPage(currentPage + 1);
+  const [cartItemToDelete, setCartItemToDelete] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [actionType, setActionType] = useState("");
+
+  const fetchAllCart = useCallback(
+    async (isInitialLoad = false) => {
+      if (isInitialLoad) {
+        setLoadPage(false);
+      }
+
+      setLoadListCart(true);
+      try {
+        if (!isInitialLoad) {
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+
+        const response = await getAllCart(
+          isInitialLoad ? 1 : nextPage,
+          pageSize
+        );
+
+        const newListCart = response.result.data;
+
+        if (newListCart.length === 0) {
+          setListCart([]);
+          setNextPage(response.result.nextPage);
+          setHasNext(response.result.hasNext);
+        } else if (newListCart.length > 0) {
+          setListCart((prevListCart) =>
+            isInitialLoad ? newListCart : [...prevListCart, ...newListCart]
+          );
+          setNextPage(response.result.nextPage);
+          setHasNext(response.result.hasNext);
+        }
+      } catch (error) {
+        console.error("Error during fetchAllCart: ", error);
+      } finally {
+        setLoadListCart(false);
+      }
+    },
+    [nextPage]
+  );
+
+  useEffect(() => {
+    fetchAllCart(true);
+  }, []);
+
+  useEffect(() => {
+    if (inView && hasNext) {
+      fetchAllCart(false);
     }
+  }, [inView, hasNext]);
+
+  const hasCheckboxCartItem = (cartItem) => {
+    return cartItem.available === true;
   };
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+  const hasCheckboxCart = (cart) => {
+    return cart.items.some((item) => item.available === true);
   };
 
-  const toggleArrow = () => {
-    setIsOpenArrow(!isOpenArrow);
-    setIsVariant(!isOpenVariant);
-  };
+  const hasCheckboxAll = listCart.some((cart) => hasCheckboxCart(cart));
 
-  const handleQuantityChange = async (cartItemId, quantityUpdate) => {
-    try {
-      await changeQuantity(cartItemId, quantityUpdate);
-      toast({
-        title: "Thành công",
-        description: `Bạn đã cập nhật số lượng thành công`,
-      });
-      fetchAllCart();
-      updateSelectedCartItems(cartItemId, quantityUpdate);
-    } catch (error) {
-      toast({
-        title: "Cập nhật số lượng thất bại",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleInputQuantityChange = (cartItemId, newQuantity) => {
-    const quantityUpdate = parseInt(newQuantity, 10);
-    if (!isNaN(quantityUpdate) && quantityUpdate > 0) {
-      handleQuantityChange(cartItemId, quantityUpdate);
-    } else {
+  const handleCheckedCartItem = (cartItem, isChecked) => {
+    if (cartItem.available === false) {
       return;
     }
+
+    if (isChecked) {
+      setSelectedListCartItem([...selectedListCartItem, cartItem]);
+    } else {
+      setSelectedListCartItem(
+        selectedListCartItem.filter(
+          (selectedItem) => selectedItem.id !== cartItem.id
+        )
+      );
+    }
+    console.log("cartItem: ", cartItem.id);
   };
 
-  // const updateCartQuantityUI = (cartItemId, quantityUpdate) => {
-  //   setCarts((prevCarts) => {
-  //     return prevCarts.map((cart) => ({
-  //       ...cart,
-  //       items: cart.items.map((item) => {
-  //         if (item.id === cartItemId) {
-  //           return { ...item, quantity: quantityUpdate };
-  //         }
-  //         return item;
-  //       }),
-  //     }));
-  //   });
-  // };
+  const checkedCartItem = (cartItem) => {
+    return (
+      cartItem.available === true &&
+      selectedListCartItem.some(
+        (selectedItem) => selectedItem.id === cartItem.id
+      )
+    );
+  };
 
-  const updateSelectedCartItems = (cartItemId, quantityUpdate) => {
-    setSelectedCartItems((prevItems) =>
+  const handleCheckedCart = (cart, isChecked) => {
+    const availableListCartItem = cart.items.filter(
+      (item) => item.available === true
+    );
+
+    if (isChecked) {
+      const newListCartItem = availableListCartItem.filter(
+        (item) =>
+          !selectedListCartItem.find(
+            (selectedItem) => selectedItem.id === item.id
+          )
+      );
+      setSelectedListCartItem([...selectedListCartItem, ...newListCartItem]);
+    } else {
+      setSelectedListCartItem(
+        selectedListCartItem.filter(
+          (selectedItem) =>
+            !availableListCartItem.find((item) => item.id === selectedItem.id)
+        )
+      );
+    }
+  };
+
+  const checkedCart = (cart) => {
+    const availableListCartItem = cart.items.filter(
+      (item) => item.available === true
+    );
+
+    return (
+      availableListCartItem.length > 0 &&
+      availableListCartItem.every((item) =>
+        selectedListCartItem.some((selectedItem) => selectedItem.id === item.id)
+      )
+    );
+  };
+
+  const handleCheckedAll = (isChecked) => {
+    if (isChecked) {
+      const allAvailableCartItem = listCart.reduce(
+        (all, cart) => [
+          ...all,
+          ...cart.items.filter((item) => item.available === true),
+        ],
+        []
+      );
+      setSelectedListCartItem(allAvailableCartItem);
+    } else {
+      setSelectedListCartItem([]);
+    }
+  };
+
+  const checkedAll = () => {
+    const allAvailableCartItem = listCart.reduce(
+      (count, cart) =>
+        count + cart.items.filter((item) => item.available === true).length,
+      0
+    );
+
+    const selectedAvailableCartItem = selectedListCartItem.filter(
+      (item) => item.available === true
+    ).length;
+
+    return (
+      selectedAvailableCartItem > 0 &&
+      selectedAvailableCartItem === allAvailableCartItem
+    );
+  };
+
+  const totalSavingsOneCart = (listCartItem) => {
+    return listCartItem
+      .filter((item) => item.available === true)
+      .reduce((totalSavings, item) => {
+        const savings = item.quantity * (item.originalPrice - item.salePrice);
+        return totalSavings + savings;
+      }, 0);
+  };
+
+  const countTotalProduct = (listCart) => {
+    return listCart.reduce((total, cart) => {
+      const availableItems = cart.items.filter(
+        (item) => item.available === true
+      );
+      return total + availableItems.length;
+    }, 0);
+  };
+
+  const totalSavingsListCartItem = (listCartItem) => {
+    return listCartItem.reduce((totalSavings, cartItem) => {
+      const savings =
+        cartItem.quantity * (cartItem.originalPrice - cartItem.salePrice);
+      return totalSavings + savings;
+    }, 0);
+  };
+
+  const totalPriceAll = (listCartItem) => {
+    return listCartItem.reduce((totalPrice, item) => {
+      const price = item.quantity * item.salePrice;
+      return totalPrice + price;
+    }, 0);
+  };
+
+  const handleClickViewShop = (storeId) => {
+    dispatch(setStore(storeId));
+    router.push("/search");
+  };
+
+  const handleClickViewProduct = (slug) => {
+    router.push(`/${slug}`);
+  };
+
+  const updateSelectedListCartItem = (cartItemId, quantityUpdate) => {
+    setSelectedListCartItem((prevItems) =>
       prevItems.map((item) => {
         if (item.id === cartItemId) {
           return { ...item, quantity: quantityUpdate };
@@ -123,235 +252,195 @@ export default function ManageCartUser() {
     );
   };
 
-  const handleOnClickButtonMinus = (item) => {
-    const quantityUpdate = item.quantity - 1;
-    if (quantityUpdate === 0) {
-      setCartItemToDelete(item);
-      setIsOpenDialogConfirm(true);
-    } else {
-      handleQuantityChange(item.id, quantityUpdate);
-    }
+  const updateQuantityUI = (cartItemId, quantityUpdate) => {
+    setListCart((prevListCart) =>
+      prevListCart.map((cart) => ({
+        ...cart,
+        items: cart.items.map((item) =>
+          item.id === cartItemId ? { ...item, quantity: quantityUpdate } : item
+        ),
+      }))
+    );
   };
 
-  const handleOnClickButtonPlus = (item) => {
-    const quantityUpdate = item.quantity + 1;
-    handleQuantityChange(item.id, quantityUpdate);
-  };
-
-  const handleDeleteCartItem = async () => {
-    if (cartItemToDelete) {
-      try {
-        await deleteCartItem(cartItemToDelete.id);
-        toast({
-          title: "Thành công",
-          description: `Bạn đã xóa sản phẩm ${cartItemToDelete.name} khỏi giỏ hàng thành công`,
-        });
-        setIsOpenDialogConfirm(false);
-        fetchAllCart();
-      } catch (error) {
-        toast({
-          title: "Thất bại",
-          description: error.message,
-        });
-      }
-    }
-  };
-
-  const handleOnclickButtonDeleteCartItem = (cartItem) => {
-    setIsOpenDialogConfirm(true);
-    setCartItemToDelete(cartItem);
-  };
-
-  const handleOnClickButtonDeleteSelectCartItem = () => {
-    if (selectedCartItems.length > 0) {
-      setIsOpenDialogConfirmSelected(true);
-    } else {
+  const handleChangeQuantity = async (cartItemId, quantityUpdate) => {
+    try {
+      await changeQuantity(cartItemId, quantityUpdate);
+      updateQuantityUI(cartItemId, quantityUpdate);
+      updateSelectedListCartItem(cartItemId, quantityUpdate);
+      fetchAllCart(true); // Đáng lẻ không fetch lại ở đây đâu, vì khi pageSize nhỏ, = 1 chẳng hạn nó sẽ load load ra lại không tối ưu lắm, mà giờ t không biết làm sao, chờ mốt K nghĩ cách giúp :((
       toast({
-        title: "Thất bại",
-        description: `Vui lòng chọn sản phẩm`,
+        description: `Cập nhật số lượng thành công`,
+      });
+    } catch (error) {
+      toast({
+        title: "Cập nhật số lượng thất bại",
+        description: error.message,
         variant: "destructive",
       });
     }
   };
 
-  const handleDeleteSelectCartItems = async () => {
-    for (const cartItem of selectedCartItems) {
+  const [inputValues, setInputValues] = useState({});
+
+  const handleChangeInput = (cartItem, newQuantity) => {
+    const quantityUpdate = parseInt(newQuantity, 10);
+
+    if (quantityUpdate === cartItem.quantity) {
+      return;
+    }
+
+    if (!isNaN(quantityUpdate) && quantityUpdate > 0) {
+      handleChangeQuantity(cartItem.id, quantityUpdate);
+      setInputValues((prev) => ({
+        ...prev,
+        [cartItem.id]: undefined,
+      }));
+    } else {
+      toast({
+        title: "Thất bại",
+        description: "Số lượng không hợp lệ",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleClickMinus = (item) => {
+    const currentInputValue = inputValues[item.id];
+    let quantityUpdate;
+
+    if (
+      currentInputValue === "" ||
+      currentInputValue < 0 ||
+      currentInputValue === "0"
+    ) {
+      quantityUpdate = 1;
+    } else {
+      const newQuantity = parseInt(currentInputValue, 10);
+      if (!isNaN(newQuantity)) {
+        quantityUpdate = newQuantity - 1;
+      } else {
+        quantityUpdate = item.quantity - 1;
+      }
+    }
+
+    if (quantityUpdate === 0) {
+      setOpenDialog(true);
+      setActionType("deleteOne");
+      setCartItemToDelete(item);
+    } else {
+      handleChangeQuantity(item.id, quantityUpdate);
+      setInputValues((prev) => ({
+        ...prev,
+        [item.id]: undefined,
+      }));
+    }
+  };
+
+  const handleClickPlus = (item) => {
+    const currentInputValue = inputValues[item.id];
+    let quantityUpdate;
+
+    if (
+      currentInputValue === "" ||
+      currentInputValue < 0 ||
+      currentInputValue === "0"
+    ) {
+      quantityUpdate = 1;
+    } else {
+      const newQuantity = parseInt(currentInputValue, 10);
+      if (!isNaN(newQuantity)) {
+        quantityUpdate = newQuantity + 1;
+      } else {
+        quantityUpdate = item.quantity + 1;
+      }
+    }
+
+    handleChangeQuantity(item.id, quantityUpdate);
+    setInputValues((prev) => ({
+      ...prev,
+      [item.id]: undefined,
+    }));
+  };
+
+  const handleClickDeleteOne = (cartItem) => {
+    setOpenDialog(true);
+    setActionType("deleteOne");
+    setCartItemToDelete(cartItem);
+  };
+
+  const updateListCart = (cartItem) => {
+    setListCart((prevListCart) =>
+      prevListCart
+        .map((cart) => ({
+          ...cart,
+          items: cart.items.filter((item) => item.id !== cartItem.id),
+        }))
+        .filter((cart) => cart.items.length > 0)
+    );
+  };
+
+  const confirmDeleteOne = async () => {
+    if (cartItemToDelete) {
+      try {
+        await deleteCartItem(cartItemToDelete.id);
+        updateListCart(cartItemToDelete);
+        setCartItemToDelete(null);
+        setActionType("");
+        setOpenDialog(false);
+        toast({
+          description: `Xóa sản phẩm ${cartItemToDelete.name} khỏi giỏ hàng thành công`,
+        });
+      } catch (error) {
+        toast({
+          title: "Thất bại",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleClickDeleteAll = () => {
+    if (selectedListCartItem.length === 0) {
+      toast({
+        title: "Thất bại",
+        description: `Vui lòng chọn sản phẩm để xóa`,
+        variant: "destructive",
+      });
+    } else if (selectedListCartItem.length > 0) {
+      setActionType("deleteList");
+      setOpenDialog(true);
+    }
+  };
+
+  const confirmDeleteList = async () => {
+    for (const cartItem of selectedListCartItem) {
       try {
         await deleteCartItem(cartItem.id);
-        setSelectedCartItems((prevItems) =>
+        updateListCart(cartItem);
+        setSelectedListCartItem((prevItems) =>
           prevItems.filter((item) => item.id !== cartItem.id)
         );
       } catch (error) {
         break;
       }
     }
+    setActionType("");
+    setOpenDialog(false);
     toast({
-      title: "Thành công",
-      description: `Bạn đã xóa ${selectedCartItems.length} sản phẩm khỏi giỏ hàng thành công`,
+      description: `Bạn đã xóa ${selectedListCartItem.length} sản phẩm khỏi giỏ hàng thành công`,
     });
-    fetchAllCart();
-    setIsOpenDialogConfirmSelected(false);
-  };
-
-  const handleSelectCartItem = (cartItem, isChecked) => {
-    if (cartItem.available === false) {
-      return;
-    }
-
-    if (isChecked) {
-      setSelectedCartItems([...selectedCartItems, cartItem]);
-    } else {
-      setSelectedCartItems(
-        selectedCartItems.filter((item) => item.id !== cartItem.id)
-      );
-    }
-    console.log("cartItem: ", cartItem.id);
-  };
-
-  const handleSelectCart = (cart, isChecked) => {
-    const availableItems = cart.items.filter((item) => item.available === true);
-
-    if (isChecked) {
-      const newSelectedItems = availableItems.filter(
-        (item) =>
-          !selectedCartItems.find((selectedItem) => selectedItem.id === item.id)
-      );
-      setSelectedCartItems([...selectedCartItems, ...newSelectedItems]);
-    } else {
-      setSelectedCartItems(
-        selectedCartItems.filter(
-          (selectedItem) =>
-            !availableItems.find((item) => item.id === selectedItem.id)
-        )
-      );
-    }
-  };
-
-  const handleSelectCartAndCartItem = (isChecked) => {
-    if (isChecked) {
-      const allAvailableItems = carts.reduce(
-        (all, cart) => [
-          ...all,
-          ...cart.items.filter((item) => item.available === true),
-        ],
-        []
-      );
-      setSelectedCartItems(allAvailableItems);
-    } else {
-      setSelectedCartItems([]);
-    }
-  };
-
-  const isSelectedCartItem = (cartItem) => {
-    return (
-      cartItem.available === true &&
-      selectedCartItems.some((selectedItem) => selectedItem.id === cartItem.id)
-    );
-  };
-
-  const isCartItemAvailable = (cartItem) => {
-    return cartItem.available === true;
-  };
-
-  const isSelectedCart = (cart) => {
-    const availableItems = cart.items.filter((item) => item.available === true);
-    return (
-      availableItems.length > 0 &&
-      availableItems.every((item) =>
-        selectedCartItems.some((selectedItem) => selectedItem.id === item.id)
-      )
-    );
-  };
-
-  const isCartAvailable = (cart) => {
-    return cart.items.some((item) => item.available === true);
-  };
-
-  const isSelectedCartAndCartItem = () => {
-    const totalAvailableItems = carts.reduce(
-      (count, cart) =>
-        count + cart.items.filter((item) => item.available === true).length,
-      0
-    );
-    const selectedAvailableItems = selectedCartItems.filter(
-      (item) => item.available === true
-    ).length;
-    return (
-      selectedAvailableItems > 0 &&
-      selectedAvailableItems === totalAvailableItems
-    );
-  };
-
-  const isCartandCartItemAvailable = carts.some((cart) =>
-    isCartAvailable(cart)
-  );
-
-  const handleOnclickViewShop = (storeId) => {
-    router.push("/search");
-    dispatch(setStore(storeId));
-  };
-
-  const fetchAllCart = useCallback(async () => {
-    try {
-      const response = await getAllCart(currentPage);
-      setCarts(response.result.data);
-      setTotalPage(response.result.totalPages);
-      setTotalElement(response.result.totalElements);
-      setHasNext(response.result.hasNext);
-      setHasPrevious(response.result.hasPrevious);
-      console.log("response", response);
-    } catch (error) {
-      toast({
-        title: "Thất bại",
-        description:
-          error.message === "Unauthenticated"
-            ? "Phiên làm việc hết hạn. Vui lòng đăng nhập lại!!!"
-            : error.message,
-        variant: "destructive",
-      });
-    }
-  }, [toast, currentPage]);
-
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    setLoading(false);
-    fetchAllCart();
-    setLoading(true);
-  }, [fetchAllCart, totalPage, totalElement]);
-
-  const calculateTotalSavings = (cartItems) => {
-    return cartItems
-      .filter((cartItem) => cartItem.available === true)
-      .reduce((totalSavings, cartItem) => {
-        const savings =
-          cartItem.quantity * (cartItem.originalPrice - cartItem.salePrice);
-        return totalSavings + savings;
-      }, 0);
-  };
-
-  const calculateTotalPriceSelectedAllCartItem = (cartItems) => {
-    return cartItems.reduce((totalPrice, cartItem) => {
-      const price = cartItem.quantity * cartItem.salePrice;
-      return totalPrice + price;
-    }, 0);
-  };
-
-  const calculateTotalSavingSelectedOneCartItem = (cartItems) => {
-    console.log("cartItems: ", cartItems);
-    return cartItems.reduce((totalSavings, cartItem) => {
-      const savings =
-        cartItem.quantity * (cartItem.originalPrice - cartItem.salePrice);
-      return totalSavings + savings;
-    }, 0);
   };
 
   const handleCheckout = () => {
-    const selectedCartWithItem = carts
+    const selectedCartWithItem = listCart
       .map((cart) => ({
         ...cart,
         items: cart.items.filter((item) =>
-          selectedCartItems.some((selectedItem) => selectedItem.id === item.id)
+          selectedListCartItem.some(
+            (selectedItem) => selectedItem.id === item.id
+          )
         ),
       }))
       .filter((cart) => cart.items.length > 0);
@@ -368,347 +457,354 @@ export default function ManageCartUser() {
     }
   };
 
-  return loading ? (
-    <div className="flex flex-col min-h-screen w-full bg-muted/4 bg-blue-primary">
+  return (
+    <>
       <Toaster />
-      <CommonHeader />
-      <div className="flex items-center justify-between bg-white-primary my-4 mx-40 shadow-xl border-1 py-2 min-h-[40px]">
-        <div className="w-1/2 flex items-center">
-          {/*Checkbox cart và cartItem*/}
-          <div className="w-1/6 flex items-center justify-center">
-            {isCartandCartItemAvailable && (
-              <Checkbox
-                checked={isSelectedCartAndCartItem()}
-                onChange={(e) => handleSelectCartAndCartItem(e.target.checked)}
-              />
-            )}
-          </div>
-          <Label className="w-5/6">Sản phẩm</Label>
-        </div>
-        <div className="w-1/2 flex items-center justify-between">
-          <div className="w-1/4 flex items-center justify-center">
-            <Label>Đơn giá</Label>
-          </div>
-          <div className="w-1/4 flex items-center justify-center">
-            <Label>Số lượng</Label>
-          </div>
-          <div className="w-1/4 flex items-center justify-center">
-            <Label>Số tiền</Label>
-          </div>
-          <div className="w-1/4 flex items-center justify-center">
-            <Label>Thao tác</Label>
-          </div>
-        </div>
-      </div>
 
-      <div className="my-4 mx-40 space-y-4 h-full mb-[100px]">
-        {carts && carts.length > 0 ? (
-          carts.map((cart, index) =>
-            cart.items && cart.items.length > 0 ? (
-              <Card key={index} className="rounded-none">
-                <CardTitle className="flex items-center pt-4 pb-4 bg-gradient-to-r from-white-primary to-white-secondary">
-                  {/*Checkbox (cart)*/}
-                  <div className="w-1/12 flex items-center justify-center">
-                    {isCartAvailable(cart) ? (
-                      <Checkbox
-                        checked={isSelectedCart(cart)}
-                        onChange={(e) =>
-                          handleSelectCart(cart, e.target.checked)
-                        }
-                      />
-                    ) : null}
-                  </div>
-                  <div
-                    className="flex items-center space-x-2 hover:cursor-pointer"
-                    onClick={() => handleOnclickViewShop(cart.storeId)}
-                  >
-                    <Image
-                      alt="avatar store"
-                      src={cart.avatarStore || storeEmpty}
-                      height={30}
-                      width={30}
-                      unoptimized={true}
-                      className="rounded-full transition-transform duration-300"
-                    />
-                    <Label className="text-xl hover:cursor-pointer">
-                      {cart.storeName}
-                    </Label>
-                    <Rating
-                      value={cart.ratingStore}
-                      precision={0.1}
-                      readOnly
-                    ></Rating>
-                  </div>
-                </CardTitle>
-                <Separator className="mx-auto w-full" />
-                <CardContent className="w-full flex flex-col items-center min-h-[150px] pr-0 pl-0 pt-4 pb-4">
-                  {cart.items.map((item) => (
+      {loadPage && (
+        <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] gap-4 bg-black-primary">
+          <CircularProgress></CircularProgress>
+          <Label className="text-2xl text-white-primary">
+            Đang tải dữ liệu...
+          </Label>
+        </div>
+      )}
+
+      {!loadPage && (
+        <div className="min-h-screen min-w-[1200px] flex flex-col bg-blue-primary">
+          <CommonHeader />
+
+          <div className="min-h-16 flex justify-between items-center mx-20 mt-4 bg-white-primary shadow-xl">
+            <div className="w-1/2 flex items-center">
+              <div className="w-1/6 flex justify-center">
+                {/* Checkbox cart và cartItem */}
+                {hasCheckboxAll && (
+                  <Checkbox
+                    checked={checkedAll()}
+                    onCheckedChange={(checked) => handleCheckedAll(checked)}
+                  />
+                )}
+              </div>
+              <Label className="w-5/6 text-sm">Sản phẩm</Label>
+            </div>
+            <div className="w-1/2 flex items-center">
+              <Label className="w-1/4 text-sm text-center line-clamp-1 text-black-primary text-opacity-50">
+                Đơn giá
+              </Label>
+              <Label className="w-1/4 text-sm text-center line-clamp-1 text-black-primary text-opacity-50">
+                Số lượng
+              </Label>
+              <Label className="w-1/4 text-sm text-center line-clamp-1 text-black-primary text-opacity-50">
+                Số tiền
+              </Label>
+              <Label className="w-1/4 text-sm text-center line-clamp-1 text-black-primary text-opacity-50">
+                Thao tác
+              </Label>
+            </div>
+          </div>
+
+          <div className="flex flex-col mx-20 my-8 gap-8 min-h-screen relative">
+            {listCart.length > 0 &&
+              listCart.map((cart, index) => (
+                <Card key={index} className="rounded-none">
+                  <CardTitle className="min-h-16 flex items-center border-b bg-gradient-to-r from-white-primary to-white-secondary">
+                    <div className="w-1/12 flex justify-center">
+                      {/*Checkbox (cart)*/}
+                      {hasCheckboxCart(cart) && (
+                        <Checkbox
+                          checked={checkedCart(cart)}
+                          onCheckedChange={(checked) =>
+                            handleCheckedCart(cart, checked)
+                          }
+                        />
+                      )}
+                    </div>
+
                     <div
-                      key={item.id}
-                      className="w-full flex flex-col relative"
+                      onClick={() => handleClickViewShop(cart.storeId)}
+                      className="flex items-center space-x-4 hover:cursor-pointer"
                     >
-                      <div className="flex items-center">
-                        <div className="w-1/2 flex items-center">
-                          <div className="w-1/6 relative flex items-center justify-center">
-                            {/*Checkbox (cartItem)*/}
-                            {isCartItemAvailable(item) && (
-                              <Checkbox
-                                checked={isSelectedCartItem(item)}
-                                onChange={(e) =>
-                                  handleSelectCartItem(item, e.target.checked)
-                                }
-                              />
-                            )}
-                          </div>
-                          <div className="w-5/6 flex items-center">
-                            <div className="w-2/3 flex items-center relative">
-                              <Image
-                                alt="ảnh sản phẩm"
-                                src={item.image || storeEmpty}
-                                height={68}
-                                width={68}
-                                className="mt-4 mb-4 max-w-[68px] max-h-[68px] rounded-md"
-                              />
-                              <div className="flex-1 min-w-0 space-y-4 ml-4">
-                                <Label className="line-clamp-2 text-xl">
-                                  {item.name}
-                                </Label>
-                                <div className="flex items-center truncate space-x-2">
-                                  <Image
-                                    alt="logo thương hiệu"
-                                    src={item.logoBrand || storeEmpty}
-                                    height={30}
-                                    width={30}
-                                    unoptimized={true}
-                                    className="rounded-md"
-                                  />
-                                  <Label>{item.brand}</Label>
-                                </div>
-                              </div>
-                              {!isCartItemAvailable(item) && (
-                                <div className="absolute bg-gray-primary bg-opacity-50 w-full h-full flex items-center justify-center rounded-2xl">
-                                  <Label className="text-3xl text-center font-bold font-sans truncate text-red-primary text-opacity-80 -rotate-[8deg] bg-black-primary p-2 rounded-2xl bg-opacity-5">
-                                    Số lượng không đủ
-                                  </Label>
-                                </div>
+                      <Image
+                        alt={cart.storeName}
+                        src={cart.avatarStore || StoreEmpty}
+                        height={30}
+                        width={30}
+                        className="rounded-full"
+                      />
+
+                      <Label className="text-lg hover:cursor-pointer">
+                        {cart.storeName}
+                      </Label>
+
+                      <Rating
+                        value={cart.ratingStore}
+                        precision={0.1}
+                        readOnly
+                      />
+                    </div>
+                  </CardTitle>
+
+                  <CardContent className="flex flex-col p-0">
+                    {cart.items.length > 0 &&
+                      cart.items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="min-h-32 flex items-center border-b"
+                        >
+                          <div className="w-1/2 flex items-center">
+                            <div className="w-1/6 flex justify-center">
+                              {/*Checkbox (cartItem)*/}
+                              {hasCheckboxCartItem(item) && (
+                                <Checkbox
+                                  checked={checkedCartItem(item)}
+                                  onCheckedChange={(checked) =>
+                                    handleCheckedCartItem(item, checked)
+                                  }
+                                />
                               )}
                             </div>
-                            <div className="w-1/3 flex flex-col items-center justify-center relative">
-                              <Button
-                                variant="outline"
-                                className="w-5/6 h-full flex flex-col items-center justify-center space-y-1 truncate hover:cursor-default"
-                              >
-                                <div className="flex items-center space-x-1">
-                                  <Label className="text-black-primary text-opacity-75">
-                                    Phân loại hàng
+
+                            <div className="w-5/6 flex items-center">
+                              <div className="w-2/3 flex items-center gap-[4px] relative">
+                                <Image
+                                  alt={item.name}
+                                  src={item.image || StoreEmpty}
+                                  height={80}
+                                  width={80}
+                                  onClick={() => {
+                                    handleClickViewProduct(item.productSlug);
+                                  }}
+                                  className="rounded-md object-contain w-20 h-20 hover:cursor-pointer hover:scale-110"
+                                />
+
+                                <div className="flex flex-col gap-[8px]">
+                                  <Label
+                                    className="text-lg line-clamp-2 hover:cursor-pointer hover:text-xl"
+                                    onClick={() => {
+                                      handleClickViewProduct(item.productSlug);
+                                    }}
+                                  >
+                                    {item.name}
                                   </Label>
-                                  {!isOpenArrow && <ArrowDown />}
-                                  {!isOpenArrow && <ArrowUp />}
+                                  <div className="flex items-center gap-[4px]">
+                                    <Image
+                                      alt={item.brand}
+                                      src={item.logoBrand || StoreEmpty}
+                                      height={28}
+                                      width={28}
+                                      className="rounded-md"
+                                    />
+                                    <Label className="text-sm">
+                                      {item.brand}
+                                    </Label>
+                                  </div>
                                 </div>
-                                <Label>
+
+                                {!hasCheckboxCartItem(item) && (
+                                  <div className="absolute w-full h-full flex flex-col justify-center items-center rounded-xl bg-gray-primary bg-opacity-50">
+                                    <Label className="text-2xl text-red-primary font-bold text-opacity-75 -rotate-6 bg-black-primary bg-opacity-5 p-[8px] rounded-xl">
+                                      Số lượng không đủ
+                                    </Label>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="w-1/3 flex flex-col justify-center items-center gap-[4px] hover:cursor-pointer">
+                                <Label className="text-sm text-black-primary text-opacity-50 hover:cursor-pointer">
+                                  Phân loại hàng
+                                </Label>
+                                <Label className="text-sm hover:cursor-pointer">
                                   {item.value
                                     ? item.value.join(" | ")
                                     : "(không có)"}
                                 </Label>
-                              </Button>
-                              {isOpenVariant && (
-                                <div className="bg-yellow-primary flex flex-col absolute w-[calc(100%+200px)] left-[-100px] top-[70px] z-10">
-                                  <div className="flex items-center justify-center">
-                                    <div className="">mũi tên</div>
-                                  </div>
-                                  <div className="w-full flex flex-wrap items-center justify-start p-4 space-x-4">
-                                    <Label className="mb-4 overflow-hidden whitespace-nowrap text-ellipsis">
-                                      Màu sắc:
-                                    </Label>
-                                    <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
-                                      1TB - GOLD
-                                    </Label>
-                                    <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
-                                      512GB - GOLD
-                                    </Label>
-                                    <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
-                                      1TB - BLACK
-                                    </Label>
-                                    <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
-                                      512GB - BLACK
-                                    </Label>
-                                    <Label className="border border-black-tertiary p-2 mb-4 overflow-hidden whitespace-nowrap text-ellipsis hover:cursor-pointer hover:border-red-primary hover:text-red-primary">
-                                      512GB - BLACK
-                                    </Label>
-                                  </div>
-                                  <div className="flex items-center justify-center space-x-6 pb-4">
-                                    <Button variant="outline" className="w-1/3">
-                                      Trở lại
-                                    </Button>
-                                    <Button variant="outline" className="w-1/3">
-                                      Xác nhận
-                                    </Button>
-                                  </div>
-                                </div>
-                              )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="w-1/2 flex items-center justify-between">
-                          <div className="w-1/4 flex items-center justify-center text-red-primary/90 space-x-2 mx-2">
-                            <Label>{formatCurrency(item.salePrice)}</Label>
-                            <Label className="line-through text-muted-foreground truncate">
-                              {formatCurrency(item.originalPrice)}
-                            </Label>
-                          </div>
-                          <div className="w-1/4 flex items-center justify-center">
-                            <div className="flex items-center justify-center">
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => handleOnClickButtonMinus(item)}
-                              >
-                                <Minus className="h-4 w-4" />
-                              </Button>
-                              <Input
-                                value={item.quantity}
-                                onChange={(e) =>
-                                  handleInputQuantityChange(
-                                    item.id,
-                                    e.target.value
-                                  )
-                                }
-                                type="number"
-                                className="w-1/3 text-xl text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                              />
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => handleOnClickButtonPlus(item)}
-                              >
-                                <Plus className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                          <div className="w-1/4 flex items-center justify-center">
-                            <Label>
-                              {formatCurrency(item.quantity * item.salePrice)}
-                            </Label>
-                          </div>
-                          <div className="w-1/4 flex items-center justify-center">
-                            <Button
-                              variant="outline"
-                              onClick={() => {
-                                handleOnclickButtonDeleteCartItem(item);
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                      <Separator className="mx-auto mt-4 mb-4"></Separator>
-                    </div>
-                  ))}
-                </CardContent>
-                <CardFooter className="mb-8 p-0">
-                  <PiggyBank className="w-1/12 text-error-dark" />
-                  <div className="w-11/12 flex items-center space-x-2">
-                    <Label>Tiết kiệm ngay</Label>
-                    <Label className="text-xl font-bold text-red-primary">
-                      {formatCurrency(calculateTotalSavings(cart.items))}
-                    </Label>
-                  </div>
-                </CardFooter>
-              </Card>
-            ) : null
-          )
-        ) : (
-          <div className="flex flex-col items-center justify-center rounded-lg min-h-[400px] mt-6 space-y-6">
-            <Image
-              alt="ảnh trống"
-              className="mx-auto"
-              src={ReviewEmpty}
-              width={300}
-              height={300}
-            />
-            <Label className="text-xl text-gray-tertiary text-center">
-              Giỏ hàng trống
-            </Label>
-          </div>
-        )}
 
-        {carts && carts.length > 0 && (
-          <PaginationAdminTable
-            currentPage={currentPage}
-            handleNextPage={handleNextPage}
-            handlePrevPage={handlePrevPage}
-            totalPage={totalPage}
-            setCurrentPage={setCurrentPage}
-            hasNext={hasNext}
-            hasPrevious={hasPrevious}
-          ></PaginationAdminTable>
-        )}
-      </div>
-      <div className="flex items-center fixed bottom-0 justify-between bg-gradient-to-r from-black-tertiary to-black-primary text-white-primary min-h-[80px] w-full border-t-2">
-        <div className="w-1/12 flex items-center justify-center">
-          {/*Checkbox cart và cartItem*/}
-          {isCartandCartItemAvailable && (
-            <Checkbox
-              checked={isSelectedCartAndCartItem()}
-              onChange={(e) => handleSelectCartAndCartItem(e.target.checked)}
-            />
-          )}
-        </div>
-        <div className="w-11/12 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" className="text-black-primary">
-              Chọn tất cả ({selectedCartItems.length})
-            </Button>
-            {/*Button xóa tất cả*/}
-            <Button
-              variant="outline"
-              className="text-black-primary"
-              onClick={() => handleOnClickButtonDeleteSelectCartItem()}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-          <Label variant="outline">
-            Tiết kiệm ngay:{" "}
-            {formatCurrency(
-              calculateTotalSavingSelectedOneCartItem(selectedCartItems)
+                          <div className="w-1/2 flex items-center">
+                            <div className="w-1/4 flex flex-col justify-center items-center gap-[4px]">
+                              <Label className="text-sm text-red-primary">
+                                {formatCurrency(item.salePrice || 0)}
+                              </Label>
+                              <Label className="text-sm text-black-primary text-opacity-50 line-through truncate">
+                                {formatCurrency(item.originalPrice || 0)}
+                              </Label>
+                            </div>
+
+                            <div className="w-1/4 flex justify-center items-center gap-[4px]">
+                              <Button
+                                variant="outline"
+                                className="w-[48px] h-10"
+                                onClick={() => handleClickMinus(item)}
+                              >
+                                <Minus className="h-5 w-5" />
+                              </Button>
+
+                              <Input
+                                value={inputValues[item.id] ?? item.quantity}
+                                onChange={(e) => {
+                                  const newValue = e.target.value;
+                                  setInputValues((prev) => ({
+                                    ...prev,
+                                    [item.id]: newValue,
+                                  }));
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    handleChangeInput(item, e.target.value);
+                                    e.target.blur();
+                                  }
+                                }}
+                                type="number"
+                                className="w-[68px] h-10 text-lg text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+
+                              <Button
+                                variant="outline"
+                                className="w-[48px] h-10"
+                                onClick={() => handleClickPlus(item)}
+                              >
+                                <Plus className="h-5 w-5" />
+                              </Button>
+                            </div>
+
+                            <Label className="w-1/4 text-sm text-center">
+                              {formatCurrency(
+                                item.quantity * item.salePrice || 0
+                              )}
+                            </Label>
+
+                            <div className="w-1/4 flex justify-center">
+                              <Button
+                                variant="outline"
+                                onClick={() => {
+                                  handleClickDeleteOne(item);
+                                }}
+                              >
+                                <Trash className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </CardContent>
+
+                  <CardFooter className="min-h-16 p-0">
+                    <PiggyBank className="w-1/12 text-sm text-error-dark" />
+                    <div className="w-11/12 flex items-center gap-[4px]">
+                      <Label className="text-sm">Tiết kiệm ngay</Label>
+                      <Label className="text-lg font-bold text-red-primary">
+                        {formatCurrency(totalSavingsOneCart(cart.items) || 0)}
+                      </Label>
+                    </div>
+                  </CardFooter>
+                </Card>
+              ))}
+
+            {listCart.length === 0 && (
+              <div className="min-h-screen flex flex-col items-center justify-center">
+                <Image
+                  alt="ảnh trống"
+                  src={ReviewEmpty}
+                  width={200}
+                  height={200}
+                />
+                <Label className="text-xl text-center">Giỏ hàng trống</Label>
+              </div>
             )}
-          </Label>
-          <div className="flex items-center space-x-4">
-            <Label>Tổng sản phẩm ({selectedCartItems.length} sản phẩm):</Label>
-            <Label className="text-2xl font-bold">
-              {formatCurrency(
-                calculateTotalPriceSelectedAllCartItem(selectedCartItems)
-              )}
-            </Label>
+
+            {loadListCart && (
+              <div className="w-full h-16 flex items-center justify-center">
+                <div className="flex space-x-4">
+                  <div className="w-4 h-4 bg-red-primary rounded-full animate-bounce"></div>
+                  <div className="w-4 h-4 bg-red-primary rounded-full animate-bounce [animation-delay:-.1s]"></div>
+                  <div className="w-4 h-4 bg-red-primary rounded-full animate-bounce [animation-delay:-.5s]"></div>
+                </div>
+              </div>
+            )}
+
+            {!loadListCart && hasNext && (
+              <div
+                ref={loadRef}
+                className="absolute bottom-0 w-full h-16"
+              ></div>
+            )}
           </div>
-          <Button
-            className="w-1/6 mr-10 bg-red-primary rounded-xl"
-            onClick={() => handleCheckout()}
-          >
-            Mua hàng
-          </Button>
+
+          <div className="min-h-20 flex justify-between items-center mx-20 bg-white-primary shadow-xl sticky bottom-0 border-t">
+            <div className="w-1/2 flex items-center">
+              <div className="w-1/6 flex justify-center">
+                {/*Checkbox cart và cartItem*/}
+                {hasCheckboxAll && (
+                  <Checkbox
+                    checked={checkedAll()}
+                    onCheckedChange={(checked) => handleCheckedAll(checked)}
+                  />
+                )}
+              </div>
+
+              <div className="w-5/6 flex justify-between items-center gap-4">
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleCheckedAll(!checkedAll())}
+                  >
+                    Chọn tất cả ({countTotalProduct(listCart)})
+                  </Button>
+
+                  {/*Button xóa tất cả*/}
+                  <Button
+                    variant="outline"
+                    onClick={() => handleClickDeleteAll()}
+                  >
+                    Xóa ({selectedListCartItem.length})
+                  </Button>
+                </div>
+                <Label className="text-sm text-center line-clamp-2">
+                  Tiết kiệm ngay:{" "}
+                  {formatCurrency(
+                    totalSavingsListCartItem(selectedListCartItem) || 0
+                  )}
+                </Label>
+              </div>
+            </div>
+
+            <div className="w-1/2 flex justify-center items-center gap-8">
+              <div className="flex items-center gap-[4px]">
+                <Label className="text-sm text-center line-clamp-2">
+                  Tổng thanh toán ({selectedListCartItem.length} sản phẩm):
+                </Label>
+                <Label className="text-xl font-bold text-center line-clamp-2">
+                  {formatCurrency(totalPriceAll(selectedListCartItem) || 0)}
+                </Label>
+              </div>
+
+              <Button
+                className="w-1/4 bg-red-primary rounded-md"
+                onClick={() => handleCheckout()}
+              >
+                Mua hàng
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-      {isOpenDialogConfirm && (
-        <DialogConfirmDeleteCartItem
-          isOpen={isOpenDialogConfirm}
-          onClose={() => setIsOpenDialogConfirm(false)}
-          cartItem={cartItemToDelete}
-          confirmDeleteCartItem={handleDeleteCartItem}
-        />
       )}
-      {isOpenDialogConfirmSelected && (
-        <DialogConfirmSelectCartItem
-          isOpen={isOpenDialogConfirmSelected}
-          onClose={() => setIsOpenDialogConfirmSelected(false)}
-          selectedCartItems={selectedCartItems}
-          confirmDeleteSelectedCartItem={handleDeleteSelectCartItems}
-        />
+
+      {openDialog && (
+        <>
+          <div className="fixed inset-0 bg-black-primary bg-opacity-85 z-[150]" />
+          <DialogConfirmCart
+            onOpen={openDialog}
+            onClose={() => setOpenDialog(false)}
+            onDeleteOne={confirmDeleteOne}
+            onDeleteList={confirmDeleteList}
+            cartItemToDelete={cartItemToDelete}
+            selectedListCartItem={selectedListCartItem}
+            actionType={actionType}
+          />
+        </>
       )}
-    </div>
-  ) : (
-    <ManageCartUserSkeleton />
+    </>
   );
 }

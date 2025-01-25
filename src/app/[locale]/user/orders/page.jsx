@@ -29,7 +29,7 @@ import DialogUpdateOrCancelOrder from "@/components/dialogs/dialogUpdateOrCancel
 import { setStore } from "@/store/features/userSearchSlice";
 import { useInView } from "react-intersection-observer";
 
-export default function OrderUserManage() {
+export default function OrderUser() {
   const pageSize = 4;
   const sortBy = "createdAt";
   const orderBy = "desc";
@@ -126,7 +126,6 @@ export default function OrderUserManage() {
           setListOrder(newListOrder);
           setNextPage(response.result.nextPage);
           setHasNext(response.result.hasNext);
-          setTotalElements(response.result.totalElements);
         }
 
         if (newListOrder.length > 0) {
@@ -135,7 +134,6 @@ export default function OrderUserManage() {
           );
           setNextPage(response.result.nextPage);
           setHasNext(response.result.hasNext);
-          setTotalElements(response.result.totalElements);
         }
       } catch (error) {
         console.error("Error fetching all order by user:", error);
