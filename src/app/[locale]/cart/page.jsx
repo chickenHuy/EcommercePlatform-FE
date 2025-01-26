@@ -8,7 +8,6 @@ import Image from "next/image";
 import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
 import { CircularProgress, Rating } from "@mui/material";
-import { formatCurrency } from "@/utils/commonUtils";
 import { Button } from "@/components/ui/button";
 import { Minus, PiggyBank, Plus, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -17,6 +16,7 @@ import {
   changeQuantity,
   deleteCartItem,
   getAllCart,
+  getQuantityCartItem,
 } from "@/api/cart/cartRequest";
 import { useInView } from "react-intersection-observer";
 import { useToast } from "@/hooks/use-toast";
@@ -30,7 +30,7 @@ import DialogConfirmCart from "@/components/dialogs/dialogConfirmCart";
 export default function CartUser() {
   const [listCart, setListCart] = useState([]);
   const [nextPage, setNextPage] = useState(1);
-  const pageSize = 10;
+  const pageSize = 4;
   const [hasNext, setHasNext] = useState(false);
   const [loadPage, setLoadPage] = useState(true);
   const [loadListCart, setLoadListCart] = useState(false);
@@ -119,7 +119,6 @@ export default function CartUser() {
         )
       );
     }
-    console.log("cartItem: ", cartItem.id);
   };
 
   const checkedCartItem = (cartItem) => {
@@ -252,13 +251,24 @@ export default function CartUser() {
     );
   };
 
-  const updateQuantityUI = (cartItemId, quantityUpdate) => {
+  const updateQuantityUI = async (cartItemId, quantityUpdate) => {
+    const response = await getQuantityCartItem(cartItemId);
+    const quantityCurrent = response.result;
+    const updatedAvailable = quantityUpdate <= quantityCurrent;
+
     setListCart((prevListCart) =>
       prevListCart.map((cart) => ({
         ...cart,
-        items: cart.items.map((item) =>
-          item.id === cartItemId ? { ...item, quantity: quantityUpdate } : item
-        ),
+        items: cart.items.map((item) => {
+          if (item.id === cartItemId) {
+            return {
+              ...item,
+              quantity: quantityUpdate,
+              available: updatedAvailable,
+            };
+          }
+          return item;
+        }),
       }))
     );
   };
@@ -268,7 +278,6 @@ export default function CartUser() {
       await changeQuantity(cartItemId, quantityUpdate);
       updateQuantityUI(cartItemId, quantityUpdate);
       updateSelectedListCartItem(cartItemId, quantityUpdate);
-      fetchAllCart(true); // Đáng lẻ không fetch lại ở đây đâu, vì khi pageSize nhỏ, = 1 chẳng hạn nó sẽ load load ra lại không tối ưu lắm, mà giờ t không biết làm sao, chờ mốt K nghĩ cách giúp :((
       toast({
         description: `Cập nhật số lượng thành công`,
       });
@@ -457,6 +466,60 @@ export default function CartUser() {
     }
   };
 
+  const handleOnChangeInput = (cartItem, newValue) => {
+    setInputValues((prev) => ({
+      ...prev,
+      [cartItem.id]: newValue,
+    }));
+  };
+
+  const handleOnKeyDownInput = (cartItem, event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleChangeInput(cartItem, event.target.value);
+      cartItem.isEnterPressed = true;
+      setTimeout(() => {
+        cartItem.isEnterPressed = false;
+      }, 0);
+      event.target.blur();
+    }
+  };
+
+  const handleOnBlurInput = (cartItem, event) => {
+    if (cartItem.isEnterPressed) {
+      return;
+    }
+    const timeoutId = setTimeout(() => {
+      handleChangeInput(cartItem, event.target.value);
+    }, 1000);
+
+    event.target.onfocus = () => clearTimeout(timeoutId);
+  };
+
+  const formatCurrency = (value) => {
+    if (!value || isNaN(value)) return "0 ₫";
+
+    const absoluteValue = Math.abs(Number(value));
+
+    if (absoluteValue >= 1e9) {
+      const billions = (absoluteValue / 1e9).toFixed(2);
+      const formatted = billions.endsWith(".00")
+        ? billions.replace(".00", "")
+        : billions;
+
+      return `${formatted} tỷ`;
+    }
+
+    const formatted = absoluteValue.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
+
+    return value < 0 ? `- ${formatted}` : formatted;
+  };
+
   return (
     <>
       <Toaster />
@@ -487,7 +550,7 @@ export default function CartUser() {
               </div>
               <Label className="w-5/6 text-sm">Sản phẩm</Label>
             </div>
-            <div className="w-1/2 flex items-center">
+            <div className="w-1/2 flex items-center gap-8">
               <Label className="w-1/4 text-sm text-center line-clamp-1 text-black-primary text-opacity-50">
                 Đơn giá
               </Label>
@@ -622,7 +685,7 @@ export default function CartUser() {
                             </div>
                           </div>
 
-                          <div className="w-1/2 flex items-center">
+                          <div className="w-1/2 flex items-center gap-8">
                             <div className="w-1/4 flex flex-col justify-center items-center gap-[4px]">
                               <Label className="text-sm text-red-primary">
                                 {formatCurrency(item.salePrice || 0)}
@@ -635,7 +698,7 @@ export default function CartUser() {
                             <div className="w-1/4 flex justify-center items-center gap-[4px]">
                               <Button
                                 variant="outline"
-                                className="w-[48px] h-10"
+                                className="w-[48px] h-8"
                                 onClick={() => handleClickMinus(item)}
                               >
                                 <Minus className="h-5 w-5" />
@@ -643,26 +706,18 @@ export default function CartUser() {
 
                               <Input
                                 value={inputValues[item.id] ?? item.quantity}
-                                onChange={(e) => {
-                                  const newValue = e.target.value;
-                                  setInputValues((prev) => ({
-                                    ...prev,
-                                    [item.id]: newValue,
-                                  }));
-                                }}
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter") {
-                                    handleChangeInput(item, e.target.value);
-                                    e.target.blur();
-                                  }
-                                }}
+                                onChange={(e) =>
+                                  handleOnChangeInput(item, e.target.value)
+                                }
+                                onKeyDown={(e) => handleOnKeyDownInput(item, e)}
+                                onBlur={(e) => handleOnBlurInput(item, e)}
                                 type="number"
-                                className="w-[68px] h-10 text-lg text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                className="w-[80px] h-8 text-lg text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               />
 
                               <Button
                                 variant="outline"
-                                className="w-[48px] h-10"
+                                className="w-[48px] h-8"
                                 onClick={() => handleClickPlus(item)}
                               >
                                 <Plus className="h-5 w-5" />

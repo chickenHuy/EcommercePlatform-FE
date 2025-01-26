@@ -32,3 +32,13 @@ export const deleteCartItem = (cartItemId) => {
     throw error;
   }
 };
+
+export const getQuantityCartItem = (cartItemId) => {
+  try {
+    const response = get(`/api/v1/cartItems/get_quantity?cartItemId=${cartItemId}`);
+    return response;
+  } catch (error) {
+    console.error("Error during getQuantityCartItem:", error);
+    throw error;
+  }
+};
