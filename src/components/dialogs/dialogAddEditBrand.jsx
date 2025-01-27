@@ -24,7 +24,6 @@ import {
 import { Textarea } from "../ui/textarea";
 import Image from "next/image";
 import brandEmpty from "@/assets/images/brandEmpty.jpg";
-import { X } from "lucide-react";
 
 const validImageTypes = ["image/jpg", "image/jpeg", "image/png", "image/webp"];
 

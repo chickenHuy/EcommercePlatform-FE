@@ -5,11 +5,12 @@ import { CircularProgress } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import OrderNotFound from "./order-not-found";
 import ViewOrderDetailUser from "./order-detail";
+import { Label } from "@/components/ui/label";
 
 export default function OrderDetailUserPage({ params }) {
   const [orderDetail, setOrderDetail] = useState(null);
   const [listOrderStatusHistory, setListOrderStatusHistory] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loadPage, setLoadPage] = useState(true);
 
   const fetchOneOrderByUser = useCallback(async () => {
     try {
@@ -19,7 +20,7 @@ export default function OrderDetailUserPage({ params }) {
     } catch (error) {
       console.error(error);
     } finally {
-      setIsLoading(false);
+      setLoadPage(false);
     }
   }, [params.orderId]);
 
@@ -27,24 +28,26 @@ export default function OrderDetailUserPage({ params }) {
     fetchOneOrderByUser();
   }, [fetchOneOrderByUser]);
 
-  if (isLoading) {
-    return (
-      <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] space-y-4 bg-black-secondary">
-        <CircularProgress></CircularProgress>
-        <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
-      </div>
-    );
-  }
-
-  if (!orderDetail) {
-    return <OrderNotFound />;
-  }
-
   return (
-    <ViewOrderDetailUser
-      orderDetail={orderDetail}
-      listOrderStatusHistory={listOrderStatusHistory}
-      refreshPage={fetchOneOrderByUser}
-    />
+    <>
+      {loadPage && (
+        <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] space-y-4 bg-black-secondary">
+          <CircularProgress />
+          <Label className="text-2xl text-white-primary">
+            Đang tải dữ liệu...
+          </Label>
+        </div>
+      )}
+
+      {!orderDetail && <OrderNotFound />}
+
+      {!loadPage && orderDetail && (
+        <ViewOrderDetailUser
+          orderDetail={orderDetail}
+          listOrderStatusHistory={listOrderStatusHistory}
+          refreshPage={fetchOneOrderByUser}
+        />
+      )}
+    </>
   );
 }

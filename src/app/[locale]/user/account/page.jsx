@@ -7,32 +7,19 @@ import { Label } from "@/components/ui/label";
 import { useCallback, useEffect, useState } from "react";
 import { CircleCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import {
-  getAccount,
-  sendMailValidation,
-  updateEmail,
-  updatePhone,
-} from "@/api/user/accountRequest";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { getAccount, sendMailValidation } from "@/api/user/accountRequest";
 import { CircularProgress } from "@mui/material";
+import DialogUpdateAccount from "@/components/dialogs/dialogUpdateAccount";
 
-export default function ManageAccount() {
+export default function AccountUser() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [username, setUsername] = useState("");
   const [emailValidationStatus, setEmailValidationStatus] = useState("");
   const [userId, setUserId] = useState(null);
-  const [emailError, setEmailError] = useState("");
-  const [phoneError, setPhoneError] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [editField, setEditField] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [loadPage, setLoadPage] = useState(true);
   const { toast } = useToast();
 
   const fetchAccount = useCallback(async () => {
@@ -43,13 +30,14 @@ export default function ManageAccount() {
       setEmailValidationStatus(response.result.emailValidationStatus);
       setUsername(response.result.username);
       setUserId(response.result.id);
-      setIsLoading(false);
     } catch (error) {
       toast({
         title: "Thất bại",
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setLoadPage(false);
     }
   }, [toast]);
 
@@ -59,61 +47,19 @@ export default function ManageAccount() {
 
   const handleOpenDialog = (field) => {
     setEditField(field);
-    setIsDialogOpen(true);
+    setOpenDialog(true);
   };
 
-  const handleCloseDialog = (field) => {
-    setEditField(field);
-    setIsDialogOpen(false);
-  };
-
-  const handleUpdate = async () => {
-    setEmailError("");
-    setPhoneError("");
-
-    if (editField === "email") {
-      if (!/^\S+@\S+\.\S+$/.test(email)) {
-        setEmailError("Email không hợp lệ");
-        return;
-      }
-    }
-
-    if (editField === "phone") {
-      if (!/^0\d{9}$/.test(phone)) {
-        setPhoneError("Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0");
-        return;
-      }
-    }
-
-    const updateFunction = editField === "email" ? updateEmail : updatePhone;
-    const data = editField === "email" ? { email } : { phone };
-
-    try {
-      await updateFunction({ ...data, userId });
-      toast({
-        title: "Thành công",
-        description: `${
-          editField === "email" ? "Email" : "Số điện thoại"
-        } đã được cập nhật`,
-      });
-      fetchAccount();
-      handleCloseDialog();
-    } catch (error) {
-      toast({
-        title: "Thất bại",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
+  const handleCloseDialog = () => {
+    setEditField("");
+    setOpenDialog(false);
   };
 
   const handleSendMailValidation = async () => {
     try {
       await sendMailValidation();
       toast({
-        title: "Thành công",
         description: "Vui lòng kiểm tra email của bạn để xác thực",
-        variant: "success",
       });
     } catch (error) {
       toast({
@@ -126,124 +72,90 @@ export default function ManageAccount() {
 
   return (
     <>
-      {isLoading ? (
-        <div className="fixed inset-0 flex flex-col justify-center items-center z-[100] space-y-4 bg-black-secondary">
+      {loadPage && (
+        <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] space-y-4 bg-black-primary">
           <CircularProgress />
-          <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
+          <Label className="text-2xl text-white-primary">
+            Đang tải dữ liệu...
+          </Label>
         </div>
-      ) : (
-        <Card className="shadow-lg rounded-lg ">
-          <CardHeader className="text-center border-b py-6">
-            <CardTitle className="text-2xl font-bold">
-              Tài khoản của tôi
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 mt-4">
-            <div className="flex items-center justify-start min-h-8 mb-8">
-              <Label className="w-1/5">Tên đăng nhập</Label>
-              <Label>{username || "chưa có tên đăng nhập"}</Label>
-            </div>
-            <div className="flex items-center justify-start min-h-8 mb-8">
-              <Label className="w-1/5 mr-8">Email</Label>
-              <Input
-                value={email || "bạn chưa có email"}
-                onChange={(e) => setEmail(e.target.value)}
-                type="email"
-                disabled={true}
-                className="flex-grow mr-4 border-none"
-              ></Input>
-              {emailValidationStatus === "VERIFIED" && (
-                <CircleCheck className="mr-4" />
-              )}
-              <Button onClick={() => handleOpenDialog("email")}>
-                Thay đổi
-              </Button>
-            </div>
-            {emailValidationStatus !== "VERIFIED" && (
-              <div className="flex justify-start mb-8">
-                <Button onClick={handleSendMailValidation}>
-                  Xác thực email
-                </Button>
-              </div>
-            )}
-            <div className="flex items-center justify-start min-h-8 mb-8">
-              <Label className="w-1/5 mr-8">Số điện thoại</Label>
-              <Input
-                value={phone || "bạn chưa có số điện thoại"}
-                onChange={(e) => setPhone(e.target.value)}
-                type="text"
-                disabled={true}
-                className="flex-grow mr-4 border-none"
-              ></Input>
-              <Button onClick={() => handleOpenDialog("phone")}>
-                Thay đổi
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       )}
-      {isDialogOpen && (
-        <Dialog
-          open={isDialogOpen}
-          onOpenChange={handleCloseDialog}
-          className="fixed inset-0 z-10 overflow-y-auto"
-        >
-          <DialogContent className="sm:max-w-[450px]">
-            <DialogHeader>
-              <DialogTitle>
-                Cập nhật {editField === "email" ? "Email" : "Số Điện Thoại"}
-              </DialogTitle>
-              <DialogDescription>
-                Nhập {editField === "email" ? "email" : "số điện thoại"} mới để
-                hoàn thành cập nhật
-              </DialogDescription>
-            </DialogHeader>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleUpdate();
-              }}
-            >
-              {editField === "email" ? (
-                <>
-                  <Input
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    type="email"
-                    placeholder="nhập email mới"
-                    className="w-full rounded-lg shadow-sm"
-                  />
-                  {emailError && (
-                    <p className="mt-2 text-sm text-error col-start-2 col-span-3">
-                      {emailError}
-                    </p>
-                  )}
-                </>
-              ) : (
-                <>
-                  <Input
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    type="text"
-                    placeholder="nhập số điện thoại mới"
-                    className="w-full rounded-lg shadow-sm"
-                  />
-                  {phoneError && (
-                    <p className="mt-2 text-sm text-error col-start-2 col-span-3">
-                      {phoneError}
-                    </p>
-                  )}
-                </>
-              )}
-              <div className="mt-4 flex justify-end gap-3">
-                <Button type="button" onClick={handleCloseDialog}>
-                  Hủy
-                </Button>
-                <Button type="submit">Lưu thay đổi</Button>
+
+      {!loadPage && (
+        <div className="flex justify-center items-center">
+          <Card className="w-full min-w-[600px] max-w-[1200px] shadow-xl rounded-xl">
+            <CardHeader className="text-center border-b">
+              <CardTitle className="text-2xl font-bold">
+                Tài khoản của tôi
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="flex flex-col items-center py-8 space-y-8">
+              <div className="w-full flex items-center min-h-8">
+                <Label className="w-[180px] text-sm">Tên đăng nhập</Label>
+                <Label className="text-sm">
+                  {username || "chưa có tên đăng nhập"}
+                </Label>
               </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+
+              <div className="w-full flex items-center min-h-8 gap-4">
+                <Label className="w-[200px] text-sm">Email</Label>
+                <Input
+                  value={email || "bạn chưa có email"}
+                  onChange={(e) => setEmail(e.target.value)}
+                  type="email"
+                  disabled={true}
+                />
+                {emailValidationStatus === "VERIFIED" && <CircleCheck />}
+                <Button
+                  variant="outline"
+                  onClick={() => handleOpenDialog("email")}
+                >
+                  Thay đổi
+                </Button>
+              </div>
+
+              {emailValidationStatus !== "VERIFIED" && (
+                <div className="w-full flex items-center justify-start">
+                  <Button variant="outline" onClick={handleSendMailValidation}>
+                    Xác thực email
+                  </Button>
+                </div>
+              )}
+
+              <div className="w-full flex items-center min-h-8 gap-4">
+                <Label className="w-[200px] text-sm">Số điện thoại</Label>
+                <Input
+                  value={phone || "bạn chưa có số điện thoại"}
+                  onChange={(e) => setPhone(e.target.value)}
+                  disabled={true}
+                />
+                <Button
+                  variant="outline"
+                  onClick={() => handleOpenDialog("phone")}
+                >
+                  Thay đổi
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {openDialog && (
+        <>
+          <div className="fixed inset-0 bg-black-primary bg-opacity-85 z-[200]" />
+          <DialogUpdateAccount
+            onOpen={openDialog}
+            onClose={handleCloseDialog}
+            editField={editField}
+            email={email}
+            phone={phone}
+            userId={userId}
+            refreshPage={fetchAccount}
+            toast={toast}
+          />
+        </>
       )}
     </>
   );
