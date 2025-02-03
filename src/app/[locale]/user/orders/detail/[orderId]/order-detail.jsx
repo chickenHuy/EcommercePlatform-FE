@@ -53,6 +53,7 @@ export default function ViewOrderDetailUser({
   refreshPage,
 }) {
   const [openDialog, setOpenDialog] = useState(false);
+  const [openReview, setOpenReview] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [actionType, setActionType] = useState("");
@@ -97,6 +98,11 @@ export default function ViewOrderDetailUser({
 
   const handleClickComback = () => {
     router.push("/user/orders");
+  };
+
+  const handleClickReview = (order) => {
+    setOpenReview(true);
+    setSelectedOrder(order);
   };
 
   const hasStatus = (statuses) => {
@@ -325,6 +331,16 @@ export default function ViewOrderDetailUser({
                 onClick={() => handleClickViewShop(orderDetail?.storeId)}
               >
                 Mua lại
+              </Button>
+            ) : null}
+            {orderDetail?.currentStatus === "DELIVERED" ? (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  handleClickReview(orderDetail);
+                }}
+              >
+                Đánh giá đơn hàng
               </Button>
             ) : null}
             {orderDetail?.currentStatus === "ON_HOLD" ? (
@@ -588,6 +604,18 @@ export default function ViewOrderDetailUser({
             onCancelOrder={confirmCancelOrder}
             selectedOrder={selectedOrder}
             actionType={actionType}
+          />
+        </>
+      )}
+
+      {openReview && (
+        <>
+          <div className="fixed inset-0 bg-black-primary bg-opacity-85 z-[150]" />
+          <OrderReviewDialog
+            onOpen={openReview}
+            onClose={() => setOpenReview(false)}
+            order={selectedOrder}
+            toast={toast}
           />
         </>
       )}

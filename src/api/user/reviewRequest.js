@@ -5,29 +5,17 @@ export const createReview = (reviewRequest) => {
     const response = post(`/api/v1/reviews`, reviewRequest);
     return response;
   } catch (error) {
-    console.error("Error during authentication:", error);
+    console.error("Error during createReview:", error);
     throw error;
   }
 };
 
-export const updateReview = (reviewRequest, reviewId) => {
+export const uploadReviewListImage = async (listImage, reviewId) => {
   try {
-    console.log("reviewId: ", reviewId);
-    const response = put(`/api/v1/reviews/${reviewId}`, reviewRequest);
-    return response;
-  } catch (error) {
-    console.error("Error during authentication:", error);
-    throw error;
-  }
-};
-
-export const uploadReviewListImage = async (listFile, reviewId) => {
-  try {
-    console.log("LIST IMAGE: ", listFile);
     const formData = new FormData();
 
-    listFile.forEach((file) => {
-      formData.append("images", file);
+    listImage.forEach((image) => {
+      formData.append("images", image);
     });
 
     const response = await post(
@@ -41,7 +29,6 @@ export const uploadReviewListImage = async (listFile, reviewId) => {
 };
 
 export const uploadVideoReview = async (file, reviewId) => {
-  console.log("VIDEO: ", file);
   try {
     const formData = new FormData();
     formData.append("video", file);
@@ -67,7 +54,7 @@ export const getReviewOneProduct = (
     );
     return response;
   } catch (error) {
-    console.error("Error during authentication:", error);
+    console.error("Error during getReviewOneProduct:", error);
     throw error;
   }
 };
@@ -79,7 +66,7 @@ export const getCommentAndMediaTotalReview = (productId) => {
     );
     return response;
   } catch (error) {
-    console.error("Error during authentication:", error);
+    console.error("Error during getCommentAndMediaTotalReview:", error);
     throw error;
   }
 };

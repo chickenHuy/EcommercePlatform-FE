@@ -14,11 +14,11 @@ import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 import ReviewEmpty from "@/assets/images/reviewEmpty.png";
 import Loading from "@/components/loading";
 import { useInView } from "react-intersection-observer";
-import { UpdateReviewDialog } from "@/components/dialogs/dialogUpdateReview";
 import { formatDate } from "@/utils/commonUtils";
+import { Label } from "@/components/ui/label";
 
-export default function Reviews({ productId, product }) {
-  const [listreviews, setListReviews] = useState([]);
+export default function Reviews({ productId }) {
+  const [listReviews, setListReviews] = useState([]);
   const { toast } = useToast();
   const [averageRating, setAverageRating] = useState(0);
   const [ratingCounts, setRatingCounts] = useState({});
@@ -32,14 +32,6 @@ export default function Reviews({ productId, product }) {
   const { ref, inView } = useInView();
   const [isLoading, setIsLoading] = useState(false);
   const size = 2;
-  const [isOpenUpdateReviewDialog, setIsOpenUpdateReviewDialog] =
-    useState(false);
-  const [reviewToUpdate, setReviewToUpdate] = useState({});
-
-  const handleOnClickButtonUpdateReview = (reviewToUpdate) => {
-    setIsOpenUpdateReviewDialog(true);
-    setReviewToUpdate(reviewToUpdate);
-  };
 
   const handleRatingFilterClick = (rating) => {
     setStarNumber(rating);
@@ -114,6 +106,10 @@ export default function Reviews({ productId, product }) {
     ]
   );
 
+  useEffect(() => {
+    console.log("listReviews: ", listReviews);
+  }, [listReviews]);
+
   const fetchCommentAndMediaTotalReview = useCallback(async () => {
     try {
       const responseCM = await getCommentAndMediaTotalReview(productId);
@@ -138,49 +134,60 @@ export default function Reviews({ productId, product }) {
 
   return (
     <>
-      <div className="space-y-6 p-4 max-w-4xl mx-auto relative">
-        <h2 className="text-xl md:text-2xl font-bold">ĐÁNH GIÁ SẢN PHẨM</h2>
-        <div className="bg-white rounded-lg p-4 md:p-6 space-y-6">
-          {/* Rating Overview */}
-          <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-center md:items-start">
-            <div className="flex flex-col justify-center items-center">
+      <div className="w-[900px] space-y-4 p-4 relative">
+        <Label className="text-2xl font-bold ml-4">ĐÁNH GIÁ SẢN PHẨM</Label>
+
+        <div className="space-y-8">
+          <div className="flex gap-4 p-8 bg-red-primary bg-opacity-5">
+            <div className="flex flex-col justify-center items-center gap-[8px]">
               <div className="flex space-x-2">
-                <p className="text-4xl md:text-5xl font-bold text-[#ee4d2d]">
-                  {averageRating}
-                </p>
-                <p className="self-end text-sm md:text-xl text-[#ee4d2d]">
+                <Label className="text-4xl font-bold text-[#ee4d2d]">
+                  {averageRating ? averageRating.toFixed(1) : "0.0"}
+                </Label>
+                <Label className="self-end text-lg text-[#ee4d2d]">
                   trên 5
-                </p>
+                </Label>
               </div>
-              <div className="flex gap-0.5 justify-center my-2">
+
+              <div className="flex gap-[2px] justify-center">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
-                    className="w-4 h-4 md:w-5 md:h-5 fill-[#ee4d2d] text-[#ee4d2d]"
+                    className="w-6 h-6 fill-[#ee4d2d] text-[#ee4d2d]"
                   />
                 ))}
               </div>
             </div>
 
-            <div className="flex-1 space-y-4 w-full md:w-auto">
-              {/* Rating Filters */}
-              <div className="flex flex-wrap justify-center md:justify-start gap-2">
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-4">
                 <Button
                   variant="outline"
-                  className="rounded-sm text-xs md:text-sm"
+                  className={`rounded-sm text-sm ${
+                    starNumber === "" &&
+                    commentString === "" &&
+                    mediaString === ""
+                      ? `border-[#ee4d2d] text-[#ee4d2d] hover:text-[#ee4d2d]`
+                      : null
+                  }`}
                   onClick={() => handleRatingFilterClick("")}
                 >
                   Tất Cả
                 </Button>
+
                 {Object.entries(ratingCounts)
                   .reverse()
                   .map(([rating, count]) => {
-                    const mappedRating = ratingMapping[rating] || rating;
+                    const mappedRating = ratingMapping[rating];
                     return (
                       <Button
                         key={rating}
                         variant="outline"
-                        className="rounded-sm text-xs md:text-sm"
+                        className={`rounded-sm text-sm ${
+                          starNumber === mappedRating
+                            ? "border-[#ee4d2d] text-[#ee4d2d] hover:text-[#ee4d2d]"
+                            : null
+                        }`}
                         onClick={() => handleRatingFilterClick(mappedRating)}
                       >
                         {mappedRating} Sao ({count})
@@ -189,18 +196,26 @@ export default function Reviews({ productId, product }) {
                   })}
               </div>
 
-              {/* Comment/Photo Filters */}
-              <div className="flex flex-wrap justify-center md:justify-start gap-2">
+              <div className="flex gap-4">
                 <Button
                   variant="outline"
-                  className="rounded-sm text-xs md:text-sm"
+                  className={`rounded-sm text-sm ${
+                    commentString === "commentString"
+                      ? "border-[#ee4d2d] text-[#ee4d2d] hover:text-[#ee4d2d]"
+                      : null
+                  }`}
                   onClick={() => handleCommentFilterClick("commentString")}
                 >
                   Có Bình Luận ({totalComments})
                 </Button>
+
                 <Button
                   variant="outline"
-                  className="rounded-sm text-xs md:text-sm"
+                  className={`rounded-sm text-sm ${
+                    mediaString === "mediaString"
+                      ? "border-[#ee4d2d] text-[#ee4d2d] hover:text-[#ee4d2d]"
+                      : null
+                  }`}
                   onClick={() => handleMediaFilterClick("mediaString")}
                 >
                   Có Hình Ảnh / Video ({totalWithMedia})
@@ -209,28 +224,29 @@ export default function Reviews({ productId, product }) {
             </div>
           </div>
 
-          {/* Review List */}
           <>
-            {listreviews.map((listreview) => (
-              <div key={listreview.id} className="space-y-6 relative">
-                <div className="border-t pt-6">
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <Avatar className="w-10 h-10 mx-auto md:mx-0">
+            {listReviews.map((listreview) => (
+              <div key={listreview.id} className="space-y-8 relative">
+                <div className="border-t-2 pt-4">
+                  <div className="flex gap-4">
+                    <Avatar className="w-10 h-10">
                       <AvatarImage
                         src={listreview.user.userAvatar || StoreEmpty}
                         alt={listreview.user.userName}
                       />
+
                       <AvatarFallback>
                         {listreview.user.userName[0]}
                       </AvatarFallback>
                     </Avatar>
 
-                    <div className="flex-1 space-y-4">
-                      <div className="text-center md:text-left">
-                        <div className="font-medium">
+                    <div className="flex flex-col space-y-4">
+                      <div className="flex flex-col">
+                        <Label className="text-sm">
                           {listreview.user.userName}
-                        </div>
-                        <div className="flex gap-0.5 justify-center md:justify-start">
+                        </Label>
+
+                        <div className="flex gap-[2px]">
                           {Array.from({ length: listreview.rating }).map(
                             (_, i) => (
                               <Star
@@ -242,83 +258,85 @@ export default function Reviews({ productId, product }) {
                         </div>
                       </div>
 
-                      <div className="text-muted-foreground text-sm text-center md:text-left">
-                        {formatDate(listreview.lastUpdatedAt)} | Phân loại
-                        hàng:Grey,L
+                      <div className="flex">
+                        <Label className="text-muted-foreground text-sm w-[260px]">
+                          {formatDate(listreview.lastUpdatedAt)} | Phân loại
+                          hàng:
+                        </Label>
+
+                        <div className="flex flex-wrap gap-4 w-[640px]">
+                          {listreview.productValues.map(
+                            (productValue, index) => (
+                              <Label
+                                key={index}
+                                className="text-muted-foreground text-xs p-[4px] border"
+                              >
+                                {productValue.values.join(" - ")}
+                              </Label>
+                            )
+                          )}
+                        </div>
                       </div>
 
-                      <div className="text-sm md:text-base">
-                        {listreview.comment}
-                      </div>
+                      <Label className="text-sm">{listreview.comment}</Label>
 
-                      <div className="flex flex-wrap justify-between md:justify-start gap-2 ">
-                        {listreview.images?.map((image, i) => (
-                          <Image
-                            key={i}
-                            src={image.url}
-                            alt={`Review image ${i + 1}`}
-                            width={72}
-                            height={72}
-                            className="rounded-sm object-cover"
-                            unoptimized={true}
-                          />
-                        ))}
-                        {listreview.videoUrl && (
-                          <video
-                            src={listreview.videoUrl}
-                            loop
-                            muted
-                            autoPlay
-                            controls
-                            className="w-1/3"
-                          />
-                        )}
-                      </div>
+                      {(listreview.videoUrl ||
+                        (listreview.images &&
+                          listreview.images.length > 0)) && (
+                        <div className="flex gap-4 h-[100px] w-[100px]">
+                          {listreview.videoUrl && (
+                            <video
+                              src={listreview.videoUrl}
+                              loop
+                              muted
+                              autoPlay
+                              controls
+                            />
+                          )}
+
+                          {listreview.images.map((image, i) => (
+                            <Image
+                              key={i}
+                              src={image.url}
+                              alt={`Review image ${i + 1}`}
+                              width={100}
+                              height={100}
+                              className="rounded-sm object-cover"
+                              unoptimized={true}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-                {/* <div className="absolute right-2 top-0">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleOnClickButtonUpdateReview(listreview)}
-                  >
-                    <EditIcon />
-                  </Button>
-                </div> */}
               </div>
             ))}
+
             {hasMore && (
               <div ref={ref} className="col-span-full flex justify-center p-4">
                 {isLoading && <Loading />}
               </div>
             )}
           </>
-          {listreviews.length === 0 && (
-            <div className="flex flex-col space-y-4 items-center justify-center bg-white-tertiary bg-opacity-15 rounded-xl w-full min-h-[200px]">
+
+          {listReviews.length === 0 && (
+            <div className="flex flex-col space-y-4 items-center justify-center bg-white-primary rounded-xl w-full min-h-[200px]">
               <Image
                 src={ReviewEmpty}
                 alt="Review empty"
-                width={400}
+                width={200}
                 height={200}
-                className="rounded-sm object-cover opacity-20"
+                className="rounded-sm object-cover"
                 unoptimized={true}
               />
-              <p className="text-xl text-gray-tertiary pb-5">
+              <Label className="text-xl text-black-primary text-opacity-50">
                 Chưa có đánh giá phù hợp với bộ lọc
-              </p>
+              </Label>
             </div>
           )}
         </div>
       </div>
-      {isOpenUpdateReviewDialog && (
-        <UpdateReviewDialog
-          onOpen={isOpenUpdateReviewDialog}
-          onClose={() => setIsOpenUpdateReviewDialog(false)}
-          reviewToUpdate={reviewToUpdate}
-          product={product}
-          toast={toast}
-        />
-      )}
     </>
   );
 }

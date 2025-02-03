@@ -42,6 +42,7 @@ export default function OrderUser() {
   const router = useRouter();
   const dispatch = useDispatch();
   const [openDialog, setOpenDialog] = useState(false);
+  const [openReview, setOpenReview] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [actionType, setActionType] = useState("");
@@ -78,6 +79,11 @@ export default function OrderUser() {
     setOrderToCancel(order);
     setSelectedOrder(order);
     setActionType("cancel");
+  };
+
+  const handleClickReview = (order) => {
+    setOpenReview(true);
+    setSelectedOrder(order);
   };
 
   const confirmCancelOrder = async () => {
@@ -446,7 +452,14 @@ export default function OrderUser() {
                             </Button>
                           ) : null}
                           {order.currentStatus === "DELIVERED" ? (
-                            <OrderReviewDialog order={order} toast={toast} />
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                handleClickReview(order);
+                              }}
+                            >
+                              Đánh giá đơn hàng
+                            </Button>
                           ) : null}
                         </div>
                       </div>
@@ -501,10 +514,24 @@ export default function OrderUser() {
         </>
       )}
 
+      {openReview && (
+        <>
+          <div className="fixed inset-0 bg-black-primary bg-opacity-85 z-[150]" />
+          <OrderReviewDialog
+            onOpen={openReview}
+            onClose={() => setOpenReview(false)}
+            order={selectedOrder}
+            toast={toast}
+          />
+        </>
+      )}
+
       {loadPage && (
-        <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] space-y-4 bg-black-secondary">
-          <CircularProgress></CircularProgress>
-          <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
+        <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] space-y-4 bg-black-primary">
+          <CircularProgress />
+          <Label className="text-2xl text-white-primary">
+            Đang tải dữ liệu...
+          </Label>
         </div>
       )}
     </>

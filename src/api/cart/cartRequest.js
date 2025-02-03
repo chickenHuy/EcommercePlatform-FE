@@ -1,4 +1,4 @@
-import { get, put, del } from "@/lib/httpClient";
+import { get, put, del, post } from "@/lib/httpClient";
 
 export const getAllCart = (page, size) => {
   try {
@@ -35,7 +35,7 @@ export const deleteCartItem = (cartItemId) => {
 
 export const getQuantityCartItem = (cartItemId) => {
   try {
-    const response = get(`/api/v1/cartItems/get_quantity?cartItemId=${cartItemId}`);
+    const response = get(`/api/v1/cartItems/get_quantity/${cartItemId}`);
     return response;
   } catch (error) {
     console.error("Error during getQuantityCartItem:", error);
