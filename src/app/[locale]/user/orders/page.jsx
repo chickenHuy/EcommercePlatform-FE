@@ -21,13 +21,19 @@ import { formatCurrency, formatDate } from "@/utils/commonUtils";
 import { OrderReviewDialog } from "@/components/dialogs/dialogReview";
 import { useToast } from "@/hooks/use-toast";
 import { useCallback, useEffect, useState } from "react";
-import { cancelOrderByUser, getAllOrderByUser } from "@/api/user/orderRequest";
+import {
+  cancelOrderByUser,
+  getAllOrderByUser,
+  isAllOrderReviewed,
+  isAnyOrderReviewed,
+} from "@/api/user/orderRequest";
 import { Toaster } from "@/components/ui/toaster";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import DialogUpdateOrCancelOrder from "@/components/dialogs/dialogUpdateOrCancelOrder";
 import { setStore } from "@/store/features/userSearchSlice";
 import { useInView } from "react-intersection-observer";
+import { OrderViewReviewDialog } from "@/components/dialogs/dialogViewReview";
 
 export default function OrderUser() {
   const pageSize = 4;
@@ -43,6 +49,7 @@ export default function OrderUser() {
   const dispatch = useDispatch();
   const [openDialog, setOpenDialog] = useState(false);
   const [openReview, setOpenReview] = useState(false);
+  const [openViewReview, setOpenViewReview] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [actionType, setActionType] = useState("");
@@ -65,7 +72,7 @@ export default function OrderUser() {
     router.push(`orders/detail/${orderId}`);
   };
 
-  const handleClickViewProductDetail = (slug) => {
+  const handleClickViewProduct = (slug) => {
     router.push(`/${slug}`);
   };
 
@@ -83,6 +90,11 @@ export default function OrderUser() {
 
   const handleClickReview = (order) => {
     setOpenReview(true);
+    setSelectedOrder(order);
+  };
+
+  const handleClickViewReview = (order) => {
+    setOpenViewReview(true);
     setSelectedOrder(order);
   };
 
@@ -142,7 +154,7 @@ export default function OrderUser() {
           setHasNext(response.result.hasNext);
         }
       } catch (error) {
-        console.error("Error fetching all order by user:", error);
+        console.error("Error fetching all order by user: ", error);
       } finally {
         setLoadListOrder(false);
       }
@@ -186,6 +198,40 @@ export default function OrderUser() {
       fetchAllOrderByUser();
     }
   }, [inView, hasNext]);
+
+  const [reviewedAllOrder, setReviewedAllOrder] = useState({});
+
+  const checkIfAllOrderReviewed = async (orderId) => {
+    try {
+      const response = await isAllOrderReviewed(orderId);
+      setReviewedAllOrder((prev) => ({ ...prev, [orderId]: response.result }));
+    } catch (error) {
+      console.error(`Error checking if all order reviewed: `, error);
+    }
+  };
+
+  useEffect(() => {
+    listOrder.forEach((order) => {
+      checkIfAllOrderReviewed(order.id);
+    });
+  }, [listOrder]);
+
+  const [reviewedAnyOrder, setReviewedAnyOrder] = useState({});
+
+  const checkIfAnyOrderReviewed = async (orderId) => {
+    try {
+      const response = await isAnyOrderReviewed(orderId);
+      setReviewedAnyOrder((prev) => ({ ...prev, [orderId]: response.result }));
+    } catch (error) {
+      console.error(`Error checking if any order reviewed: `, error);
+    }
+  };
+
+  useEffect(() => {
+    listOrder.forEach((order) => {
+      checkIfAnyOrderReviewed(order.id);
+    });
+  }, [listOrder]);
 
   const listOrderStatus = [
     { label: "Tất cả", filterKey: "" },
@@ -373,7 +419,7 @@ export default function OrderUser() {
                           <div className="flex items-center space-x-2">
                             <Image
                               alt={item.productName}
-                              src={item.productMainImageUrl || ProductNotFound}
+                              src={item.productMainImageUrl}
                               height={100}
                               width={100}
                               unoptimized={true}
@@ -381,7 +427,7 @@ export default function OrderUser() {
                               className="rounded-md transition-transform duration-300 hover:scale-125"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleClickViewProductDetail(item.productSlug);
+                                handleClickViewProduct(item.productSlug);
                               }}
                             />
                             <div className="flex flex-col space-y-2">
@@ -389,9 +435,7 @@ export default function OrderUser() {
                                 className="text-xl font-bold hover:text-2xl hover:cursor-pointer"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleClickViewProductDetail(
-                                    item.productSlug
-                                  );
+                                  handleClickViewProduct(item.productSlug);
                                 }}
                               >
                                 {item.productName}
@@ -441,6 +485,7 @@ export default function OrderUser() {
                               Mua lại
                             </Button>
                           ) : null}
+
                           {order.currentStatus === "ON_HOLD" ? (
                             <Button
                               variant="outline"
@@ -451,14 +496,27 @@ export default function OrderUser() {
                               Hủy đơn hàng
                             </Button>
                           ) : null}
-                          {order.currentStatus === "DELIVERED" ? (
+
+                          {order.currentStatus === "DELIVERED" &&
+                          !reviewedAllOrder[order.id] ? (
                             <Button
                               variant="outline"
                               onClick={() => {
                                 handleClickReview(order);
                               }}
                             >
-                              Đánh giá đơn hàng
+                              Đánh giá
+                            </Button>
+                          ) : null}
+
+                          {reviewedAnyOrder[order.id] ? (
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                handleClickViewReview(order);
+                              }}
+                            >
+                              Xem đánh giá shop
                             </Button>
                           ) : null}
                         </div>
@@ -520,8 +578,20 @@ export default function OrderUser() {
           <OrderReviewDialog
             onOpen={openReview}
             onClose={() => setOpenReview(false)}
-            order={selectedOrder}
+            orderId={selectedOrder.id}
             toast={toast}
+            refreshPage={() => fetchAllOrderByUser(true)}
+          />
+        </>
+      )}
+
+      {openViewReview && (
+        <>
+          <div className="fixed inset-0 bg-black-primary bg-opacity-85 z-[150]" />
+          <OrderViewReviewDialog
+            onOpen={openViewReview}
+            onClose={() => setOpenViewReview(false)}
+            storeId={selectedOrder.storeId}
           />
         </>
       )}

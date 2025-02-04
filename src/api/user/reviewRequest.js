@@ -1,11 +1,11 @@
-import { get, post, put } from "@/lib/httpClient";
+import { get, post } from "@/lib/httpClient";
 
 export const createReview = (reviewRequest) => {
   try {
     const response = post(`/api/v1/reviews`, reviewRequest);
     return response;
   } catch (error) {
-    console.error("Error during createReview:", error);
+    console.error("Error during createReview: ", error);
     throw error;
   }
 };
@@ -54,7 +54,7 @@ export const getReviewOneProduct = (
     );
     return response;
   } catch (error) {
-    console.error("Error during getReviewOneProduct:", error);
+    console.error("Error during getReviewOneProduct: ", error);
     throw error;
   }
 };
@@ -66,7 +66,27 @@ export const getCommentAndMediaTotalReview = (productId) => {
     );
     return response;
   } catch (error) {
-    console.error("Error during getCommentAndMediaTotalReview:", error);
+    console.error("Error during getCommentAndMediaTotalReview: ", error);
+    throw error;
+  }
+};
+
+export const getAllReviewByStoreId = (storeId) => {
+  try {
+    const response = get(`/api/v1/reviews/store/${storeId}`);
+    return response;
+  } catch (error) {
+    console.error("Error during getAllReviewByStoreId: ", error);
+    throw error;
+  }
+};
+
+export const getAllProductReview = (orderId) => {
+  try {
+    const response = get(`/api/v1/reviews/order/${orderId}/product`);
+    return response;
+  } catch (error) {
+    console.error("Error during getAllProductReview: ", error);
     throw error;
   }
 };

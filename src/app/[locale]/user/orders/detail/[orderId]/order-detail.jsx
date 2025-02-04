@@ -1,4 +1,8 @@
-import { cancelOrderByUser } from "@/api/user/orderRequest";
+import {
+  cancelOrderByUser,
+  isAllOrderReviewed,
+  isAnyOrderReviewed,
+} from "@/api/user/orderRequest";
 import { OrderReviewDialog } from "@/components/dialogs/dialogReview";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
@@ -35,7 +39,7 @@ import Image from "next/image";
 import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 import ProductNotFound from "@/assets/images/productPlaceholder.png";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import {
   Tooltip,
@@ -46,6 +50,7 @@ import {
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { setStore } from "@/store/features/userSearchSlice";
 import DialogUpdateOrCancelOrder from "@/components/dialogs/dialogUpdateOrCancelOrder";
+import { OrderViewReviewDialog } from "@/components/dialogs/dialogViewReview";
 
 export default function ViewOrderDetailUser({
   orderDetail,
@@ -54,10 +59,41 @@ export default function ViewOrderDetailUser({
 }) {
   const [openDialog, setOpenDialog] = useState(false);
   const [openReview, setOpenReview] = useState(false);
+  const [openViewReview, setOpenViewReview] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [actionType, setActionType] = useState("");
   const { toast } = useToast();
+
+  const [reviewedAllOrder, setReviewedAllOrder] = useState({});
+
+  const checkIfAllOrderReviewed = async (orderId) => {
+    try {
+      const response = await isAllOrderReviewed(orderId);
+      setReviewedAllOrder((prev) => ({ ...prev, [orderId]: response.result }));
+    } catch (error) {
+      console.error(`Error checking if all order reviewed: `, error);
+    }
+  };
+
+  useEffect(() => {
+    checkIfAllOrderReviewed(orderDetail.id);
+  }, [orderDetail]);
+
+  const [reviewedAnyOrder, setReviewedAnyOrder] = useState({});
+
+  const checkIfAnyOrderReviewed = async (orderId) => {
+    try {
+      const response = await isAnyOrderReviewed(orderId);
+      setReviewedAnyOrder((prev) => ({ ...prev, [orderId]: response.result }));
+    } catch (error) {
+      console.error(`Error checking if any order reviewed: `, error);
+    }
+  };
+
+  useEffect(() => {
+    checkIfAnyOrderReviewed(orderDetail.id);
+  }, [orderDetail]);
 
   const handleCancelButtonClick = (orderDetail) => {
     setOpenDialog(true);
@@ -102,6 +138,11 @@ export default function ViewOrderDetailUser({
 
   const handleClickReview = (order) => {
     setOpenReview(true);
+    setSelectedOrder(order);
+  };
+
+  const handleClickViewReview = (order) => {
+    setOpenViewReview(true);
     setSelectedOrder(order);
   };
 
@@ -333,16 +374,30 @@ export default function ViewOrderDetailUser({
                 Mua lại
               </Button>
             ) : null}
-            {orderDetail?.currentStatus === "DELIVERED" ? (
+
+            {orderDetail?.currentStatus === "DELIVERED" &&
+            !reviewedAllOrder[orderDetail.id] ? (
               <Button
                 variant="outline"
                 onClick={() => {
                   handleClickReview(orderDetail);
                 }}
               >
-                Đánh giá đơn hàng
+                Đánh giá
               </Button>
             ) : null}
+
+            {reviewedAnyOrder[orderDetail.id] ? (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  handleClickViewReview(orderDetail);
+                }}
+              >
+                Xem đánh giá shop
+              </Button>
+            ) : null}
+
             {orderDetail?.currentStatus === "ON_HOLD" ? (
               <Button
                 variant="outline"
@@ -354,19 +409,20 @@ export default function ViewOrderDetailUser({
                 Hủy đơn hàng
               </Button>
             ) : null}
-            {orderDetail?.currentStatus === "DELIVERED" ? (
-              <OrderReviewDialog order={orderDetail} toast={toast} />
-            ) : null}
-            {orderDetail?.currentStatus === "PICKED_UP" ||
-            orderDetail?.currentStatus === "OUT_FOR_DELIVERY" ? (
+
+            {(orderDetail?.currentStatus === "PICKED_UP" ||
+              orderDetail?.currentStatus === "OUT_FOR_DELIVERY") &&
+            !reviewedAnyOrder[orderDetail.id] ? (
               <Label className="text-xl text-center">
                 Đơn hàng sẽ sớm được giao đến bạn
               </Label>
             ) : null}
-            {orderDetail?.currentStatus === "PENDING" ||
-            orderDetail?.currentStatus === "CONFIRMED" ||
-            orderDetail?.currentStatus === "PREPARING" ||
-            orderDetail?.currentStatus === "WAITING_FOR_SHIPPING" ? (
+
+            {(orderDetail?.currentStatus === "PENDING" ||
+              orderDetail?.currentStatus === "CONFIRMED" ||
+              orderDetail?.currentStatus === "PREPARING" ||
+              orderDetail?.currentStatus === "WAITING_FOR_SHIPPING") &&
+            !reviewedAnyOrder[orderDetail.id] ? (
               <Label className="text-xl text-center">
                 Đơn hàng sẽ sớm được người bán giao cho ĐVVC
               </Label>
@@ -614,8 +670,20 @@ export default function ViewOrderDetailUser({
           <OrderReviewDialog
             onOpen={openReview}
             onClose={() => setOpenReview(false)}
-            order={selectedOrder}
+            orderId={selectedOrder.id}
             toast={toast}
+            refreshPage={refreshPage}
+          />
+        </>
+      )}
+
+      {openViewReview && (
+        <>
+          <div className="fixed inset-0 bg-black-primary bg-opacity-85 z-[150]" />
+          <OrderViewReviewDialog
+            onOpen={openViewReview}
+            onClose={() => setOpenViewReview(false)}
+            storeId={selectedOrder.storeId}
           />
         </>
       )}

@@ -106,10 +106,6 @@ export default function Reviews({ productId }) {
     ]
   );
 
-  useEffect(() => {
-    console.log("listReviews: ", listReviews);
-  }, [listReviews]);
-
   const fetchCommentAndMediaTotalReview = useCallback(async () => {
     try {
       const responseCM = await getCommentAndMediaTotalReview(productId);
@@ -264,7 +260,7 @@ export default function Reviews({ productId }) {
                           hàng:
                         </Label>
 
-                        <div className="flex flex-wrap gap-4 w-[640px]">
+                        <div className="flex flex-wrap gap-4 w-[640px] max-h-[72px] overflow-hidden">
                           {listreview.productValues.map(
                             (productValue, index) => (
                               <Label
