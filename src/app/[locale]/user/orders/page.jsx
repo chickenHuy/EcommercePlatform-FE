@@ -29,11 +29,13 @@ import {
 } from "@/api/user/orderRequest";
 import { Toaster } from "@/components/ui/toaster";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import DialogUpdateOrCancelOrder from "@/components/dialogs/dialogUpdateOrCancelOrder";
 import { setStore } from "@/store/features/userSearchSlice";
 import { useInView } from "react-intersection-observer";
 import { OrderViewReviewDialog } from "@/components/dialogs/dialogViewReview";
+import { addToCart } from "@/api/cart/addToCart";
+import { changeQuantity } from "@/store/features/cartSlice";
 
 export default function OrderUser() {
   const pageSize = 4;
@@ -79,6 +81,38 @@ export default function OrderUser() {
   const handleClickViewShop = (storeId) => {
     router.push("/search");
     dispatch(setStore(storeId));
+  };
+
+  const oldQuantity = useSelector((state) => state.cartReducer.count);
+  const handleClickRePurchase = async (listOrderItem) => {
+    try {
+      const listCartItemFromOrder = [];
+      for (const orderItem of listOrderItem) {
+        const request = {
+          productId: orderItem.productId,
+          variantId: orderItem.variantId,
+          quantity: 1,
+        };
+
+        const response = await addToCart(request);
+        listCartItemFromOrder.push(response.result);
+
+        const newQuantity = oldQuantity + 1;
+        dispatch(changeQuantity(newQuantity));
+      }
+
+      localStorage.setItem(
+        "listCartItemFromOrder",
+        JSON.stringify(listCartItemFromOrder)
+      );
+      router.push("/cart");
+    } catch (error) {
+      toast({
+        title: "Mua lại thất bại",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleClickCancel = (order) => {
@@ -480,7 +514,9 @@ export default function OrderUser() {
                           order.currentStatus === "CANCELLED" ? (
                             <Button
                               variant="outline"
-                              onClick={() => handleClickViewShop(order.storeId)}
+                              onClick={() =>
+                                handleClickRePurchase(order.orderItems)
+                              }
                             >
                               Mua lại
                             </Button>

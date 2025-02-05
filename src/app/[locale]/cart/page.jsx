@@ -95,6 +95,35 @@ export default function CartUser() {
     }
   }, [inView, hasNext]);
 
+  useEffect(() => {
+    const listCartItemFromOrder = JSON.parse(
+      localStorage.getItem("listCartItemFromOrder") || "[]"
+    );
+
+    console.log("listCartItemFromOrder: ", listCartItemFromOrder);
+
+    if (listCartItemFromOrder.length > 0 && listCart.length > 0) {
+      const updatedSelectedListCartItem = listCartItemFromOrder
+        .map((newItem) => {
+          const allItems = listCart.flatMap((cart) => cart.items);
+
+          const foundItem = allItems.find(
+            (item) => String(item.id) === String(newItem.id)
+          );
+
+          return foundItem || null;
+        })
+        .filter(Boolean);
+
+      setSelectedListCartItem((prevSelectedItems) => [
+        ...prevSelectedItems,
+        ...updatedSelectedListCartItem,
+      ]);
+
+      localStorage.removeItem("listCartItemFromOrder");
+    }
+  }, [listCart]);
+
   const hasCheckboxCartItem = (cartItem) => {
     return cartItem.available === true;
   };
@@ -520,6 +549,8 @@ export default function CartUser() {
     return value < 0 ? `- ${formatted}` : formatted;
   };
 
+  const listCartMapped = listCart.filter((cart) => cart.items.length > 0);
+
   return (
     <>
       <Toaster />
@@ -567,8 +598,8 @@ export default function CartUser() {
           </div>
 
           <div className="flex flex-col mx-20 my-8 gap-8 min-h-screen relative">
-            {listCart.length > 0 &&
-              listCart.map((cart, index) => (
+            {listCartMapped.length > 0 &&
+              listCartMapped.map((cart, index) => (
                 <Card key={index} className="rounded-none">
                   <CardTitle className="min-h-16 flex items-center border-b bg-gradient-to-r from-white-primary to-white-secondary">
                     <div className="w-1/12 flex justify-center">
@@ -757,7 +788,7 @@ export default function CartUser() {
                 </Card>
               ))}
 
-            {listCart.length === 0 && (
+            {listCartMapped.length === 0 && (
               <div className="min-h-screen flex flex-col items-center justify-center">
                 <Image
                   alt="ảnh trống"
