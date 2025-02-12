@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
-import AuthPage from "@/views/authPage";
+import AuthPage from "@/views/auth";
 
 export default function Auth() {
 
