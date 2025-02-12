@@ -2,21 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
-*{
+* {
   font-weight: 500;
 }
 
@@ -104,5 +90,34 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+.global_loading_icon {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  animation: loading_rotate 1s infinite linear;
+  top: calc(50% - 10px);
+  left: calc(50% - 10px);
+}
+
+.global_loading_icon.white {
+  border-bottom: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+}
+
+.global_loading_icon.black {
+  border-bottom: 2px solid #000000;
+  border-left: 2px solid #000000;
+}
+
+@keyframes loading_rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
