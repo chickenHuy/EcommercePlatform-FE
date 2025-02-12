@@ -19,7 +19,7 @@ export const refreshToken = async () => {
           errorMessage = errorData.message;
         }
       } catch (jsonError) {
-        console.error("Error parsing JSON from response", jsonError);
+        throw jsonError;
       }
 
       throw new Error(errorMessage);
@@ -30,7 +30,6 @@ export const refreshToken = async () => {
     Cookies.set(process.env.NEXT_PUBLIC_JWT_NAME, data.result.token);
     return data.result.token;
   } catch (error) {
-    console.error('Error refreshing token:', error);
     throw error;
   }
 };
@@ -41,7 +40,6 @@ const request = async (
 ) => {
   try {
     const token = Cookies.get(process.env.NEXT_PUBLIC_JWT_NAME);
-
     const isFormData = body instanceof FormData;
 
     const response = await fetch(
@@ -71,7 +69,7 @@ const request = async (
             errorMessage = errorData.message;
           }
         } catch (jsonError) {
-          console.error("Error parsing JSON from response", jsonError);
+          throw jsonError;
         }
 
         throw new Error(errorMessage);
@@ -80,7 +78,6 @@ const request = async (
 
     return await response.json();
   } catch (error) {
-    console.error("HTTP Client Error:", error);
     throw error;
   }
 };
