@@ -6,6 +6,7 @@ import shopNow from "@/assets/images/shopNow.png";
 import { Button } from "@/components/ui/button";
 import ProductGrid from "./search/productGrid";
 import ProductBestSelling from "@/components/user/home/product-best-selling";
+import ProductSuggestions from "@/components/user/home/product-suggestions";
 
 export default function HomePage() {
   return (
@@ -30,6 +31,7 @@ export default function HomePage() {
         <ProductGrid />
       </div>
       <ProductBestSelling />
+      <ProductSuggestions />
     </main>
   );
 }

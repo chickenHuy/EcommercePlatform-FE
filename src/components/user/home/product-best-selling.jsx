@@ -122,14 +122,11 @@ export default function ProductBestSelling() {
   }, []);
 
   const formatPrice = (price) => {
-    if (price < 1000000) {
+    if (price < 1000000000) {
       return new Intl.NumberFormat("vi-VN", {
         style: "currency",
         currency: "VND",
       }).format(price);
-    } else if (price >= 1000000 && price < 1000000000) {
-      const priceInMillions = (price / 1000000).toFixed(1);
-      return `${priceInMillions.replace(".0", "")} triệu`;
     } else if (price > 1000000000) {
       const priceInMillions = (price / 1000000000).toFixed(1);
       return `${priceInMillions.replace(".0", "")} tỷ`;
@@ -241,14 +238,14 @@ export default function ProductBestSelling() {
                     </AspectRatio>
                   </CardContent>
                   <CardFooter className="flex flex-col items-start p-2 space-y-0 bg-white-primary overflow-hidden">
-                    <Label className="text-xs font-bold line-clamp-2 w-full min-h-[2.5rem] leading-[1.25rem]">
+                    <Label className="text-sm font-bold line-clamp-2 w-full min-h-[2.5rem] leading-[1.25rem] hover:cursor-pointer">
                       {product.name}
                     </Label>
-                    <div className="flex justify-between items-center w-full gap-[4px] mt-2 h-6">
-                      <Label className="text-red-primary font-bold text-sm flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
+                    <div className="flex justify-between items-center w-full gap-[4px] mt-2 h-6 hover:cursor-pointer">
+                      <Label className="text-red-primary font-bold text-sm hover:cursor-pointer flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
                         {formatPrice(product.salePrice)}
                       </Label>
-                      <Label className="text-black-primary text-xs flex-shrink-0 transition-opacity duration-300 group-hover:opacity-75">
+                      <Label className="text-black-primary text-xs hover:cursor-pointer flex-shrink-0 transition-opacity duration-300 group-hover:opacity-75">
                         Đã bán {formatSold(product.sold)}
                       </Label>
                     </div>
@@ -280,8 +277,6 @@ export default function ProductBestSelling() {
             </Button>
           )}
         </div>
-
-        <div className="w-full h-[2px] bg-red-primary bg-opacity-75 mt-4"></div>
       </div>
     );
   }

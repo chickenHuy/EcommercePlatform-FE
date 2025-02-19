@@ -18,6 +18,7 @@ import { get, post } from "@/lib/httpClient";
 import { setWishList } from "@/store/features/wishListSlice";
 import Loading from "@/components/loading";
 import { useToast } from "@/hooks/use-toast";
+import ProductDetailSuggestions from "./product-detail-suggestions";
 
 const ReviewLazy = lazy(() => import("./reviewPage"));
 
@@ -368,6 +369,8 @@ export default function ProductDetail({ product }) {
         </div>
 
         <Separator className="my-8" />
+
+        <ProductDetailSuggestions productId={product.id} />
 
         <div className="mx-auto px-4 bg-white-primary">
           <Suspense fallback={<Loading></Loading>}>

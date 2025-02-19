@@ -1,4 +1,4 @@
-import { get, post, put, del } from "@/lib/httpClient";
+import { get, post, put } from "@/lib/httpClient";
 
 export const getAccount = async () => {
   try {
