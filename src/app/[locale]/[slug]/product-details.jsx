@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { changeQuantity } from "@/store/features/cartSlice";
 import { useRouter } from "next/navigation";
 import { setStore } from "@/store/features/userSearchSlice";
-import { get, post } from "@/lib/httpClient";
+import { get, post, put } from "@/lib/httpClient";
 import { setWishList } from "@/store/features/wishListSlice";
 import Loading from "@/components/loading";
 import { useToast } from "@/hooks/use-toast";
@@ -170,6 +170,18 @@ export default function ProductDetail({ product }) {
     dispatch(setStore(storeId));
     router.push("/search");
   };
+
+  useEffect(() => {
+    const productId = product.id;
+    const changeCount = async (productId) => {
+      try {
+        await put(`/api/v1/view_product/change_count/${productId}`);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    changeCount(productId);
+  }, [product.id]);
 
   return (
     <div className="flex-col bg-opacity-60 bg-blue-primary">
