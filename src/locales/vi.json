@@ -4,9 +4,10 @@
   },
   "VendorHeader": {
     "vendorTitle": "Kênh người bán",
+    "notify": "Thông báo",
     "userOptionsMenu": {
       "shop-information": "Hồ Sơ Shop",
-      "shop-setting": "Thiết Lập Shop",
+      "account-information": "Thông Tin Tài Khoản",
       "language": "Ngôn Ngữ",
       "logout": "Đăng Xuất"
     }
@@ -67,7 +68,7 @@
     "alreadyHaveAccount": "Đã có tài khoản?",
     "signInHere": "Đăng nhập ở đây."
   },
-    "AdminHeader": {
+  "AdminHeader": {
     "vendorTitle": "Trung Tâm Quản Trị",
     "userOptionsMenu": {
       "shop-information": "Shop Information",
@@ -75,5 +76,65 @@
       "language": "Language",
       "logout": "Logout"
     }
+  },
+  "VendorRegister": {
+    "register_store": "Đăng ký trở thành người bán",
+    "username": "Tên đăng nhập",
+    "store_name": "Tên cửa hàng",
+    "bio": "Bio",
+    "cancel": "Hủy bỏ",
+    "register": "Đăng ký",
+    "success_title": "Thành công",
+    "success_message": "Bạn đã đăng ký cửa hàng thành công",
+    "error_title": "Thất bại",
+    "unauthenticated_error": "Phiên làm việc hết hạn. Vui lòng đăng nhập lại!!!",
+    "store_name_validation": "Tên cửa hàng phải từ 3 đến 30 ký tự",
+    "bio_validation": "Bio không được vượt quá 255 ký tự"
+  },
+  "VendorStoreInfo": {
+    "store_profile": "Hồ sơ cửa hàng",
+    "store_name": "Tên cửa hàng",
+    "store_name_placeholder": "Nhập tên cửa hàng",
+    "store_name_required": "Tên cửa hàng không được để trống",
+    "bio": "Bio",
+    "bio_placeholder": "Nhập bio của cửa hàng",
+    "store_rating": "Đánh giá của Shop",
+    "store_rating_value": "({rating})",
+    "total_products": "Tổng số sản phẩm của Shop",
+    "total_products_value": "sản phẩm",
+    "pickup_address_list": "Danh sách địa chỉ lấy hàng của shop",
+    "select_pickup_address": "Chọn địa chỉ lấy hàng",
+    "add_new_address": "Thêm địa chỉ mới",
+    "select_address_error": "Vui lòng chọn địa chỉ lấy hàng",
+    "update_button": "Cập nhật",
+    "update_success": "Thông tin cửa hàng đã được cập nhật thành công",
+    "update_failure": "Cập nhật thất bại: {error}",
+    "notify": "Thông báo"
+  },
+  "AddressForm": {
+    "addressForm_title_update": "Cập nhật địa chỉ",
+    "addressForm_title_create": "Thêm địa chỉ mới",
+    "addressForm_recipientName": "Họ và tên",
+    "addressForm_phone": "Số điện thoại",
+    "addressForm_province": "Tỉnh/Thành phố",
+    "addressForm_district": "Quận/Huyện",
+    "addressForm_subDistrict": "Phường/Xã",
+    "addressForm_detailAddress": "Địa chỉ cụ thể",
+    "addressForm_isDefault": "Đặt làm địa chỉ mặc định",
+    "addressForm_buttons_cancel": "Hủy",
+    "addressForm_buttons_save": "Lưu",
+    "addressForm_errors_recipientName": "Họ và tên là bắt buộc",
+    "addressForm_errors_phoneRequired": "Số điện thoại là bắt buộc",
+    "addressForm_errors_phoneInvalid": "Số điện thoại không hợp lệ",
+    "addressForm_errors_province": "Vui lòng chọn Tỉnh/Thành phố",
+    "addressForm_errors_district": "Vui lòng chọn Quận/Huyện",
+    "addressForm_errors_subDistrict": "Vui lòng chọn Phường/Xã",
+    "addressForm_errors_detailAddress": "Địa chỉ cụ thể là bắt buộc",
+    "addressForm_toast_success_update": "Cập nhật địa chỉ thành công",
+    "addressForm_toast_success_create": "Thêm địa chỉ mới thành công",
+    "addressForm_toast_notify": "Thông báo",
+    "addressForm_toast_error_description": "Lỗi: {message}",
+    "addressForm_command_placeholder": "Tìm kiếm...",
+    "addressForm_command_empty": "Không có kết quả"
   }
 }

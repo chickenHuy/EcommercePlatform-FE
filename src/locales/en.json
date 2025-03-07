@@ -4,9 +4,10 @@
   },
   "VendorHeader": {
     "vendorTitle": "Seller Center",
+    "notify": "Notify",
     "userOptionsMenu": {
       "shop-information": "Shop Information",
-      "shop-setting": "Shop Setting",
+      "account-information": "Account Information",
       "language": "Language",
       "logout": "Logout"
     }
@@ -75,5 +76,64 @@
       "language": "Language",
       "logout": "Logout"
     }
+  },
+  "VendorRegister": {
+    "register_store": "Register as a vendor",
+    "username": "Username",
+    "store_name": "Store name",
+    "bio": "Bio",
+    "cancel": "Cancel",
+    "register": "Register",
+    "success_title": "Success",
+    "success_message": "You have successfully registered your store",
+    "error_title": "Failed",
+    "unauthenticated_error": "Session expired. Please log in again!!!",
+    "store_name_validation": "Store name must be between 3 and 30 characters",
+    "bio_validation": "Bio must not exceed 255 characters"
+  },
+  "VendorStoreInfo": {
+    "store_profile": "Store Profile",
+    "store_name": "Store Name",
+    "store_name_placeholder": "Enter store name",
+    "store_name_required": "Store name cannot be empty",
+    "bio": "Bio",
+    "bio_placeholder": "Enter store bio",
+    "store_rating": "Store Rating",
+    "total_products": "Total Products",
+    "total_products_value": "products",
+    "pickup_address_list": "Store Pickup Address List",
+    "select_pickup_address": "Select pickup address",
+    "add_new_address": "Add New Address",
+    "select_address_error": "Please select a pickup address",
+    "notify": "Notify",
+    "update_button": "Update",
+    "update_success": "Store information has been updated successfully",
+    "update_failure": "Update failed:"
+  },
+  "AddressForm": {
+    "addressForm_title_update": "Update Address",
+    "addressForm_title_create": "Add New Address",
+    "addressForm_recipientName": "Recipient Name",
+    "addressForm_phone": "Phone Number",
+    "addressForm_province": "Province/City",
+    "addressForm_district": "District",
+    "addressForm_subDistrict": "Ward/Commune",
+    "addressForm_detailAddress": "Specific Address",
+    "addressForm_isDefault": "Set as Default Address",
+    "addressForm_buttons_cancel": "Cancel",
+    "addressForm_buttons_save": "Save",
+    "addressForm_errors_recipientName": "Recipient Name is required",
+    "addressForm_errors_phoneRequired": "Phone Number is required",
+    "addressForm_errors_phoneInvalid": "Invalid Phone Number",
+    "addressForm_errors_province": "Please select a Province/City",
+    "addressForm_errors_district": "Please select a District",
+    "addressForm_errors_subDistrict": "Please select a Ward/Commune",
+    "addressForm_errors_detailAddress": "Specific Address is required",
+    "addressForm_toast_success_update": "Address updated successfully",
+    "addressForm_toast_success_create": "New address added successfully",
+    "addressForm_toast_notify": "Notify",
+    "addressForm_toast_error_description": "Error: {message}",
+    "addressForm_command_placeholder": "Search...",
+    "addressForm_command_empty": "No items found"
   }
 }
