@@ -39,7 +39,7 @@ export default async function RootLayout({ children, params }) {
     <html lang={locale}>
       <StoreProvider>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <body>
+          <body className={helveticalNeue.className}>
             <UserHeader />
             {children}
           </body>

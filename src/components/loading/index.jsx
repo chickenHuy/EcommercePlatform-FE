@@ -10,9 +10,6 @@ const Loading = () => {
         <div class="boxes box2"></div>
         <div class="boxes box3"></div>
       </div>
-      <div class="text">
-        <b>Loading...</b>
-      </div>
     </div>
   );
 };
