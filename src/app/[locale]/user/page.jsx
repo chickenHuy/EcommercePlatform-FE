@@ -18,7 +18,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import BrandEmpty from "@/assets/images/brandEmpty.jpg";
-import { CircularProgress } from "@mui/material";
 import Image from "next/image";
 
 const validImageTypes = ["image/jpg", "image/jpeg", "image/png"];
@@ -147,7 +146,6 @@ export default function ManageProfile() {
     <>
       {loadPage && (
         <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] space-y-4 bg-black-primary">
-          <CircularProgress />
           <Label className="text-2xl text-white-primary">
             Đang tải dữ liệu...
           </Label>

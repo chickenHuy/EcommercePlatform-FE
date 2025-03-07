@@ -1,10 +1,9 @@
 "use client";
 
 import { CaretSortIcon } from "@radix-ui/react-icons";
-
-import { Button } from "@/components/ui/button";
 import {
   Command,
+  CommandEmpty,
   CommandInput,
   CommandItem,
   CommandList,
@@ -16,32 +15,40 @@ import {
 } from "@/components/ui/popover";
 import { useState, useEffect } from "react";
 import { getAddressOfStore } from "@/api/vendor/storeRequest";
-import { toast } from "@/hooks/use-toast";
-import { Label } from "@/components/ui/label";
+import { useTranslations } from "next-intl";
 
 export default function CbbAddresses({
+  isAddNewAddress,
+  setIsAddNewAddress,
   onAddressSelect,
   defaultAddressToUpdate,
 }) {
   const [open, setOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
+  const t = useTranslations("AddressForm");
 
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
         const response = await getAddressOfStore();
-        console.log("fetchAddresses: ", response.result);
         setAddresses(response.result);
       } catch (error) {
-        console.error("Failed to fetch addresses:", error);
-        toast({
-          title: "Nhắc nhở",
-          description: error.message,
-        });
+        setAddresses([]);
       }
     };
+
+    if (isAddNewAddress === null) {
+      return;
+    }
+    else {
+      if (isAddNewAddress) {
+        fetchAddresses();
+        setIsAddNewAddress(false);
+        return;
+      }
+    }
     fetchAddresses();
-  }, [onAddressSelect, defaultAddressToUpdate]);
+  }, [onAddressSelect, defaultAddressToUpdate, isAddNewAddress]);
 
   const handleSelect = (address) => {
     onAddressSelect(address);
@@ -50,36 +57,31 @@ export default function CbbAddresses({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-1/2 flex items-center justify-between"
-        >
-          <Label className="text-black-primary hover:cursor-pointer">
+      <PopoverTrigger className="w-full">
+        <div className="flex items-center justify-between w-full h-10 flex-row border-[1px] shadow-sm px-2 py-1 rounded-md">
+          <span className="text-left">
             {defaultAddressToUpdate?.defaultAddressStr}
-          </Label>
+          </span>
           <CaretSortIcon />
-        </Button>
+        </div>
       </PopoverTrigger>
-      <div className="bg-yellow-primary">
-        <PopoverContent className="p-0">
-          <Command>
-            <CommandInput placeholder="Tìm địa chỉ..." />
-            <CommandList>
-              {addresses.map((address) => (
-                <CommandItem
-                  key={address.defaultAddressId}
-                  onSelect={() => handleSelect(address)}
-                >
-                  {address.defaultAddressStr}
-                </CommandItem>
-              ))}
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </div>
+      <PopoverContent className="z-50 w-full">
+        <Command>
+          <CommandInput placeholder={t('addressForm_command_placeholder')} />
+          <CommandList>
+            <CommandEmpty>{t('addressForm_command_empty')}</CommandEmpty>
+            {addresses.map((address, index) => (
+              <CommandItem
+                key={address.defaultAddressId}
+                onSelect={() => handleSelect(address)}
+                className='cursor-pointer'
+              >
+                {index + 1 + ': ' + address.defaultAddressStr}
+              </CommandItem>
+            ))}
+          </CommandList>
+        </Command>
+      </PopoverContent>
     </Popover>
   );
 }
