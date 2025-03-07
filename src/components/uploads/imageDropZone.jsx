@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+// import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { Separator } from "@/components/ui/separator";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -166,7 +166,7 @@ const ImageDropzone = ({
             <p className="text-blue-600">Thả hình ảnh vào đây...</p>
           ) : (
             <p className="text-gray-600">
-              <CloudUploadIcon className="w-28 h-28 animate-bounce" />
+              {/* <CloudUploadIcon className="w-28 h-28 animate-bounce" /> */}
             </p>
           )}
         </div>
@@ -234,7 +234,7 @@ const ImageDropzone = ({
           <Dialog.Trigger asChild>
             <Button className="font-semibold text-sm flex flex-row justify-center items-end gap-3">
               Tải ảnh lên
-              <CloudUploadIcon className="scale-90" />
+              {/* <CloudUploadIcon className="scale-90" /> */}
             </Button>
           </Dialog.Trigger>
 
