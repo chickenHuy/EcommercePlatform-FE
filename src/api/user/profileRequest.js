@@ -1,11 +1,10 @@
-import { get, post, put, del } from "@/lib/httpClient";
+import { get, post, put } from "@/lib/httpClient";
 
 export const getProfile = async () => {
   try {
     const response = await get(`/api/v1/users/me`);
     return response;
   } catch (error) {
-    console.error("Error during getProfile:", error);
     throw error;
   }
 };

@@ -11,8 +11,6 @@ export const createAddress = async (addressData) => {
 
 export const updateAddress = async (addressData, id) => {
   try {
-    console.log("addressData", addressData);
-    console.log("id", id);
     const response = await put(`/api/v1/addresses/${id}`, addressData);
     return response;
   } catch (error) {
