@@ -203,11 +203,10 @@ export default function VendorNavigate({ vendorContent }) {
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton asChild>
                               <button
-                                className={`w-full hover:cursor-pointer ${
-                                  activeItem === subItem.activeKey
+                                className={`w-full hover:cursor-pointer ${activeItem === subItem.activeKey
                                     ? "font-bold"
                                     : null
-                                }`}
+                                  }`}
                                 onClick={() =>
                                   handleSetFilter(
                                     subItem.filterKey,
