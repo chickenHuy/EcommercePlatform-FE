@@ -7,22 +7,18 @@ import BackgroundAuthPage from "@/assets/images/background_auth_page.png";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useSelector } from "react-redux";
 import { OAuthConfig, FacebookOAuthConfig } from "@/configs/oauthConfig";
 import { post } from "@/lib/httpClient";
 import { handleLoginNavigation } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import SignInComponent from "@/components/auth/sign_in";
 import SignUpComponent from "@/components/auth/sign_up";
 
 const AuthPage = () => {
   const t = useTranslations("AuthPage");
-  const { toast } = useToast();
   const [isSignIn, setIsSignIn] = useState(true);
-  const loginData = useSelector((state) => state.loginReducer);
   const router = useRouter();
 
   function login(data) {
@@ -65,9 +61,9 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="w-full h-full min-h-screen flex justify-center items-center">
+    <div className="w-full h-full min-h-screen flex justify-center items-center py-20 px-5">
       <div className="w-fit h-fit flex flex-col justify-center items-center lg:flex-row rounded-md shadow-sm shadow-white-tertiary">
-        <div className="w-full max-w-[570px] h-full p-10">
+        <div className="w-full max-w-[570px] h-full md:p-10 py-10 px-2">
           <div>
             <div className="flex flex-row justify-center items-center mb-2">
               <Logo width={"70"} />
