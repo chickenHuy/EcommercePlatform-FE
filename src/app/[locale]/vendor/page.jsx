@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { formatCurrency } from "@/utils/commonUtils";
+import { formatCurrency } from "@/utils";
 import { getStoreStatistic } from "@/api/vendor/storeStatisticRequest";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState, useCallback } from "react";

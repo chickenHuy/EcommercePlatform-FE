@@ -22,7 +22,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { formatCurrency } from "@/utils/commonUtils";
+import { formatCurrency } from "@/utils";
 
 const chartConfig = {
   revenue: {

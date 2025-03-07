@@ -9,7 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { formatCurrency, formatDate } from "@/utils/commonUtils";
+import { formatCurrency, formatDate } from "@/utils";
 import { Rating } from "@mui/material";
 import {
   ChevronLeft,

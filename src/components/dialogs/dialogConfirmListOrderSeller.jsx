@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { formatCurrency, formatDate } from "@/utils/commonUtils";
+import { formatCurrency, formatDate } from "@/utils";
 import { ScrollArea } from "../ui/scroll-area";
 
 export default function DialogConfirmListOrderSeller(props) {

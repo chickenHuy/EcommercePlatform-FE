@@ -36,7 +36,7 @@ import { deleteCategory, getAllCategory } from "@/api/admin/categoryRequest";
 import EditCategory from "./editCategories";
 import DialogConfirm from "@/components/dialogs/dialogConfirm";
 import { useSelector } from "react-redux";
-import { formatDate } from "@/utils/commonUtils";
+import { formatDate } from "@/utils";
 import { CircularProgress } from "@mui/material";
 import Image from "next/image";
 import { Label } from "@/components/ui/label";

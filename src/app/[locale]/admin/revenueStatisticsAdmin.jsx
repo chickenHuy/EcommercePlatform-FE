@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ChartAdmin } from "./chartAdmin";
-import { formatCurrency } from "@/utils/commonUtils";
+import { formatCurrency } from "@/utils";
 import storeEmpty from "@/assets/images/storeEmpty.jpg";
 import Image from "next/image";
 import { Label } from "@/components/ui/label";

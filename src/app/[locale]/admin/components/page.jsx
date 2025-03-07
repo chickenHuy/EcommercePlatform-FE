@@ -42,7 +42,7 @@ import {
   removeComponent,
   updateComponent,
 } from "@/api/admin/componentRequest";
-import { formatDate } from "@/utils/commonUtils";
+import { formatDate } from "@/utils";
 import { useToast } from "@/hooks/use-toast";
 import DialogConfirm from "@/components/dialogs/dialogConfirm";
 import { useSelector } from "react-redux";

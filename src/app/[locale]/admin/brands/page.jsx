@@ -40,7 +40,7 @@ import DialogAddEditBrand from "@/components/dialogs/dialogAddEditBrand";
 import DialogConfirm from "@/components/dialogs/dialogConfirm";
 import { useSelector } from "react-redux";
 import BrandEmpty from "@/assets/images/brandEmpty.jpg";
-import { formatDate } from "@/utils/commonUtils";
+import { formatDate } from "@/utils";
 import { CircularProgress } from "@mui/material";
 import { Label } from "@/components/ui/label";
 import ReviewEmpty from "@/assets/images/ReviewEmpty.png";

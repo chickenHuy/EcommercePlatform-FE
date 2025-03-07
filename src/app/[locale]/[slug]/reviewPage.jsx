@@ -14,7 +14,7 @@ import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 import ReviewEmpty from "@/assets/images/reviewEmpty.png";
 import Loading from "@/components/loading";
 import { useInView } from "react-intersection-observer";
-import { formatDate } from "@/utils/commonUtils";
+import { formatDate } from "@/utils";
 import { Label } from "@/components/ui/label";
 
 export default function Reviews({ productId }) {

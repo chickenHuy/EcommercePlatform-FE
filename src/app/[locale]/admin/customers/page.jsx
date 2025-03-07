@@ -50,7 +50,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useSelector } from "react-redux";
 import DrawerCustomerDetail from "./drawerUserDetail";
-import { formatDate } from "@/utils/commonUtils";
+import { formatDate } from "@/utils";
 import Image from "next/image";
 import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
 import { CircularProgress } from "@mui/material";

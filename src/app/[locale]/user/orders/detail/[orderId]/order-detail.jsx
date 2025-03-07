@@ -9,7 +9,7 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { formatCurrency, formatDate } from "@/utils/commonUtils";
+import { formatCurrency, formatDate } from "@/utils";
 import {
   Timeline,
   TimelineConnector,

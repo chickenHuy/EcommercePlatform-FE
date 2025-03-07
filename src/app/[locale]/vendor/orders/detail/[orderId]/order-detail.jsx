@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/toaster";
-import { formatCurrency, formatDate } from "@/utils/commonUtils";
+import { formatCurrency, formatDate } from "@/utils";
 import { ChevronLeft, Mail, Phone, UserRoundCog } from "lucide-react";
 import Image from "next/image";
 import StoreEmpty from "@/assets/images/storeEmpty.jpg";

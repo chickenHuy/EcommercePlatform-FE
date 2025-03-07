@@ -48,7 +48,7 @@ import { Search, UpdateSharp } from "@mui/icons-material";
 import { toast } from "@/hooks/use-toast";
 import Loading from "@/components/loading";
 import { ProductUpdateDialog } from "@/app/[locale]/vendor/products/_update/productUpdateDialog";
-import { formatDate } from "@/utils/commonUtils";
+import { formatDate } from "@/utils";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import ProductPlaceholder from "@/assets/images/productPlaceholder.png";

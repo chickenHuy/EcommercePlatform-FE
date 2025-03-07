@@ -8,7 +8,7 @@ import {
 import Image from "next/image";
 import { Label } from "@/components/ui/label";
 import { Rating } from "@mui/material";
-import { formatDate } from "@/utils/commonUtils";
+import { formatDate } from "@/utils";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCallback, useEffect, useState } from "react";

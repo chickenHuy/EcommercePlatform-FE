@@ -51,7 +51,7 @@ import { useSelector } from "react-redux";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
-import { formatCurrency, formatDate } from "@/utils/commonUtils";
+import { formatCurrency, formatDate } from "@/utils";
 import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
 import DialogUpdateOrCancelOrder from "@/components/dialogs/dialogUpdateOrCancelOrder";
