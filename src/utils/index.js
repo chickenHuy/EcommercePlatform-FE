@@ -1,9 +1,12 @@
 import { usePathname } from "next/navigation";
+import OpenCageGeocoder from 'opencage-api-client';
 
+// Detect the current locale of the website
 export const localeDetector = () => {
   return usePathname().includes("/en");
 };
 
+// Format the date string to a readable format
 export const formatDate = (dateString) => {
   const date = new Date(dateString);
 
@@ -26,6 +29,7 @@ export const roundToNearest = (num, decimalPlaces) => {
   return Math.round(num * factor) / factor;
 };
 
+// Format the currency string to a readable format
 export const formatCurrency = (value) => {
   const absoluteValue = Math.abs(Number(value));
   const formatted = absoluteValue.toLocaleString("vi-VN", {
@@ -36,18 +40,3 @@ export const formatCurrency = (value) => {
   });
   return value < 0 ? `- ${formatted}` : formatted;
 };
-
-// export const formatDate = (isoString) => {
-//   const date = new Date(isoString);
-
-//   const options = {
-//     year: "numeric",
-//     month: "long",
-//     day: "numeric",
-//     hour: "2-digit",
-//     minute: "2-digit",
-//     second: "2-digit",
-//   };
-
-//   return date.toLocaleString(options);
-// };
