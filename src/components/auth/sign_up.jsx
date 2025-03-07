@@ -5,6 +5,9 @@ import { z } from "zod";
 import { post } from "@/lib/httpClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "../ui/button";
+import { useState } from "react";
+import { EyeOff } from 'lucide-react';
+import { Eye } from 'lucide-react';
 
 const signUpSchema = z
   .object({
@@ -38,10 +41,11 @@ const signUpSchema = z
   });
 
 export default function SignUpComponent(props) {
-  const { setIsLogin } = props;
+  const { setIsSignIn } = props;
   const { toast } = useToast();
   const t = useTranslations("AuthPage");
   const [isLoading, setIsLoading] = useState(false);
+  const [isShowPassword, setIsShowPassword] = useState(false);
 
   const {
     register,
@@ -60,11 +64,9 @@ export default function SignUpComponent(props) {
       if (response.code === 1000) {
         toast({
           title: "Thông báo",
-          description: response.message,
+          description: "Đăng ký thành công",
         })
-        if (setIsLogin) {
-          setIsLogin(true);
-        }
+        setIsSignIn(true);
       }
     } catch (error) {
       toast({
@@ -123,32 +125,42 @@ export default function SignUpComponent(props) {
         )}
       </div>
       <div className="w-full flex flex-row items-center justify-between gap-3">
-        <div className="mb-5">
+        <div className="mb-5 relative">
           <label className="font-bold text-[16px] block mb-1">{t("password")}</label>
           <input
             tabIndex={4}
-            type="password"
+            type={isShowPassword ? "text" : "password"}
             placeholder={t("password")}
             {...register("password")}
-            className="w-full p-2 border border-gray-300 rounded-md focus:border-black-primary outline-none shadow-sm shadow-white-secondary"
+            className="w-full p-2 pr-12 border border-gray-300 rounded-md focus:border-black-primary outline-none shadow-sm shadow-white-secondary"
           />
           {errors.password && (
             <p className="text-red-primary absolute text-sm">{errors.password.message}</p>
           )}
+          {isShowPassword ? (
+            <Eye className="absolute scale-90 right-4 top-[55%] cursor-pointer" onClick={() => setIsShowPassword(!isShowPassword)} />
+          ) : (
+            <EyeOff className="absolute scale-90 right-4 top-[55%] cursor-pointer" onClick={() => setIsShowPassword(!isShowPassword)} />
+          )}
         </div>
-        <div className="mb-5">
+        <div className="mb-5 relative">
           <label className="font-bold text-[16px] block mb-1">{t("confirmPassword")}</label>
           <input
             tabIndex={5}
-            type="password"
+            type={isShowPassword ? "text" : "password"}
             placeholder={t("confirmPassword")}
             {...register("passwordConfirmation")}
-            className="w-full p-2 border border-gray-300 rounded-md focus:border-black-primary outline-none shadow-sm shadow-white-secondary"
+            className="w-full p-2 pr-12 border border-gray-300 rounded-md focus:border-black-primary outline-none shadow-sm shadow-white-secondary"
           />
           {errors.passwordConfirmation && (
             <p className="text-red-primary absolute text-sm">
               {errors.passwordConfirmation.message}
             </p>
+          )}
+          {isShowPassword ? (
+            <Eye className="absolute scale-90 right-4 top-[55%] cursor-pointer" onClick={() => setIsShowPassword(!isShowPassword)} />
+          ) : (
+            <EyeOff className="absolute scale-90 right-4 top-[55%] cursor-pointer" onClick={() => setIsShowPassword(!isShowPassword)} />
           )}
         </div>
       </div>
