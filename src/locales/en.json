@@ -1,6 +1,8 @@
 {
   "Header": {
-    "appTitle": "Next.js Weather"
+    "userTitle": "User Center",
+    "vendorTitle": "Seller Center",
+    "adminTitle": "Admin Center"
   },
   "VendorHeader": {
     "vendorTitle": "Seller Center",

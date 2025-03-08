@@ -26,6 +26,7 @@ import { UserRoundPen } from 'lucide-react';
 import { Languages } from 'lucide-react';
 import { useState } from 'react';
 import { localeDetector } from '@/utils';
+import Image from 'next/image';
 
 const UserMenuComponent = (props) => {
     const { user } = props;
@@ -64,14 +65,14 @@ const UserMenuComponent = (props) => {
                 <div className="flex flex-row justify-center items-center gap-2 cursor-pointer">
                     {user?.imageUrl ? (
 
-                        <Image src={user?.imageUrl} alt="Ảnh đại diện" width={30} height={30} />
+                        <Image src={user?.imageUrl} alt="Ảnh đại diện" width={30} height={30} className="w-[30px] h-[30px] rounded-full object-cover" />
                     ) : (
                         <div>
                             <CircleUserRound width={30} height={30} className="text-white-secondary" />
                         </div>
                     )}
-                    <span className="text-white-secondary text[0.9em] truncate">{user?.username}</span>
-                    {!isShowUserMenu ? <ChevronDown className="scale-75" /> : <ChevronUp className="scale-75" />}
+                    <span className="max-w-[100px] text-white-secondary text[0.9em] truncate">{user?.name}</span>
+                    {!isShowUserMenu ? <ChevronDown className="scale-75 text-white-secondary" /> : <ChevronUp className="scale-75 text-white-secondary" />}
                 </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-[300px] mt-3 mr-3">
@@ -80,19 +81,21 @@ const UserMenuComponent = (props) => {
                 <div className="w-full h-fit flex flex-col justify-center items-center gap-1 py-3">
                     {user?.imageUrl ? (
 
-                        <Image src={user?.imageUrl} alt="Ảnh đại diện" width={70} height={70} />
+                        <Image src={user?.imageUrl} alt="Ảnh đại diện" width={70} height={70} className="w-[70px] h-[70px] rounded-full object-cover" />
                     ) : (
                         <div>
                             <CircleUserRound width={70} height={70} className="text-black-secondary" />
                         </div>
                     )}
-                    <span className="text-black-secondary text[0.9em] truncate">{user?.username}</span>
+                    <span className="text-black-secondary text[0.9em] truncate">{user?.name}</span>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex flex-row justify-start items-center gap-3 px-3 cursor-pointer" onClick={() => router.push("/vendor/store")}>
-                    <Store />
-                    {t("userOptionsMenu.shop-information")}
-                </DropdownMenuItem>
+                {user.roles.some((role) => role.name === "SELLER") && (
+                    <DropdownMenuItem className="flex flex-row justify-start items-center gap-3 px-3 cursor-pointer" onClick={() => router.push("/vendor/store")}>
+                        <Store />
+                        {t("userOptionsMenu.shop-information")}
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuItem className="flex flex-row justify-start items-center gap-3 px-3 cursor-pointer" onClick={() => router.push("/user")}>
                     <UserRoundPen />
                     {t("userOptionsMenu.account-information")}

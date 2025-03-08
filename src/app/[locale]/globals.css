@@ -122,3 +122,8 @@
     transform: rotate(360deg);
   }
 }
+
+/* Disable UI */
+.rdp-weekdays {
+  display: none;
+}

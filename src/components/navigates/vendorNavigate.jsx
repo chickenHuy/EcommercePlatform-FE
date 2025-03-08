@@ -32,7 +32,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import VendorHeader from "../headers/vendorHeader";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setFilterTab,
@@ -42,6 +41,8 @@ import {
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import UserHeader from "../headers/userHeader";
+import { useTranslations } from "next-intl";
 
 const data = {
   navMain: [
@@ -153,6 +154,7 @@ export default function VendorNavigate({ vendorContent }) {
   const activeItem = useSelector(
     (state) => state.orderFilterReducer.activeItem
   );
+  const t = useTranslations("Header");
 
   const handleSetFilter = (filterKey, activeKey, url) => {
     dispatch(setFilterTab(filterKey));
@@ -176,7 +178,7 @@ export default function VendorNavigate({ vendorContent }) {
 
   return (
     <SidebarProvider>
-      <VendorHeader />
+      <UserHeader title={t('vendorTitle')} />
       <Sidebar collapsible="icon" className="mt-16">
         <SidebarContent>
           <SidebarGroup>
@@ -204,8 +206,8 @@ export default function VendorNavigate({ vendorContent }) {
                             <SidebarMenuSubButton asChild>
                               <button
                                 className={`w-full hover:cursor-pointer ${activeItem === subItem.activeKey
-                                    ? "font-bold"
-                                    : null
+                                  ? "font-bold"
+                                  : null
                                   }`}
                                 onClick={() =>
                                   handleSetFilter(

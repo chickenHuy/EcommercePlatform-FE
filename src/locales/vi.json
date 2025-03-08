@@ -1,6 +1,8 @@
 {
   "Header": {
-    "appTitle": "Thời tiết Next.js"
+    "userTitle": "Trung Tâm Người Dùng",
+    "vendorTitle": "Trung Tâm Người Bán",
+    "adminTitle": "Trung Tâm Quản Trị"
   },
   "VendorHeader": {
     "vendorTitle": "Kênh người bán",

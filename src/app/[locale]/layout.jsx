@@ -4,7 +4,7 @@ import { getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import StoreProvider from "@/store/storeProvider";
 import { ThemeProvider } from "@/components/themes/theme-provider";
-import UserHeader from "@/components/headers/userHeader";
+import UserHeader from "@/components/headers/mainHeader";
 
 const helveticalNeue = localFont({
   src: [

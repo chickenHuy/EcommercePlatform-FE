@@ -1,16 +1,21 @@
 "use client";
-import { useState } from "react";
 import { ThemeProvider } from "@/components/themes/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
 import Link from "next/link";
-import CommonHeader from "@/components/headers/commonHeader";
+import UserHeader from "@/components/headers/userHeader";
+import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Menu, X } from 'lucide-react';
 
 export default function UserLayout({ children }) {
-  const [activeLink, setActiveLink] = useState("/user");
+  const t = useTranslations("Header");
+  const pathName = usePathname();
+  const active = pathName.split("/")[pathName.split("/").length - 1];
+  const [isShowUserMenu, setIsShowUserMenu] = useState(false);
 
-  const handleLinkClick = (href) => {
-    setActiveLink(href);
-  };
+  useEffect(() => {
+    setIsShowUserMenu(false);
+  }, [pathName]);
 
   return (
     <body>
@@ -20,72 +25,36 @@ export default function UserLayout({ children }) {
         enableSystem
         disableTransitionOnChange
       >
-        <CommonHeader />
-        <div className="min-h-screen w-full flex flex-col">
-          <Toaster />
-          <div className="mx-auto pl-6 mt-6 w-full">
-            <h1 className="text-3xl font-semibold mb-6">Cài đặt chung</h1>
-          </div>
-          <div className="mx-auto pl-6 grid w-full md:grid-cols-[250px_1fr]">
-            <nav
-              className="flex flex-col gap-4 text-sm text-muted-foreground"
-              x-chunk="dashboard-04-chunk-0"
-            >
-              <Link
-                href="/user"
-                onClick={() => handleLinkClick("/user")}
-                className={`${
-                  activeLink === "/user" ? "text-primary font-semibold" : ""
-                } hover:text-primary transition-colors`}
-              >
-                Hồ sơ
+        <UserHeader title={t('userTitle')} link="/user" />
+
+        <div className="p-1 z-50 absolute top-[70px] left-2 shadow-md shadow-white-secondary rounded-sm cursor-pointer hover:bg-white-secondary" onClick={() => setIsShowUserMenu(true)}>
+          {isShowUserMenu ? <Menu className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
+        </div>
+
+        <div className="h-fit min-h-screen w-full flex flex-row pt-[64px]">
+          <div className={`lg:w-[300px] w-[250px] h-fit min-h-screen bg-[#f9f9f9] py-5 px-3 border-r border-white-secondary flex flex-col justify-start items-start gap-4 lg:fixed absolute scale-0 lg:scale-100 z-50 ${isShowUserMenu ? "scale-100" : "scale-0"}`}>
+            <X className={`absolute p-1 scale-125 top-2 right-2 hover:bg-white-secondary cursor-pointer ${!isShowUserMenu && "hidden"}`} onClick={() => setIsShowUserMenu(false)} />
+            <h1 className="text-[1.5em]">Cài đặt chung</h1>
+            <div className="h-fit w-full flex flex-col gap-2">
+              <Link className={`py-2 px-4 rounded-md shadow-md shadow-white-secondary ${active === 'user' ? 'bg-black-primary text-white-secondary ' : 'border-white-secondary border'}`} href="/user">
+                Hồ sơ người dùng
               </Link>
-              <Link
-                href="/user/orders"
-                onClick={() => handleLinkClick("/user/orders")}
-                className={`${
-                  activeLink === "/user/orders"
-                    ? "text-primary font-semibold"
-                    : ""
-                } hover:text-primary transition-colors`}
-              >
+              <Link className={`py-2 px-4 rounded-md shadow-md shadow-white-secondary ${active === 'orders' ? 'bg-black-primary text-white-secondary ' : 'border-white-secondary border'}`} href="/user/orders">
                 Đơn hàng
               </Link>
-              <Link
-                href="/user/account"
-                onClick={() => handleLinkClick("/user/account")}
-                className={`${
-                  activeLink === "/user/account"
-                    ? "text-primary font-semibold"
-                    : ""
-                } hover:text-primary transition-colors`}
-              >
+              <Link className={`py-2 px-4 rounded-md shadow-md shadow-white-secondary ${active === 'account' ? 'bg-black-primary text-white-secondary ' : 'border-white-secondary border'}`} href="/user/account">
                 Tài khoản
               </Link>
-              <Link
-                href="/user/address"
-                onClick={() => handleLinkClick("/user/address")}
-                className={`${
-                  activeLink === "/user/address"
-                    ? "text-primary font-semibold"
-                    : ""
-                } hover:text-primary transition-colors`}
-              >
+              <Link className={`py-2 px-4 rounded-md shadow-md shadow-white-secondary ${active === 'address' ? 'bg-black-primary text-white-secondary ' : 'border-white-secondary border'}`} href="/user/address">
                 Địa chỉ
               </Link>
-              <Link
-                href="/user/change-password"
-                onClick={() => handleLinkClick("/user/change-password")}
-                className={`${
-                  activeLink === "/user/change-password"
-                    ? "text-primary font-semibold"
-                    : ""
-                } hover:text-primary transition-colors`}
-              >
+              <Link className={`py-2 px-4 rounded-md shadow-md shadow-white-secondary ${active === 'change-password' ? 'bg-black-primary text-white-secondary ' : 'border-white-secondary border'}`} href="/user/change-password">
                 Đổi mật khẩu
               </Link>
-            </nav>
-            <div className="grid max-w-full p-6">{children}</div>
+            </div>
+          </div>
+          <div className="w-full h-fit py-5">
+            {children}
           </div>
         </div>
       </ThemeProvider>
