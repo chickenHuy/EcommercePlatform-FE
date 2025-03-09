@@ -59,13 +59,13 @@ export default function CbbAddresses({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger className="w-full">
         <div className="flex items-center justify-between w-full h-10 flex-row border-[1px] shadow-sm px-2 py-1 rounded-md">
-          <span className="text-left">
+          <span className="text-left truncate max-w-[250px] lg:max-w-full">
             {defaultAddressToUpdate?.defaultAddressStr}
           </span>
           <CaretSortIcon />
         </div>
       </PopoverTrigger>
-      <PopoverContent className="z-50 w-full">
+      <PopoverContent className="z-50 w-[350px] lg:w-full">
         <Command>
           <CommandInput placeholder={t('addressForm_command_placeholder')} />
           <CommandList>
