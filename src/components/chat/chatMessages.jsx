@@ -15,6 +15,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { ProductInMessage } from "./productInMessage"
 
+
 export function ChatMessages({
     room,
     onBack,
@@ -26,6 +27,7 @@ export function ChatMessages({
     isStore,
     productId,
     orderId,
+    setProductId,
 }) {
     const [messages, setMessages] = useState([])
     const [newMessage, setNewMessage] = useState("")
@@ -112,13 +114,6 @@ export function ChatMessages({
         }
     }
 
-    useEffect(() => {
-        messages.forEach((msg) => {
-            if (msg.productId) {
-                fetchProduct(msg.productId);
-            }
-        });
-    }, [messages]);
 
     const formatPrice = (price) => {
         return new Intl.NumberFormat("vi-VN", {
@@ -181,7 +176,7 @@ export function ChatMessages({
             })
 
             orderId = ""
-            productId = ""
+            setProductId("")
 
         } catch (err) {
             console.error("Failed to send message:", err)
@@ -226,9 +221,27 @@ export function ChatMessages({
             content: msg.content,
             createdAt: msg.createdAt,
             senderId: msg.senderId,
+            productId: msg.productId,
+            orderId: msg.orderId,
             status: "sent",
         })),
     ]
+
+    useEffect(() => {
+        messages.forEach((msg) => {
+            if (msg.productId) {
+                fetchProduct(msg.productId);
+            }
+        });
+    }, [messages]);
+
+    useEffect(() => {
+        websocketMessages.forEach((msg) => {
+            if (msg.productId) {
+                fetchProduct(msg.productId);
+            }
+        });
+    }, [websocketMessages]);
 
     return (
         <>

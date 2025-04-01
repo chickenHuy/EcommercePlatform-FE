@@ -28,6 +28,7 @@ export default function ProductDetail({ product }) {
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [availableOptions, setAvailableOptions] = useState({});
+  const [productId, setProductId] = useState(product.id);
   const { toast } = useToast();
 
   const initializeAvailableOptions = () => {
@@ -364,7 +365,7 @@ export default function ProductDetail({ product }) {
                 <Store className="mr-2"></Store>
                 Xem shop
               </Button>
-              <StoreChat storeId={product.store.id} productId={product.id} websocketUrl={"http://localhost:8080/api/v1/ws"} isStore={false}/>
+              <StoreChat storeId={product.store.id} productId={productId} setProductId={setProductId} websocketUrl={"http://localhost:8080/api/v1/ws"} isStore={false}/>
             </div>
           </div>
         </div>

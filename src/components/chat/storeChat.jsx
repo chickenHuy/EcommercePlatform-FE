@@ -9,7 +9,7 @@ import { ChatMessages } from "@/components/chat/chatMessages"
 import { createRoom, listRooms, listMessages } from "@/api/chat/chat"
 import useWebSocket from "@/utils/websocket/websocket"
 
-export function StoreChat({ storeId, userId, websocketUrl, isStore, productId, orderId }) {
+export function StoreChat({ storeId, userId, websocketUrl, isStore, productId, orderId, setProductId }) {
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [selectedRoom, setSelectedRoom] = useState(null)
   const [chatRooms, setChatRooms] = useState([])
@@ -175,17 +175,32 @@ export function StoreChat({ storeId, userId, websocketUrl, isStore, productId, o
   return (
     <div className="relative" ref={chatRef}>
       {/* Chat Button */}
-      {
-        !isStore ? (<Button variant="ghost" size="icon" className="text-white-primary relative" onClick={() => setIsChatOpen(true)}>
-          <MessageCircle className="h-5 w-5" />
-          {totalUnreadCount > 0 && (
-            <div className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-primary text-[10px] font-bold flex items-center justify-center">
-              {totalUnreadCount}
-            </div>
-          )}
-        </Button>
-        ) : (<></>)
-      }
+      {!isStore ? (
+        productId !== "" ? (
+          <Button
+            variant="outline"
+            className="mt-4 mr-auto"
+            onClick={() => setIsChatOpen(true)}
+          >
+            <MessageCircle className="h-5 w-5" />
+            Hỏi về sản phẩm
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-black-primary relative"
+            onClick={() => setIsChatOpen(true)}
+          >
+            <MessageCircle className="h-5 w-5" />
+            {totalUnreadCount > 0 && (
+              <div className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-primary text-[10px] font-bold flex items-center justify-center">
+                {totalUnreadCount}
+              </div>
+            )}
+          </Button>
+        )
+      ) : null}
       {/* Chat Window */}
       <AnimatePresence>
         {isChatOpen && (
@@ -221,6 +236,7 @@ export function StoreChat({ storeId, userId, websocketUrl, isStore, productId, o
                 isStore={isStore}
                 productId={productId}
                 orderId={orderId}
+                setProductId={setProductId}
               />
             ) : (
               <ChatRoomList
