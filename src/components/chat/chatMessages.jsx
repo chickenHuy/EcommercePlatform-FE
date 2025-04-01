@@ -173,9 +173,7 @@ export function ChatMessages({
         setNewMessage("")
 
         try {
-            websocketSendM
-
-            essage(room.id, {
+            websocketSendMessage(room.id, {
                 content: messageContent,
                 orderId: orderId,
                 productId: productId,
