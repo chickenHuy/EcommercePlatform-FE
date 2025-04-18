@@ -3,6 +3,7 @@ import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import Cookies from "js-cookie";
 
+
 const useWebSocket = (baseUrl) => {
     const [client, setClient] = useState(null);
     const [subscriptions, setSubscriptions] = useState({});
@@ -41,6 +42,10 @@ const useWebSocket = (baseUrl) => {
     /** Subscribe vào một room */
     const subscribeRoom = (roomId) => {
         console.log(`🔗 Subscribing to room ${roomId}`);
+        if (subscriptions[roomId]) {
+            console.log(`❌ Already subscribed to room ${roomId}`);
+            return;
+        }
         const sub = client.subscribe(`/topic/room/${roomId}`, (message) => {
             try {
                 const parsedMessage = JSON.parse(message.body);
@@ -87,6 +92,7 @@ const useWebSocket = (baseUrl) => {
 
     /** Lấy danh sách tin nhắn của room */
     const getMessagesByRoom = (roomId) => {
+        console.log("📥 Getting messages for room", roomMessages[roomId]);
         return roomMessages[roomId] || [];
     };
 

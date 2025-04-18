@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState, Suspense, lazy } from "react";
-import { Star, ShoppingCart, Heart, Minus, Plus, Store } from "lucide-react";
+import { Star, ShoppingCart, Heart, Minus, Plus, Store, MessageCircle, MessageCircleIcon, MessageSquareText } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ProductSpecifications } from "./product-specifications";
@@ -19,6 +19,7 @@ import { setWishList } from "@/store/features/wishListSlice";
 import Loading from "@/components/loading";
 import { useToast } from "@/hooks/use-toast";
 import ProductDetailSuggestions from "./product-detail-suggestions";
+import { StoreChat } from "@/components/chat/storeChat";
 
 const ReviewLazy = lazy(() => import("./reviewPage"));
 
@@ -27,6 +28,7 @@ export default function ProductDetail({ product }) {
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [availableOptions, setAvailableOptions] = useState({});
+  const [productId, setProductId] = useState(product.id);
   const { toast } = useToast();
 
   const initializeAvailableOptions = () => {
@@ -171,6 +173,7 @@ export default function ProductDetail({ product }) {
     router.push("/search");
   };
 
+
   useEffect(() => {
     const productId = product.id;
     const changeCount = async (productId) => {
@@ -212,11 +215,10 @@ export default function ProductDetail({ product }) {
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
-                      className={`h-5 w-5 ${
-                        star <= (product.rating || 0)
-                          ? "text-yellow-primary fill-current"
-                          : "text-gray-secondary"
-                      }`}
+                      className={`h-5 w-5 ${star <= (product.rating || 0)
+                        ? "text-yellow-primary fill-current"
+                        : "text-gray-secondary"
+                        }`}
                     />
                   ))}
                 </div>
@@ -363,6 +365,7 @@ export default function ProductDetail({ product }) {
                 <Store className="mr-2"></Store>
                 Xem shop
               </Button>
+              <StoreChat storeId={product.store.id} productId={productId} setProductId={setProductId} websocketUrl={"http://localhost:8080/api/v1/ws"} isStore={false}/>
             </div>
           </div>
         </div>

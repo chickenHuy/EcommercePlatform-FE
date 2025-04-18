@@ -1,6 +1,6 @@
 "use client";
 import Cookies from "js-cookie";
-import { User, ShoppingCartIcon } from 'lucide-react';
+import { User, ShoppingCartIcon, MessageCircleIcon } from 'lucide-react';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SearchWithSuggestions } from "../searchBars/userSearch";
@@ -15,6 +15,7 @@ import { get, post } from '@/lib/httpClient';
 import { set } from "react-hook-form";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import WishlistPopup from "../popUp/wishListPopUp";
+import { StoreChat } from "../chat/storeChat";
 
 const UserHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -169,6 +170,11 @@ const UserHeader = () => {
                   )}
                 </Button>
                 {isCartVisible && <ShoppingCard />}
+              </div>
+              <div
+                className="relative"
+              >
+                <StoreChat websocketUrl={"http://localhost:8080/api/v1/ws"} isStore={false} productId={""} orderId={""} />
               </div>
             </div>
           </div>
