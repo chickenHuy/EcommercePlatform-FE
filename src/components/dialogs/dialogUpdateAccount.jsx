@@ -86,11 +86,10 @@ export default function DialogUpdateAccount(props) {
               <Input
                 value={tempEmail}
                 onChange={(e) => setTempEmail(e.target.value)}
-                placeholder="nhập email mới @gmail.com"
-                className="w-full rounded-xl"
+                placeholder="Nhập email mới @gmail.com"
               />
               {emailError && (
-                <Label className="text-sm text-error">{emailError}</Label>
+                <span className="text-sm text-red-primary">{emailError}</span>
               )}
             </div>
           )}
@@ -100,11 +99,10 @@ export default function DialogUpdateAccount(props) {
               <Input
                 value={tempPhone}
                 onChange={(e) => setTempPhone(e.target.value)}
-                placeholder="nhập số điện thoại mới"
-                className="w-full rounded-xl"
+                placeholder="Nhập số điện thoại mới"
               />
               {phoneError && (
-                <Label className="text-sm text-error">{phoneError}</Label>
+                <span className="text-sm text-red-primary">{phoneError}</span>
               )}
             </div>
           )}
