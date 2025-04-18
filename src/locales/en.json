@@ -220,5 +220,8 @@
       "failed": "Failed",
       "verification_sent": "Please check your email to verify"
     }
+  },
+  "Dialog" : {
+    // Here
   }
 }

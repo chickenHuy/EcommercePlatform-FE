@@ -221,5 +221,8 @@
       "failed": "Thất bại",
       "verification_sent": "Vui lòng kiểm tra email của bạn để xác thực"
     }
+  },
+  "Dialog": {
+    // Here
   }
 }
