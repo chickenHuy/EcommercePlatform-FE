@@ -73,7 +73,6 @@ export default function ManageStoreInfo() {
   }, [fetchStoreByUserId]);
 
   const handleUpdate = async (storeData) => {
-    console.log('CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC')
     console.log(defaultAddressToUpdate);
     if (!defaultAddressToUpdate?.defaultAddressId) {
       setAddressError(t('select_address_error'));
