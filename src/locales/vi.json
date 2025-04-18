@@ -206,6 +206,20 @@
       "total_amount": "Tổng số tiền:",
       "note": "Ghi chú:",
       "last_updated": "Cập nhật lần cuối"
+    },
+    "account": {
+      "title": "Tài khoản của tôi",
+      "username": "Tên đăng nhập",
+      "no_username": "Chưa có tên đăng nhập",
+      "email": "Email",
+      "no_email": "Bạn chưa có email",
+      "verify_email": "Xác thực email",
+      "email_verified": "Email đã xác thực",
+      "change": "Thay đổi",
+      "phone": "Số điện thoại",
+      "no_phone": "Bạn chưa có số điện thoại",
+      "failed": "Thất bại",
+      "verification_sent": "Vui lòng kiểm tra email của bạn để xác thực"
     }
   }
 }

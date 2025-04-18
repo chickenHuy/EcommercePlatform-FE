@@ -205,6 +205,20 @@
       "total_amount": "Total Amount:",
       "note": "Note:",
       "last_updated": "Last Updated"
+    },
+    "account": {
+      "title": "My Account",
+      "username": "Username",
+      "no_username": "No username available",
+      "email": "Email",
+      "no_email": "You don't have an email yet",
+      "verify_email": "Verify email",
+      "email_verified": "Email verified",
+      "change": "Change",
+      "phone": "Phone number",
+      "no_phone": "You don't have a phone number yet",
+      "failed": "Failed",
+      "verification_sent": "Please check your email to verify"
     }
   }
 }
