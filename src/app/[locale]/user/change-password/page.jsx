@@ -10,33 +10,36 @@ import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-
-const changePasswordSchema = z
-  .object({
-    oldPassword: z.string().trim(),
-    newPassword: z
-      .string()
-      .trim()
-      .min(8, { message: "Mật khẩu mới phải có trên 8 và dưới 20 ký tự" })
-      .max(20, { message: "Mật khẩu mới phải có trên 8 và dưới 20 ký tự" })
-      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/, {
-        message:
-          "Mật khẩu phải chứa ít nhất một chữ cái viết hoa, một chữ cái viết thường và một số",
-      }),
-    newPasswordConfirmation: z.string().trim(),
-  })
-  .refine((formData) => formData.newPassword === formData.newPasswordConfirmation, {
-    message: "Mật khẩu mới và xác nhận mật khẩu mới không khớp",
-    path: ["newPasswordConfirmation"],
-  });
+import { useTranslations } from "next-intl";
 
 export default function ChangePasswordUser() {
   const { toast } = useToast();
+  const t = useTranslations("User.change_password");
   const [loadPage, setLoadPage] = useState(false);
 
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const changePasswordSchema = z
+    .object({
+      oldPassword: z.string().trim(),
+      newPassword: z
+        .string()
+        .trim()
+        .min(8, { message: t('new_password_length') })
+        .max(20, { message: t('new_password_length') })
+        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/, {
+          message:
+            t('new_password_pattern')
+        }),
+      newPasswordConfirmation: z.string().trim(),
+    })
+    .refine((formData) => formData.newPassword === formData.newPasswordConfirmation, {
+      message: t('confirm_not_match'),
+      path: ["newPasswordConfirmation"],
+    });
+
 
   const formData = useForm({
     resolver: zodResolver(changePasswordSchema),
@@ -57,13 +60,13 @@ export default function ChangePasswordUser() {
     try {
       await updatePassword(passwordData);
       toast({
-        title: "Thành công",
-        description: "Mật khẩu đã được cập nhật",
+        title: t('notify'),
+        description: t('message'),
       });
       resetForm();
     } catch (error) {
       toast({
-        title: "Thất bại",
+        title: t('notify'),
         description: error.message,
         variant: "destructive",
       });
@@ -76,7 +79,7 @@ export default function ChangePasswordUser() {
     <div className="w-full h-fit lg:pl-[300px] flex justify-center items-center">
       <Card className="min-w-[350px] w-[95%] shadow-xl rounded-xl">
         <CardHeader className="text-center border-b">
-          <CardTitle className="text-2xl font-bold">Đổi mật khẩu</CardTitle>
+          <CardTitle className="text-2xl font-bold">{t('title')}</CardTitle>
         </CardHeader>
 
         <CardContent className="flex flex-col items-center py-8">
@@ -84,14 +87,13 @@ export default function ChangePasswordUser() {
             onSubmit={formData.handleSubmit(onSubmit)}
             className="w-full space-y-7"
           >
-            {/* Old Password */}
             <div className="space-y-2">
               <div className="relative space-y-[8px]">
-                <span className="text-[1em]">Mật khẩu cũ</span>
+                <span className="text-[1em]">{t('old_password')}</span>
                 <Input
                   type={showOldPassword ? "text" : "password"}
                   {...formData.register("oldPassword")}
-                  placeholder="Mật khẩu cũ"
+                  placeholder={t('old_password')}
                 />
                 <span
                   className="absolute right-3 top-[38px] cursor-pointer text-muted-foreground"
@@ -107,14 +109,13 @@ export default function ChangePasswordUser() {
               )}
             </div>
 
-            {/* New Password */}
             <div className="space-y-2">
               <div className="relative space-y-[8px]">
-                <span className="text-[1em]">Mật khẩu mới</span>
+                <span className="text-[1em]">{t('new_password')}</span>
                 <Input
                   type={showNewPassword ? "text" : "password"}
                   {...formData.register("newPassword")}
-                  placeholder="Mật khẩu mới"
+                  placeholder={t('new_password')}
                 />
                 <span
                   className="absolute right-3 top-[38px] cursor-pointer text-muted-foreground"
@@ -130,14 +131,13 @@ export default function ChangePasswordUser() {
               )}
             </div>
 
-            {/* Confirm New Password */}
             <div className="space-y-2">
               <div className="relative space-y-[8px]">
-                <span className="text-[1em]">Xác nhận mật khẩu mới</span>
+                <span className="text-[1em]">{t('confirm_new_password')}</span>
                 <Input
                   type={showConfirmPassword ? "text" : "password"}
                   {...formData.register("newPasswordConfirmation")}
-                  placeholder="Xác nhận mật khẩu mới"
+                  placeholder={t('confirm_new_password')}
                 />
                 <span
                   className="absolute right-3 top-[38px] cursor-pointer text-muted-foreground"
@@ -161,7 +161,7 @@ export default function ChangePasswordUser() {
               >
                 {loadPage ? (
                   <div className="global_loading_icon white"></div>
-                ) : "Cập nhật mật khẩu"}
+                ) : t('submit')}
               </Button>
             </div>
           </form>

@@ -220,9 +220,21 @@
       "no_phone": "Bạn chưa có số điện thoại",
       "failed": "Thất bại",
       "verification_sent": "Vui lòng kiểm tra email của bạn để xác thực"
+    },
+    "change_password": {
+      "title": "Đổi mật khẩu",
+      "old_password": "Mật khẩu cũ",
+      "new_password": "Mật khẩu mới",
+      "confirm_new_password": "Xác nhận mật khẩu mới",
+      "submit": "Cập nhật mật khẩu",
+      "notify": "Thông báo",
+      "message": "Mật khẩu đã được cập nhật",
+      "new_password_length": "Mật khẩu phải từ 8 đến 20 ký tự",
+      "new_password_pattern": "Mật khẩu phải chứa ít nhất một chữ cái viết hoa, một chữ cái viết thường và một số",
+      "confirm_not_match": "Mật khẩu mới và xác nhận không khớp"
     }
   },
   "Dialog": {
-    // Here
+    "title": ""
   }
 }
