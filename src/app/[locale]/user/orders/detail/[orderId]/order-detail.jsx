@@ -25,6 +25,8 @@ import {
   CircleX,
   Dot,
   Forklift,
+  GitCommitHorizontal,
+  GitCommitVertical,
   Import,
   MapPin,
   Phone,
@@ -46,9 +48,7 @@ import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Table, TableBody, span, TableRow } from "@/components/ui/table";
 import {
   Tooltip,
   TooltipContent,
@@ -66,6 +66,7 @@ import { changeQuantity } from "@/store/features/cartSlice";
 
 import { formatCurrency, formatDate } from "@/utils";
 import { useTranslations } from "next-intl";
+import { Logo } from "@/components/logo";
 
 
 export default function ViewOrderDetailUser({
@@ -123,11 +124,11 @@ export default function ViewOrderDetailUser({
     if (!orderToCancel) return;
     try {
       await cancelOrderByUser(orderToCancel.id);
-      toast({ description: `Đơn hàng "${orderToCancel.id}" đã được hủy thành công` });
+      toast({ description: t('order_cancel', { order: orderToCancel.id }) });
       refreshPage();
       setOpenDialog(false);
     } catch (error) {
-      toast({ title: "Thất bại", description: error.message, variant: "destructive" });
+      toast({ title: t('notify'), description: error.message, variant: "destructive" });
     }
   };
 
@@ -159,7 +160,7 @@ export default function ViewOrderDetailUser({
       localStorage.setItem("listCartItemFromOrder", JSON.stringify(listCartItemFromOrder));
       router.push("/cart");
     } catch (error) {
-      toast({ title: "Mua lại thất bại", description: error.message, variant: "destructive" });
+      toast({ title: t('notify'), description: error.message, variant: "destructive" });
     }
   };
 
@@ -204,15 +205,15 @@ export default function ViewOrderDetailUser({
   const lastStatusIndex = listOrderStatusHistory?.length - 1;
 
   const getStatusOrder = (status) => ({
-    ON_HOLD: "CHỜ THANH TOÁN",
-    PENDING: "CHỜ XÁC NHẬN",
-    CONFIRMED: "ĐÃ XÁC NHẬN",
-    PREPARING: "CHUẨN BỊ HÀNG",
-    WAITING_FOR_SHIPPING: "CHỜ GIAO CHO ĐVVC",
-    PICKED_UP: "ĐÃ GIAO CHO ĐVVC",
-    OUT_FOR_DELIVERY: "ĐANG GIAO HÀNG",
-    DELIVERED: "HOÀN THÀNH",
-    CANCELLED: "ĐÃ HỦY",
+    ON_HOLD: t('ON_HOLD_1'),
+    PENDING: t('PENDING_1'),
+    CONFIRMED: t('CONFIRMED_1'),
+    PREPARING: t('PREPARING_1'),
+    WAITING_FOR_SHIPPING: t('WAITING_FOR_SHIPPING_1'),
+    PICKED_UP: t('PICKED_UP_1'),
+    OUT_FOR_DELIVERY: t('OUT_FOR_DELIVERY_1'),
+    DELIVERED: t('DELIVERED_1'),
+    CANCELLED: t('CANCELLED_1'),
   }[status]);
 
   const getTimelineIconOrder = (status) => ({
@@ -224,27 +225,27 @@ export default function ViewOrderDetailUser({
   }[status] || <Dot />);
 
   const getMessageStatusOrder = (status) => ({
-    ON_HOLD: "Chờ thanh toán",
-    PENDING: "Chờ xác nhận",
-    CONFIRMED: "Đã xác nhận",
-    PREPARING: "Chuẩn bị hàng",
-    WAITING_FOR_SHIPPING: "Chờ giao cho ĐVVC",
-    PICKED_UP: "Đã giao cho ĐVVC",
-    OUT_FOR_DELIVERY: "Đang giao hàng",
-    DELIVERED: "Hoàn thành",
-    CANCELLED: "Đã hủy",
+    ON_HOLD: t('on_hold'),
+    PENDING: t('pending'),
+    CONFIRMED: t('confirmed'),
+    PREPARING: t('preparing'),
+    WAITING_FOR_SHIPPING: t('waiting_delivery'),
+    PICKED_UP: t('picked_up'),
+    OUT_FOR_DELIVERY: t('in_transit'),
+    DELIVERED: t('delivered'),
+    CANCELLED: t('cancelled'),
   }[status]);
 
   const getMessageDescriptionOrder = (status) => ({
-    ON_HOLD: "Đơn hàng đang chờ thanh toán",
-    PENDING: "Đơn hàng đang chờ người bán xác nhận",
-    CONFIRMED: "Người bán đã xác nhận đơn hàng",
-    PREPARING: "Người bán đang chuẩn bị hàng",
-    WAITING_FOR_SHIPPING: "Chờ người bán giao hàng cho đơn vị vận chuyển",
-    PICKED_UP: "Đơn vị vận chuyển lấy hàng thành công",
-    OUT_FOR_DELIVERY: "Đơn hàng đang trên đường giao đến bạn, vui lòng chú ý điện thoại",
-    DELIVERED: "Đơn hàng đã được giao thành công",
-    CANCELLED: "Đơn hàng đã bị hủy",
+    ON_HOLD: t('ON_HOLD'),
+    PENDING: t('PENDING'),
+    CONFIRMED: t('CONFIRMED'),
+    PREPARING: t('PREPARING'),
+    WAITING_FOR_SHIPPING: t('WAITING_FOR_SHIPPING'),
+    PICKED_UP: t('PICKED_UP'),
+    OUT_FOR_DELIVERY: t('OUT_FOR_DELIVERY'),
+    DELIVERED: t('DELIVERED'),
+    CANCELLED: t('CANCELLED'),
   }[status]);
 
   return (
@@ -260,7 +261,7 @@ export default function ViewOrderDetailUser({
             </div>
             <div className="flex lg:flex-row flex-col lg:items-center items-end gap-2">
               <span className="lg:w-full w-[300px] truncate text-[1em]">
-                MÃ ĐƠN HÀNG: {orderDetail?.id}
+                {t('ORDER_CODE', { orderCode: orderDetail?.id })}
               </span>
               <div className="w-[1px] h-5 bg-black-primary lg:block hidden"></div>
               <span className="whitespace-nowrap text-[1em] text-red-primary shadow-md px-3 py-1 rounded-md">
@@ -281,7 +282,7 @@ export default function ViewOrderDetailUser({
               </div>
 
               <span className="text-[1.1em] text-center">
-                Đơn Hàng Đã Được Đặt
+                {t('order_placed')}
               </span>
               <span className="text-muted-foreground text-[.9em]">
                 {lastOnHoldOrPending ? formatDate(lastOnHoldOrPending) : null}
@@ -315,7 +316,9 @@ export default function ViewOrderDetailUser({
                   <Forklift color={clForklift} size={50} />
                 </div>
               </div>
-              <span className="text-[1.1em] text-center">Đã Giao Cho ĐVVC</span>
+              <span className="text-[1.1em] text-center">
+                {t('picked_up')}
+              </span>
               <span className="text-muted-foreground text-[.9em]">
                 {lastPickedUp ? formatDate(lastPickedUp) : null}
               </span>
@@ -348,7 +351,9 @@ export default function ViewOrderDetailUser({
                   <Import color={clImport} size={50} />
                 </div>
               </div>
-              <span className="text-[1.1em] text-center">Đã Nhận Được Hàng</span>
+              <span className="text-[1.1em] text-center">
+                {t('received_the_item')}
+              </span>
               <span className="text-muted-foreground text-[0.9em]">
                 {lastDelivered ? formatDate(lastDelivered) : null}
               </span>
@@ -403,23 +408,64 @@ export default function ViewOrderDetailUser({
               </Button>
             ) : null}
 
-            {(orderDetail?.currentStatus === "PICKED_UP" ||
-              orderDetail?.currentStatus === "OUT_FOR_DELIVERY") &&
-              !reviewedAnyOrder[orderDetail.id] ? (
-              <span className="text-[1.1em] text-center shadow-md px-5 py-2 rounded-md bg-success-dark">
-                Đơn hàng sẽ sớm được giao đến bạn
-              </span>
-            ) : null}
 
-            {(orderDetail?.currentStatus === "PENDING" ||
-              orderDetail?.currentStatus === "CONFIRMED" ||
-              orderDetail?.currentStatus === "PREPARING" ||
-              orderDetail?.currentStatus === "WAITING_FOR_SHIPPING") &&
-              !reviewedAnyOrder[orderDetail.id] ? (
-              <span className="text-[1.1em] text-center shadow-md px-5 py-2 rounded-md bg-success-dark">
-                Đơn hàng sẽ sớm được người bán giao cho ĐVVC
-              </span>
-            ) : null}
+            <div className="w-full h-fit flex flex-col justify-center items-center">
+              <div className="relative">
+                <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                  width="250pt" height="100pt" viewBox="0 0 300 159"
+                  preserveAspectRatio="xMidYMid meet">
+                  <g transform="translate(0.000000,159.000000) scale(0.100000,-0.100000)"
+                    fill="#000000" stroke="none">
+                    <path d="M676 1378 c-13 -18 -16 -53 -16 -169 0 -160 7 -182 50 -159 20 11 21
+18 19 146 l-1 134 591 0 591 0 0 -480 0 -481 -280 -2 -281 -2 -6 38 c-9 56
+-55 121 -108 153 -126 74 -299 -4 -323 -145 l-7 -44 -64 -1 c-67 -1 -91 -16
+-78 -50 5 -13 21 -16 79 -16 l73 -1 21 -42 c11 -24 39 -55 63 -72 39 -28 50
+-30 126 -30 76 0 87 2 126 30 24 17 52 48 63 72 l21 42 325 0 325 0 21 -42
+c71 -146 313 -144 381 3 18 39 18 39 75 40 49 0 62 4 90 29 l33 29 3 207 3
+207 -79 80 c-74 74 -80 83 -85 130 -8 65 -49 149 -89 183 -69 58 -104 69 -235
+73 l-123 4 0 57 c0 35 -6 65 -16 79 l-15 22 -629 0 -629 0 -15 -22z m1560
+-225 c74 -39 112 -96 129 -195 l6 -38 -196 0 -195 0 0 131 0 131 108 -4 c84
+-3 116 -8 148 -25z m231 -349 l53 -46 0 -188 c0 -104 -3 -191 -8 -193 -4 -3
+-27 -7 -52 -8 l-45 -4 -7 44 c-21 124 -151 204 -271 167 -64 -19 -112 -57
+-133 -106 -10 -22 -20 -40 -23 -40 -3 0 -5 96 -3 212 l3 213 216 -3 217 -3 53
+-45z m-1258 -311 c90 -67 95 -176 11 -246 -138 -116 -329 76 -213 214 15 17
+41 38 58 45 39 18 110 12 144 -13z m1062 4 c96 -64 105 -178 20 -250 -139
+-116 -330 75 -214 214 51 61 134 76 194 36z m-271 -122 c0 -32 -2 -35 -30 -35
+-28 0 -30 2 -24 28 9 38 13 42 35 42 15 0 19 -7 19 -35z"/>
+                    <path d="M177 983 c-16 -16 -6 -53 16 -58 12 -3 159 -4 326 -3 267 3 305 5
+314 19 6 9 7 24 4 33 -6 14 -40 16 -330 16 -178 0 -327 -3 -330 -7z"/>
+                    <path d="M342 824 c-9 -7 -12 -18 -8 -32 l7 -22 327 2 327 3 3 28 c2 15 0 27
+-5 27 -319 6 -639 3 -651 -6z"/>
+                    <path d="M499 664 c-9 -11 -10 -20 -2 -32 9 -15 44 -17 321 -20 272 -2 312 0
+326 14 12 12 13 20 6 35 -10 18 -25 19 -324 19 -274 0 -315 -2 -327 -16z"/>
+                  </g>
+                </svg>
+                <div className="absolute animate-spin w-9 h-9 rounded-full border-black-primary border-[1px] top-[85px] left-[118px] flex justify-center items-center">
+                  <GitCommitVertical className="w-9 h-9" />
+                </div>
+                <div className="absolute animate-spin w-9 h-9 rounded-full border-black-primary border-[1px] top-[85px] left-[207px] flex justify-center items-center">
+                  <GitCommitHorizontal className="w-9 h-9" />
+                </div>
+              </div>
+              {(orderDetail?.currentStatus === "PICKED_UP" ||
+                orderDetail?.currentStatus === "OUT_FOR_DELIVERY") &&
+                !reviewedAnyOrder[orderDetail.id] ? (
+                <span className="text-[1.1em] text-center shadow-md px-5 py-2 rounded-md border text-success-dark border-success-dark">
+                  {t('your_order_will_be_delivered_to_you_soon')}
+                </span>
+              ) : null}
+
+              {(orderDetail?.currentStatus === "PENDING" ||
+                orderDetail?.currentStatus === "CONFIRMED" ||
+                orderDetail?.currentStatus === "PREPARING" ||
+                orderDetail?.currentStatus === "WAITING_FOR_SHIPPING") &&
+                !reviewedAnyOrder[orderDetail.id] ? (
+                <span className="text-[1.1em] text-center shadow-md px-5 py-2 rounded-md text-success-dark border border-success-dark">
+                  {t('your_order_will_be_delivered_to_the_carried_soon')}
+                </span>
+              ) : null}
+            </div>
+
           </div>
 
           <Separator></Separator>
@@ -427,7 +473,7 @@ export default function ViewOrderDetailUser({
           <div className="flex flex-col lg:px-6 px-0 my-7 shadow-md border rounded-lg">
             <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between py-8">
               <div className="lg:w-2/5 w-full flex flex-col gap-4 px-5">
-                <span className="text-[1.2em] w-full text-center">Địa Chỉ Nhận Hàng</span>
+                <span className="text-[1.2em] w-full text-center">{t('order_receive_address')}</span>
                 <Separator></Separator>
                 <div className="flex items-center gap-2">
                   <UserPlus />
@@ -452,13 +498,13 @@ export default function ViewOrderDetailUser({
                 position="right"
                 className="lg:w-3/5 w-full lg:border-l-[1px] lg:mt-0 mt-10 border-black-primary border-opacity-25 px-4 flex gap-3"
               >
-                <span className="text-[1.2em] w-full text-center">Trạng thái đơn hàng</span>
+                <span className="text-[1.2em] w-full text-center">{t('order_status')}</span>
                 <Separator></Separator>
                 {listOrderStatusHistory?.map((item, index) => (
                   <TimelineItem key={item.id}>
                     <TimelineOppositeContent
                       sx={{ m: "auto 0" }}
-                      // align="right"
+                      align="right"
                       variant="body"
                       color={index === lastStatusIndex ? "success" : "grey"}
                     >
@@ -523,8 +569,8 @@ export default function ViewOrderDetailUser({
                     <TooltipTrigger>
                       <CircleHelpIcon className="cursor-pointer" />
                     </TooltipTrigger>
-                    <TooltipContent className="flex flex-col gap-2 p-2">
-                      <span>Cập Nhật Mới Nhất</span>
+                    <TooltipContent className="flex flex-col items-center gap-2 p-2">
+                      <span>{t('last_updated')}</span>
                       <span>{formatDate(orderDetail?.lastUpdatedAt)}</span>
                     </TooltipContent>
                   </Tooltip>
@@ -580,7 +626,7 @@ export default function ViewOrderDetailUser({
                 <div className="w-full rounded-lg border shadow-md">
                   <div className="w-full px-3 lg:px-7 py-3 border-b flex flex-row justify-between items-center">
                     <span className="w-1/2 text-left text-black-primary ">
-                      Tổng tiền hàng
+                      {t('total_amount')}
                     </span>
                     <span className="w-1/2 text-right border-l">
                       {formatCurrency(orderDetail?.total)}
@@ -588,7 +634,7 @@ export default function ViewOrderDetailUser({
                   </div>
                   <div className="w-full px-3 lg:px-7 py-3 border-b flex flex-row justify-between items-center">
                     <span className="w-1/2 text-left text-black-primary ">
-                      Phí vận chuyển
+                      {t('shipping_fee')}
                     </span>
                     <span className="w-1/2 text-right border-l">
                       {formatCurrency(orderDetail?.shippingFee)}
@@ -596,7 +642,7 @@ export default function ViewOrderDetailUser({
                   </div>
                   <div className="w-full px-3 lg:px-7 py-3 border-b flex flex-row justify-between items-center">
                     <span className="w-1/2 text-left text-black-primary ">
-                      Giảm giá phí vận chuyển
+                      {t('discount_shipping')}
                     </span>
                     <span className="w-1/2 text-right border-l">
                       {`- ${formatCurrency(orderDetail?.shippingDiscount)}`}
@@ -604,7 +650,7 @@ export default function ViewOrderDetailUser({
                   </div>
                   <div className="w-full px-3 lg:px-7 py-3 border-b flex flex-row justify-between items-center">
                     <span className="w-1/2 text-left text-black-primary ">
-                      Giảm giá từ Shop
+                      {t('discount_from_shop')}
                     </span>
                     <span className="w-1/2 text-right border-l">
                       {`- ${formatCurrency(orderDetail?.discount)}`}
@@ -612,7 +658,7 @@ export default function ViewOrderDetailUser({
                   </div>
                   <div className="w-full px-3 lg:px-7 py-3 border-b flex flex-row justify-between items-center">
                     <span className="w-1/2 text-left text-black-primary ">
-                      Thành tiền
+                      {t('total_payment_amount')}
                     </span>
                     <span className="w-1/2 text-right border-l text-red-primary">
                       {formatCurrency(orderDetail?.grandTotal)}
@@ -629,22 +675,22 @@ export default function ViewOrderDetailUser({
             <div className="w-full rounded-lg border shadow-md">
               <div className="w-full px-3 lg:px-7 py-3 border-b flex flex-row justify-between items-center">
                 <span className="w-1/2 text-left text-black-primary ">
-                  Phương thức thanh toán
+                  {t('payment_method')}
                 </span>
                 <span className="w-1/2 text-right border-l">
                   {orderDetail?.paymentMethod === "VN_PAY"
                     ? "VN PAY"
-                    : "Thanh toán khi nhận hàng"}
+                    : t('cash_on_delivery')}
                 </span>
               </div>
               <div className="w-full px-3 lg:px-7 py-3 border-b">
                 <div className="w-full flex lg:flex-row flex-col items-center justify-center gap-2">
                   <BellRing />
-                  <span className="text-sm">Vui lòng thanh toán</span>
+                  <span className="text-sm">{t('please_pay')}</span>
                   <span className="text-[1.3em] font-bold text-red-primary">
                     {formatCurrency(orderDetail?.grandTotal)}
                   </span>
-                  <span className="text-sm">khi nhận hàng</span>
+                  <span className="text-sm">{t('upon_receipt')}</span>
                 </div>
               </div>
             </div>
