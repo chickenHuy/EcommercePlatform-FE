@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import Loading from "@/components/loading";
@@ -22,6 +21,7 @@ import {
   setDefaultAddress,
 } from "@/api/user/addressRequest";
 import { toast } from "@/hooks/use-toast";
+import { useTranslations } from "next-intl";
 
 export default function Component() {
   const [addresses, setAddresses] = useState([]);
@@ -29,6 +29,7 @@ export default function Component() {
   const [selectedId, setSelectedId] = useState(null);
   const [isDialogConfirmOpen, setIsDialogConfirmOpen] = useState(false);
   const [addressToDelete, setAddressToDelete] = useState(null);
+  const t = useTranslations("User.address");
 
   const fetchAddresses = useCallback(async () => {
     try {
@@ -47,14 +48,14 @@ export default function Component() {
     try {
       await setDefaultAddress(id);
       toast({
-        title: "Thành công",
-        description: "Thay đổi địa chỉ mặc định thành công",
+        title: t("toast_success"),
+        description: t("toast_description_set_default"),
         variant: "success",
       });
       fetchAddresses();
     } catch (error) {
       toast({
-        title: "Thất bại",
+        title: t("toast_error"),
         description: error.message,
         variant: "destructive",
       });
@@ -71,13 +72,15 @@ export default function Component() {
     try {
       await deleteAddress(addressToDelete.id);
       toast({
-        title: "Thành công",
-        description: `Địa chỉ "${addressToDelete.first_line} + ${addressToDelete.second_line}" đã được xóa thành công`,
+        title: t("toast_success"),
+        description: t("toast_description_delete", {
+          address: `${addressToDelete.first_line} ${addressToDelete.second_line}`,
+        }),
       });
       fetchAddresses();
     } catch (error) {
       toast({
-        title: "Thất bại",
+        title: t("toast_error"),
         description: error.message,
         variant: "destructive",
       });
@@ -98,7 +101,7 @@ export default function Component() {
         <Toaster className="z-50" />
         <div className="min-w-[350px] w-[95%] px-5 py-10 shadow-xl rounded-xl flex flex-col items-center justify-between gap-5">
           <div className="w-full flex flex-row justify-between items-center">
-            <h1 className="text-2xl font-bold">Địa chỉ của tôi</h1>
+            <h1 className="text-2xl font-bold">{t("title")}</h1>
             <Button
               onClick={() => {
                 setSelectedId(null);
@@ -106,7 +109,7 @@ export default function Component() {
               }}
             >
               <PlusCircle className="mr-2 h-4 w-4" />
-              Thêm địa chỉ mới
+              {t("button_add_new")}
             </Button>
           </div>
           <div className="w-full grid gap-4">
@@ -135,14 +138,14 @@ export default function Component() {
                             setShowAddressForm(true);
                           }}
                         >
-                          Cập nhật
+                          {t("button_update")}
                         </Button>
                         {!is_default && (
                           <Button
                             variant="outline"
                             onClick={() => handleDeleteClick(address)}
                           >
-                            Xóa
+                            {t("button_delete")}
                           </Button>
                         )}
                       </div>
@@ -157,7 +160,7 @@ export default function Component() {
                               <span
                                 className="text-sm text-red-primary border shadow-sm px-3 py-2 rounded-sm"
                               >
-                                Mặc định
+                                {t("text_is_default")}
                               </span>
                             )}
                             {is_store_address && (
@@ -165,12 +168,12 @@ export default function Component() {
                                 <span
                                   className="text-sm text-red-primary border shadow-sm px-3 py-2 rounded-sm"
                                 >
-                                  Địa chỉ lấy hàng
+                                  {t("text_store_pickup")}
                                 </span>
                                 <span
                                   className="text-sm text-red-primary border shadow-sm px-3 py-2 rounded-sm"
                                 >
-                                  Địa chỉ trả hàng
+                                  {t("text_store_return")}
                                 </span>
                               </>
                             )}
@@ -179,7 +182,7 @@ export default function Component() {
                             <Button
                               onClick={() => handleSetDefault(id)}
                             >
-                              Thiết lập mặc định
+                              {t("text_set_default")}
                             </Button>
                           )}
                         </div>
@@ -203,8 +206,8 @@ export default function Component() {
             isOpen={isDialogConfirmOpen}
             onClose={() => setIsDialogConfirmOpen(false)}
             onConfirm={confirmDelete}
-            tableName="địa chỉ"
-            objectName={`${addressToDelete.first_line} + ${addressToDelete.second_line}`}
+            tableName={t("tableName")}
+            objectName={`${addressToDelete.first_line} ${addressToDelete.second_line}`}
           />
         )}
       </div>
