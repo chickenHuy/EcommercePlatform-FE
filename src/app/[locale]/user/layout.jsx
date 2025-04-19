@@ -27,7 +27,7 @@ export default function UserLayout({ children }) {
 
   useEffect(() => {
     setIsShowUserMenu(false);
-    document.title = t('userTitle') + " | " + title[active];
+    document.title = t('userTitle') + " | " + (title[active] || tUser('orders'));
   }, [pathName]);
 
   return (
