@@ -286,17 +286,17 @@ export default function OrderUser() {
               className="flex flex-col space-y-7 px-7 py-3"
             >
               {listOrder.length > 0 &&
-              <div className="w-full flex items-center relative mx-auto">
-                <Search className="absolute right-5 top-1/2 -translate-y-1/2 h-6 w-6 cursor-pointer" />
-                <Input
-                  placeholder={t('search_orders')}
-                  className="h-[45px] px-5 rounded-full"
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setNextPage(1);
-                  }}
-                />
-              </div>
+                <div className="w-full flex items-center relative mx-auto">
+                  <Search className="absolute right-5 top-1/2 -translate-y-1/2 h-6 w-6 cursor-pointer" />
+                  <Input
+                    placeholder={t('search_orders')}
+                    className="h-[45px] px-5 rounded-full"
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                      setNextPage(1);
+                    }}
+                  />
+                </div>
               }
 
               {listOrder.length > 0 &&
@@ -370,7 +370,7 @@ export default function OrderUser() {
                       {order?.orderItems.map((item) => (
                         <Card
                           key={item.id}
-                          className="w-full flex items-center justify-between p-3 cursor-pointer rounded-sm shadow-none hover:shadow-md"
+                          className="w-full flex flex-col items-start lg:flex-row lg:items-center justify-between p-3 cursor-pointer rounded-lg"
                         >
                           <div className="flex items-center gap-3">
                             <Image
@@ -403,7 +403,7 @@ export default function OrderUser() {
                               </span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="w-full flex justify-end gap-2">
                             <span className="line-through text-sm text-black-tertiary text-opacity-50">
                               {formatCurrency(item.price)}
                             </span>

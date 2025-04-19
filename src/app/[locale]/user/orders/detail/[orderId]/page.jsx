@@ -1,11 +1,10 @@
 "use client";
 
-import { getOneOrderByUser } from "@/api/user/orderRequest";
-import { CircularProgress } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
+import { getOneOrderByUser } from "@/api/user/orderRequest";
 import OrderNotFound from "./order-not-found";
 import ViewOrderDetailUser from "./order-detail";
-import { Label } from "@/components/ui/label";
+import Loading from "@/components/loading";
 
 export default function OrderDetailUserPage({ params }) {
   const [orderDetail, setOrderDetail] = useState(null);
@@ -15,10 +14,11 @@ export default function OrderDetailUserPage({ params }) {
   const fetchOneOrderByUser = useCallback(async () => {
     try {
       const response = await getOneOrderByUser(params.orderId);
-      setOrderDetail(response.result);
-      setListOrderStatusHistory(response.result.orderStatusHistories);
+      const result = response.result;
+      setOrderDetail(result);
+      setListOrderStatusHistory(result.orderStatusHistories);
     } catch (error) {
-      console.error(error);
+      console.error("Failed to fetch order:", error);
     } finally {
       setLoadPage(false);
     }
@@ -31,17 +31,14 @@ export default function OrderDetailUserPage({ params }) {
   return (
     <>
       {loadPage && (
-        <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] space-y-4 bg-black-secondary">
-          <CircularProgress />
-          <Label className="text-2xl text-white-primary">
-            Đang tải dữ liệu...
-          </Label>
+        <div className="w-full h-screen lg:pl-[300px]">
+          <Loading />
         </div>
       )}
-
-      {!orderDetail && <OrderNotFound />}
-
-      {!loadPage && orderDetail && (
+      {!orderDetail && !loadPage && (
+        <OrderNotFound />
+      )}
+      {orderDetail && !loadPage && (
         <ViewOrderDetailUser
           orderDetail={orderDetail}
           listOrderStatusHistory={listOrderStatusHistory}
@@ -49,5 +46,5 @@ export default function OrderDetailUserPage({ params }) {
         />
       )}
     </>
-  );
-}
+  )
+};
