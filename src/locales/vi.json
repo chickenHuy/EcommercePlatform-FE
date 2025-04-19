@@ -253,9 +253,43 @@
       "new_password_length": "Mật khẩu phải từ 8 đến 20 ký tự",
       "new_password_pattern": "Mật khẩu phải chứa ít nhất một chữ cái viết hoa, một chữ cái viết thường và một số",
       "confirm_not_match": "Mật khẩu mới và xác nhận không khớp"
+    },
+    "address": {
+      "toast_success": "Thành công",
+      "toast_error": "Thất bại",
+      "toast_description_set_default": "Thay đổi địa chỉ mặc định thành công",
+      "toast_description_delete": "Địa chỉ {address} đã được xóa",
+      "title": "Địa chỉ của tôi",
+      "button_add_new": "Thêm mới",
+      "button_update": "Cập nhật",
+      "button_delete": "Xóa",
+      "text_is_default": "Mặc định",
+      "text_store_pickup": "Địa chỉ lấy hàng",
+      "text_store_return": "Địa chỉ trả hàng",
+      "text_set_default": "Thiết lập mặc định",
+      "tableName": "địa chỉ"
     }
   },
   "Dialog": {
-    "title": ""
+    "update_account": {
+      "email_error": "Email không hợp lệ",
+      "phone_error": "Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0",
+      "toast_success": "Thành công",
+      "toast_error": "Thất bại",
+      "toast_description_email": "Email đã được cập nhật",
+      "toast_description_phone": "Số điện thoại đã được cập nhật",
+      "title_email": "Cập nhật email",
+      "title_phone": "Cập nhật số điện thoại",
+      "input_placeholder_email": "Nhập email mới @gmail.com",
+      "input_placeholder_phone": "Nhập số điện thoại mới",
+      "button_cancel": "Hủy bỏ",
+      "button_save": "Lưu thay đổi"
+    },
+    "confirm": {
+      "title": "Xác nhận xóa",
+      "description": "Bạn có chắc chắn muốn xóa {tableName} {objectName} không?",
+      "button_cancel": "Hủy bỏ",
+      "button_save": "Xóa"
+    }
   }
 }

@@ -252,9 +252,42 @@
       "new_password_length": "Password must be between 8 and 20 characters",
       "new_password_pattern": "Password must contain at least one uppercase letter, one lowercase letter, and one number",
       "confirm_not_match": "New password and confirmation do not match"
+    },
+    "address": {
+      "toast_success": "Success",
+      "toast_error": "Error",
+      "toast_description_set_default": "Default address changed successfully",
+      "toast_description_delete": "{address} has been deleted",
+      "title": "My Address",
+      "button_add_new": "Add new",
+      "button_update": "Update",
+      "button_delete": "Delete",
+      "text_is_default": "Default",
+      "text_store_pickup": "Pick up address",
+      "text_store_return": "Return address",
+      "text_set_default": "Set default",
+      "tableName": "address"
     }
   },
   "Dialog": {
-    "title": ""
+    "update_account": {
+      "email_error": "Invalid email",
+      "phone_error": "Phone number must be 10 digits and start with 0",
+      "toast_success": "Success",
+      "toast_error": "Error",
+      "toast_description_email": "Email has been updated",
+      "toast_description_phone": "Phone has been updated",
+      "title_email": "Update email",
+      "title_phone": "Update phone",
+      "input_placeholder_email": "Enter new email @gmail.com",
+      "button_cancel": "Cancel",
+      "button_save": "Save"
+    },
+    "confirm": {
+      "title": "Confirm deletion",
+      "description": "Are you sure you want to delete {objectName} {tableName}?",
+      "button_cancel": "Cancel",
+      "button_save": "Delete"
+    }
   }
 }
