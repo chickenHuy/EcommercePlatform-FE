@@ -175,7 +175,9 @@ export default function AddressForm({ open, onOpenChange, id, setHasNew, hasNew,
       });
     }
     finally {
-      setIsAddNewAddress(true);
+      if(setIsAddNewAddress) {
+        setIsAddNewAddress(false);
+      }
       setIsLoading(false);
     }
   };

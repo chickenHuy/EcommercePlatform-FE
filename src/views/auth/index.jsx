@@ -115,7 +115,7 @@ const AuthPage = () => {
             </>
           )}
         </div>
-        <div>
+        <div className="w-full h-full">
           <Image src={BackgroundAuthPage} alt="Backgroupd Auth Page" />
         </div>
       </div>

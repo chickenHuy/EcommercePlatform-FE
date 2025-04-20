@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { CheckCircle, HourglassEmpty, ErrorOutline } from "@mui/icons-material";
+// import { CheckCircle, HourglassEmpty, ErrorOutline } from "@mui/icons-material";
 import { get } from "@/lib/httpClient";
 import { Card } from "@/components/ui/card";
 import { Typography } from "@mui/material";
@@ -53,11 +53,11 @@ const StatusPage = ({ params }) => {
     const getStatusIcon = () => {
         switch (statusType) {
             case "COD":
-                return <ErrorOutline style={{ color: "#F39C12" }} />;
+                // return <ErrorOutline style={{ color: "#F39C12" }} />;
             case "WAITING":
-                return <HourglassEmpty style={{ color: "#FFC107" }} />;
+                // return <HourglassEmpty style={{ color: "#FFC107" }} />;
             case "SUCCESS":
-                return <CheckCircle style={{ color: "#28A745" }} />;
+                // return <CheckCircle style={{ color: "#28A745" }} />;
             default:
                 return null;
         }

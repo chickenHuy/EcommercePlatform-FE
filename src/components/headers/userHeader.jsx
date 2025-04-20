@@ -34,7 +34,7 @@ function UserHeader({ title = '', link = '' }) {
     <header className="fixed top-0 z-20 flex w-full h-16 items-center justify-between bg-black-primary px-3">
       <Link href={link} className="flex flex-row justify-center items-center cursor-pointer gap-2">
         <Logo width={50} height={50} color="#ffffff" />
-        <span className="text-white-secondary text-[19px]">
+        <span className="text-white-secondary text-[19px] hidden sm:block">
           {title}
         </span>
       </Link>

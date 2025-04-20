@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export default function DialogUpdateAccount(props) {
@@ -26,18 +26,19 @@ export default function DialogUpdateAccount(props) {
   const [tempPhone, setTempPhone] = useState(phone);
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const t = useTranslations("Dialog.update_account");
 
   const handleUpdate = async () => {
     if (editField === "email") {
       if (!/^\S+@\S+\.\S+$/.test(tempEmail)) {
-        setEmailError("Email không hợp lệ");
+        setEmailError(t("email_error"));
         return;
       }
     }
 
     if (editField === "phone") {
       if (!/^0\d{9}$/.test(tempPhone)) {
-        setPhoneError("Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0");
+        setPhoneError(t("phone_error"));
         return;
       }
     }
@@ -50,15 +51,13 @@ export default function DialogUpdateAccount(props) {
       onClose();
       await updateFunction({ ...data, userId });
       toast({
-        title: "Thành công",
-        description: `${
-          editField === "email" ? "Email" : "Số điện thoại"
-        } đã được cập nhật`,
+        title: t("toast_success"),
+        description:editField === "email" ? t("toast_description_email") : t("toast_description_phone")
       });
       refreshPage();
     } catch (error) {
       toast({
-        title: "Thất bại",
+        title: t("toast_error"),
         description: error.message,
         variant: "destructive",
       });
@@ -70,7 +69,7 @@ export default function DialogUpdateAccount(props) {
       <DialogContent className="z-[200] max-w-[550px] flex flex-col gap-8">
         <DialogHeader>
           <DialogTitle>
-            Cập nhật {editField === "email" ? "Email" : "Số Điện Thoại"}
+            {editField === "email" ? t("title_email") : t("title_phone")}
           </DialogTitle>
         </DialogHeader>
 
@@ -86,11 +85,10 @@ export default function DialogUpdateAccount(props) {
               <Input
                 value={tempEmail}
                 onChange={(e) => setTempEmail(e.target.value)}
-                placeholder="nhập email mới @gmail.com"
-                className="w-full rounded-xl"
+                placeholder={t("input_placeholder_email")}
               />
               {emailError && (
-                <Label className="text-sm text-error">{emailError}</Label>
+                <span className="text-sm text-red-primary">{emailError}</span>
               )}
             </div>
           )}
@@ -100,21 +98,20 @@ export default function DialogUpdateAccount(props) {
               <Input
                 value={tempPhone}
                 onChange={(e) => setTempPhone(e.target.value)}
-                placeholder="nhập số điện thoại mới"
-                className="w-full rounded-xl"
+                placeholder={t("input_placeholder_phone")}
               />
               {phoneError && (
-                <Label className="text-sm text-error">{phoneError}</Label>
+                <span className="text-sm text-red-primary">{phoneError}</span>
               )}
             </div>
           )}
 
           <div className="mt-4 flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={onClose}>
-              Hủy bỏ
+              {t("button_cancel")}
             </Button>
             <Button type="submit" variant="outline">
-              Lưu thay đổi
+              {t("button_save")}
             </Button>
           </div>
         </form>

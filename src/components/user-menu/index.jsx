@@ -27,6 +27,8 @@ import { Languages } from 'lucide-react';
 import { useState } from 'react';
 import { localeDetector } from '@/utils';
 import Image from 'next/image';
+import Cookies from 'js-cookie';
+import { post } from '@/lib/httpClient';
 
 const UserMenuComponent = (props) => {
     const { user } = props;

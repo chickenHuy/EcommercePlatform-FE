@@ -1,6 +1,5 @@
 "use client";
 
-import CommonHeader from "@/components/headers/commonHeader";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -26,6 +25,7 @@ import { setStore } from "@/store/features/userSearchSlice";
 import { Toaster } from "@/components/ui/toaster";
 import { setCheckout } from "@/store/features/checkoutSlice";
 import DialogConfirmCart from "@/components/dialogs/dialogConfirmCart";
+import UserHeader from "@/components/headers/mainHeader";
 
 export default function CartUser() {
   const [listCart, setListCart] = useState([]);
@@ -566,7 +566,7 @@ export default function CartUser() {
 
       {!loadPage && (
         <div className="min-h-screen min-w-[1200px] flex flex-col bg-blue-primary">
-          <CommonHeader />
+          <UserHeader />
 
           <div className="min-h-16 flex justify-between items-center mx-20 mt-4 bg-white-primary shadow-xl">
             <div className="w-1/2 flex items-center">
