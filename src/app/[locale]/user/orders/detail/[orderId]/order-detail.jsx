@@ -66,7 +66,6 @@ import { changeQuantity } from "@/store/features/cartSlice";
 
 import { formatCurrency, formatDate } from "@/utils";
 import { useTranslations } from "next-intl";
-import { Logo } from "@/components/logo";
 
 
 export default function ViewOrderDetailUser({
@@ -363,50 +362,9 @@ export default function ViewOrderDetailUser({
           <Separator></Separator>
 
           <div className="flex items-center justify-center space-x-4 py-4">
-            {orderDetail?.currentStatus === "DELIVERED" ||
-              orderDetail?.currentStatus === "CANCELLED" ? (
-              <Button
-                variant="outline"
-                onClick={() => handleClickRePurchase(orderDetail?.orderItems)}
-              >
-                Mua lại
-              </Button>
-            ) : null}
 
-            {orderDetail?.currentStatus === "DELIVERED" &&
-              !reviewedAllOrder[orderDetail.id] ? (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  handleClickReview(orderDetail);
-                }}
-              >
-                Đánh giá
-              </Button>
-            ) : null}
 
-            {reviewedAnyOrder[orderDetail.id] ? (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  handleClickViewReview(orderDetail);
-                }}
-              >
-                Xem đánh giá shop
-              </Button>
-            ) : null}
 
-            {orderDetail?.currentStatus === "ON_HOLD" ? (
-              <Button
-                variant="outline"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCancelButtonClick(orderDetail);
-                }}
-              >
-                Hủy đơn hàng
-              </Button>
-            ) : null}
 
 
             <div className="w-full h-fit flex flex-col justify-center items-center">
@@ -564,17 +522,30 @@ c71 -146 313 -144 381 3 18 39 18 39 75 40 49 0 62 4 90 29 l33 29 3 207 3
                     readOnly
                   />
                 </div>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <CircleHelpIcon className="cursor-pointer" />
-                    </TooltipTrigger>
-                    <TooltipContent className="flex flex-col items-center gap-2 p-2">
-                      <span>{t('last_updated')}</span>
-                      <span>{formatDate(orderDetail?.lastUpdatedAt)}</span>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+
+                <div className="flex flex-row justify-center items-center gap-3">
+                  {reviewedAnyOrder[orderDetail.id] ? (
+                    <Button
+                      onClick={() => {
+                        handleClickViewReview(orderDetail);
+                      }}
+                    >
+                      {t('view_review')}
+                    </Button>
+                  ) : null}
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <CircleHelpIcon className="cursor-pointer" />
+                      </TooltipTrigger>
+                      <TooltipContent className="flex flex-col items-center gap-2 p-2">
+                        <span>{t('last_updated')}</span>
+                        <span>{formatDate(orderDetail?.lastUpdatedAt)}</span>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </CardTitle>
               <CardContent className="flex flex-col items-center justify-center p-3 gap-5 border-t round">
                 {orderDetail?.orderItems.map((item) => (
@@ -613,13 +584,36 @@ c71 -146 313 -144 381 3 18 39 18 39 75 40 49 0 62 4 90 29 l33 29 3 207 3
                         </span>
                       </div>
                     </div>
-                    <div className="w-full flex justify-end gap-2">
-                      <span className="line-through text-sm text-black-tertiary ">
-                        {formatCurrency(item.price)}
-                      </span>
-                      <span className="text-md text-red-primary">
-                        {formatCurrency(item.price - item.discount)}
-                      </span>
+                    <div className="w-full flex flex-col justify-end items-end gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="line-through text-sm text-black-tertiary ">
+                          {formatCurrency(item.price)}
+                        </span>
+                        <span className="text-md text-red-primary">
+                          {formatCurrency(item.price - item.discount)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {orderDetail?.currentStatus === "DELIVERED" &&
+                          !reviewedAllOrder[orderDetail.id] ? (
+                          <Button
+                            onClick={() => {
+                              handleClickReview(orderDetail);
+                            }}
+                          >
+                            {t('review')}
+                          </Button>
+                        ) : null}
+                        {orderDetail?.currentStatus === "DELIVERED" ||
+                          orderDetail?.currentStatus === "CANCELLED" ? (
+                          <Button
+                            onClick={() => handleClickRePurchase(orderDetail?.orderItems)}
+                          >
+                            {t('re_purchase')}
+                          </Button>
+                        ) : null}
+                      </div>
                     </div>
                   </Card>
                 ))}
@@ -692,6 +686,18 @@ c71 -146 313 -144 381 3 18 39 18 39 75 40 49 0 62 4 90 29 l33 29 3 207 3
                   </span>
                   <span className="text-sm">{t('upon_receipt')}</span>
                 </div>
+              </div>
+              <div className="w-full flex justify-end px-7 py-3">
+                {orderDetail?.currentStatus === "ON_HOLD" ? (
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCancelButtonClick(orderDetail);
+                    }}
+                  >
+                    {t('cancelled')}
+                  </Button>
+                ) : null}
               </div>
             </div>
           </div>
