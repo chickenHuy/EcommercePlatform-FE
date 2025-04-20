@@ -49,7 +49,7 @@ export function ChatMessages({
             setIsLoading(true)
             try {
                 // Only load the most recent messages (e.g., last 10)
-                const result = await fetchMessages(room.id, 1, 3)
+                const result = await fetchMessages(room.id, 1, 10)
                 // API returns messages in descending order (newest first)
                 // Reverse them to display oldest first
                 setMessages([...result.data].reverse())
@@ -392,7 +392,7 @@ export function ChatMessages({
                             <div className="text-center text-gray-tertiary py-8">No messages yet. Start a conversation!</div>
                         ) : (
                             allMessages.map((msg) => (
-                                <div key={msg.id}>
+                                <div key={msg.id} cl>
                                     {msg.productId && msg.productId != "" ? (
                                         <ProductInMessage productId={msg.productId} products={products} />
                                     ) : null}
