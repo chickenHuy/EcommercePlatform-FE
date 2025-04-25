@@ -2,7 +2,7 @@
 
 import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
@@ -33,9 +33,6 @@ export default function ChartSeller({ chartData }) {
 
   return (
     <Card className="w-full h-full flex flex-col">
-      <CardHeader className="text-md px-5 py-5">
-        <CardTitle>Doanh số trong ngày</CardTitle>
-      </CardHeader>
       <CardContent className="w-full h-full p-3">
         <ChartContainer config={chartConfig} className="w-full h-full">
           <LineChart
@@ -43,7 +40,7 @@ export default function ChartSeller({ chartData }) {
             data={chartData}
             margin={{
               top: 10,
-              bottom: 110,
+              bottom: 60,
               left: 10,
               right: 10,
             }}

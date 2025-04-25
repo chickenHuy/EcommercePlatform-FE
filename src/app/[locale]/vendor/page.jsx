@@ -1,7 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { formatCurrency } from "@/utils";
 import { getStoreStatistic } from "@/api/vendor/storeStatisticRequest";
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +19,7 @@ import {
   PackageCheck,
   PackagePlus,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function Dashboard() {
   const [storeStatistic, setStoreStatistic] = useState({
@@ -34,6 +34,7 @@ export default function Dashboard() {
     numberOfProductsTemporarilyBlocked: 0,
   });
   const { toast } = useToast();
+  const t = useTranslations("Vendor.dashboard");
 
   const fetchStoreStatistic = useCallback(async () => {
     try {
@@ -41,10 +42,10 @@ export default function Dashboard() {
       setStoreStatistic(response.result);
     } catch (error) {
       toast({
-        title: "Thất bại",
+        title: t("notify"),
         description:
           error.message === "Unauthenticated"
-            ? "Phiên làm việc hết hạn. Vui lòng đăng nhập lại!!!"
+            ? t("session_expired")
             : error.message,
         variant: "destructive",
       });
@@ -57,32 +58,32 @@ export default function Dashboard() {
 
   const toDoListAbove = [
     {
-      nameStatus: "Đã xác nhận",
+      nameStatus: t("confirmed"),
       number: storeStatistic.numberOfOrdersConfirmed,
       icon: <CircleCheck className="m-2 scale-75 sm:scale-100" />,
     },
     {
-      nameStatus: "Chuẩn bị hàng",
+      nameStatus: t('preparing'),
       number: storeStatistic.numberOfOrdersPreparing,
       icon: <PackageOpen className="m-2 scale-75 sm:scale-100" />,
     },
     {
-      nameStatus: "Chờ vận chuyển",
+      nameStatus: t('waiting_delivery'),
       number: storeStatistic.numberOfOrdersWaitingForShipping,
       icon: <History className="m-2 scale-75 sm:scale-100" />,
     },
     {
-      nameStatus: "Đơn đã hủy",
+      nameStatus: t('cancelled_order'),
       number: storeStatistic.numberOfOrdersCancelled,
       icon: <SquareX className="m-2 scale-75 sm:scale-100" />,
     },
     {
-      nameStatus: "Sản phẩm bị tạm khóa",
+      nameStatus: t('temporarily_locked'),
       number: storeStatistic.numberOfProductsTemporarilyBlocked,
       icon: <Lock className="m-2 scale-75 sm:scale-100" />,
     },
     {
-      nameStatus: "Sản phẩm hết hàng",
+      nameStatus: t('sold_out'),
       number: storeStatistic.numberOfProductsOutOfStock,
       icon: <CircleSlash2 className="m-2 scale-75 sm:scale-100" />,
     },
@@ -90,17 +91,17 @@ export default function Dashboard() {
 
   const salesAnalysis = [
     {
-      nameStatus: "Doanh thu ngày",
+      nameStatus: t('daily_revenue'),
       number: formatCurrency(storeStatistic.dailyRevenue),
       icon: <CircleDollarSign className="m-2 scale-75 sm:scale-100" />,
     },
     {
-      nameStatus: "Đơn hàng hoàn thành",
+      nameStatus: t('order_completed'),
       number: storeStatistic.numberOfOrdersDelivered,
       icon: <PackageCheck className="m-2 scale-75 sm:scale-100" />,
     },
     {
-      nameStatus: "Đơn hàng mới",
+      nameStatus: t('new_order'),
       number: storeStatistic.numberOfOrdersPending,
       icon: <PackagePlus className="m-2 scale-75 sm:scale-100" />,
     },
@@ -123,7 +124,7 @@ export default function Dashboard() {
       <Card className="shadow-md border rounded-lg pt-3">
         <CardHeader className="flex flex-row items-center gap-3 py-2">
           <CalendarCheck className="scale-125" />
-          <span className="text-[1.3em] font-[900]">Danh sách cần làm</span>
+          <span className="text-[1.3em] font-[900]">{t('to_do_list')}</span>
         </CardHeader>
         <CardContent className="lg:p-5 p-3">
           <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-3">
@@ -150,7 +151,7 @@ export default function Dashboard() {
       <Card className="w-full h-fit flex flex-col shadow-lg border rounded-lg">
         <CardHeader className="flex flex-row items-center gap-3 py-4">
           <ChartNoAxesCombined className="scale-125" />
-          <span className="text-[1.3em] font-[900]">Thống kê bán hàng</span>
+          <span className="text-[1.3em] font-[900]">{t('sale_statistics')}</span>
         </CardHeader>
         <CardContent className="w-full h-fit flex flex-col lg:flex-row justify-center items-start gap-3 p-3">
           <div className="grid md:grid-cols-3 lg:grid-cols-1 grid-cols-2 gap-3 w-full max-w-[650px] h-full">
@@ -167,10 +168,10 @@ export default function Dashboard() {
                   }`}
                 >
                   <div className="px-4 lg:px-6 pt-5 pb-1 h-full flex-grow">
-                    <p className="text-[0.9em]">
+                    <p className="text-[0.9em] xl:text-[1.1em]">
                       {item.nameStatus || "(trạng thái đơn hàng)"}
                     </p>
-                    <p className="text-[1.8em] font-[900] text-blue-600">
+                    <p className="text-[1.8em] xl:text-[2.5em] font-[900] text-blue-600">
                       {item.number || 0}
                     </p>
                   </div>
