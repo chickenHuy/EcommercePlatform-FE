@@ -290,6 +290,40 @@
       "description": "Bạn có chắc chắn muốn xóa {tableName} {objectName} không?",
       "button_cancel": "Hủy bỏ",
       "button_save": "Xóa"
+    },
+    "confirm_cart": {
+      "title_one": "Xác nhận xóa sản phẩm",
+      "title_list": "Xác nhận xóa danh sách sản phẩm",
+      "description_one": "Bạn có chắc chắn muốn xóa sản phẩm {productName} khỏi giỏ hàng không?",
+      "description_list": "Bạn có chắc chắn muốn xóa {productLength} sản phẩm đã chọn khỏi giỏ hàng không?",
+      "button_cancel": "Hủy bỏ",
+      "button_save": "Xóa"
     }
+  },
+  "Cart": {
+    "message_load_page": "Đang tải dữ liệu...",
+    "text_product": "Sản phẩm",
+    "text_unit_price": "Đơn giá",
+    "text_quantity": "Số lượng",
+    "text_amount": "Số tiền",
+    "text_action": "Thao tác",
+    "text_classification": "Phân loại hàng",
+    "text_savings": "Tiết kiệm ngay",
+    "text_empty_cart": "Giỏ hàng trống",
+    "text_select_all": "Chọn tất cả",
+    "text_delete": "Xóa",
+    "text_total_payment": "Tổng thanh toán",
+    "text_product_lower": "sản phẩm",
+    "text_insufficient_quantity": "Số lượng không đủ",
+    "text_nothing": "Không có",
+    "text_checkout": "Mua hàng",
+    "change_quantity_success": "Cập nhật số lượng thành công",
+    "toast_title_update_fail": "Cập nhật thất bại",
+    "toast_title_fail": "Thất bại",
+    "text_invalid_quantity": "Số lượng không hợp lệ",
+    "toast_description_select_delete": "Vui lòng chọn sản phẩm để xóa",
+    "toast_description_select_checkout": "Vui lòng chọn sản phẩm để mua hàng",
+    "toast_description_delete_one": "Xóa sản phẩm {productName} khỏi giỏ hàng thành công",
+    "toast_description_delete_list": "Xóa {productLength} sản phẩm khỏi giỏ hàng thành công"
   }
 }

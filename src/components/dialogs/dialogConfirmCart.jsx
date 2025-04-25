@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 export default function DialogConfirmCart(props) {
   const {
@@ -20,16 +21,17 @@ export default function DialogConfirmCart(props) {
     selectedListCartItem,
     actionType,
   } = props;
+  const t = useTranslations("Dialog.confirm_cart");
 
   const performAction = actionType === "deleteOne" ? onDeleteOne : onDeleteList;
   const title =
     actionType === "deleteOne"
-      ? "Xác nhận xóa sản phẩm"
-      : "Xác nhận xóa danh sách sản phẩm";
+      ? t("title_one")
+      : t("title_list");
   const description =
     actionType === "deleteOne"
-      ? `Bạn có chắc chắn muốn xóa sản phẩm ${cartItemToDelete.name} khỏi giỏ hàng không?`
-      : `Bạn có chắc chắn muốn xóa ${selectedListCartItem.length} sản phẩm đã chọn khỏi giỏ hàng không?`;
+      ? t("description_one", {productName: cartItemToDelete.name})
+      : t("description_list", {productLength: selectedListCartItem.length});
 
   return (
     <Dialog open={onOpen} onOpenChange={onClose}>
@@ -40,10 +42,10 @@ export default function DialogConfirmCart(props) {
         </DialogHeader>
         <DialogFooter className="flex justify-between">
           <Button variant="outline" onClick={onClose}>
-            Hủy bỏ
+            {t("button_cancel")}
           </Button>
           <Button variant="outline" onClick={performAction}>
-            Đồng ý
+            {t("button_save")}
           </Button>
         </DialogFooter>
       </DialogContent>

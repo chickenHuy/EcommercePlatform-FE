@@ -26,6 +26,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { setCheckout } from "@/store/features/checkoutSlice";
 import DialogConfirmCart from "@/components/dialogs/dialogConfirmCart";
 import UserHeader from "@/components/headers/mainHeader";
+import { useTranslations } from "next-intl";
 
 export default function CartUser() {
   const [listCart, setListCart] = useState([]);
@@ -45,6 +46,7 @@ export default function CartUser() {
   const [cartItemToDelete, setCartItemToDelete] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [actionType, setActionType] = useState("");
+  const t = useTranslations("Cart");
 
   const fetchAllCart = useCallback(
     async (isInitialLoad = false) => {
@@ -308,11 +310,11 @@ export default function CartUser() {
       updateQuantityUI(cartItemId, quantityUpdate);
       updateSelectedListCartItem(cartItemId, quantityUpdate);
       toast({
-        description: `Cập nhật số lượng thành công`,
+        description: t("change_quantity_success"),
       });
     } catch (error) {
       toast({
-        title: "Cập nhật số lượng thất bại",
+        title: t("toast_title_update_fail"),
         description: error.message,
         variant: "destructive",
       });
@@ -336,8 +338,8 @@ export default function CartUser() {
       }));
     } else {
       toast({
-        title: "Thất bại",
-        description: "Số lượng không hợp lệ",
+        title: t("toast_title_fail"),
+        description: t("text_invalid_quantity"),
         variant: "destructive",
       });
     }
@@ -427,11 +429,11 @@ export default function CartUser() {
         setActionType("");
         setOpenDialog(false);
         toast({
-          description: `Xóa sản phẩm ${cartItemToDelete.name} khỏi giỏ hàng thành công`,
+          description: t("toast_description_delete_one", {productName: cartItemToDelete.name}),
         });
       } catch (error) {
         toast({
-          title: "Thất bại",
+          title: t("toast_title_fail"),
           description: error.message,
           variant: "destructive",
         });
@@ -442,8 +444,8 @@ export default function CartUser() {
   const handleClickDeleteAll = () => {
     if (selectedListCartItem.length === 0) {
       toast({
-        title: "Thất bại",
-        description: `Vui lòng chọn sản phẩm để xóa`,
+        title: t("toast_title_fail"),
+        description: t("toast_description_select_delete"),
         variant: "destructive",
       });
     } else if (selectedListCartItem.length > 0) {
@@ -467,7 +469,7 @@ export default function CartUser() {
     setActionType("");
     setOpenDialog(false);
     toast({
-      description: `Bạn đã xóa ${selectedListCartItem.length} sản phẩm khỏi giỏ hàng thành công`,
+      description: t("toast_description_delete_list", {productLength: selectedListCartItem.length}),
     });
   };
 
@@ -485,8 +487,8 @@ export default function CartUser() {
     console.log("selectedCartWithItem: ", selectedCartWithItem);
     if (selectedCartWithItem.length === 0) {
       toast({
-        title: "Thất bại",
-        description: "Vui lòng chọn sản phẩm để mua hàng",
+        title: t("toast_title_fail"),
+        description: t("toast_description_select_checkout"),
         variant: "destructive",
       });
     } else {
@@ -559,7 +561,7 @@ export default function CartUser() {
         <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] gap-4 bg-black-primary">
           <CircularProgress></CircularProgress>
           <Label className="text-2xl text-white-primary">
-            Đang tải dữ liệu...
+            {t("message_load_page")}
           </Label>
         </div>
       )}
@@ -579,20 +581,20 @@ export default function CartUser() {
                   />
                 )}
               </div>
-              <Label className="w-5/6 text-sm">Sản phẩm</Label>
+              <Label className="w-5/6 text-sm">{t("text_product")}</Label>
             </div>
             <div className="w-1/2 flex items-center gap-8">
               <Label className="w-1/4 text-sm text-center line-clamp-1 text-black-primary text-opacity-50">
-                Đơn giá
+                {t("text_unit_price")}
               </Label>
               <Label className="w-1/4 text-sm text-center line-clamp-1 text-black-primary text-opacity-50">
-                Số lượng
+                {t("text_quantity")}
               </Label>
               <Label className="w-1/4 text-sm text-center line-clamp-1 text-black-primary text-opacity-50">
-                Số tiền
+                {t("text_amount")}
               </Label>
               <Label className="w-1/4 text-sm text-center line-clamp-1 text-black-primary text-opacity-50">
-                Thao tác
+                {t("text_action")}
               </Label>
             </div>
           </div>
@@ -697,7 +699,7 @@ export default function CartUser() {
                                 {!hasCheckboxCartItem(item) && (
                                   <div className="absolute w-full h-full flex flex-col justify-center items-center rounded-xl bg-gray-primary bg-opacity-50">
                                     <Label className="text-2xl text-red-primary font-bold text-opacity-75 -rotate-6 bg-black-primary bg-opacity-5 p-[8px] rounded-xl">
-                                      Số lượng không đủ
+                                      {t("text_insufficient_quantity")}
                                     </Label>
                                   </div>
                                 )}
@@ -705,12 +707,12 @@ export default function CartUser() {
 
                               <div className="w-1/3 flex flex-col justify-center items-center gap-[4px] hover:cursor-pointer">
                                 <Label className="text-sm text-black-primary text-opacity-50 hover:cursor-pointer">
-                                  Phân loại hàng
+                                  {t("text_classification")}
                                 </Label>
                                 <Label className="text-sm hover:cursor-pointer">
                                   {item.value
                                     ? item.value.join(" | ")
-                                    : "(không có)"}
+                                    : t("text_nothing")}
                                 </Label>
                               </div>
                             </div>
@@ -779,7 +781,7 @@ export default function CartUser() {
                   <CardFooter className="min-h-16 p-0">
                     <PiggyBank className="w-1/12 text-sm text-error-dark" />
                     <div className="w-11/12 flex items-center gap-[4px]">
-                      <Label className="text-sm">Tiết kiệm ngay</Label>
+                      <Label className="text-sm">{t("text_savings")}</Label>
                       <Label className="text-lg font-bold text-red-primary">
                         {formatCurrency(totalSavingsOneCart(cart.items) || 0)}
                       </Label>
@@ -796,7 +798,7 @@ export default function CartUser() {
                   width={200}
                   height={200}
                 />
-                <Label className="text-xl text-center">Giỏ hàng trống</Label>
+                <Label className="text-xl text-center">{t("text_empty_cart")}</Label>
               </div>
             )}
 
@@ -836,7 +838,7 @@ export default function CartUser() {
                     variant="outline"
                     onClick={() => handleCheckedAll(!checkedAll())}
                   >
-                    Chọn tất cả ({countTotalProduct(listCart)})
+                    {t("text_select_all")} ({countTotalProduct(listCart)})
                   </Button>
 
                   {/*Button xóa tất cả*/}
@@ -844,11 +846,11 @@ export default function CartUser() {
                     variant="outline"
                     onClick={() => handleClickDeleteAll()}
                   >
-                    Xóa ({selectedListCartItem.length})
+                    {t("text_delete")} ({selectedListCartItem.length})
                   </Button>
                 </div>
                 <Label className="text-sm text-center line-clamp-2">
-                  Tiết kiệm ngay:{" "}
+                  {t("text_savings")}:{" "}
                   {formatCurrency(
                     totalSavingsListCartItem(selectedListCartItem) || 0
                   )}
@@ -859,7 +861,7 @@ export default function CartUser() {
             <div className="w-1/2 flex justify-center items-center gap-8">
               <div className="flex items-center gap-[4px]">
                 <Label className="text-sm text-center line-clamp-2">
-                  Tổng thanh toán ({selectedListCartItem.length} sản phẩm):
+                  {t("text_total_payment")} ({selectedListCartItem.length} {t("text_product_lower")}):
                 </Label>
                 <Label className="text-xl font-bold text-center line-clamp-2">
                   {formatCurrency(totalPriceAll(selectedListCartItem) || 0)}
@@ -870,7 +872,7 @@ export default function CartUser() {
                 className="w-1/4 bg-red-primary rounded-md"
                 onClick={() => handleCheckout()}
               >
-                Mua hàng
+                {t("text_checkout")}
               </Button>
             </div>
           </div>

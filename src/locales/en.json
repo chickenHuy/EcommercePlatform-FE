@@ -288,6 +288,40 @@
       "description": "Are you sure you want to delete {objectName} {tableName}?",
       "button_cancel": "Cancel",
       "button_save": "Delete"
+    },
+    "confirm_cart": {
+      "title_one": "Confirm product deletion",
+      "title_list": "Confirm delete product list",
+      "description_one": "Are you sure you want to remove {productName} product from your cart?",
+      "description_list": "Are you sure you want to remove the selected product {productLength} from your cart?",
+      "button_cancel": "Cancel",
+      "button_save": "Delete"
     }
+  },
+  "Cart": {
+    "message_load_page": "Loading data...",
+    "text_product": "Product",
+    "text_unit_price": "Unit price",
+    "text_quantity": "Quantity",
+    "text_amount": "Amount",
+    "text_action": "Action",
+    "text_classification": "Classification",
+    "text_savings": "Instant savings",
+    "text_empty_cart": "Empty cart",
+    "text_select_all": "Select all",
+    "text_delete": "Delete",
+    "text_total_payment": "Total payment",
+    "text_product_lower": "product",
+    "text_insufficient_quantity": "Insufficient quantity",
+    "text_nothing": "Nothing",
+    "text_checkout": "Checkout",
+    "change_quantity_success": "Update quantity successfully",
+    "toast_title_update_fail": "Update failed",
+    "toast_title_fail": "Failed",
+    "text_invalid_quantity": "Invalid quantity",
+    "toast_description_select_delete": "Please select a product to delete",
+    "toast_description_select_checkout": "Please select a product to purchase",
+    "toast_description_delete_one": "{productName} product removed from cart successfully",
+    "toast_description_delete_list": "Removed {productLength} product from cart successfully"
   }
 }
