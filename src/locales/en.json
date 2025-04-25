@@ -79,6 +79,25 @@
       "logout": "Logout"
     }
   },
+  "MainHeader": {
+    "text_become_seller": "Become a seller",
+    "text_go_to_seller_page": "Go to seller page",
+    "text_go_to_admin_page": "Go to admin page",
+    "text_favorite_product": "Favorite product",
+    "text_empty_wishlist": "There are no products in the wishlist yet",
+    "text_confirm_deletion": "Confirm deletion",
+    "text_confirm_description": "Are you sure you want to remove {productName} from your wishlist?",
+    "button_cancel": "Cancel",
+    "button_save": "Confirm",
+    "text_account": "Account",
+    "text_log_out": "Log out",
+    "text_auth": "Log in / Register",
+    "text_not_product": "No product yet",
+    "text_new_products_added": "New Products Added",
+    "text_count": "{count} Add To Cart",
+    "text_view_cart": "View Cart",
+    "text_search_products": "Search for products ..."
+  },
   "VendorRegister": {
     "register_store": "Register as a vendor",
     "username": "Username",

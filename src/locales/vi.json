@@ -79,6 +79,25 @@
       "logout": "Logout"
     }
   },
+  "MainHeader": {
+    "text_become_seller": "Trở thành người bán",
+    "text_go_to_seller_page": "Đến trang bán hàng",
+    "text_go_to_admin_page": "Đến trang quản trị",
+    "text_favorite_product": "Sản phẩm yêu thích",
+    "text_empty_wishlist": "Chưa có sản phẩm nào trong danh sách yêu thích",
+    "text_confirm_deletion": "Xác nhận xóa",
+    "text_confirm_description": "Bạn có chắc chắn muốn xóa {productName} khỏi danh sách yêu thích không?",
+    "button_cancel": "Hủy",
+    "button_save": "Xác nhận",
+    "text_account": "Tài khoản",
+    "text_log_out": "Đăng xuất",
+    "text_auth": "Đăng nhập / Đăng ký",
+    "text_not_product": "Chưa có sản phẩm",
+    "text_new_products_added": "Sản Phẩm Mới Thêm",
+    "text_count": "{count} Thêm Vào Giỏ Hàng",
+    "text_view_cart": "Xem Giỏ Hàng",
+    "text_search_products": "Tìm kiếm sản phẩm ..."
+  },
   "VendorRegister": {
     "register_store": "Đăng ký trở thành người bán",
     "username": "Tên đăng nhập",

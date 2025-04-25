@@ -24,7 +24,7 @@ import { setSearch } from "@/store/features/userSearchSlice";
 import { useRouter } from "next/navigation";
 import { CommandDialog } from "cmdk";
 
-export function SearchWithSuggestions({ className }) {
+export function SearchWithSuggestions({ className, t }) {
   const [query, setQuery] = React.useState("");
   const [isExpanded, setIsExpanded] = React.useState(true);
   const [suggestions, setSuggestions] = React.useState([]);
@@ -113,7 +113,7 @@ export function SearchWithSuggestions({ className }) {
       >
         <Input
           ref={inputRef}
-          placeholder="Tìm kiếm sản phẩm ..."
+          placeholder={t("text_search_products")}
           value={query}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
@@ -138,7 +138,6 @@ export function SearchWithSuggestions({ className }) {
           }}
         >
           <Search className="h-full text-white-primary" />
-          <span className="sr-only">Search</span>
         </Button>
       </div>
       {suggestions.length > 0 && isExpanded && (

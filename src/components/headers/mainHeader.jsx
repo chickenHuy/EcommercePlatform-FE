@@ -1,6 +1,6 @@
 "use client";
 import Cookies from "js-cookie";
-import { User, ShoppingCartIcon, MessageCircleIcon } from 'lucide-react';
+import { User, ShoppingCartIcon } from 'lucide-react';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SearchWithSuggestions } from "../searchBars/userSearch";
@@ -10,12 +10,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { countQuantity } from "@/api/cart/countItem";
 import { changeQuantity } from "@/store/features/cartSlice";
 import ShoppingCard from '../card/shoppingCard';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { get, post } from '@/lib/httpClient';
-import { set } from "react-hook-form";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import WishlistPopup from "../popUp/wishListPopUp";
 import { StoreChat } from "../chat/storeChat";
+import { useTranslations } from "next-intl";
 
 const UserHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -24,6 +24,7 @@ const UserHeader = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const [user, setUser] = useState(null);
+  const t = useTranslations("MainHeader");
 
   const getMe = async () => {
     await get("/api/v1/users/info").then((res) => {
@@ -96,23 +97,23 @@ const UserHeader = () => {
               href="/"
               className="text-sm font-bold text-white-primary hover:text-white-tertiary transition-colors"
             >
-              HK-Uptech
+              HKK-Uptech
             </Link>
             <Link
               href={user?.lastRole === "USER" ? "/register-store" : user?.lastRole === "SELLER" ? "/vendor/" : user?.lastRole === "ADMIN" ? "/admin" : "/"}
               className="text-s font-normal ml-2 text-white-primary/40 hover:text-white-tertiary transition-colors"
             >
-              {user?.lastRole === "USER" ? "Trở thành người bán" : ""}
-              {user?.lastRole === "SELLER" ? "Đến trang bán hàng" : ""}
-              {user?.lastRole === "ADMIN" ? "Đến trang quản trị" : ""}
+              {user?.lastRole === "USER" ? t("text_become_seller") : ""}
+              {user?.lastRole === "SELLER" ? t("text_go_to_seller_page") : ""}
+              {user?.lastRole === "ADMIN" ? t("text_go_to_admin_page") : ""}
             </Link>
 
             <div className="flex-1 flex justify-center px-4">
-              <SearchWithSuggestions />
+              <SearchWithSuggestions t={t} />
             </div>
 
             <div className="flex items-center space-x-4">
-              <WishlistPopup />
+              <WishlistPopup t={t}/>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   {user ? (<Button size="icon" variant="ghost">
@@ -130,23 +131,22 @@ const UserHeader = () => {
                     className="text-white-primary"
                   >
                     <User className="h-5 w-5" />
-                    <span className="sr-only">Account</span>
                   </Button>)}
                 </DropdownMenuTrigger>
                 {user ? (<DropdownMenuContent className="w-56">
                   <DropdownMenuLabel className="truncate">{user ? user.name : "My Account"}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => handleMyAccount()}>
-                    Tài khoản
+                    {t('text_account')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleLogout()}>
-                    Đăng xuất
+                    {t("text_log_out")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>) : (
                   <DropdownMenuContent className="w-56">
                     <DropdownMenuItem>
                       <Link href="/auth">
-                        Đăng nhập / Đăng ký
+                        {t("text_auth")}
                       </Link>
                     </DropdownMenuItem>
                   </DropdownMenuContent>)}
@@ -162,14 +162,13 @@ const UserHeader = () => {
                   className="text-white-primary relative"
                 >
                   <ShoppingCartIcon className="h-5 w-5" />
-                  <div className="sr-only">Cart</div>
                   {quantity > 0 && (
                     <div className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-primary text-[10px] font-bold flex items-center justify-center">
                       {quantity}
                     </div>
                   )}
                 </Button>
-                {isCartVisible && <ShoppingCard />}
+                {isCartVisible && <ShoppingCard t={t} />}
               </div>
               <div
                 className="relative"
