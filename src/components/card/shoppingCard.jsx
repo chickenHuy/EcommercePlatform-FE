@@ -10,7 +10,7 @@ import { getTop5CartItems } from "@/api/cart/getTop5CartItem"
 import ShopEmpty from "@/assets/images/storeEmpty.jpg"
 import { useSelector } from "react-redux"
 
-export default function ShoppingCard() {
+export default function ShoppingCard({t}) {
     const [cartItems, setCartItems] = useState([])
     const count = useSelector((state) => state.cartReducer.count)
 
@@ -40,7 +40,7 @@ export default function ShoppingCard() {
                         height={80}
                         className="mx-auto mb-4"
                     />
-                    <p className="text-muted-foreground">Chưa có sản phẩm</p>
+                    <p className="text-muted-foreground">{t("text_not_product")}</p>
                 </div>
             </Card>
         )
@@ -49,7 +49,7 @@ export default function ShoppingCard() {
     return (
         <Card className="w-[360px] shadow-lg absolute -right-2 top-[calc(100%+8px)] before:content-[''] before:absolute before:top-[-8px] before:right-[18px] before:w-0 before:h-0 before:border-l-[8px] before:border-l-transparent before:border-r-[8px] before:border-r-transparent before:border-b-[8px] before:border-b-white-primary">
             <div className="p-3 border-b bg-gray-secondary bg-opacity-10">
-                <h3 className="text-sm font-medium">Sản Phẩm Mới Thêm</h3>
+                <h3 className="text-sm font-medium">{t("text_new_products_added")}</h3>
             </div>
             <div className="max-h-[400px] overflow-y-auto">
                 {cartItems.map((item) => (
@@ -87,14 +87,14 @@ export default function ShoppingCard() {
             </div>
             <div className="p-2 bg-gray-secondary bg-opacity-10">
                 <div className="font-light text-gray-tertiary mb-3 text-sm">
-                    {count} Thêm Vào Giỏ Hàng
+                    {t("text_count", {count: count})}
                 </div>
                 <Button
                     className="w-full bg-red-primary hover:bg-red-primary/50 text-white-primary"
                     asChild
                 >
                     <Link href="/cart">
-                        Xem Giỏ Hàng
+                        {t('text_view_cart')}
                     </Link>
                 </Button>
             </div>

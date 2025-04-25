@@ -1,17 +1,17 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Heart, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import EmptyImage from "@/assets/images/brandEmpty.jpg";
 import StoreImage from "@/assets/images/storeEmpty.jpg";
-import { get, del } from "@/lib/httpClient"; // Giả sử `del` là phương thức DELETE được định nghĩa trong httpClient
+import { get, del } from "@/lib/httpClient";
 import Loading from "../loading";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { useDispatch, useSelector } from "react-redux";
 import { setWishList } from "@/store/features/wishListSlice";
 
-export default function WishlistPopup() {
+export default function WishlistPopup({t}) {
   const [isLoading, setLoading] = useState(false);
   const wishlistData = useSelector((state) => state.wishListReducer.wishList);
   const dispatch = useDispatch();
@@ -67,7 +67,7 @@ export default function WishlistPopup() {
         <DialogContent className="sm:max-w-[600px]">
           <div className="max-h-[80vh] overflow-auto">
             <h2 className="text-2xl font-semibold mb-6 text-gray-900">
-              Sản phẩm yêu thích
+              {t("text_favorite_product")}
             </h2>
             <div className="grid gap-4">
               {isLoading && <Loading />}
@@ -80,7 +80,7 @@ export default function WishlistPopup() {
                     height={100}
                   />
                   <p className="text-gray-primary text-center">
-                    Chưa có sản phẩm nào trong danh sách yêu thích
+                    {t("text_empty_wishlist")}
                   </p>
                 </>
               )}
@@ -143,18 +143,14 @@ export default function WishlistPopup() {
       {confirmDelete && (
         <Dialog open={!!confirmDelete} onOpenChange={() => setConfirmDelete(null)}>
           <DialogContent className="sm:max-w-[400px] text-center">
-            <h3 className="text-lg font-semibold mb-4">Xác nhận xóa</h3>
-            <p>
-              Bạn có chắc chắn muốn xóa{" "}
-              <span className="font-bold">{confirmDelete.productName}</span> khỏi danh
-              sách yêu thích không?
-            </p>
+            <h3 className="text-lg font-semibold mb-4">{t("text_confirm_deletion")}</h3>
+            <p>{t("text_confirm_description", {productName: confirmDelete.productName})}</p>
             <div className="flex justify-center gap-4 mt-6">
               <button
                 className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                 onClick={() => setConfirmDelete(null)}
               >
-                Hủy
+                {t("button_cancel")}
               </button>
               <button
                 className="px-4 py-2 bg-red-primary text-white-primary rounded hover:bg-error-light"
@@ -163,7 +159,7 @@ export default function WishlistPopup() {
                   () => handleRemoveProduct(confirmDelete.productId) 
                 }
               >
-                Xác nhận
+                {t("button_save")}
               </button>
             </div>
           </DialogContent>
