@@ -14,14 +14,10 @@ import { checkoutOrders } from "@/api/user/checkout";
 import { toast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { useRouter } from "next/navigation";
-import { set } from "react-hook-form";
-import { useDispatch } from "react-redux";
-import { setCheckout } from "@/store/features/checkoutSlice";
-import { on } from "events";
 
 export default function CheckoutContent(props) {
   const route = useRouter();
-  const { stores, selectedAddress } = props;
+  const { stores, selectedAddress, t } = props;
   const calculateSubtotal = (data) => {
     let subtotal = 0;
     data.forEach((store) => {
@@ -42,8 +38,6 @@ export default function CheckoutContent(props) {
     return discount;
   };
 
-  const dispatch = useDispatch();
-
   const subtotal = calculateSubtotal(stores);
   const shippingFee = 24000 * stores.length;
   const discount = calculateDiscount(stores);
@@ -62,7 +56,7 @@ export default function CheckoutContent(props) {
     setOnSubmit(true);
     if (selectedAddress === undefined) {
       return toast({
-        title: "Vui lòng chọn địa chỉ giao hàng",
+        title: t("toast_title_select_address"),
         variant: "destructive",
       });
     }
@@ -95,7 +89,7 @@ export default function CheckoutContent(props) {
     } catch (error) {
       setOnSubmit(false);
       toast({
-        title: "Đã xãy ra lỗi trong quá trình đặt hàng, vui lòng thử lại",
+        title: t("toast_title_error_order"),
         description: error.message,
         variant: "destructive",
       });
@@ -106,7 +100,7 @@ export default function CheckoutContent(props) {
     <div>
       <Toaster />
       <div className="space-y-6 p-4 rounded-xl  bg-gradient-to-br from-[#ffffff] via-[#a40b0b] to-[#f64a4a] bg-opacity-5">
-        <span className="text-2xl p-4 font-semibold">Sản phẩm</span>
+        <span className="text-2xl p-4 font-semibold">{t("text_product")}</span>
         {stores.map((store) => (
           <Card key={store.storeId} className="rounded p-0">
             <CardHeader className="flex-row items-center gap-4 pb-2">
@@ -116,10 +110,10 @@ export default function CheckoutContent(props) {
             <Separator className="mx-autow-full my-2" />
             <CardContent>
               <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4">
-                <div className="font-medium">Sản phẩm</div>
-                <div className="text-right font-medium">Đơn giá</div>
-                <div className="text-right font-medium">Số lượng</div>
-                <div className="text-right font-medium">Thành tiền</div>
+                <div className="font-medium">{t("text_product")}</div>
+                <div className="text-right font-medium">{t("text_unit_price")}</div>
+                <div className="text-right font-medium">{t("text_quantity")}</div>
+                <div className="text-right font-medium">{t("text_total")}</div>
 
                 {store.items.map((product) => (
                   <React.Fragment key={product.id}>
@@ -135,7 +129,7 @@ export default function CheckoutContent(props) {
                         <h4 className="font-medium">{product.name}</h4>
                         {product.value ? (
                           <p className="text-sm text-muted-foreground">
-                            Loại: {product.value.join(" | ")}
+                            {t("text_classification")}: {product.value.join(" | ")}
                           </p>
                         ) : null}
                       </div>
@@ -155,9 +149,9 @@ export default function CheckoutContent(props) {
                     <BaggageClaim id="insurance" />
                     <div className="grid gap-1.5">
                       <p className="text-sm text-muted-foreground">
-                        Phương thức vận chuyển{" "}
+                        {t("text_shipping_method")}{" "}
                         <span className="text-red-primary hover:underline">
-                          Cơ bản
+                          {t("text_basic")}
                         </span>
                       </p>
                     </div>
@@ -177,14 +171,14 @@ export default function CheckoutContent(props) {
               className="h-6 w-6 text-black-primary m-
                         2"
             ></MessageCircle>
-            <span>Ghi chú đơn hàng</span>
+            <span>{t("text_note")}</span>
           </CardTitle>
           <CardContent className="">
             <Textarea
               className="bg-blue-primary min-h-[100px] bg-opacity-15 font-light"
               value={note}
               onChange={(e) => handleNoteChange(e)}
-              placeholder="Nhập ghi chú tại đây..."
+              placeholder={t("text_enter_note")}
             ></Textarea>
           </CardContent>
         </Card>
@@ -196,7 +190,7 @@ export default function CheckoutContent(props) {
             <div className="flex items-center mb-4">
               <Wallet className="h-6 w-6 text-black-primary"></Wallet>
               <h3 className="text-lg font-medium ml-2">
-                Phương thức thanh toán
+                {t("text_payment_method")}
               </h3>
             </div>
             <RadioGroup
@@ -207,19 +201,18 @@ export default function CheckoutContent(props) {
               <div className="flex items-center space-x-4 rounded-lg border p-4">
                 <RadioGroupItem value="COD" id="cod" />
                 <Label htmlFor="cod" className="flex-1 cursor-pointer">
-                  Thanh toán khi nhận hàng
+                  {t("text_cash_on_delivery")}
                 </Label>
                 {paymentMethod === "COD" && (
                   <div className="text-sm text-muted-foreground">
-                    Phí thu hộ: ₫0 VND. Ưu đãi về phí vận chuyển (nếu có) áp
-                    dụng cả với phí thu hộ.
+                    {t("text_note_payment_method")}
                   </div>
                 )}
               </div>
               <div className="flex items-center space-x-4 rounded-lg border p-4">
                 <RadioGroupItem value="VN_PAY" id="vnpay" />
                 <Label htmlFor="vnpay" className="flex-1 cursor-pointer">
-                  VN PAY
+                  {t("text_VN_PAY")}
                 </Label>
                 {paymentMethod === "VN_PAY" && (
                   <Image
@@ -237,34 +230,34 @@ export default function CheckoutContent(props) {
 
         <div className="space-y-4 px-4 bg-white-primary border-0 rounded-t-xl border-b-[4px] border-red-primary p-2">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Tổng tiền hàng</span>
+            <span className="text-muted-foreground">{t("text_total_price")}</span>
             <span>₫{subtotal.toLocaleString()}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">
-              Tổng tiền phí vận chuyển
+              {t("text_total_shipping_cost")}
             </span>
             <span>₫{shippingFee.toLocaleString()}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">
-              Tổng cộng Voucher giảm giá
+              {t("text_total_discount_voucher")}
             </span>
             <span className="text-red-primary">
               -₫{discount.toLocaleString()}
             </span>
           </div>
           <div className="flex justify-between text-lg font-medium">
-            <span>Tổng thanh toán</span>
+            <span>{t("text_total_payment")}</span>
             <span className="text-red-primary">₫{total.toLocaleString()}</span>
           </div>
         </div>
 
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Nhấn "Đặt hàng" đồng nghĩa vớ i việc bạn đồng ý tuân theo{" "}
+            {t("text_message_confirm_click")}{" "}
             <a href="#" className="text-primary hover:underline">
-              Điều khoản HK Uptech
+              {t("text_HKK_Uptech_terms")}
             </a>
           </p>
           <Button
@@ -273,7 +266,7 @@ export default function CheckoutContent(props) {
             onClick={(e) => handleSubmit(e)}
             disabled={onSubmit}
           >
-            {onSubmit ? "Đang xử lý..." : "Đặt hàng"}
+            {onSubmit ? t("text_processing") : t("text_place_order")}
           </Button>
         </div>
       </div>

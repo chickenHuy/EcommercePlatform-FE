@@ -1,5 +1,4 @@
 "use client";
-import { getAddresses } from "@/api/user/addressRequest";
 import AddressForm from "@/components/dialogs/dialogEditAddress";
 import Loading from "@/components/loading";
 import { Badge } from "@/components/ui/badge";
@@ -16,10 +15,9 @@ import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/toaster";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
-import { set } from "react-hook-form";
+import { useEffect, useState } from "react";
 export default function listAdress(props) {
-    const { open, onOpenChange, defaultId, addresses, setDefaultAddress, setHasNew, hasNew } = props;
+    const { open, onOpenChange, defaultId, addresses, setDefaultAddress, setHasNew, hasNew, t } = props;
     const [selectedAddressId, setSelectedAddressId] = useState(defaultId);
     const handleRadioChange = (addressId) => {
         setSelectedAddressId(addressId);
@@ -59,7 +57,7 @@ export default function listAdress(props) {
                     <DialogContent className="sm:max-w-[520px] p-0">
                         <DialogHeader>
                             <DialogTitle className="text-xl pl-4 pt-2">
-                                Danh sách địa chỉ
+                                {t("text_address_list")}
                             </DialogTitle>
                         </DialogHeader>
                         <ScrollArea className="grid gap-4 max-h-[360px] px-4 pt-4">
@@ -100,13 +98,13 @@ export default function listAdress(props) {
                                                             variant="secondary"
                                                             className="border-[#151010] text-[#D95040]"
                                                         >
-                                                            Mặc định
+                                                            {t("text_default")}
                                                         </Badge>
                                                     )}
                                                     {address.is_store_address && (
                                                         <>
-                                                            <Badge variant="outline">Địa chỉ lấy hàng</Badge>
-                                                            <Badge variant="outline">Địa chỉ trả hàng</Badge>
+                                                            <Badge variant="outline">{t("text_pickup_address")}</Badge>
+                                                            <Badge variant="outline">{t("text_return_address")}</Badge>
                                                         </>
                                                     )}
                                                 </div>
@@ -126,11 +124,11 @@ export default function listAdress(props) {
                                 addresses.length < 10 ? (<Button variant="outline" className="hover:cursor-pointer hover:bg-blue-primary m-4" onClick={() => handleAddNewAddress()}>
                                     <PlusIcon>
                                     </PlusIcon>
-                                    <span>Thêm địa chỉ mới</span>
+                                    <span>{t("text_add_new")}</span>
                                 </Button>) : (<div className="text-gray-tertiary font-light m-4">
-                                    Bạn đã giới hạn số lượng địa chỉ cho phép.
+                                    {t("text_address_limited")}
                                     <Link href={"/user/address"} className="text-red-primary ml-2">
-                                        Chỉnh sửa
+                                        {t("text_edit")}
                                     </Link>
                                 </div>)
                             }
@@ -142,10 +140,10 @@ export default function listAdress(props) {
                                         setSelectedAddressId(defaultId);
                                     }
                                 }>
-                                    Hủy
+                                    {t("button_cancel")}
                                 </Button>
                                 <Button className="bg-red-primary m-2" onClick={() => handleConfirm()}>
-                                    Xác nhận
+                                    {t("button_save")}
                                 </Button>
                             </div>
                         </div>

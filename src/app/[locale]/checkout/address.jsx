@@ -2,14 +2,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
-import ListAdress from "./listAddressPopup";
+import ListAddress from "./listAddressPopup";
 import { getAddresses } from "@/api/user/addressRequest";
 import { useCallback, useState, useEffect } from "react";
 
 export default function Address(props) {
 
     const [addresses, setAddresses] = useState([]);
-    const { defaultAddress, setDefaultAddress } = props;
+    const { defaultAddress, setDefaultAddress, t } = props;
     const page = 1;
     const itemsPerPage = 10;
     const [hasNew, setHasNew] = useState(false);
@@ -38,7 +38,7 @@ export default function Address(props) {
             <CardHeader className="py-0 px-[7px] ">
                 <div className="flex flex-row justify-start items-center">
                     <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
-                    <CardTitle className="text-base">Địa Chỉ Nhận Hàng</CardTitle>
+                    <CardTitle className="text-base">{t("text_shipping_address")}</CardTitle>
                 </div>
             </CardHeader>
             <CardContent>
@@ -53,22 +53,22 @@ export default function Address(props) {
                                 {
                                     defaultAddress?.is_default ?
                                         (<div className="text-red-primary/90 mr-6 text-sm">
-                                            Mặc định
+                                            {t("text_default")}
                                         </div>) : null
                                 }
                             </div>
                         ) : (
-                            <div className="text-sm">Chưa có địa chỉ, vui lòng thêm mới</div>
+                            <div className="text-sm">{t("text_not_address")}</div>
                         )
                     }
                     <div className="">
                         <Button onClick={() => handleChangeAddress()}>
-                            Thay Đổi
+                            {t("button_change")}
                         </Button>
                     </div>
                 </div>
             </CardContent>
-            <ListAdress open={open} onOpenChange={setOpen} setHasNew={setHasNew} hasNew={hasNew} setDefaultAddress={setDefaultAddress} defaultId={defaultAddress?.id} addresses={addresses} />
+            <ListAddress open={open} onOpenChange={setOpen} setHasNew={setHasNew} hasNew={hasNew} setDefaultAddress={setDefaultAddress} defaultId={defaultAddress?.id} addresses={addresses} t={t} />
         </Card>
     )
 }
