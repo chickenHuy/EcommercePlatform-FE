@@ -1,21 +1,14 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
 import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
 
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Label } from "@/components/ui/label";
+import { useEffect, useState } from "react";
 
 const chartConfig = {
   revenue: {
@@ -25,30 +18,45 @@ const chartConfig = {
 };
 
 export default function ChartSeller({ chartData }) {
+  const [isPhone, setIsPhone] = useState(false);
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 600) {
+        setIsPhone(true);
+      } else {
+        setIsPhone(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+  }, []);
+
   return (
-    <Card className="">
-      <CardHeader>
-        <CardTitle className="text-lg">Biểu đồ doanh số trong ngày</CardTitle>
+    <Card className="w-full h-full flex flex-col">
+      <CardHeader className="text-md px-5 py-5">
+        <CardTitle>Doanh số trong ngày</CardTitle>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
+      <CardContent className="w-full h-full p-3">
+        <ChartContainer config={chartConfig} className="w-full h-full">
           <LineChart
             accessibilityLayer
             data={chartData}
             margin={{
-              top: 100,
-              bottom: 100,
-              left: 50,
-              right: 50,
+              top: 10,
+              bottom: 110,
+              left: 10,
+              right: 10,
             }}
           >
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={60}
-              tickFormatter={(value) => value.slice(0, 10)}
+              tickMargin={10}
+              interval={0}
+              tick={{
+                angle: -90,
+                textAnchor: "end",
+              }}
             />
             <ChartTooltip
               cursor={false}
@@ -59,17 +67,17 @@ export default function ChartSeller({ chartData }) {
                     const { payload } = props;
                     const date = payload?.date;
                     return (
-                      <div className="flex items-center justify-between space-x-2 p-2">
-                        <div className="h-full w-[3px] bg-error"></div>
+                      <div className="flex items-center justify-between space-x-2 p-1">
+                        <div className="h-full w-[3px] bg-red-primary"></div>
                         <div className="flex flex-col space-y-1">
-                          <Label>{date}</Label>
+                          <span>{date}</span>
                           <div>
-                            <Label className="text-muted-foreground mr-2">
+                            <span className="text-muted-foreground mr-2">
                               {chartConfig[name]?.label || name}:
-                            </Label>
-                            <Label className="font-bold">
+                            </span>
+                            <span className="font-bold">
                               {value.toLocaleString()} ₫
-                            </Label>
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -81,10 +89,10 @@ export default function ChartSeller({ chartData }) {
             <Line
               dataKey="revenue"
               type="natural"
-              stroke="var(--color-revenue)"
+              stroke="#ef233b"
               strokeWidth={2}
               dot={{
-                fill: "var(--color-revenue)",
+                fill: "#ef233b",
               }}
               activeDot={{
                 r: 6,
@@ -100,14 +108,6 @@ export default function ChartSeller({ chartData }) {
           </LineChart>
         </ChartContainer>
       </CardContent>
-      {/* <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this date <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 dates
-        </div>
-      </CardFooter> */}
     </Card>
   );
 }
