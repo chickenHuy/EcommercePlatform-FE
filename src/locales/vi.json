@@ -14,40 +14,57 @@
       "logout": "Đăng Xuất"
     }
   },
-  "VendorNagivate": {
-    "order": {
-      "title": "Quản Lý Đơn Hàng",
-      "my-orders": "Tất Cả",
-      "cancellation": "Đơn Hủy",
-      "return-refund": "Trả Hàng/Hoàn Tiền",
-      "shipping-setting": "Cài Đặt Vận Chuyển"
+  "Vendor": {
+    "VendorNagivate": {
+      "order": {
+        "title": "Quản Lý Đơn Hàng",
+        "my-orders": "Tất Cả",
+        "cancellation": "Đơn Hủy",
+        "return-refund": "Trả Hàng/Hoàn Tiền",
+        "shipping-setting": "Cài Đặt Vận Chuyển"
+      },
+      "product": {
+        "title": "Quản Lý Sản Phẩm",
+        "my-products": "Tất Cả Sản Phẩm",
+        "add-new-product": "Thêm Sản Phẩm"
+      },
+      "customerService": {
+        "title": "Chăm Sóc Khách Hàng",
+        "chat-management": "Quản lý Chat",
+        "review-management": "Quản lý Đánh Giá"
+      },
+      "finance": {
+        "title": "Tài Chính",
+        "my-income": "Doanh Thu",
+        "my-balance": "Số Dư",
+        "bank-account": "Tài Khoản Ngân Hàng"
+      },
+      "data": {
+        "title": "Dữ Liệu",
+        "business-insight": "Phân Tích Bán Hàng",
+        "account-health": "Hiệu Quả Hoạt Động"
+      },
+      "shop": {
+        "title": "Quản Lý Shop",
+        "shop-information": "Hồ Sơ Shop",
+        "shop-decoration": "Trang Trí Shop",
+        "shop-setting": "Thiết Lập Shop"
+      }
     },
-    "product": {
-      "title": "Quản Lý Sản Phẩm",
-      "my-products": "Tất Cả Sản Phẩm",
-      "add-new-product": "Thêm Sản Phẩm"
-    },
-    "customerService": {
-      "title": "Chăm Sóc Khách Hàng",
-      "chat-management": "Quản lý Chat",
-      "review-management": "Quản lý Đánh Giá"
-    },
-    "finance": {
-      "title": "Tài Chính",
-      "my-income": "Doanh Thu",
-      "my-balance": "Số Dư",
-      "bank-account": "Tài Khoản Ngân Hàng"
-    },
-    "data": {
-      "title": "Dữ Liệu",
-      "business-insight": "Phân Tích Bán Hàng",
-      "account-health": "Hiệu Quả Hoạt Động"
-    },
-    "shop": {
-      "title": "Quản Lý Shop",
-      "shop-information": "Hồ Sơ Shop",
-      "shop-decoration": "Trang Trí Shop",
-      "shop-setting": "Thiết Lập Shop"
+    "dashboard": {
+      "notify": "Thông báo",
+      "session_expired": "Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại",
+      "confirmed": "Đã xác nhận",
+      "preparing": "Đang chuẩn bị",
+      "waiting_delivery": "Chờ vận chuyển",
+      "cancelled_order": "Đơn đã hủy",
+      "temporarily_locked": "Sản phẩm bị tạm khóa",
+      "sold_out": "Sản phẩm hết hàng",
+      "daily_revenue": "Doanh thu hằng ngày",
+      "order_completed": "Đơn hàng đã hoàn thành",
+      "new_order": "Đơn hàng mới",
+      "to_do_list": "Danh sách cần làm",
+      "sale_statistics": "Thống kê bán hàng"
     }
   },
   "AuthPage": {
@@ -232,7 +249,7 @@
       "shipping_fee": "Phí vận chuyển",
       "discount_shipping": "Giảm giá vận chuyển",
       "discount_from_shop": "Giảm giá từ cửa hàng",
-      "total_payment_amount": "Tổng số tiền thanh toán", 
+      "total_payment_amount": "Tổng số tiền thanh toán",
       "payment_method": "Phương thức thanh toán",
       "cash_on_delivery": "Thanh toán khi nhận hàng",
       "please_pay": "Vui lòng thanh toán",

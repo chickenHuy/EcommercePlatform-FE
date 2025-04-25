@@ -5,7 +5,6 @@ import { formatCurrency } from "@/utils";
 import { getStoreStatistic } from "@/api/vendor/storeStatisticRequest";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState, useCallback } from "react";
-import ChartSeller from "./chartSeller";
 import {
   CircleCheck,
   History,
@@ -20,6 +19,7 @@ import {
   PackagePlus,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import ChartSeller from "@/components/chart/chartSeller";
 
 export default function Dashboard() {
   const [storeStatistic, setStoreStatistic] = useState({
