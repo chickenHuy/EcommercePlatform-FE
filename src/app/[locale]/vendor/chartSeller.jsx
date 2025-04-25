@@ -8,7 +8,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { useEffect, useState } from "react";
 
 const chartConfig = {
   revenue: {
@@ -18,18 +17,6 @@ const chartConfig = {
 };
 
 export default function ChartSeller({ chartData }) {
-  const [isPhone, setIsPhone] = useState(false);
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 600) {
-        setIsPhone(true);
-      } else {
-        setIsPhone(false);
-      }
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-  }, []);
 
   return (
     <Card className="w-full h-full flex flex-col">
