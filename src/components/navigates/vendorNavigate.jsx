@@ -1,5 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { useTranslations } from "next-intl";
+
 import {
   BookOpen,
   Box,
@@ -18,9 +24,7 @@ import {
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarRail,
   SidebarInset,
@@ -28,21 +32,16 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuButton,
-  SidebarMenuSubItem,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { useDispatch, useSelector } from "react-redux";
+
+import UserHeader from "../headers/userHeader";
 import {
   setFilterTab,
   setFilter,
   setActiveItem,
 } from "@/store/features/orderFilterSlice";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import UserHeader from "../headers/userHeader";
-import { useTranslations } from "next-intl";
 
 const data = {
   navMain: [
@@ -151,10 +150,10 @@ const data = {
 export default function VendorNavigate({ vendorContent }) {
   const dispatch = useDispatch();
   const router = useRouter();
-  const activeItem = useSelector(
-    (state) => state.orderFilterReducer.activeItem
-  );
   const t = useTranslations("Header");
+  const activeItem = useSelector(
+    (state) => state.orderFilterReducer.activeItem,
+  );
 
   const handleSetFilter = (filterKey, activeKey, url) => {
     dispatch(setFilterTab(filterKey));
@@ -164,63 +163,62 @@ export default function VendorNavigate({ vendorContent }) {
   };
 
   useEffect(() => {
-    if (router && router.asPath) {
-      const path = router.asPath;
-      if (path.includes("/vendor/products/create")) {
-        dispatch(setActiveItem("createProduct"));
-      } else if (path.includes("/vendor/products")) {
-        dispatch(setActiveItem("productList"));
-      } else {
-        dispatch(setActiveItem(null));
-      }
+    const path = window.location.pathname;
+    if (path.includes("/vendor/products/create")) {
+      dispatch(setActiveItem("createProduct"));
+    } else if (path.includes("/vendor/products")) {
+      dispatch(setActiveItem("productList"));
+    } else {
+      dispatch(setActiveItem(null));
     }
-  }, [router, router.asPath, dispatch]);
+  }, [dispatch]);
 
   return (
     <SidebarProvider>
-      <UserHeader title={t('vendorTitle')} />
+      <SidebarTrigger className="fixed top-20 left-2 z-50 md:hidden bg-black-secondary text-white-primary w-9 h-9" />
+      <UserHeader title={t("vendorTitle")} link="/vendor" />
       <Sidebar collapsible="icon" className="mt-16">
-        <SidebarContent>
+        <SidebarContent className="top-0">
           <SidebarGroup>
-            <SidebarGroupLabel>Quản lý</SidebarGroupLabel>
-            <SidebarMenu>
-              {data.navMain.map((item) => (
+            <span className="font-[900] px-2 py-1 text-base border-b mb-2">
+              Quản lý
+            </span>
+            <SidebarMenu className="gap-3">
+              {data.navMain.map((section) => (
                 <Collapsible
-                  key={item.title}
+                  key={section.title}
                   asChild
-                  defaultOpen={item.isActive}
-                  className="group/collapsible"
+                  defaultOpen={section.isActive}
                 >
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
-                      <SidebarMenuButton tooltip={item.title}>
-                        {item.icon && <item.icon />}
-                        <span>{item.title}</span>
-                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                      </SidebarMenuButton>
+                      <div className="flex items-center justify-between gap-2">
+                        {section.icon && <section.icon className="size-4" />}
+                        <span>{section.title}</span>
+                        <ChevronRight className="ml-auto group-data-[state=open]/collapsible:rotate-90 size-4 cursor-pointer" />
+                      </div>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub>
-                        {item.items?.map((subItem) => (
-                          <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton asChild>
-                              <button
-                                className={`w-full hover:cursor-pointer ${activeItem === subItem.activeKey
-                                  ? "font-bold"
-                                  : null
-                                  }`}
-                                onClick={() =>
-                                  handleSetFilter(
-                                    subItem.filterKey,
-                                    subItem.activeKey,
-                                    subItem.url
-                                  )
-                                }
-                              >
-                                {subItem.title}
-                              </button>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
+                        {section.items?.map((subItem) => (
+                          <SidebarMenuSubButton key={subItem.title} asChild>
+                            <button
+                              onClick={() =>
+                                handleSetFilter(
+                                  subItem.filterKey,
+                                  subItem.activeKey,
+                                  subItem.url,
+                                )
+                              }
+                              className={`w-full text-sm text-left px-2 py-1 rounded ${
+                                activeItem === subItem.activeKey
+                                  ? "font-bold bg-white-secondary"
+                                  : "hover:bg-white-secondary"
+                              }`}
+                            >
+                              {subItem.title}
+                            </button>
+                          </SidebarMenuSubButton>
                         ))}
                       </SidebarMenuSub>
                     </CollapsibleContent>
@@ -231,13 +229,15 @@ export default function VendorNavigate({ vendorContent }) {
           </SidebarGroup>
 
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-            <SidebarGroupLabel>Cửa hàng của tôi</SidebarGroupLabel>
+            <span className="font-[900] px-2 py-1 text-base border-b mb-2">
+              Cửa hàng của tôi
+            </span>
             <SidebarMenu>
               {data.projects.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
                     <Link href={item.url}>
-                      <item.icon />
+                      <item.icon className="size-4" />
                       <span>{item.name}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -246,21 +246,6 @@ export default function VendorNavigate({ vendorContent }) {
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
-
-        <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <div
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              >
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <SidebarTrigger className="size-4" />
-                </div>
-              </div>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter>
         <SidebarRail />
       </Sidebar>
       <SidebarInset>{vendorContent}</SidebarInset>
