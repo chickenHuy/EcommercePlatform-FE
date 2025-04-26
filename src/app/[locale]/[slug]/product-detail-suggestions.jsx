@@ -1,4 +1,4 @@
-import { getRecommendProduct } from "@/api/ai/recommendReqquest";
+import { getRecommendProduct } from "@/api/ai/recommendRequest";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-export default function ProductDetailSuggestions({ productId }) {
+export default function ProductDetailSuggestions({ productId, t }) {
   const [listProduct, setListProduct] = useState([]);
   const videoRefs = useRef({});
   const [isVideoLoaded, setIsVideoLoaded] = useState({});
@@ -70,7 +70,7 @@ export default function ProductDetailSuggestions({ productId }) {
     return (
       <>
         <div className="space-y-8 bg-white-primary px-8 py-[24px]">
-          <Label className="text-2xl font-bold">CÓ THỂ BẠN CŨNG THÍCH</Label>
+          <Label className="text-2xl font-bold">{t("text_you_like")}</Label>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-4">
             {listProduct.map((product) => (
@@ -119,7 +119,7 @@ export default function ProductDetailSuggestions({ productId }) {
                         {formatPrice(product.salePrice)}
                       </Label>
                       <Label className="text-xs flex-shrink-0 hover:cursor-pointer">
-                        Đã bán {formatSold(product.sold)}
+                        {t("text_sold")} {formatSold(product.sold)}
                       </Label>
                     </div>
                   </CardFooter>

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ProductPlaceHoler } from "@/assets/images/productPlaceholder.png";
 import { getAccount } from "@/api/user/accountRequest";
-import { getRecommendListProduct } from "@/api/ai/recommendReqquest";
+import { getRecommendListProduct } from "@/api/ai/recommendRequest";
 
 export default function ProductSuggestions() {
   const [listProduct, setListProduct] = useState([]);

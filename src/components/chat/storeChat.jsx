@@ -18,6 +18,7 @@ export function StoreChat({
   productId,
   orderId,
   setProductId,
+  t
 }) {
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [selectedRoom, setSelectedRoom] = useState(null)
@@ -151,7 +152,7 @@ export function StoreChat({
         productId !== '' ? (
           <Button variant="outline" className="mt-4 mr-auto" onClick={() => setIsChatOpen(true)}>
             <MessageCircle className="h-5 w-5" />
-            Hỏi về sản phẩm
+            {t("text_ask_about_product")}
           </Button>
         ) : (
           <Button

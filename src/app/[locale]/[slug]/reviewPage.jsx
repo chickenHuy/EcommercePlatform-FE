@@ -17,7 +17,7 @@ import { useInView } from "react-intersection-observer";
 import { formatDate } from "@/utils";
 import { Label } from "@/components/ui/label";
 
-export default function Reviews({ productId }) {
+export default function Reviews({ productId, t }) {
   const [listReviews, setListReviews] = useState([]);
   const { toast } = useToast();
   const [averageRating, setAverageRating] = useState(0);
@@ -131,7 +131,7 @@ export default function Reviews({ productId }) {
   return (
     <>
       <div className="w-[900px] space-y-4 p-4 relative">
-        <Label className="text-2xl font-bold ml-4">ĐÁNH GIÁ SẢN PHẨM</Label>
+        <Label className="text-2xl font-bold ml-4">{t("text_review_product")}</Label>
 
         <div className="space-y-8">
           <div className="flex gap-4 p-8 bg-red-primary bg-opacity-5">
@@ -141,7 +141,7 @@ export default function Reviews({ productId }) {
                   {averageRating ? averageRating.toFixed(1) : "0.0"}
                 </Label>
                 <Label className="self-end text-lg text-[#ee4d2d]">
-                  trên 5
+                  {t("text_over_5")}
                 </Label>
               </div>
 
@@ -168,7 +168,7 @@ export default function Reviews({ productId }) {
                   }`}
                   onClick={() => handleRatingFilterClick("")}
                 >
-                  Tất Cả
+                  {t("text_all")}
                 </Button>
 
                 {Object.entries(ratingCounts)
@@ -186,7 +186,7 @@ export default function Reviews({ productId }) {
                         }`}
                         onClick={() => handleRatingFilterClick(mappedRating)}
                       >
-                        {mappedRating} Sao ({count})
+                        {mappedRating} {t("text_star")} ({count})
                       </Button>
                     );
                   })}
@@ -202,7 +202,7 @@ export default function Reviews({ productId }) {
                   }`}
                   onClick={() => handleCommentFilterClick("commentString")}
                 >
-                  Có Bình Luận ({totalComments})
+                  {t("text_have_comment")} ({totalComments})
                 </Button>
 
                 <Button
@@ -214,7 +214,7 @@ export default function Reviews({ productId }) {
                   }`}
                   onClick={() => handleMediaFilterClick("mediaString")}
                 >
-                  Có Hình Ảnh / Video ({totalWithMedia})
+                  {t("text_have_media")} ({totalWithMedia})
                 </Button>
               </div>
             </div>
@@ -256,8 +256,7 @@ export default function Reviews({ productId }) {
 
                       <div className="flex">
                         <Label className="text-muted-foreground text-sm w-[260px]">
-                          {formatDate(listreview.lastUpdatedAt)} | Phân loại
-                          hàng:
+                          {formatDate(listreview.lastUpdatedAt)} | {t("text_classification")}
                         </Label>
 
                         <div className="flex flex-wrap gap-4 w-[640px] max-h-[72px] overflow-hidden">
@@ -327,7 +326,7 @@ export default function Reviews({ productId }) {
                 unoptimized={true}
               />
               <Label className="text-xl text-black-primary text-opacity-50">
-                Chưa có đánh giá phù hợp với bộ lọc
+                {t("text_no_reviews")}
               </Label>
             </div>
           )}

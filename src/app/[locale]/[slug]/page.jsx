@@ -1,19 +1,21 @@
 "use client"
+
 import { notFound } from "next/navigation";
 import { useEffect, useState } from "react";
 import ProductDetail from "./product-details";
-import ProductDetailSkeleton from "./product-skeleton"; // Thêm nếu chưa có
+import ProductDetailSkeleton from "./product-skeleton";
 import { get } from "@/lib/httpClient";
 import ProductNotFound from "./productNotFound";
+import { useTranslations } from "next-intl";
 
 const ProductPage = ({ params }) => {
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState(null);
+  const t = useTranslations("Slug");
 
-  // Hàm lấy dữ liệu sản phẩm
   const getProduct = async (slug) => {
     const res = await get(`/api/v1/products/slug/${slug}`);
-    return res; // Trả về dữ liệu JSON
+    return res;
   };
 
   useEffect(() => {
@@ -27,22 +29,22 @@ const ProductPage = ({ params }) => {
       } catch (error) {
         console.error(error);
       } finally {
-        setLoading(false); // Dừng trạng thái loading
+        setLoading(false);
       }
     };
 
-    fetchData(); // Gọi hàm fetch khi component được render
-  }, [params.slug]); // Thêm `params.slug` vào dependency
+    fetchData();
+  }, [params.slug]);
 
   if (loading) {
-    return <ProductDetailSkeleton />; // Hiển thị skeleton trong khi chờ dữ liệu
+    return <ProductDetailSkeleton />;
   }
 
   if (!product) {
-    return <ProductNotFound />;
+    return <ProductNotFound t={t} />;
   }
 
-  return <ProductDetail product={product} />;
+  return <ProductDetail product={product} t={t} />;
 };
 
 export default ProductPage;

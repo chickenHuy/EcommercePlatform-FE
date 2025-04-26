@@ -7,34 +7,35 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import Empty from "@/assets/images/reviewEmpty.png";
 
-export function ProductSpecifications({
-  components,
-}) {
-  if (components.length === 0) {
+export function ProductSpecifications({components,t}) {
+  const validComponents = components.filter(
+    (component) => component.value && component.value.trim() !== ""
+  );
+
+  if (validComponents.length === 0) {
     return (<></>);
   }
 
   return (
     <Card className="border-none shadow-none">
       <CardHeader className="">
-        <CardTitle className="text-2xl font-bold">THÔNG SỐ KỸ THUẬT</CardTitle>
+        <CardTitle className="text-2xl font-bold">{t("text_specifications")}</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader className="hover">
             <TableRow className="bg-black-primary bg-opacity-90">
               <TableHead className="text-white-primary font-semibold">
-                Tên
+                {t("text_name")}
               </TableHead>
               <TableHead className="text-white-primary font-semibold">
-                Giá trị
+                {t("text_value")}
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {components.map((component, index) => (
+            {validComponents.map((component, index) => (
               <TableRow
                 key={component.valueId}
                 className={
