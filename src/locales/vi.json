@@ -400,5 +400,25 @@
     "text_HKK_Uptech_terms": "Điều khoản HKK Uptech",
     "text_processing": "Đang xử lý...",
     "text_place_order": "Đặt hàng"
+  },
+  "Search": {
+    "text_category": "Danh mục",
+    "text_search_result": "Kết quả tìm kiếm cho từ khoá",
+    "text_brand": "Thương hiệu",
+    "text_sale_price": "Giá bán",
+    "text_review": "Đánh giá",
+    "text_upward": "Trở lên",
+    "text_clear_all": "Xóa tất cả",
+    "text_sort_by": "Sắp xếp theo",
+    "text_post_date": "Ngày đăng sản phẩm",
+    "text_original_price": "Giá gốc",
+    "text_load_product": "Đang tải sản phẩm...",
+    "toast_title_wishlist_success": "Đã thêm sản phẩm vào danh sách yêu thích",
+    "toast_description_wishlist_success": "Bạn có thể xem danh sách yêu thích ở thanh menu",
+    "toast_title_wishlist_fail": "Thêm sản phẩm vào danh sách yêu thích thất bại",
+    "text_suggest_for_you": "Gợi ý cho bạn",
+    "text_product_photo": "Ảnh sản phẩm",
+    "text_store_not_found": "Không tìm thấy cửa hàng",
+    "text_number_product": "Số sản phẩm: "
   }
 }

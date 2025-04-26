@@ -4,12 +4,10 @@ import ProductPlaceHolder from "@/assets/images/productPlaceholder.png";
 import { Star } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { getProductTop3 } from "@/api/search/searchApi";
-import { useSelector } from "react-redux";
 import { useEffect, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 
-export function SuggestedProducts(props) {
-  const { storeId } = props;
+export function SuggestedProducts({storeId, t}) {
   const [products, setProducts] = useState(null);
   const router = useRouter();
 
@@ -44,7 +42,7 @@ export function SuggestedProducts(props) {
     storeId && (
       <div className="space-y-4">
         <h3 className="font-semibold text-lg text-black-primary ml-4">
-          Gợi ý cho bạn
+          {t("text_suggest_for_you")}
         </h3>
         <div className="space-y-3">
           {products && products.length > 0 ? (
@@ -102,7 +100,7 @@ export function SuggestedProducts(props) {
             <div className="w-full flex items-center justify-center">
               <Image
                 src={ProductPlaceHolder}
-                alt="ảnh sản phẩm"
+                alt={t("text_product_photo")}
                 width={200}
                 height={200}
                 className="rounded-md object-cover mb-4"

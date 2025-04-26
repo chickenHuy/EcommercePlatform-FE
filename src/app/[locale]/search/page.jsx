@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState, lazy } from "react";
+import { Suspense, useState, lazy } from "react";
 import { Separator } from "@/components/ui/separator";
 import SearchHeader from "./headerSearch";
 import {
@@ -28,12 +28,14 @@ import LeftSideBar from "./leftSideBar";
 import RightSideBar from "./rightSidebar";
 import { useDispatch, useSelector } from "react-redux";
 import { setOrder, setSortBy } from "@/store/features/userSearchSlice";
+import { useTranslations } from "next-intl";
 
 export default function SearchPage() {
   const ProductGrid = lazy(() => import("./productGrid"));
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
   const dispatch = useDispatch();
+  const t = useTranslations("Search");
 
   const order = useSelector((state) => state.searchFilter.order);
   const sortBy = useSelector((state) => state.searchFilter.sortBy);
@@ -60,7 +62,7 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <SearchHeader />
+      <SearchHeader t={t} />
 
       {/* Main Content */}
       <ResizablePanelGroup direction="horizontal" className="flex-1">
@@ -73,7 +75,7 @@ export default function SearchPage() {
           maxSize={30}
           className="hidden md:block"
         >
-          <LeftSideBar />
+          <LeftSideBar t={t} />
         </ResizablePanel>
         <ResizableHandle withHandle />
 
@@ -113,14 +115,14 @@ export default function SearchPage() {
                       onValueChange={(value) => handleSortByChange(value)}
                     >
                       <SelectTrigger className="w-[180px] h-10 rounded-full border-none text-black-primary bg-white-secondary opacity-50">
-                        <SelectValue placeholder="Sắp xếp theo" />
+                        <SelectValue placeholder={t("text_sort_by")} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="createdAt">
-                          Ngày đăng sản phẩm
+                          {t("text_post_date")}
                         </SelectItem>
-                        <SelectItem value="originalPrice">Giá gốc</SelectItem>
-                        <SelectItem value="salePrice">Giá bán</SelectItem>
+                        <SelectItem value="originalPrice">{t("text_original_price")}</SelectItem>
+                        <SelectItem value="salePrice">{t("text_sale_price")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -142,8 +144,8 @@ export default function SearchPage() {
             {/* Main Content Area - Scrollable */}
             <div className="flex-1 overflow-auto p-4">
               <div className="space-y-4">
-                <Suspense fallback={<div>Đang tải sản phẩm...</div>}>
-                  <ProductGrid />
+                <Suspense fallback={<div>{t("text_load_product")}</div>}>
+                  <ProductGrid t={t}/>
                 </Suspense>
               </div>
             </div>
@@ -162,7 +164,7 @@ export default function SearchPage() {
             maxSize={30}
             className="hidden md:block"
           >
-            <RightSideBar storeId={storeId} />
+            <RightSideBar storeId={storeId} t={t} />
           </ResizablePanel>
         )}
       </ResizablePanelGroup>
@@ -179,7 +181,7 @@ export default function SearchPage() {
             >
               <X className="h-4 w-4" />
             </Button>
-            <LeftSideBar />
+            <LeftSideBar t={t} />
           </div>
         </div>
       )}
@@ -196,7 +198,7 @@ export default function SearchPage() {
             >
               <X className="h-4 w-4" />
             </Button>
-            <RightSideBar storeId={storeId} />
+            <RightSideBar storeId={storeId} t={t} />
           </div>
         </div>
       )}

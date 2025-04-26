@@ -8,7 +8,7 @@ import Loading from "@/components/loading";
 import { get, post } from "@/lib/httpClient";
 import { setWishList } from "@/store/features/wishListSlice";
 
-export default function ProductGrid() {
+export default function ProductGrid({t}) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -43,11 +43,6 @@ export default function ProductGrid() {
         }
       } catch (error) {
         console.error("Error loading products:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load products. Please try again.",
-          variant: "destructive",
-        });
       } finally {
         setLoading(false);
       }
@@ -72,8 +67,8 @@ export default function ProductGrid() {
     try {
       await post(`/api/v1/users/follow/${productId}`);
       toast({
-        title: "Đã thêm sản phẩm vào danh sách yêu thích",
-        description: "Bạn có thể xem danh sách yêu thích ở thanh menu",
+        title: t("toast_title_wishlist_success"),
+        description: t("toast_description_wishlist_success"),
       });
 
       get(`/api/v1/users/listFollowedProduct`)
@@ -85,7 +80,7 @@ export default function ProductGrid() {
         });
     } catch (error) {
       toast({
-        title: "Thêm sản phẩm vào danh sách yêu thích thất bại",
+        title: t("toast_title_wishlist_fail"),
         description: error.message,
         variant: "destructive",
       });

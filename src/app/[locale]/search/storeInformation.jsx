@@ -4,9 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Star } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { getStore } from "@/api/search/searchApi";
-import { Button } from "@/components/buttons/iconImageButton";
 
-export function StoreInformation({ storeId }) {
+export function StoreInformation({ storeId, t }) {
   const [store, setStore] = useState(null);
 
   const fetchStore = useCallback(async () => {
@@ -30,7 +29,7 @@ export function StoreInformation({ storeId }) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 text-gray-primary p-6 border border-dashed border-gray-primary rounded-lg">
         <Image src={StoreEmpty} alt="Store not found" width={80} height={80} />
-        <Label className="text-center text-lg">Không tìm thấy cửa hàng</Label>
+        <Label className="text-center text-lg">{t("text_store_not_found")}</Label>
       </div>
     );
   }
@@ -54,7 +53,7 @@ export function StoreInformation({ storeId }) {
           {store.name || "(Tên cửa hàng)"}
         </Label>
         <Label className="truncate text-sm text-gray-primary">
-          Số sản phẩm:{" "}
+          {t("text_number_product")}
           <span className="font-medium text-gray-primary">
             {store.totalProduct || 0}
           </span>
