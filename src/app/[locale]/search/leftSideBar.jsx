@@ -30,7 +30,7 @@ import {
   setCategories as setSelectedCategories,
 } from "@/store/features/userSearchSlice";
 
-export default function ModernLeftSideBar() {
+export default function ModernLeftSideBar({t}) {
   const [categories, setCategories] = React.useState([]);
   const [brands, setBrands] = React.useState([]);
   const [isLoadingBrands, setIsLoadingBrands] = React.useState(true);
@@ -155,7 +155,7 @@ export default function ModernLeftSideBar() {
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="categories">
             <AccordionTrigger className="text-lg font-semibold text-black-primary">
-              Danh mục
+              {t("text_category")}
             </AccordionTrigger>
             <AccordionContent>
               <ScrollArea className="h-72 w-full pr-4">
@@ -172,7 +172,7 @@ export default function ModernLeftSideBar() {
 
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-black-primary">
-            Thương hiệu
+            {t("text_brand")}
           </h3>
           <ScrollArea className="h-48 w-full pr-4">
             {isLoadingBrands ? (
@@ -214,7 +214,7 @@ export default function ModernLeftSideBar() {
         <Separator className="bg-black-tertiary opacity-20" />
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-black-primary">Giá bán</h3>
+          <h3 className="text-lg font-semibold text-black-primary">{t("text_sale_price")}</h3>
           <Slider
             value={[minPrice, maxPrice ? maxPrice : 99999999]}
             onValueChange={(value) => handlePriceChange(value)}
@@ -237,7 +237,7 @@ export default function ModernLeftSideBar() {
         <Separator className="bg-black-tertiary opacity-20" />
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-black-primary">Đánh Giá</h3>
+          <h3 className="text-lg font-semibold text-black-primary">{t("text_review")}</h3>
           <div className="space-y-2">
             {ratings.map((rating) => (
               <button
@@ -260,7 +260,7 @@ export default function ModernLeftSideBar() {
                   ))}
                 </div>
                 <span className="text-sm font-light text-black-primary">
-                  {rating == 5 ? "" : "trở lên"}
+                  {rating == 5 ? "" : t("text_upward")}
                 </span>
               </button>
             ))}
@@ -273,7 +273,7 @@ export default function ModernLeftSideBar() {
           className="w-full text-white-primary bg-red-primary hover:bg-red-primary/50 transition-colors duration-200"
           onClick={() => handleDeleteFilter()}
         >
-          Xoá tất cả
+          {t("text_clear_all")}
         </Button>
       </div>
     </div>

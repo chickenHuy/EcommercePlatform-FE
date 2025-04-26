@@ -1,13 +1,12 @@
 import Link from "next/link";
-import { Search, User, ShoppingCart, Home } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Home } from "lucide-react";
 import Image from "next/image";
 import Placeholder from "@/assets/images/placeholder.png";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { getCategory } from "@/api/search/searchApi";
 
-export default function SearchHeader() {
+export default function SearchHeader({t}) {
   const mainCategoryId = useSelector(
     (state) => state.searchFilter.mainCategoryId
   );
@@ -48,7 +47,7 @@ export default function SearchHeader() {
               </Link>
               /
               <Link href="/category" className="">
-                Category
+                {t("text_category")}
               </Link>
               /<h1 className="text-white-primary">{category?.name}</h1>
             </div>
@@ -61,7 +60,7 @@ export default function SearchHeader() {
       ) : (
         <div className="flex items-center min-h-[100px] bg-black-primary ">
           <div className="mx-auto pt-20 pb-2 text-white-primary">
-            Kết quả tìm kiếm cho từ khoá "
+            {t("text_search_result")} "
             <span className="text-red-primary">{keyword}</span>"
           </div>
         </div>

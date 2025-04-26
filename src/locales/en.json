@@ -388,5 +388,25 @@
     "text_HKK_Uptech_terms": "HKK Uptech Terms",
     "text_processing": "Processing...",
     "text_place_order": "Place order"
+  },
+  "Search": {
+    "text_category": "Category",
+    "text_search_result": "Search results for keyword",
+    "text_brand": "Brand",
+    "text_sale_price": "Sale price",
+    "text_review": "Review",
+    "text_upward": "Upward",
+    "text_clear_all": "Clear all",
+    "text_sort_by": "Sort by",
+    "text_post_date": "Post date",
+    "text_original_price": "Original price",
+    "text_load_product": "Loading product...",
+    "toast_title_wishlist_success": "Product added to wishlist",
+    "toast_description_wishlist_success": "You can view your wishlist in the menu bar",
+    "toast_title_wishlist_fail": "Failed to add product to wishlist",
+    "text_suggest_for_you": "Suggest for you",
+    "text_product_photo": "Product photo",
+    "text_store_not_found": "Store not found",
+    "text_number_product": "Number products: "
   }
 }
