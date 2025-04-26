@@ -15,41 +15,31 @@
     }
   },
   "Vendor": {
-    "VendorNagivate": {
-      "order": {
-        "title": "Quản Lý Đơn Hàng",
-        "my-orders": "Tất Cả",
-        "cancellation": "Đơn Hủy",
-        "return-refund": "Trả Hàng/Hoàn Tiền",
-        "shipping-setting": "Cài Đặt Vận Chuyển"
-      },
-      "product": {
-        "title": "Quản Lý Sản Phẩm",
-        "my-products": "Tất Cả Sản Phẩm",
-        "add-new-product": "Thêm Sản Phẩm"
-      },
-      "customerService": {
-        "title": "Chăm Sóc Khách Hàng",
-        "chat-management": "Quản lý Chat",
-        "review-management": "Quản lý Đánh Giá"
-      },
-      "finance": {
-        "title": "Tài Chính",
-        "my-income": "Doanh Thu",
-        "my-balance": "Số Dư",
-        "bank-account": "Tài Khoản Ngân Hàng"
-      },
-      "data": {
-        "title": "Dữ Liệu",
-        "business-insight": "Phân Tích Bán Hàng",
-        "account-health": "Hiệu Quả Hoạt Động"
-      },
-      "shop": {
-        "title": "Quản Lý Shop",
-        "shop-information": "Hồ Sơ Shop",
-        "shop-decoration": "Trang Trí Shop",
-        "shop-setting": "Thiết Lập Shop"
-      }
+    "nagivate": {
+      "manage": "Quản lý",
+      "order": "Đơn đặt hàng",
+      "all_orders": "Tất cả đơn hàng",
+      "waiting_for_payment": "Chờ thanh toán",
+      "waiting_for_confirmation": "Chờ xác nhận",
+      "confirmed": "Đã xác nhận",
+      "preparing": "Chuẩn bị hàng",
+      "waiting_for_shipping": "Chờ vận chuyển",
+      "delivered_to_the_carrier": "Đã giao cho đơn vị vận chuyển",
+      "on_delivery": "Đang vận chuyển",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy",
+      "product": "Sản phẩm",
+      "add_new_product": "Thêm sản phẩm",
+      "list_product": "Danh sách sản phẩm",
+      "chat_management": "Quản lý tin nhắn",
+      "review_management": "Quản lý đánh giá",
+      "other": "Khác",
+      "revenue": "Doanh thu",
+      "business_performance": "Hiệu quả hoạt động",
+      "my_store": "Cửa hàng của tôi",
+      "review_and_comment": "Đánh giá và bình luận",
+      "pickup_address": "Địa chỉ lấy hàng",
+      "store_profile": "Hồ sơ cửa hàng"
     },
     "dashboard": {
       "notify": "Thông báo",

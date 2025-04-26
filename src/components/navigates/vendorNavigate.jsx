@@ -43,118 +43,122 @@ import {
   setActiveItem,
 } from "@/store/features/orderFilterSlice";
 
-const data = {
-  navMain: [
-    {
-      title: "Đơn đặt hàng",
-      url: "#",
-      icon: ShoppingBag,
-      isActive: true,
-      items: [
-        {
-          title: "Tất cả",
-          url: "/vendor/orders",
-          filterKey: "",
-          activeKey: "all",
-        },
-        {
-          title: "Chờ thanh toán",
-          url: "/vendor/orders",
-          filterKey: "ON_HOLD",
-          activeKey: "onHold",
-        },
-        {
-          title: "Chờ xác nhận",
-          url: "/vendor/orders",
-          filterKey: "PENDING",
-          activeKey: "pending",
-        },
-        {
-          title: "Đã xác nhận",
-          url: "/vendor/orders",
-          filterKey: "CONFIRMED",
-          activeKey: "confirmed",
-        },
-        {
-          title: "Chuẩn bị hàng",
-          url: "/vendor/orders",
-          filterKey: "PREPARING",
-          activeKey: "preparing",
-        },
-        {
-          title: "Chờ vận chuyển",
-          url: "/vendor/orders",
-          filterKey: "WAITING_FOR_SHIPPING",
-          activeKey: "waitingForShipping",
-        },
-        {
-          title: "Đã giao cho ĐVVC",
-          url: "/vendor/orders",
-          filterKey: "PICKED_UP",
-          activeKey: "pickedUp",
-        },
-        {
-          title: "Đang giao hàng",
-          url: "/vendor/orders",
-          filterKey: "OUT_FOR_DELIVERY",
-          activeKey: "outForDelivery",
-        },
-        {
-          title: "Hoàn thành",
-          url: "/vendor/orders",
-          filterKey: "DELIVERED",
-          activeKey: "delivered",
-        },
-        {
-          title: "Đã hủy",
-          url: "/vendor/orders",
-          filterKey: "CANCELLED",
-          activeKey: "cancelled",
-        },
-      ],
-    },
-    {
-      title: "Sản phẩm",
-      url: "#",
-      icon: Box,
-      items: [
-        {
-          title: "Thêm sản phẩm",
-          url: "/vendor/products/create",
-          activeKey: "createProduct",
-        },
-        {
-          title: "Danh sách sản phẩm",
-          url: "/vendor/products",
-          activeKey: "productList",
-        },
-      ],
-    },
-    {
-      title: "Khác",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        { title: "Doanh thu", url: "#", activeKey: "revenue" },
-        { title: "Hiệu quả hoạt động", url: "#", activeKey: "performance" },
-      ],
-    },
-  ],
-  projects: [
-    { name: "Đánh giá & bình luận", url: "#", icon: Star },
-    { name: "Địa chỉ lấy hàng", url: "#", icon: MapPinHouse },
-    { name: "Hồ sơ cửa hàng", url: "#", icon: Store },
-  ],
-};
-
 export default function VendorNavigate({ vendorContent }) {
   const dispatch = useDispatch();
   const router = useRouter();
-  const t = useTranslations("Header");
+  const tHeader = useTranslations("Header");
+  const t = useTranslations("Vendor.navigate");
   const activeItem = useSelector(
     (state) => state.orderFilterReducer.activeItem,
   );
 
+  const data = {
+    navMain: [
+      {
+        title: t("order"),
+        url: "#",
+        icon: ShoppingBag,
+        isActive: true,
+        items: [
+          {
+            title: t("all_order"),
+            url: "/vendor/orders",
+            filterKey: "",
+            activeKey: "all",
+          },
+          {
+            title: t("waiting_for_payment"),
+            url: "/vendor/orders",
+            filterKey: "ON_HOLD",
+            activeKey: "onHold",
+          },
+          {
+            title: t("waiting_for_confirmation"),
+            url: "/vendor/orders",
+            filterKey: "PENDING",
+            activeKey: "pending",
+          },
+          {
+            title: t("confirmed"),
+            url: "/vendor/orders",
+            filterKey: "CONFIRMED",
+            activeKey: "confirmed",
+          },
+          {
+            title: t("preparing"),
+            url: "/vendor/orders",
+            filterKey: "PREPARING",
+            activeKey: "preparing",
+          },
+          {
+            title: t("waiting_for_shipping"),
+            url: "/vendor/orders",
+            filterKey: "WAITING_FOR_SHIPPING",
+            activeKey: "waitingForShipping",
+          },
+          {
+            title: t("delivered_to_the_carrier"),
+            url: "/vendor/orders",
+            filterKey: "PICKED_UP",
+            activeKey: "pickedUp",
+          },
+          {
+            title: t("on_delivery"),
+            url: "/vendor/orders",
+            filterKey: "OUT_FOR_DELIVERY",
+            activeKey: "outForDelivery",
+          },
+          {
+            title: t("completed"),
+            url: "/vendor/orders",
+            filterKey: "DELIVERED",
+            activeKey: "delivered",
+          },
+          {
+            title: t("cancelled"),
+            url: "/vendor/orders",
+            filterKey: "CANCELLED",
+            activeKey: "cancelled",
+          },
+        ],
+      },
+      {
+        title: t("product"),
+        url: "#",
+        icon: Box,
+        items: [
+          {
+            title: t("add_new_product"),
+            url: "/vendor/products/create",
+            activeKey: "createProduct",
+          },
+          {
+            title: t("list_product"),
+            url: "/vendor/products",
+            activeKey: "productList",
+          },
+        ],
+      },
+      {
+        title: t("other"),
+        url: "#",
+        icon: BookOpen,
+        items: [
+          { title: t("revenue"), url: "#", activeKey: "revenue" },
+          {
+            title: t("business_performance"),
+            url: "#",
+            activeKey: "performance",
+          },
+        ],
+      },
+    ],
+    projects: [
+      { name: t("review_and_comment"), url: "#", icon: Star },
+      { name: t("pickup_address"), url: "/vendor/store", icon: MapPinHouse },
+      { name: t("store_profile"), url: "/vendor/store", icon: Store },
+    ],
+  };
   const handleSetFilter = (filterKey, activeKey, url) => {
     dispatch(setFilterTab(filterKey));
     dispatch(setFilter(filterKey));
@@ -176,12 +180,12 @@ export default function VendorNavigate({ vendorContent }) {
   return (
     <SidebarProvider>
       <SidebarTrigger className="fixed top-20 left-2 z-50 md:hidden bg-black-secondary text-white-primary w-9 h-9" />
-      <UserHeader title={t("vendorTitle")} link="/vendor" />
+      <UserHeader title={tHeader("vendorTitle")} link="/vendor" />
       <Sidebar collapsible="icon" className="mt-16">
         <SidebarContent className="top-0">
           <SidebarGroup>
             <span className="font-[900] px-2 py-1 text-base border-b mb-2">
-              Quản lý
+              {t('manage')}
             </span>
             <SidebarMenu className="gap-3">
               {data.navMain.map((section) => (
@@ -210,7 +214,7 @@ export default function VendorNavigate({ vendorContent }) {
                                   subItem.url,
                                 )
                               }
-                              className={`w-full text-sm text-left px-2 py-1 rounded ${
+                              className={`w-full text-[1em] text-left px-2 py-1 rounded-sm ${
                                 activeItem === subItem.activeKey
                                   ? "font-bold bg-white-secondary"
                                   : "hover:bg-white-secondary"
@@ -230,15 +234,18 @@ export default function VendorNavigate({ vendorContent }) {
 
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <span className="font-[900] px-2 py-1 text-base border-b mb-2">
-              Cửa hàng của tôi
+              {t('my_store')}
             </span>
             <SidebarMenu>
               {data.projects.map((item) => (
                 <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton
+                    className="rounded-sm hover:bg-white-secondary"
+                    asChild
+                  >
                     <Link href={item.url}>
                       <item.icon className="size-4" />
-                      <span>{item.name}</span>
+                      <span className="text-[1em]">{item.name}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
