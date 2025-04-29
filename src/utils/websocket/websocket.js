@@ -41,9 +41,7 @@ const useWebSocket = (baseUrl) => {
 
     /** Subscribe vào một room */
     const subscribeRoom = (roomId) => {
-        console.log(`🔗 Subscribing to room ${roomId}`);
         if (subscriptions[roomId]) {
-            console.log(`❌ Already subscribed to room ${roomId}`);
             return;
         }
         const sub = client.subscribe(`/topic/room/${roomId}`, (message) => {

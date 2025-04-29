@@ -16,6 +16,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import WishlistPopup from "../popUp/wishListPopUp";
 import { StoreChat } from "../chat/storeChat";
 import { useTranslations } from "next-intl";
+import { Logo } from "../logo";
+import HKKUptechLogo from "../logo/logo";
 
 const UserHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -97,7 +99,7 @@ const UserHeader = () => {
               href="/"
               className="text-sm font-bold text-white-primary hover:text-white-tertiary transition-colors"
             >
-              HKK-Uptech
+              <HKKUptechLogo />
             </Link>
             <Link
               href={user?.lastRole === "USER" ? "/register-store" : user?.lastRole === "SELLER" ? "/vendor/" : user?.lastRole === "ADMIN" ? "/admin" : "/"}
@@ -113,7 +115,7 @@ const UserHeader = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <WishlistPopup t={t}/>
+              <WishlistPopup t={t} />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   {user ? (<Button size="icon" variant="ghost">
