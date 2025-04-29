@@ -251,7 +251,8 @@
       "your_order_will_be_delivered_to_you_soon": "Your Order Will Be Delivered To you Soon",
       "your_order_will_be_delivered_to_the_carried_soon": "Your Order Will Be Delivered To The Carrier Soon",
       "order_receive_address": "Order Delivery Address",
-      "order_status": "Order Status"
+      "order_status": "Order Status",
+      "text_ask_about_product": "Ask about order"
     },
     "account": {
       "title": "My Account",

@@ -131,7 +131,7 @@ export default function ProductDetail({ product, t }) {
       dispatch(changeQuantity(qty));
       toast({
         title: t("toast_title_product_to_cart"),
-        description:t("toast_description_product_to_cart"),
+        description: t("toast_description_product_to_cart"),
       });
     } catch (error) {
       toast({
@@ -357,14 +357,14 @@ export default function ProductDetail({ product, t }) {
                 )}
               </div>
               <Button
-                className="mt-4 mr-auto"
+                className="mr-auto"
                 variant="outline"
                 onClick={() => handleOnClickViewShop(product.store.id)}
               >
                 <Store className="mr-2"></Store>
                 {t("text_view_shop")}
               </Button>
-              <StoreChat storeId={product.store.id} productId={productId} setProductId={setProductId} websocketUrl={"http://localhost:8080/api/v1/ws"} isStore={false} t={t}/>
+              <StoreChat storeId={product.store.id} productId={productId}  websocketUrl={"http://localhost:8080/api/v1/ws"} isStore={false} t={t} />
             </div>
           </div>
         </div>
@@ -379,7 +379,7 @@ export default function ProductDetail({ product, t }) {
               dangerouslySetInnerHTML={{ __html: product.details }}
             />
           </div>
-          <ProductSpecifications components={product.components || []} t={t}/>
+          <ProductSpecifications components={product.components || []} t={t} />
         </div>
 
         <Separator className="my-8" />

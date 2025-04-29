@@ -9,6 +9,7 @@ import { ChatRoomList } from '@/components/chat/chatRoomList'
 import { ChatMessages } from '@/components/chat/chatMessages'
 import { createRoom, listRooms, listMessages } from '@/api/chat/chat'
 import useWebSocket from '@/utils/websocket/websocket'
+import { set } from 'date-fns'
 
 export function StoreChat({
   storeId,
@@ -16,8 +17,7 @@ export function StoreChat({
   websocketUrl,
   isStore,
   productId,
-  orderId,
-  setProductId,
+  order,
   t
 }) {
   const [isChatOpen, setIsChatOpen] = useState(false)
@@ -29,6 +29,8 @@ export function StoreChat({
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
   const chatRef = useRef(null)
+  const [orderId, setOrderId] = useState(null)
+  const [curProductId, setProductId] = useState(null)
 
   const {
     getMessagesByRoom,
@@ -137,6 +139,21 @@ export function StoreChat({
     }
   }, [isChatOpen])
 
+  useEffect(() => {
+    if (order && selectedRoom && order.storeId == selectedRoom.store_id) {
+      setOrderId(order.id)
+    } else {
+      setOrderId("")
+    }
+    if (selectedRoom && storeId == selectedRoom.store_id) {
+      setProductId(productId)
+    } else {
+      setProductId("")
+    }
+
+  }, [selectedRoom])
+
+
   const handleSelectRoom = (room) => {
     setSelectedRoom(room)
     setChatRooms((prev) =>
@@ -150,7 +167,7 @@ export function StoreChat({
     <div className="relative">
       {!isStore ? (
         productId !== '' ? (
-          <Button variant="outline" className="mt-4 mr-auto" onClick={() => setIsChatOpen(true)}>
+          <Button variant="outline" className="mr-auto" onClick={() => setIsChatOpen(true)}>
             <MessageCircle className="h-5 w-5" />
             {t("text_ask_about_product")}
           </Button>
@@ -158,7 +175,7 @@ export function StoreChat({
           <Button
             variant="ghost"
             size="icon"
-            className="text-black-primary relative"
+            className="text-white-primary relative"
             onClick={() => setIsChatOpen(true)}
           >
             <MessageCircle className="h-5 w-5" />
@@ -184,7 +201,7 @@ export function StoreChat({
                   ref={chatRef}
                   className={`${isStore
                     ? 'fixed inset-0 w-screen h-screen'
-                    : 'w-[380px] sm:w-[450px] h-[550px]'
+                    : 'w-[380px] sm:w-[450px] h-[700px]'
                     } bg-white-primary shadow-2xl rounded-xl flex flex-col overflow-hidden border border-gray-tertiary pointer-events-auto`}
                   style={isStore ? {} : { maxHeight: 'calc(100vh - 100px)' }}
                 >
@@ -210,9 +227,9 @@ export function StoreChat({
                       websocketSendMessage={wsSendMessage}
                       websocketConnected={wsConnected}
                       isStore={isStore}
-                      productId={productId}
+                      productId={curProductId}
                       orderId={orderId}
-                      setProductId={setProductId}
+                      order={order}
                     />
                   ) : (
                     <ChatRoomList

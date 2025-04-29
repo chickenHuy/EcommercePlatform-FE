@@ -252,7 +252,8 @@
       "your_order_will_be_delivered_to_you_soon": "Đơn hàng của bạn sẽ được giao đến bạn sớm",
       "your_order_will_be_delivered_to_the_carried_soon": "Đơn hàng của bạn sẽ được giao đến bạn sớm",
       "order_receive_address": "Địa chỉ nhận hàng",
-      "order_status": "Trạng thái đơn hàng"
+      "order_status": "Trạng thái đơn hàng",
+      "text_ask_about_product":"Hỏi về đơn hàng"
     },
     "account": {
       "title": "Tài khoản của tôi",
