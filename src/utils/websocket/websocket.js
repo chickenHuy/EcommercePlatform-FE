@@ -85,6 +85,7 @@ const useWebSocket = (baseUrl) => {
                 destination: `/app/chat/${roomId}`,
                 body: JSON.stringify(message),
             });
+            console.log(message)
         } else {
             console.error("❌ WebSocket not connected. Cannot send message.");
         }

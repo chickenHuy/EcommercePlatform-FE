@@ -76,7 +76,7 @@ export function OrderViewReviewDialog(props) {
                           key={index}
                           className="text-sm text-black-primary text-opacity-50 p-[4px] border hover:cursor-pointer"
                         >
-                          {productValue.values.join(" - ")}
+                          {productValue.values?.join(" - ")}
                         </Label>
                       ))}
                     </div>
@@ -117,29 +117,29 @@ export function OrderViewReviewDialog(props) {
                     {(viewReview.reviewVideo ||
                       (viewReview.reviewImages &&
                         viewReview.reviewImages.length > 0)) && (
-                      <div className="flex items-center gap-4 mt-4">
-                        {viewReview.reviewVideo && (
-                          <video
-                            controls
-                            autoPlay
-                            muted
-                            className="h-[100px] w-[100px]"
-                          >
-                            <source src={viewReview.reviewVideo} />
-                          </video>
-                        )}
+                        <div className="flex items-center gap-4 mt-4">
+                          {viewReview.reviewVideo && (
+                            <video
+                              controls
+                              autoPlay
+                              muted
+                              className="h-[100px] w-[100px]"
+                            >
+                              <source src={viewReview.reviewVideo} />
+                            </video>
+                          )}
 
-                        {viewReview.reviewImages.map((image, index) => (
-                          <Image
-                            key={index}
-                            src={image.url}
-                            alt={`Ảnh ${index + 1}`}
-                            height={100}
-                            width={100}
-                          />
-                        ))}
-                      </div>
-                    )}
+                          {viewReview.reviewImages.map((image, index) => (
+                            <Image
+                              key={index}
+                              src={image.url}
+                              alt={`Ảnh ${index + 1}`}
+                              height={100}
+                              width={100}
+                            />
+                          ))}
+                        </div>
+                      )}
 
                     <Label className="text-sm text-black-primary text-opacity-50">
                       {formatDate(viewReview.lastUpdatedAt)}

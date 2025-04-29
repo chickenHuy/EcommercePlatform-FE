@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { format } from "date-fns"
-import { ChevronLeft, X, Send, Paperclip, MoreVertical, Check, CheckCheck, ShoppingBag, ChevronRight, Package } from "lucide-react"
+import { ChevronLeft, X, Send, Paperclip, MoreVertical, Check, CheckCheck, ShoppingBag, ChevronRight, Package, XIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -11,6 +11,8 @@ import Loading from "@/components/loading/index"
 import { get } from "@/lib/httpClient"
 import Image from "next/image"
 import { ProductInMessage } from "./productInMessage"
+import { OrderChatMessage } from "./orderInMessages"
+import { setOrder } from "@/store/features/userSearchSlice"
 
 export function ChatMessages({
     room,
@@ -37,7 +39,9 @@ export function ChatMessages({
     const messagesContainerRef = useRef(null)
     const fileInputRef = useRef(null)
     const [products, setProducts] = useState({})
+    const [orders, setOrders] = useState({})
     const [currentPro, setCurrentPro] = useState(null)
+    const [currentOrder, setCurrentOrder] = useState(null)
     const [discountPercentage, setDiscountPercentage] = useState(0)
     const [initialLoadComplete, setInitialLoadComplete] = useState(false)
     const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false)
@@ -101,6 +105,14 @@ export function ChatMessages({
         fetchProduct()
     }, [room.id, productId])
 
+    useEffect(() => {
+        const fetchOrder = async () => {
+            setCurrentOrder(order)
+        }
+
+        fetchOrder()
+    }, [room.id, order])
+
     // Only scroll to bottom for new messages sent by the user or received via websocket
     useEffect(() => {
         if (shouldScrollToBottom && messagesEndRef.current && !autoScrollDisabled) {
@@ -161,6 +173,21 @@ export function ChatMessages({
                 setProducts((prev) => ({ ...prev, [id]: data.result }))
             } catch (error) {
                 console.error("Lỗi khi lấy sản phẩm:", error)
+            }
+        }
+    }
+
+    const fetchOrder = async (id) => {
+        if (!orders[id]) {
+            try {
+                var refix = `user`
+                if (isStore) {
+                    refix = `seller`
+                }
+                const data = await get(`/api/v1/orders/${id}/${refix}`)
+                setOrders((prev) => ({ ...prev, [id]: data.result }))
+            } catch (error) {
+                console.error("Lỗi khi lấy đơn hàng:", error)
             }
         }
     }
@@ -229,7 +256,7 @@ export function ChatMessages({
             setAutoScrollDisabled(false)
             setShouldScrollToBottom(true)
 
-            orderId = ""
+            console.log("Message sent:", orderId, productId, messageContent)
         } catch (err) {
             console.error("Failed to send message:", err)
             // Show error to user
@@ -284,6 +311,9 @@ export function ChatMessages({
             if (msg.productId) {
                 fetchProduct(msg.productId)
             }
+            if (msg.orderId) {
+                fetchOrder(msg.orderId)
+            }
         })
     }, [messages])
 
@@ -291,6 +321,9 @@ export function ChatMessages({
         websocketMessages.forEach((msg) => {
             if (msg.productId) {
                 fetchProduct(msg.productId)
+            }
+            if (msg.orderId) {
+                fetchOrder(msg.orderId)
             }
         })
     }, [websocketMessages])
@@ -395,6 +428,10 @@ export function ChatMessages({
                                 <div key={msg.id} cl>
                                     {msg.productId && msg.productId != "" ? (
                                         <ProductInMessage productId={msg.productId} products={products} />
+                                    ) : null}
+
+                                    {msg.orderId && msg.orderId != "" ? (
+                                        <OrderChatMessage orderId={msg.orderId} orders={orders} />
                                     ) : null}
                                     <div
                                         className={cn(
@@ -501,7 +538,6 @@ export function ChatMessages({
                                 className="w-full h-full object-cover"
                             />
                         </div>
-
                         <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
                                 <div>
@@ -523,58 +559,72 @@ export function ChatMessages({
 
                             <div className="mt-1.5 text-xs text-muted-foreground">Bạn đang hỏi về sản phẩm này</div>
                         </div>
+
+                        {/* Nút đóng */}
+                        <XIcon className="text-black-primary h-4 w-4 bg-blue-primary rounded-sm"
+                            onClick={() => {
+                                setCurrentPro(null)
+                            }}>
+                        </XIcon>
+
                     </div>
                 ) : (
                     <></>
                 )}
-                {order && orderId !== "" ? (
+                {currentOrder && orderId !== "" ? (
                     <div className="mb-4 rounded-lg border border-border shadow-sm hover:shadow transition-shadow duration-200 overflow-hidden">
                         {/* Order header */}
                         <div className="p-3 bg-muted/30 border-b border-border flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <ShoppingBag className="h-4 w-4 text-muted-foreground" />
-                                <span className="font-medium text-sm">Đơn hàng: #{order.id}</span>
+                                <span className="font-medium text-sm">Đơn hàng: #{currentOrder.id}</span>
                             </div>
+                            {/* Nút đóng */}
+                            <XIcon className="text-black-primary h-4 w-4 bg-blue-primary rounded-sm"
+                                onClick={() => {
+                                    setCurrentOrder(null)
+                                }}>
+                            </XIcon>
                         </div>
 
                         {/* Order items */}
                         <div className="p-3">
                             {/* Display first item with more details */}
-                            {order.orderItems && order.orderItems.length > 0 && (
+                            {currentOrder.orderItems && currentOrder.orderItems.length > 0 && (
                                 <div className="flex items-start gap-3 mb-2">
                                     <div className="flex-shrink-0 relative w-16 h-16 rounded-md overflow-hidden border border-border">
                                         <Image
                                             width={80}
                                             height={80}
-                                            src={order.orderItems[0].productMainImageUrl || "/placeholder.svg"}
-                                            alt={order.orderItems[0].productName}
+                                            src={currentOrder.orderItems[0].productMainImageUrl || "/placeholder.svg"}
+                                            alt={currentOrder.orderItems[0].productName}
                                             className="w-full h-full object-cover"
                                         />
                                     </div>
 
                                     <div className="flex-1 min-w-0">
                                         <h4 className="font-medium text-sm line-clamp-2 text-foreground">
-                                            {order.orderItems[0].productName}
+                                            {currentOrder.orderItems[0].productName}
                                         </h4>
 
-                                        {order.orderItems[0].values && order.orderItems[0].values.length > 0 && (
+                                        {currentOrder.orderItems[0].values && order.orderItems[0].values.length > 0 && (
                                             <div className="mt-1 text-xs text-muted-foreground">
-                                                Phân loại: {order.orderItems[0].values.join(", ")}
+                                                Phân loại: {currentOrder.orderItems[0].values.join(", ")}
                                             </div>
                                         )}
 
                                         <div className="mt-1 flex items-center justify-between">
                                             <div className="flex items-center gap-2">
                                                 <span className="text-sm font-medium">
-                                                    {formatPrice(order.orderItems[0].price - order.orderItems[0].discount)}
+                                                    {formatPrice(currentOrder.orderItems[0].price - currentOrder.orderItems[0].discount)}
                                                 </span>
-                                                {order.orderItems[0].discount > 0 && (
+                                                {currentOrder.orderItems[0].discount > 0 && (
                                                     <span className="text-xs text-muted-foreground line-through">
-                                                        {formatPrice(order.orderItems[0].price)}
+                                                        {formatPrice(currentOrder.orderItems[0].price)}
                                                     </span>
                                                 )}
                                             </div>
-                                            <span className="text-xs text-muted-foreground">x{order.orderItems[0].quantity}</span>
+                                            <span className="text-xs text-muted-foreground">x{currentOrder.orderItems[0].quantity}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -668,7 +718,7 @@ export function ChatMessages({
                         </Button>
                     </div>
                 </div>
-            </div>
+            </div >
         </>
     )
 }

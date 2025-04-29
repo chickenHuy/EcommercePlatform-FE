@@ -2,22 +2,30 @@
 
 import { formatDistanceToNow } from "date-fns"
 import { Star, Package, ChevronDown, ChevronUp, Clock } from "lucide-react"
-import { useState } from "react"
+import Image from "next/image"
+import { useEffect, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import ProductPlaceholder from "@/assets/images/productPlaceholder.png"
+import Link from "next/link"
 
-
-export function OrderChatMessage({ order }) {
+export function OrderChatMessage({ orderId, orders }) {
   const [showItems, setShowItems] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
+  const [order, setOrder] = useState(null)
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-US", {
+  useEffect(() => {
+    if (!orders) return
+    setOrder(orders[orderId])
+  }, [orders])
+
+  const formatCurrency = (price) => {
+    return new Intl.NumberFormat("vi-VN", {
       style: "currency",
-      currency: "USD",
-    }).format(amount)
+      currency: "VND",
+      maximumFractionDigits: 0,
+    }).format(price)
   }
 
   const formatDate = (dateString) => {
@@ -45,7 +53,7 @@ export function OrderChatMessage({ order }) {
   }
 
   return (
-    <Card className="w-full overflow-hidden">
+    <> {order && (<Card className="w-full overflow-hidden">
       <div className="p-4">
         {/* Order header */}
         <div className="flex justify-between items-start mb-3">
@@ -58,65 +66,6 @@ export function OrderChatMessage({ order }) {
               <Clock className="inline-block w-3 h-3 mr-1" />
               {formatDate(order.lastUpdatedAt)}
             </p>
-          </div>
-        </div>
-
-        {/* Store info */}
-        <div className="flex items-center gap-2 mb-3">
-          <div className="h-8 w-8 rounded-full overflow-hidden">
-            <img
-              src={order.avatarStore || "/placeholder.svg"}
-              alt={order.storeName}
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <div>
-            <p className="font-medium">{order.storeName}</p>
-            <div className="flex items-center">
-              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-              <span className="text-xs ml-1">{order.ratingStore}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Shipping info */}
-        <div className="mb-3">
-          <h4 className="text-sm font-medium mb-1">Shipping Details</h4>
-          <p className="text-sm">{order.recipientName}</p>
-          <p className="text-sm">{order.orderPhone}</p>
-          <p className="text-sm text-muted-foreground">{order.defaultAddressStr}</p>
-        </div>
-
-        {/* Payment info */}
-        <div className="mb-3">
-          <h4 className="text-sm font-medium mb-1">Payment</h4>
-          <p className="text-sm">{order.paymentMethod}</p>
-          <div className="mt-2 space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span>{formatCurrency(order.total)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Shipping</span>
-              <span>{formatCurrency(order.shippingFee)}</span>
-            </div>
-            {order.shippingDiscount > 0 && (
-              <div className="flex justify-between text-green-600">
-                <span>Shipping Discount</span>
-                <span>-{formatCurrency(order.shippingDiscount)}</span>
-              </div>
-            )}
-            {order.discount > 0 && (
-              <div className="flex justify-between text-green-600">
-                <span>Discount</span>
-                <span>-{formatCurrency(order.discount)}</span>
-              </div>
-            )}
-            <Separator className="my-2" />
-            <div className="flex justify-between font-medium">
-              <span>Total</span>
-              <span>{formatCurrency(order.grandTotal)}</span>
-            </div>
           </div>
         </div>
 
@@ -140,16 +89,21 @@ export function OrderChatMessage({ order }) {
             {order.orderItems.map((item) => (
               <div key={item.id} className="flex gap-3">
                 <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0">
-                  <img
-                    src={item.productMainImageUrl || "/placeholder.svg"}
+                  <Image
+                    width={68}
+                    height={68}
+                    src={item.productMainImageUrl ? item.productMainImageUrl : ProductPlaceholder}
                     alt={item.productName}
-                    className="h-full w-full object-cover"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="flex-1">
-                  <h5 className="font-medium">{item.productName}</h5>
+                  <Link href={`/${item.productSlug}`} className="font-medium">
+                    {item.productName}
+                  </Link>
+
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {item.values.map((value, index) => (
+                    {item.values?.map((value, index) => (
                       <Badge key={index} variant="outline" className="text-xs">
                         {value}
                       </Badge>
@@ -184,7 +138,7 @@ export function OrderChatMessage({ order }) {
         {/* Order history */}
         {showHistory && (
           <div className="mt-3 space-y-2">
-            {order.orderStatusHistories.map((status, index) => (
+            {order.orderStatusHistories?.map((status, index) => (
               <div key={index} className="flex items-start gap-2">
                 <div className="w-2 h-2 rounded-full bg-primary mt-1.5"></div>
                 <div className="flex-1">
@@ -196,7 +150,8 @@ export function OrderChatMessage({ order }) {
           </div>
         )}
       </div>
-    </Card>
+    </Card>)}
+    </>
   )
 }
 
