@@ -61,7 +61,7 @@ export function PaginationAdminTable(props) {
           : null}
 
         <PaginationItem>
-          <PaginationLink isActive>{currentPage}</PaginationLink>
+          <PaginationLink className="cursor-pointer" isActive>{currentPage}</PaginationLink>
         </PaginationItem>
 
         {currentPage < totalPage

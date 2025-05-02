@@ -216,7 +216,7 @@ export default function VendorNavigate({ vendorContent }) {
                               }
                               className={`w-full text-[1em] text-left px-2 py-1 rounded-sm ${
                                 activeItem === subItem.activeKey
-                                  ? "font-bold bg-white-secondary"
+                                  ? "font-[900] bg-white-secondary"
                                   : "hover:bg-white-secondary"
                               }`}
                             >

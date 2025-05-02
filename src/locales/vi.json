@@ -15,10 +15,10 @@
     }
   },
   "Vendor": {
-    "nagivate": {
+    "navigate": {
       "manage": "Quản lý",
       "order": "Đơn đặt hàng",
-      "all_orders": "Tất cả đơn hàng",
+      "all_order": "Tất cả đơn hàng",
       "waiting_for_payment": "Chờ thanh toán",
       "waiting_for_confirmation": "Chờ xác nhận",
       "confirmed": "Đã xác nhận",
@@ -55,6 +55,43 @@
       "new_order": "Đơn hàng mới",
       "to_do_list": "Danh sách cần làm",
       "sale_statistics": "Thống kê bán hàng"
+    },
+    "order": {
+      "notify": "Thông báo",
+      "updated_notify": "Đơn hàng {orderId} đã được cập nhật trạng thái",
+      "cancelled_notify": "Đơn hàng {orderId} đã bị hủy",
+      "list_updated_notify": "Danh sách đơn hàng {orderId} đã được cập nhật trạng thái",
+      "list_cancelled_notify": "Danh sách đơn hàng {orderId} đã bị hủy",
+      "not_select_order": "Vui lòng chọn ít nhất một đơn hàng để {actionName}",
+      "all_order": "Tất cả đơn hàng",
+      "waiting_for_payment": "Chờ thanh toán",
+      "waiting_for_confirmation": "Chờ xác nhận",
+      "confirmed": "Đã xác nhận",
+      "preparing": "Đang chuẩn bị",
+      "waiting_for_shipping": "Chờ giao hàng",
+      "delivered_to_the_carrier": "Đã bàn giao cho đơn vị vận chuyển",
+      "on_delivery": "Đang giao hàng",
+      "completed": "Đã hoàn thành",
+      "cancelled": "Đã hủy",
+      "default": "Mặc định",
+      "update_more": "Cập nhật (nhiều)",
+      "cancel_more": "Hủy (nhiều)",
+      "sort": "Sắp xếp",
+      "order_code": "Mã đơn hàng",
+      "order_date": "Ngày đặt hàng",
+      "find_by_order_code": "Tìm theo mã đơn hàng",
+      "descreasing": "Giảm dần",
+      "increasing": "Tăng dần",
+      "unsort": "Không sắp xếp",
+      "filter": "Lọc",
+      "filter_by_status": "Lọc theo trạng thái",
+      "list_of_all_order": "Danh sách tất cả đơn hàng ( {total} )",
+      "manage_all_order_in_the_store": "Quản lý tất cả đơn hàng trong cửa hàng",
+      "update": "Cập nhật",
+      "cancel": "Hủy",
+      "total_amount": "Tổng số tiền",
+      "status": "Trạng thái",
+      "no_order": "Không có đơn hàng nào"
     }
   },
   "AuthPage": {
