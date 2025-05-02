@@ -41,9 +41,7 @@ const useWebSocket = (baseUrl) => {
 
     /** Subscribe vào một room */
     const subscribeRoom = (roomId) => {
-        console.log(`🔗 Subscribing to room ${roomId}`);
         if (subscriptions[roomId]) {
-            console.log(`❌ Already subscribed to room ${roomId}`);
             return;
         }
         const sub = client.subscribe(`/topic/room/${roomId}`, (message) => {
@@ -85,6 +83,7 @@ const useWebSocket = (baseUrl) => {
                 destination: `/app/chat/${roomId}`,
                 body: JSON.stringify(message),
             });
+            console.log(message)
         } else {
             console.error("❌ WebSocket not connected. Cannot send message.");
         }

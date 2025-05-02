@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState, Suspense, lazy } from "react";
-import { Star, ShoppingCart, Heart, Minus, Plus, Store, MessageCircle, MessageCircleIcon, MessageSquareText } from "lucide-react";
+import { Star, ShoppingCart, Heart, Minus, Plus, Store } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ProductSpecifications } from "./product-specifications";
@@ -23,7 +23,7 @@ import { StoreChat } from "@/components/chat/storeChat";
 
 const ReviewLazy = lazy(() => import("./reviewPage"));
 
-export default function ProductDetail({ product }) {
+export default function ProductDetail({ product, t }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [quantity, setQuantity] = useState(1);
@@ -130,13 +130,12 @@ export default function ProductDetail({ product }) {
       const qty = oldQuantity + quantity;
       dispatch(changeQuantity(qty));
       toast({
-        title: "Sản phẩm đã được thêm vào giỏ hàng",
-        description:
-          "Bạn có thể xem giỏ hàng bằng cách nhấn vào biểu tượng giỏ hàng ở góc trên bên phải",
+        title: t("toast_title_product_to_cart"),
+        description: t("toast_description_product_to_cart"),
       });
     } catch (error) {
       toast({
-        title: "Thêm sản phẩm thất bại",
+        title: t("toast_title_error_product_cart"),
         description: error.message,
         variant: "destructive",
       });
@@ -147,8 +146,8 @@ export default function ProductDetail({ product }) {
     try {
       await post(`/api/v1/users/follow/${product.id}`);
       toast({
-        title: "Đã thêm sản phẩm vào danh sách yêu thích",
-        description: "Bạn có thể xem danh sách yêu thích ở thanh menu",
+        title: t("toast_title_product_to_wishlist"),
+        description: t("toast_description_product_to_wishlist"),
       });
 
       get(`/api/v1/users/listFollowedProduct`)
@@ -160,7 +159,7 @@ export default function ProductDetail({ product }) {
         });
     } catch (error) {
       toast({
-        title: "Thêm sản phẩm vào danh sách yêu thích thất bại",
+        title: t("toast_title_error_product_wishlist"),
         description: error.message,
         variant: "destructive",
       });
@@ -203,7 +202,7 @@ export default function ProductDetail({ product }) {
             {product.quantity === 0 && (
               <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
                 <div className="bg-red-primary text-white-primary font-bold text-3xl py-1 px-3 rounded-lg shadow-md transform rotate-45">
-                  SOLD OUT
+                  {t("text_sold_out")}
                 </div>
               </div>
             )}
@@ -223,7 +222,7 @@ export default function ProductDetail({ product }) {
                   ))}
                 </div>
                 <span className="text-sm text-gray-500">
-                  ({product.reviewCount} đánh giá)
+                  {product.reviewCount ? `(${product.reviewCount} ${t("text_review")})` : null}
                 </span>
               </div>
             </div>
@@ -279,7 +278,7 @@ export default function ProductDetail({ product }) {
             ))}
 
             <div className="mt-1">
-              <h3 className="font-semibold">Số lượng</h3>
+              <h3 className="font-semibold">{t("text_quantity")}</h3>
               <div className="mt-2 flex items-center space-x-2">
                 <Button
                   variant="outline"
@@ -304,7 +303,7 @@ export default function ProductDetail({ product }) {
                   {selectedVariant
                     ? selectedVariant.quantity
                     : product.quantity}{" "}
-                  sản phẩm có sẵn
+                  {t("text_product_available")}
                 </span>
               </div>
             </div>
@@ -317,7 +316,7 @@ export default function ProductDetail({ product }) {
                 onClick={() => addProductToCart()}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
-                Thêm vào giỏ hàng
+                {t("text_add_to_cart")}
               </Button>
               <Button
                 variant="outline"
@@ -336,7 +335,7 @@ export default function ProductDetail({ product }) {
       <div className="mx-auto px-4 bg-blue-primary rounded-lg">
         <div className="bg-blue-primary border-none">
           <div className="p-4 w-3/4 mx-auto text-center">
-            <h2 className="text-2xl font-bold">Thông tin cửa hàng</h2>
+            <h2 className="text-2xl font-bold">{t("text_shop_info")}</h2>
             <div className="mt-4 flex mx-auto w-fit items-center space-x-4">
               <Image
                 src={
@@ -351,21 +350,21 @@ export default function ProductDetail({ product }) {
                 <h3 className="font-semibold">{product.store.name}</h3>
                 {product.store.rating ? (
                   <p className="text-sm text-black-tertiary">
-                    Đánh giá: {product.store.rating?.toFixed(1)}/5.0
+                    {t("text_review_upcase")}{product.store.rating?.toFixed(1)}/5.0
                   </p>
                 ) : (
-                  "(0 đánh giá)"
+                  t("text_not_review")
                 )}
               </div>
               <Button
-                className="mt-4 mr-auto"
+                className="mr-auto"
                 variant="outline"
                 onClick={() => handleOnClickViewShop(product.store.id)}
               >
                 <Store className="mr-2"></Store>
-                Xem shop
+                {t("text_view_shop")}
               </Button>
-              <StoreChat storeId={product.store.id} productId={productId} setProductId={setProductId} websocketUrl={"http://localhost:8080/api/v1/ws"} isStore={false}/>
+              <StoreChat storeId={product.store.id} productId={productId}  websocketUrl={"http://localhost:8080/api/v1/ws"} isStore={false} t={t} />
             </div>
           </div>
         </div>
@@ -374,22 +373,22 @@ export default function ProductDetail({ product }) {
         <Separator className="my-8" />
         <div className="bg-white-primary">
           <div className="p-6">
-            <h2 className="text-2xl font-bold">CHI TIẾT SẢN PHẨM</h2>
+            <h2 className="text-2xl font-bold">{t("text_product_detail")}</h2>
             <div
               className="prose mt-4 max-w-none"
               dangerouslySetInnerHTML={{ __html: product.details }}
             />
           </div>
-          <ProductSpecifications components={product.components || []} />
+          <ProductSpecifications components={product.components || []} t={t} />
         </div>
 
         <Separator className="my-8" />
 
-        <ProductDetailSuggestions productId={product.id} />
+        <ProductDetailSuggestions productId={product.id} t={t} />
 
         <div className="mx-auto px-4 bg-white-primary">
           <Suspense fallback={<Loading></Loading>}>
-            <ReviewLazy productId={product.id} product={product} />
+            <ReviewLazy productId={product.id} t={t} />
           </Suspense>
         </div>
       </div>

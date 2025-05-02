@@ -31,7 +31,7 @@ import { changeQuantity } from "@/store/features/cartSlice";
 import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
 import { useTranslations } from "next-intl";
-
+import { StoreChat } from "@/components/chat/storeChat";
 
 export default function OrderUser() {
   const pageSize = 4;
@@ -421,6 +421,9 @@ export default function OrderUser() {
                           ? `Ghi chú: ${order.note}`
                           : t('no_notes')}
                       </span>
+                      <div className="flex items-center">
+                        <StoreChat storeId={order.storeId} orderId={order.id} websocketUrl={"http://localhost:8080/api/v1/ws"} isStore={false} t={t} order={order} />
+                      </div>
                       <div className="w-full flex-grow flex items-center justify-end gap-2">
                         <span className="text-sm w-fit">{t('total_amount')} </span>
                         <span className="text-[1.3em] font-bold text-red-primary">

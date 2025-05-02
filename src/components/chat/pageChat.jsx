@@ -126,7 +126,7 @@ export default function StoreChatPage({ storeId, userId, websocketUrl, isStore, 
                                     <ChatRoomList
                                         rooms={chatRooms}
                                         onSelectRoom={handleSelectRoom}
-                                        onClose={() => setIsChatOpen(false)}
+                                        onClose={() => { setIsChatOpen(false) }}
                                         fetchMoreRooms={fetchMoreRooms}
                                         currentPage={currentPage}
                                         hasMore={hasMore}

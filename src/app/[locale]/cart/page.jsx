@@ -27,6 +27,7 @@ import { setCheckout } from "@/store/features/checkoutSlice";
 import DialogConfirmCart from "@/components/dialogs/dialogConfirmCart";
 import UserHeader from "@/components/headers/mainHeader";
 import { useTranslations } from "next-intl";
+import { CartItemVariantSelector } from "./cartItemVariantSelector";
 
 export default function CartUser() {
   const [listCart, setListCart] = useState([]);
@@ -429,7 +430,7 @@ export default function CartUser() {
         setActionType("");
         setOpenDialog(false);
         toast({
-          description: t("toast_description_delete_one", {productName: cartItemToDelete.name}),
+          description: t("toast_description_delete_one", { productName: cartItemToDelete.name }),
         });
       } catch (error) {
         toast({
@@ -469,7 +470,7 @@ export default function CartUser() {
     setActionType("");
     setOpenDialog(false);
     toast({
-      description: t("toast_description_delete_list", {productLength: selectedListCartItem.length}),
+      description: t("toast_description_delete_list", { productLength: selectedListCartItem.length }),
     });
   };
 
@@ -705,16 +706,24 @@ export default function CartUser() {
                                 )}
                               </div>
 
-                              <div className="w-1/3 flex flex-col justify-center items-center gap-[4px] hover:cursor-pointer">
-                                <Label className="text-sm text-black-primary text-opacity-50 hover:cursor-pointer">
-                                  {t("text_classification")}
-                                </Label>
-                                <Label className="text-sm hover:cursor-pointer">
-                                  {item.value
-                                    ? item.value.join(" | ")
-                                    : t("text_nothing")}
-                                </Label>
+                              <div className="w-1/3 px-2">
+                                <div className="flex justify-between items-start gap-2">
+                                  <div className="flex flex-col">
+                                    <Label className="text-sm text-black-primary text-opacity-50 hover:cursor-pointer">
+                                      {t("text_classification")}
+                                    </Label>
+                                    <Label className="text-sm hover:cursor-pointer text-black">
+                                      {item.value ? item.value.join(" | ") : t("text_nothing")}
+                                    </Label>
+                                  </div>
+
+                                  {item.value && (
+                                    <CartItemVariantSelector cartItemId={item.id} />
+                                  )}
+                                </div>
                               </div>
+
+
                             </div>
                           </div>
 

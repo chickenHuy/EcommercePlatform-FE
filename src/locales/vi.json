@@ -289,7 +289,8 @@
       "your_order_will_be_delivered_to_you_soon": "Đơn hàng của bạn sẽ được giao đến bạn sớm",
       "your_order_will_be_delivered_to_the_carried_soon": "Đơn hàng của bạn sẽ được giao đến bạn sớm",
       "order_receive_address": "Địa chỉ nhận hàng",
-      "order_status": "Trạng thái đơn hàng"
+      "order_status": "Trạng thái đơn hàng",
+      "text_ask_about_product":"Hỏi về đơn hàng"
     },
     "account": {
       "title": "Tài khoản của tôi",
@@ -447,5 +448,40 @@
     "text_product_photo": "Ảnh sản phẩm",
     "text_store_not_found": "Không tìm thấy cửa hàng",
     "text_number_product": "Số sản phẩm: "
+  },
+  "Slug": {
+    "text_oops": "Oops! Không tìm thấy sản phẩm",
+    "text_unavailable": "Chúng tôi không tìm thấy sản phẩm bạn đang tìm kiếm. Có thể sản phẩm đã bị xóa hoặc không có sẵn",
+    "text_back_home": "Quay lại trang chủ",
+    "toast_title_product_to_cart": "Sản phẩm đã được thêm vào giỏ hàng",
+    "toast_description_product_to_cart": "Bạn có thể xem giỏ hàng bằng cách nhấn vào biểu tượng giỏ hàng ở góc trên bên phải",
+    "toast_title_error_product_cart": "Thêm sản phẩm thất bại",
+    "toast_title_product_to_wishlist": "Đã thêm sản phẩm vào danh sách yêu thích",
+    "toast_description_product_to_wishlist": "Bạn có thể xem danh sách yêu thích ở thanh menu",
+    "toast_title_error_product_wishlist": "Thêm sản phẩm vào danh sách yêu thích thất bại",
+    "text_sold_out": "Hết hàng",
+    "text_review": "đánh giá",
+    "text_quantity": "Số lượng",
+    "text_product_available": "sản phẩm có sẵn",
+    "text_add_to_cart": "Thêm vào giỏ hàng",
+    "text_shop_info": "Thông tin cửa hàng",
+    "text_review_upcase": "Đánh giá: ",
+    "text_not_review": "0 đánh giá",
+    "text_view_shop": "Xem shop",
+    "text_ask_about_product": "Hỏi về sản phẩm",
+    "text_product_detail": "CHI TIẾT SẢN PHẨM",
+    "text_specifications": "THÔNG SỐ KỸ THUẬT",
+    "text_name": "Tên",
+    "text_value": "Giá trị",
+    "text_you_like": "CÓ THỂ BẠN CŨNG THÍCH",
+    "text_sold": "Đã bán",
+    "text_review_product": "ĐÁNH GIÁ SẢN PHẨM",
+    "text_over_5": "trên 5",
+    "text_all": "Tất Cả",
+    "text_star": "Sao",
+    "text_have_comment": "Có bình luận",
+    "text_have_media": "Có Hình Ảnh / Video",
+    "text_classification": "Phân loại hàng:",
+    "text_no_reviews": "Chưa có đánh giá phù hợp với bộ lọc"
   }
 }
