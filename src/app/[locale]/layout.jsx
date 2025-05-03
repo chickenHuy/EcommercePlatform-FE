@@ -26,7 +26,7 @@ const helveticalNeue = localFont({
 });
 
 export const metadata = {
-  title: "HKuptech",
+  title: "HKK-Uptech",
   description: "General purpose e-commerce website.",
 };
 
