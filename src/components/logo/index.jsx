@@ -61,7 +61,7 @@ export const LogoText = (props) => {
       <svg
         version="1.0"
         width={textWidth}
-        height={textHeight}zy
+        height={textHeight}
         viewBox="0 0 276 40"
       >
         <g
