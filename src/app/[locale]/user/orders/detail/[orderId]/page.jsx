@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getOneOrderByUser } from "@/api/user/orderRequest";
-import OrderNotFound from "./order-not-found";
 import ViewOrderDetailUser from "./order-detail";
 import Loading from "@/components/loading";
+import OrderNotFound from "@/components/order-not-found";
 
 export default function OrderDetailUserPage({ params }) {
   const [orderDetail, setOrderDetail] = useState(null);
@@ -36,7 +36,7 @@ export default function OrderDetailUserPage({ params }) {
         </div>
       )}
       {!orderDetail && !loadPage && (
-        <OrderNotFound />
+        <OrderNotFound backLocale="/user/orders" />
       )}
       {orderDetail && !loadPage && (
         <ViewOrderDetailUser
