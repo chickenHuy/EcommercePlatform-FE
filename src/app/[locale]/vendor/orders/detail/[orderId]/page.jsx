@@ -1,14 +1,14 @@
 "use client";
 
 import { getOneOrderBySeller } from "@/api/vendor/orderRequest";
-import { CircularProgress } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import ViewOrderDetailSeller from "./order-detail";
-import OrderNotFound from "./order-not-found";
+import Loading from "@/components/loading";
+import OrderNotFound from "@/components/order-not-found";
 
 export default function OrderDetailSellerPage({ params }) {
   const [orderDetail, setOrderDetail] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loadPage, setLoadPage] = useState(true);
 
   const fetchOneOrderBySeller = useCallback(async () => {
     try {
@@ -17,7 +17,7 @@ export default function OrderDetailSellerPage({ params }) {
     } catch (error) {
       console.error(error);
     } finally {
-      setIsLoading(false);
+      setLoadPage(false);
     }
   }, [params.orderId]);
 
@@ -25,23 +25,24 @@ export default function OrderDetailSellerPage({ params }) {
     fetchOneOrderBySeller();
   }, [fetchOneOrderBySeller]);
 
-  if (isLoading) {
-    return (
-      <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] space-y-4 bg-black-secondary">
-        <CircularProgress></CircularProgress>
-        <p className="text-2xl text-white-primary">Đang tải dữ liệu...</p>
-      </div>
-    );
-  }
-
-  if (!orderDetail) {
-    return <OrderNotFound />;
-  }
-
   return (
-    <ViewOrderDetailSeller
-      orderDetail={orderDetail}
-      refreshPage={fetchOneOrderBySeller}
-    />
+    <>
+      {loadPage && (
+        <div className="w-full h-screen">
+          <Loading />
+        </div>
+      )}
+      {orderDetail && !loadPage && (
+        <div className=''>
+          <OrderNotFound backLocale="/vendor/orders" customPaddingLeft={false}/>
+        </div>
+      )}
+      {!orderDetail && !loadPage && (
+        <ViewOrderDetailSeller
+          orderDetail={orderDetail}
+          refreshPage={fetchOneOrderBySeller}
+        />
+      )}
+    </>
   );
 }
