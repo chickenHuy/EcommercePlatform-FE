@@ -7,9 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Portal } from '@/components/chat/portal'
 import { ChatRoomList } from '@/components/chat/chatRoomList'
 import { ChatMessages } from '@/components/chat/chatMessages'
-import { createRoom, listRooms, listMessages } from '@/api/chat/chat'
+import { createRoom, listRooms, listMessages, checkStoreOnlineStatus,  } from '@/api/chat/chat'
 import useWebSocket from '@/utils/websocket/websocket'
-import { set } from 'date-fns'
 
 export function StoreChat({
   storeId,
@@ -31,6 +30,7 @@ export function StoreChat({
   const chatRef = useRef(null)
   const [orderId, setOrderId] = useState(null)
   const [curProductId, setProductId] = useState(null)
+  const [storeOnline, setStoreOnline] = useState(false);
 
   const {
     getMessagesByRoom,
@@ -163,6 +163,21 @@ export function StoreChat({
 
   const totalUnreadCount = chatRooms.reduce((total, room) => total + (room.unreadCount || 0), 0)
 
+  const fetchStoreOnlineStatus = async (storeId) => {
+    try {
+      const response = await checkStoreOnlineStatus(storeId)
+      setStoreOnline(response.result.online)
+    } catch (error) {
+      console.error('Error fetching store online status:', err)
+    }
+  }
+
+  useEffect(() => {
+    if (selectedRoom?.store_id) {
+      fetchStoreOnlineStatus(selectedRoom.store_id)
+    }
+  }, [selectedRoom])
+
   return (
     <div className="relative">
       {!isStore ? (
@@ -230,6 +245,7 @@ export function StoreChat({
                       productId={curProductId}
                       orderId={orderId}
                       order={order}
+                      storeOnline={storeOnline}
                     />
                   ) : (
                     <ChatRoomList

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { format } from "date-fns"
-import { ChevronLeft, X, Send, Paperclip, MoreVertical, Check, CheckCheck, ShoppingBag, ChevronRight, Package, XIcon } from "lucide-react"
+import { ChevronLeft, X, Send, Paperclip, MoreVertical, Check, CheckCheck, ShoppingBag, Package, XIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -12,7 +12,7 @@ import { get } from "@/lib/httpClient"
 import Image from "next/image"
 import { ProductInMessage } from "./productInMessage"
 import { OrderChatMessage } from "./orderInMessages"
-import { setOrder } from "@/store/features/userSearchSlice"
+import { callChatbot } from "@/api/ai/chatbotRequest"
 
 export function ChatMessages({
     room,
@@ -26,6 +26,7 @@ export function ChatMessages({
     productId,
     orderId,
     order,
+    storeOnline,
 }) {
     const [messages, setMessages] = useState([])
     const [newMessage, setNewMessage] = useState("")
@@ -46,6 +47,7 @@ export function ChatMessages({
     const [initialLoadComplete, setInitialLoadComplete] = useState(false)
     const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false)
     const [autoScrollDisabled, setAutoScrollDisabled] = useState(true)
+    const [chatbotMessages, setChatbotMessages] = useState([])
 
     // Load initial messages - only the most recent ones
     useEffect(() => {
@@ -328,6 +330,48 @@ export function ChatMessages({
         })
     }, [websocketMessages])
 
+    const fetchMessageChatbot = async (selected_id = "") => {
+        try {
+            const response = await callChatbot(selected_id)
+            const newMessage = {
+                id: `chatbot-${Date.now()}-${selected_id || "initial"}`,
+                content: response.message,
+                createdAt: new Date().toISOString(),
+                senderId: "chatbot",
+                is_ai: response.is_ai,
+                has_next: response.has_next,
+                options: response.options || [],
+                answer: response.answer || "",
+            }
+            setChatbotMessages((prev) => [...prev, newMessage])
+        } catch (error) {
+            console.error("Error fetching chatbot message:", error)
+        }
+    }
+
+    useEffect(() => {
+        console.log("chatbotMessages: ", chatbotMessages)
+    }, [chatbotMessages])
+
+    const handleOptionSelect = async (option) => {
+        const userMessage = {
+            id: `user-${Date.now()}`,
+            content: option.title,
+            createdAt: new Date().toISOString(),
+            senderId: room.user_id,
+            is_ai: false,
+        }
+        setChatbotMessages((prev) => [...prev, userMessage])
+
+        await fetchMessageChatbot(option.id)
+    }
+
+    useEffect(() => {
+        if (!storeOnline && messages.length === 0 && chatbotMessages.length === 0) {
+            fetchMessageChatbot("")
+        }
+    }, [storeOnline])
+
     return (
         <>
             {/* Chat Header */}
@@ -388,142 +432,221 @@ export function ChatMessages({
             </div>
 
             {/* Messages */}
-            <div
-                className="flex-1 overflow-y-auto p-4 space-y-4 bg-blue-primary"
-                ref={messagesContainerRef}
-                onScroll={handleScroll}
-            >
-                {/* Loading more indicator - now at the top */}
-                {isLoadingMore && (
-                    <div className="flex justify-center py-2">
-                        <Loading size="sm" />
-                    </div>
-                )}
+            {
+                <div
+                    className="flex-1 overflow-y-auto p-4 space-y-4 bg-blue-primary"
+                    ref={messagesContainerRef}
+                    onScroll={handleScroll}
+                >
+                    {/* Loading more indicator - now at the top */}
+                    {isLoadingMore && (
+                        <div className="flex justify-center py-2">
+                            <Loading size="sm" />
+                        </div>
+                    )}
 
-                {/* Error message */}
-                {error && (
-                    <div className="bg-red-100 text-red-800 p-2 rounded-md text-center">
-                        {error}
-                        <Button
-                            variant="link"
-                            className="text-red-800 underline ml-2 p-0 h-auto"
-                            onClick={() => loadOlderMessages()}
-                        >
-                            Retry
-                        </Button>
-                    </div>
-                )}
+                    {/* Error message */}
+                    {error && (
+                        <div className="bg-red-100 text-red-800 p-2 rounded-md text-center">
+                            {error}
+                            <Button
+                                variant="link"
+                                className="text-red-800 underline ml-2 p-0 h-auto"
+                                onClick={() => loadOlderMessages()}
+                            >
+                                Retry
+                            </Button>
+                        </div>
+                    )}
 
-                {/* Loading initial messages */}
-                {isLoading ? (
-                    <div className="flex justify-center items-center h-full">
-                        <Loading />
-                    </div>
-                ) : (
-                    <>
-                        {allMessages.length === 0 ? (
-                            <div className="text-center text-gray-tertiary py-8">No messages yet. Start a conversation!</div>
-                        ) : (
-                            allMessages.map((msg) => (
-                                <div key={msg.id} cl>
-                                    {msg.productId && msg.productId != "" ? (
-                                        <ProductInMessage productId={msg.productId} products={products} />
-                                    ) : null}
-
-                                    {msg.orderId && msg.orderId != "" ? (
-                                        <OrderChatMessage orderId={msg.orderId} orders={orders} />
-                                    ) : null}
-                                    <div
-                                        className={cn(
-                                            "flex", "my-2",
-                                            (msg.senderId !== room.user_id && isStore) || (msg.senderId === room.user_id && !isStore)
-                                                ? "justify-end"
-                                                : "justify-start",
-                                        )}
-                                    >
-                                        {msg.senderId !== room.user_id && !isStore && (
-                                            <Avatar className="h-8 w-8 mr-2 mt-1 flex-shrink-0">
-                                                <AvatarImage
-                                                    src={room.store_image_url || "/placeholder.svg?height=40&width=40"}
-                                                    alt={room.store_name}
-                                                />
-                                                <AvatarFallback className="bg-black-secondary text-white-primary">
-                                                    {room.store_name.charAt(0)}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                        )}
-                                        {msg.senderId == room.user_id && isStore && (
-                                            <Avatar className="h-8 w-8 mr-2 mt-1 flex-shrink-0">
-                                                <AvatarImage
-                                                    src={room.user_image_url || "/placeholder.svg?height=40&width=40"}
-                                                    alt={room.user_name}
-                                                />
-                                                <AvatarFallback className="bg-black-secondary text-white-primary">
-                                                    {room.user_name.charAt(0)}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                        )}
-                                        <div className="max-w-[70%]">
-                                            <div
-                                                className={cn(
-                                                    "p-3 rounded-lg shadow-sm",
-                                                    msg.senderId == room.user_id
-                                                        ? "bg-black-primary text-white-primary rounded-br-none"
-                                                        : "bg-white-primary text-black-primary rounded-bl-none border border-gray-tertiary",
+                    {/* Loading initial messages */}
+                    {isLoading ? (
+                        <div className="flex justify-center items-center h-full">
+                            <Loading />
+                        </div>
+                    ) : (
+                        <>
+                            {/* Chatbot support */}
+                            {(!storeOnline && allMessages.length === 0 && chatbotMessages.length > 0 && !isStore) ? (
+                                chatbotMessages.map((msg) => (
+                                    <div key={msg.id} className="space-y-3">
+                                        <div
+                                            className={cn(
+                                                "flex",
+                                                msg.senderId === room.user_id ? "justify-end" : "justify-start"
+                                            )}
+                                        >
+                                            {msg.senderId !== room.user_id && (
+                                                <Avatar className="h-8 w-8 mr-2 mt-1 flex-shrink-0">
+                                                    <AvatarImage
+                                                        src={room.store_image_url || "/placeholder.svg"}
+                                                        alt={room.store_name}
+                                                    />
+                                                    <AvatarFallback className="bg-black-secondary text-white-primary">
+                                                        {room.store_name.charAt(0)}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            )}
+                                            <div className="max-w-[70%]">
+                                                { msg.content &&
+                                                    <div
+                                                    className={cn(
+                                                        "p-3 rounded-lg shadow-sm",
+                                                        msg.senderId === room.user_id
+                                                            ? "bg-black-primary text-white-primary rounded-br-none"
+                                                            : "bg-white-primary text-black-primary rounded-bl-none border border-gray-tertiary"
+                                                    )}
+                                                    >
+                                                    {msg.content}
+                                                    </div>
+                                                }
+                                                {(msg.answer && !msg.has_next && msg.options.length === 0) && (
+                                                    <div
+                                                        className={cn(
+                                                            "p-3 rounded-lg shadow-sm",
+                                                            msg.senderId === room.user_id
+                                                                ? "bg-black-primary text-white-primary rounded-br-none"
+                                                                : "bg-white-primary text-black-primary rounded-bl-none border border-gray-tertiary"
+                                                        )}
+                                                    >
+                                                        {msg.answer}
+                                                    </div>
                                                 )}
-                                            >
-                                                {msg.content}
+                                                <div
+                                                    className={cn(
+                                                        "text-xs mt-1 flex items-center justify-between",
+                                                        msg.senderId === room.user_id ? "justify-end" : "justify-between"
+                                                    )}
+                                                >
+                                                    {msg.senderId === "chatbot" && (
+                                                        <span className="text-gray-500">Được gửi bởi Chatbot</span>
+                                                    )}
+                                                    <span className="text-gray-500">{formatMessageTime(msg.createdAt)}</span>
+                                                </div>
                                             </div>
-                                            <div
-                                                className={cn(
-                                                    "text-xs mt-1 flex items-center gap-1",
-                                                    msg.senderId === room.user_id && !isStore ? "justify-end" : "justify-start",
-                                                )}
-                                            >
-                                                <span className="text-gray-tertiary">{formatMessageTime(msg.createdAt)}</span>
-                                                {msg.senderId === room.user_id && !isStore && getMessageStatusIcon(msg.status)}
+                                        </div>
+                                        {msg.has_next && msg.options && msg.options.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 justify-start">
+                                                {msg.options.map((option) => (
+                                                    <Button
+                                                        key={option.id}
+                                                        variant="outline"
+                                                        className="bg-white-primary text-[#2673dd] rounded-full text-sm py-1 px-4 ml-12 hover:text-[#2673dd]"
+                                                        onClick={() => handleOptionSelect(option)}
+                                                    >
+                                                        {option.title}
+                                                    </Button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
+                            ) : (
+                                allMessages.map((msg) => (
+                                    <div key={msg.id} cl>
+                                        {msg.productId && msg.productId != "" ? (
+                                            <ProductInMessage productId={msg.productId} products={products} />
+                                        ) : null}
+
+                                        {msg.orderId && msg.orderId != "" ? (
+                                            <OrderChatMessage orderId={msg.orderId} orders={orders} />
+                                        ) : null}
+                                        <div
+                                            className={cn(
+                                                "flex", "my-2",
+                                                (msg.senderId !== room.user_id && isStore) || (msg.senderId === room.user_id && !isStore)
+                                                    ? "justify-end"
+                                                    : "justify-start",
+                                            )}
+                                        >
+                                            {msg.senderId !== room.user_id && !isStore && (
+                                                <Avatar className="h-8 w-8 mr-2 mt-1 flex-shrink-0">
+                                                    <AvatarImage
+                                                        src={room.store_image_url || "/placeholder.svg?height=40&width=40"}
+                                                        alt={room.store_name}
+                                                    />
+                                                    <AvatarFallback className="bg-black-secondary text-white-primary">
+                                                        {room.store_name.charAt(0)}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            )}
+                                            {msg.senderId == room.user_id && isStore && (
+                                                <Avatar className="h-8 w-8 mr-2 mt-1 flex-shrink-0">
+                                                    <AvatarImage
+                                                        src={room.user_image_url || "/placeholder.svg?height=40&width=40"}
+                                                        alt={room.user_name}
+                                                    />
+                                                    <AvatarFallback className="bg-black-secondary text-white-primary">
+                                                        {room.user_name.charAt(0)}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            )}
+                                            <div className="max-w-[70%]">
+                                                <div
+                                                    className={cn(
+                                                        "p-3 rounded-lg shadow-sm",
+                                                        msg.senderId == room.user_id
+                                                            ? "bg-black-primary text-white-primary rounded-br-none"
+                                                            : "bg-white-primary text-black-primary rounded-bl-none border border-gray-tertiary",
+                                                    )}
+                                                >
+                                                    {msg.content}
+                                                </div>
+                                                <div
+                                                    className={cn(
+                                                        "text-xs mt-1 flex items-center gap-1",
+                                                        msg.senderId === room.user_id && !isStore ? "justify-end" : "justify-start",
+                                                    )}
+                                                >
+                                                    <span className="text-gray-tertiary">{formatMessageTime(msg.createdAt)}</span>
+                                                    {msg.senderId === room.user_id && !isStore && getMessageStatusIcon(msg.status)}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))
-                        )}
+                                ))
+                            )}
 
-                        {/* Typing indicator */}
-                        {isTyping && (
-                            <div className="flex justify-start">
-                                <Avatar className="h-8 w-8 mr-2 mt-1">
-                                    <AvatarImage
-                                        src={room.store_image_url || "/placeholder.svg?height=40&width=40"}
-                                        alt={room.store_name}
-                                    />
-                                    <AvatarFallback className="bg-black-secondary text-white-primary">
-                                        {room.store_name.charAt(0)}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="bg-white-primary p-3 rounded-lg shadow-sm border border-gray-tertiary rounded-bl-none">
-                                    <div className="flex space-x-1">
-                                        <div
-                                            className="h-2 w-2 rounded-full bg-gray-tertiary animate-bounce"
-                                            style={{ animationDelay: "0ms" }}
-                                        ></div>
-                                        <div
-                                            className="h-2 w-2 rounded-full bg-gray-tertiary animate-bounce"
-                                            style={{ animationDelay: "150ms" }}
-                                        ></div>
-                                        <div
-                                            className="h-2 w-2 rounded-full bg-gray-tertiary animate-bounce"
-                                            style={{ animationDelay: "300ms" }}
-                                        ></div>
+                            {(storeOnline && allMessages.length === 0) && (
+                                <p className="flex justify-center">Bắt đầu cuộc trò chuyện với người bán</p>
+                            )}
+
+                            {/* Typing indicator */}
+                            {isTyping && (
+                                <div className="flex justify-start">
+                                    <Avatar className="h-8 w-8 mr-2 mt-1">
+                                        <AvatarImage
+                                            src={room.store_image_url || "/placeholder.svg?height=40&width=40"}
+                                            alt={room.store_name}
+                                        />
+                                        <AvatarFallback className="bg-black-secondary text-white-primary">
+                                            {room.store_name.charAt(0)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="bg-white-primary p-3 rounded-lg shadow-sm border border-gray-tertiary rounded-bl-none">
+                                        <div className="flex space-x-1">
+                                            <div
+                                                className="h-2 w-2 rounded-full bg-gray-tertiary animate-bounce"
+                                                style={{ animationDelay: "0ms" }}
+                                            ></div>
+                                            <div
+                                                className="h-2 w-2 rounded-full bg-gray-tertiary animate-bounce"
+                                                style={{ animationDelay: "150ms" }}
+                                            ></div>
+                                            <div
+                                                className="h-2 w-2 rounded-full bg-gray-tertiary animate-bounce"
+                                                style={{ animationDelay: "300ms" }}
+                                            ></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        <div ref={messagesEndRef} />
-                    </>
-                )}
-            </div>
+                            <div ref={messagesEndRef} />
+                        </>
+                    )}
+                </div>
+            }
 
             {/* Message Input */}
             <div className="p-3 border-t border-gray-tertiary bg-white-primary">

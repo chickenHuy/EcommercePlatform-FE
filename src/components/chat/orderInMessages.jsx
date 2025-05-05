@@ -1,7 +1,7 @@
 "use client"
 
 import { formatDistanceToNow } from "date-fns"
-import { Star, Package, ChevronDown, ChevronUp, Clock } from "lucide-react"
+import { Package, ChevronDown, ChevronUp, Clock } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import { Badge } from "@/components/ui/badge"

@@ -1,9 +1,7 @@
-import { cn } from "@/lib/utils"
 import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import ProductPlaceholder from "@/assets/images/productPlaceholder.png"
-import Loading from "../loading"
 
 
 export function ProductInMessage({ productId, products }) {

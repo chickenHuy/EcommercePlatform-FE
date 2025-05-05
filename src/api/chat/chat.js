@@ -52,8 +52,15 @@ export const listRooms = async (userType, page = 1, size = 10) => {
     }
 };
 
-
-
+export const checkStoreOnlineStatus = (storeId) => {
+    try {
+      const response = get(`/api/v1/stores/check_online_status/${storeId}`);
+      return response;
+    } catch (error) {
+      console.error("Error during checkStoreOnlineStatus: ", error);
+      throw error;
+    }
+  };
 
 // import { listMessages, createRoom, listRooms } from "./common";
 

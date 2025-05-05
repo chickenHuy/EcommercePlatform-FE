@@ -1,8 +1,7 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import Cookies from "js-cookie";
-
 
 const useWebSocket = (baseUrl) => {
     const [client, setClient] = useState(null);
@@ -58,9 +57,6 @@ const useWebSocket = (baseUrl) => {
 
         setSubscriptions((prev) => ({ ...prev, [roomId]: sub }));
     };
-
-
-
 
     /** Unsubscribe khỏi một room */
     const unsubscribeRoom = (roomId) => {
