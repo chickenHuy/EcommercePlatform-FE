@@ -91,7 +91,23 @@
       "cancel": "Hủy",
       "total_amount": "Tổng số tiền",
       "status": "Trạng thái",
-      "no_order": "Không có đơn hàng nào"
+      "no_order": "Không có đơn hàng nào",
+      "ORDER_CODE": "Mã đơn: {orderCode}",
+      "order_delivered_successfully": "Đơn hàng đã được giao thành công",
+      "order_has_been_cancelled": "Đơn hàng đã bị hủy",
+      "waiting_for_shipping_pickup": "Đợi đơn vị vận chuyển lấy hàng",
+      "shipping_unit_successfully_picked_up": "Đơn vị vận chuyển lấy hàng thành công",
+      "order_is_being_delivered_to_customer": "Đơn hàng đã được giao đến khách hàng",
+      "update_status": "Cập nhật trạng thái",
+      "cancel_order": "Hủy đơn hàng",
+      "customer_information": "Thông tin khách hàng",
+      "note": "Ghi chú",
+      "no_note": "[Không có ghi chú]",
+      "product_list": "Danh sách sản phẩm",
+      "order_summary": "Tóm tắt đơn hàng",
+      "total_item": "Tổng {total} (mục)",
+      "shop_discount": "Giảm giá từ cửa hàng",
+      "total_payment": "Tổng thanh toán"
     }
   },
   "AuthPage": {

@@ -91,7 +91,23 @@
       "cancel": "Cancel",
       "total_amount": "Total Amount",
       "status": "Status",
-      "no_order": "No Order"
+      "no_order": "No Order",
+      "ORDER_CODE": "ORDER CODE: {orderCode}",
+      "order_delivered_successfully": "Order Delivered Successfully",
+      "order_has_been_cancelled": "Order Has Been Cancelled",
+      "waiting_for_shipping_pickup": "Waiting For Shipping Pickup",
+      "shipping_unit_successfully_picked_up": "Shipping Unit Successfully Picked Up",
+      "order_is_being_delivered_to_customer": "Order Is Being Delivered To Customer",
+      "update_status": "Update Status",
+      "cancel_order": "Cancel Order",
+      "customer_information": "Customer Information",
+      "note": "Note",
+      "no_note": "[No Note]",
+      "product_list": "Product List",
+      "order_summary": "Order Summary",
+      "total_item": "Total {total} (item(s))",
+      "shop_discount": "Shop Discount",
+      "total_payment": "Total Payment"
     }
   },
   "AuthPage": {
