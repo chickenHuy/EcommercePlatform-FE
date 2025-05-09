@@ -78,7 +78,7 @@ export default function ManageOrderBySeller() {
   const { toast } = useToast();
 
   const pageSize = 10;
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const [totalElement, setTotalElement] = useState(0);
@@ -380,7 +380,7 @@ export default function ManageOrderBySeller() {
     <>
       <Toaster />
       <div className="min-h-screen min-w-[900px] pt-20 lg:px-6 px-3">
-        {orders.length > 0 && (
+        {orders && orders.length > 0 && (
           <div className="flex flex-col gap-5">
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between gap-3">
@@ -537,7 +537,7 @@ export default function ManageOrderBySeller() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {orders.map((order) => (
+                      {orders?.map((order) => (
                         <TableRow
                           key={order.id}
                           onClick={() => handleClickViewOrderDetail(order.id)}
@@ -648,7 +648,7 @@ export default function ManageOrderBySeller() {
             </Card>
           </div>
         )}
-        {orders.length === 0 && (
+        {orders && orders.length === 0 && (
           <div className="min-h-screen flex flex-col items-center justify-start py-10">
             <Image
               alt="Empty Image"

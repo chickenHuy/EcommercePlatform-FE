@@ -32,12 +32,10 @@ export default function OrderDetailSellerPage({ params }) {
           <Loading />
         </div>
       )}
-      {orderDetail && !loadPage && (
-        <div className=''>
-          <OrderNotFound backLocale="/vendor/orders" customPaddingLeft={false}/>
-        </div>
-      )}
       {!orderDetail && !loadPage && (
+          <OrderNotFound backLocale="/vendor/orders" customPaddingLeft={false}/>
+      )}
+      {orderDetail && !loadPage && (
         <ViewOrderDetailSeller
           orderDetail={orderDetail}
           refreshPage={fetchOneOrderBySeller}
