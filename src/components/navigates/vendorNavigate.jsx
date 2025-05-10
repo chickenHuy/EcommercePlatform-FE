@@ -155,7 +155,6 @@ export default function VendorNavigate({ vendorContent }) {
     ],
     projects: [
       { name: t("review_and_comment"), url: "#", icon: Star },
-      { name: t("pickup_address"), url: "/vendor/store", icon: MapPinHouse },
       { name: t("store_profile"), url: "/vendor/store", icon: Store },
     ],
   };
