@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { format } from "date-fns"
-import { ChevronLeft, X, Send, Paperclip, MoreVertical, Check, CheckCheck, ShoppingBag, Package, XIcon, User, MessageCircleMore } from "lucide-react"
+import { ChevronLeft, X, Send, Paperclip, MoreVertical, Check, CheckCheck, ShoppingBag, Package, XIcon, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -355,6 +355,7 @@ export function ChatMessages({
 
     useEffect(() => {
         console.log("chatbotMessages: ", chatbotMessages)
+        console.log("đã set")
     }, [chatbotMessages])
 
     const handleOptionSelect = async (option) => {
@@ -373,10 +374,14 @@ export function ChatMessages({
 
     const [showChatWithShop, setShowChatWithShop] = useState(false);
     useEffect(() => {
-        if (!storeOnline && messages.length === 0 && chatbotMessages.length === 0) {
-            fetchMessageChatbot("")
-            setShowChatWithShop(true)
-        }
+        const timer = setTimeout(() => {
+            if (!storeOnline && messages.length === 0 && chatbotMessages.length === 0) {
+                fetchMessageChatbot("");
+                setShowChatWithShop(true);
+            }
+        }, 200);
+    
+        return () => clearTimeout(timer);
     }, [storeOnline])
 
     const [shopChat, setShopChat] = useState(false);
