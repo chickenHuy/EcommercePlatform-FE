@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { format } from "date-fns"
-import { ChevronLeft, X, Send, Paperclip, MoreVertical, Check, CheckCheck, ShoppingBag, Package, XIcon } from "lucide-react"
+import { ChevronLeft, X, Send, Paperclip, MoreVertical, Check, CheckCheck, ShoppingBag, Package, XIcon, User, MessageCircleMore } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -333,6 +333,9 @@ export function ChatMessages({
     const fetchMessageChatbot = async (selected_id = "") => {
         try {
             const response = await callChatbot(selected_id)
+            if (response.has_chat_with_shop) {
+                setShowChatWithShop(true)
+            }
             const newMessage = {
                 id: `chatbot-${Date.now()}-${selected_id || "initial"}`,
                 content: response.message,
@@ -342,6 +345,7 @@ export function ChatMessages({
                 has_next: response.has_next,
                 options: response.options || [],
                 answer: response.answer || "",
+                has_chat_with_shop: response.has_chat_with_shop || false
             }
             setChatbotMessages((prev) => [...prev, newMessage])
         } catch (error) {
@@ -354,6 +358,7 @@ export function ChatMessages({
     }, [chatbotMessages])
 
     const handleOptionSelect = async (option) => {
+        setShowChatWithShop(false)
         const userMessage = {
             id: `user-${Date.now()}`,
             content: option.title,
@@ -366,11 +371,20 @@ export function ChatMessages({
         await fetchMessageChatbot(option.id)
     }
 
+    const [showChatWithShop, setShowChatWithShop] = useState(false);
     useEffect(() => {
         if (!storeOnline && messages.length === 0 && chatbotMessages.length === 0) {
             fetchMessageChatbot("")
+            setShowChatWithShop(true)
         }
     }, [storeOnline])
+
+    const [shopChat, setShopChat] = useState(false);
+    const handleChatWithShop = () => {
+        setShowChatWithShop(false)
+        setShopChat(true);
+        setChatbotMessages([])
+    }
 
     return (
         <>
@@ -467,80 +481,99 @@ export function ChatMessages({
                     ) : (
                         <>
                             {/* Chatbot support */}
-                            {(!storeOnline && allMessages.length === 0 && chatbotMessages.length > 0 && !isStore) ? (
-                                chatbotMessages.map((msg) => (
-                                    <div key={msg.id} className="space-y-3">
-                                        <div
-                                            className={cn(
-                                                "flex",
-                                                msg.senderId === room.user_id ? "justify-end" : "justify-start"
-                                            )}
-                                        >
-                                            {msg.senderId !== room.user_id && (
-                                                <Avatar className="h-8 w-8 mr-2 mt-1 flex-shrink-0">
-                                                    <AvatarImage
-                                                        src={room.store_image_url || "/placeholder.svg"}
-                                                        alt={room.store_name}
-                                                    />
-                                                    <AvatarFallback className="bg-black-secondary text-white-primary">
-                                                        {room.store_name.charAt(0)}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                            )}
-                                            <div className="max-w-[70%]">
-                                                { msg.content &&
-                                                    <div
-                                                    className={cn(
-                                                        "p-3 rounded-lg shadow-sm",
-                                                        msg.senderId === room.user_id
-                                                            ? "bg-black-primary text-white-primary rounded-br-none"
-                                                            : "bg-white-primary text-black-primary rounded-bl-none border border-gray-tertiary"
-                                                    )}
-                                                    >
-                                                    {msg.content}
-                                                    </div>
-                                                }
-                                                {(msg.answer && !msg.has_next && msg.options.length === 0) && (
-                                                    <div
-                                                        className={cn(
-                                                            "p-3 rounded-lg shadow-sm",
-                                                            msg.senderId === room.user_id
-                                                                ? "bg-black-primary text-white-primary rounded-br-none"
-                                                                : "bg-white-primary text-black-primary rounded-bl-none border border-gray-tertiary"
-                                                        )}
-                                                    >
-                                                        {msg.answer}
-                                                    </div>
-                                                )}
+                            {(!storeOnline && allMessages.length === 0 && !isStore) ? (
+                                <>
+                                {
+                                    chatbotMessages.length > 0 && (
+                                        chatbotMessages.map((msg) => (
+                                            <div key={msg.id} className="space-y-2">
                                                 <div
                                                     className={cn(
-                                                        "text-xs mt-1 flex items-center justify-between",
-                                                        msg.senderId === room.user_id ? "justify-end" : "justify-between"
+                                                        "flex",
+                                                        msg.senderId === room.user_id ? "justify-end" : "justify-start"
                                                     )}
                                                 >
-                                                    {msg.senderId === "chatbot" && (
-                                                        <span className="text-gray-500">Được gửi bởi Chatbot</span>
+                                                    {msg.senderId !== room.user_id && (
+                                                        <Avatar className="h-8 w-8 mr-2 mt-1 flex-shrink-0">
+                                                            <AvatarImage
+                                                                src={room.store_image_url || "/placeholder.svg"}
+                                                                alt={room.store_name}
+                                                            />
+                                                            <AvatarFallback className="bg-black-secondary text-white-primary">
+                                                                {room.store_name.charAt(0)}
+                                                            </AvatarFallback>
+                                                        </Avatar>
                                                     )}
-                                                    <span className="text-gray-500">{formatMessageTime(msg.createdAt)}</span>
+                                                    <div className="max-w-[70%]">
+                                                        { msg.content &&
+                                                            <div
+                                                            className={cn(
+                                                                "p-3 rounded-lg shadow-sm",
+                                                                msg.senderId === room.user_id
+                                                                    ? "bg-black-primary text-white-primary rounded-br-none"
+                                                                    : "bg-white-primary text-black-primary rounded-bl-none border border-gray-tertiary"
+                                                            )}
+                                                            >
+                                                            {msg.content}
+                                                            </div>
+                                                        }
+                                                        {(msg.answer && !msg.has_next && msg.options.length === 0) && (
+                                                            <div
+                                                                className={cn(
+                                                                    "p-3 rounded-lg shadow-sm",
+                                                                    msg.senderId === room.user_id
+                                                                        ? "bg-black-primary text-white-primary rounded-br-none"
+                                                                        : "bg-white-primary text-black-primary rounded-bl-none border border-gray-tertiary"
+                                                                )}
+                                                            >
+                                                                {msg.answer}
+                                                            </div>
+                                                        )}
+                                                        <div
+                                                            className={cn(
+                                                                "text-xs mt-1 flex items-center justify-between",
+                                                                msg.senderId === room.user_id ? "justify-end" : "justify-between"
+                                                            )}
+                                                        >
+                                                            {msg.senderId === "chatbot" && (
+                                                                <span className="text-gray-500">Được gửi bởi Chatbot</span>
+                                                            )}
+                                                            <span className="text-gray-500">{formatMessageTime(msg.createdAt)}</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                                {msg.has_next && msg.options && msg.options.length > 0 && (
+                                                    <div className="flex flex-wrap gap-2 justify-start">
+                                                        {msg.options.map((option) => (
+                                                            <Button
+                                                                key={option.id}
+                                                                variant="outline"
+                                                                className="bg-white-primary text-[#2673dd] rounded-full text-sm py-1 px-4 ml-12 hover:text-[#2673dd]"
+                                                                onClick={() => handleOptionSelect(option)}
+                                                            >
+                                                                {option.title}
+                                                            </Button>
+                                                        ))}
+                                                    </div>
+                                                )}                                      
+                                            </div>                            
+                                    )))
+                                }
+                                {
+                                    showChatWithShop && (
+                                        <div className="flex flex-wrap gap-2 justify-start">                                              
+                                            <Button
+                                                variant="outline"
+                                                className="bg-white-primary text-[#ee4d2d] rounded-md text-sm py-1 px-2 ml-6 hover:text-[#ee4d2d]"
+                                                onClick={() => handleChatWithShop()}
+                                            >
+                                                <User />
+                                                Chat với Shop
+                                            </Button>
                                         </div>
-                                        {msg.has_next && msg.options && msg.options.length > 0 && (
-                                            <div className="flex flex-wrap gap-2 justify-start">
-                                                {msg.options.map((option) => (
-                                                    <Button
-                                                        key={option.id}
-                                                        variant="outline"
-                                                        className="bg-white-primary text-[#2673dd] rounded-full text-sm py-1 px-4 ml-12 hover:text-[#2673dd]"
-                                                        onClick={() => handleOptionSelect(option)}
-                                                    >
-                                                        {option.title}
-                                                    </Button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))
+                                    )
+                                }
+                                </>
                             ) : (
                                 allMessages.map((msg) => (
                                     <div key={msg.id} cl>
@@ -606,6 +639,12 @@ export function ChatMessages({
                                     </div>
                                 ))
                             )}
+
+                            {
+                                shopChat && (
+                                    <p className="flex justify-center">Vui lòng chờ người bán phản hồi...</p>
+                                )
+                            }
 
                             {(storeOnline && allMessages.length === 0) && (
                                 <p className="flex justify-center">Bắt đầu cuộc trò chuyện với người bán</p>
