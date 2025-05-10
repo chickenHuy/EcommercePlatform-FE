@@ -1,13 +1,17 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/toaster";
 import { formatCurrency, formatDate } from "@/utils";
-import { ChevronLeft, Mail, Phone, UserRoundCog } from "lucide-react";
+import {
+  ChevronLeft,
+  CircleOff,
+  Mail,
+  Pencil,
+  Phone,
+  UserRoundCog,
+} from "lucide-react";
 import Image from "next/image";
-import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 import DialogUpdateOrCancelOrder from "@/components/dialogs/dialogUpdateOrCancelOrder";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -16,7 +20,7 @@ import {
   cancelOneOrderBySeller,
   updateOneOrderBySeller,
 } from "@/api/vendor/orderRequest";
-import { EditCalendar, EventBusy } from "@mui/icons-material";
+import { useTranslations } from "next-intl";
 
 export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -25,6 +29,8 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [actionType, setActionType] = useState("");
   const { toast } = useToast();
+  const t = useTranslations("Vendor.order");
+  const router = useRouter();
 
   const handleClickButtonCancel = (orderDetail) => {
     setIsDialogOpen(true);
@@ -40,12 +46,11 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
     setActionType("update");
   };
 
-  const router = useRouter();
-  const handleOnClickViewProductDetail = (slug) => {
+  const handleClickViewProductDetail = (slug) => {
     router.push(`/${slug}`);
   };
 
-  const handleOnClickComback = () => {
+  const handleClickComback = () => {
     router.push("/vendor/orders");
   };
 
@@ -54,13 +59,13 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
       try {
         await cancelOneOrderBySeller(orderToCancel.id);
         toast({
-          description: `Đơn hàng "${orderToCancel.id}" đã được hủy thành công`,
+          description: t("cancelled_notify", { orderId: orderToCancel.id }),
         });
         refreshPage();
         setIsDialogOpen(false);
       } catch (error) {
         toast({
-          title: "Thất bại",
+          title: t("notify"),
           description: error.message,
           variant: "destructive",
         });
@@ -73,13 +78,13 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
       try {
         await updateOneOrderBySeller(orderToUpdate.id);
         toast({
-          description: `Đơn hàng "${orderToUpdate.id}" đã được cập nhật trạng thái`,
+          description: t("updated_notify", { orderId: orderToUpdate.id }),
         });
         refreshPage();
         setIsDialogOpen(false);
       } catch (error) {
         toast({
-          title: "Thất bại",
+          title: t("notify"),
           description: error.message,
           variant: "destructive",
         });
@@ -90,224 +95,233 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
   function getCurrentStatus(status) {
     switch (status) {
       case "ON_HOLD":
-        return "Chờ thanh toán";
+        return t("waiting_for_payment");
       case "PENDING":
-        return "Chờ xác nhận";
+        return t("waiting_for_confirmation");
       case "CONFIRMED":
-        return "Đã xác nhận";
+        return t("confirmed");
       case "PREPARING":
-        return "Chuẩn bị hàng";
+        return t("preparing");
       case "WAITING_FOR_SHIPPING":
-        return "Chờ giao cho ĐVVC";
+        return t("waiting_for_shipping");
       case "PICKED_UP":
-        return "Đã giao cho ĐVVC";
+        return t("delivered_to_the_carrier");
       case "OUT_FOR_DELIVERY":
-        return "Đang giao hàng";
+        return t("on_delivery");
       case "DELIVERED":
-        return "Hoàn thành";
+        return t("completed");
       case "CANCELLED":
-        return "Đã hủy";
+        return t("cancelled");
     }
   }
 
   function renderStatusBadge(currentStatus) {
     const statusMap = {
-      DELIVERED: "Đơn hàng được giao thành công",
-      CANCELLED: "Đơn hàng đã bị hủy",
-      WAITING_FOR_SHIPPING: "Đang chờ đơn vị vận chuyển lấy hàng",
-      PICKED_UP: "Đơn vị vận chuyển lấy hàng thành công",
-      OUT_FOR_DELIVERY: "Đơn hàng đang giao đến khách hàng",
+      DELIVERED: t('order_delivered_successfully'),
+      CANCELLED: t('order_has_been_cancelled'),
+      WAITING_FOR_SHIPPING: t('waiting_for_shipping_pickup'),
+      PICKED_UP: t('shipping_unit_successfully_picked_up'),
+      OUT_FOR_DELIVERY: t('order_is_being_delivered_to_customer'),
     };
 
     return statusMap[currentStatus] ? (
-      <Badge variant="outline" className="truncate text-xl">
+      <span className="whitespace-nowrap text-[1em] text-red-primary shadow-md px-3 py-1 rounded-md">
         {statusMap[currentStatus]}
-      </Badge>
+      </span>
     ) : null;
   }
 
   return (
     <>
       <Toaster />
-      <div className="min-h-screen ml-8 mr-8 mt-16">
-        <div className="flex items-center justify-between space-x-4 pt-4 pb-4">
-          <div
-            className="flex items-center space-x-2 hover:cursor-pointer"
-            onClick={() => handleOnClickComback()}
-          >
-            <ChevronLeft className="h-7 w-7" />
-            <Label className="truncate text-xl hover:cursor-pointer">
-              Trở lại
-            </Label>
-          </div>
-          <div className="flex-col space-y-2">
-            <Label className="truncate text-2xl font-bold">
-              Mã đơn hàng: {orderDetail?.id}
-            </Label>
-            <div className="flex items-center space-x-2">
-              <Label className="text-sm">
-                Ngày đặt hàng: {formatDate(orderDetail?.createdAt)}
-              </Label>
-              <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="truncate">
-                  {getCurrentStatus(orderDetail?.currentStatus)}
-                </Badge>
-              </div>
+
+      <div className="w-full h-fit flex flex-col justify-center items-center py-20">
+        <div className="w-[98%] border rounded-md shadow-md p-3">
+          <div className="flex lg:items-center items-start justify-between py-3 gap-3">
+            <div
+              className="cursor-pointer hover:bg-white-secondary rounded-sm hover:shadow-md"
+              onClick={() => handleClickComback()}
+            >
+              <ChevronLeft />
+            </div>
+            <div className="flex lg:flex-row flex-col lg:items-center items-end gap-2">
+              <span className="lg:w-full w-[300px] truncate text-[1em]">
+                {t("ORDER_CODE", { orderCode: orderDetail?.id })}
+              </span>
+              <div className="w-[1px] h-5 bg-black-primary lg:block hidden"></div>
+              <span className="whitespace-nowrap text-[1em] text-red-primary shadow-md px-3 py-1 rounded-md">
+                {getCurrentStatus(orderDetail?.currentStatus)}
+              </span>
             </div>
           </div>
-        </div>
-        <Separator></Separator>
-        <div className="flex items-center justify-center space-x-4 pt-4 pb-4">
-          {(orderDetail?.currentStatus === "ON_HOLD" ||
-            orderDetail?.currentStatus === "PENDING" ||
-            orderDetail?.currentStatus === "CONFIRMED" ||
-            orderDetail?.currentStatus === "PREPARING") && (
-            <Button
-              variant="outline"
-              onClick={() => {
-                handleClickButtonCancel(orderDetail);
-              }}
-            >
-              <EventBusy className="h-6 w-6 mr-2" />
-              Hủy đơn hàng
-            </Button>
-          )}
-          {(orderDetail?.currentStatus === "PENDING" ||
-            orderDetail?.currentStatus === "CONFIRMED" ||
-            orderDetail?.currentStatus === "PREPARING") && (
-            <Button
-              variant="outline"
-              onClick={() => {
-                handleClickButtonUpdate(orderDetail);
-              }}
-            >
-              <EditCalendar className="h-6 w-6 mr-2" />
-              Cập nhật trạng thái
-            </Button>
-          )}
-          {renderStatusBadge(orderDetail?.currentStatus)}
-        </div>
-        <Separator></Separator>
-        <div className="w-full flex justify-between space-x-8 mt-8">
-          <div className="w-3/4 flex flex-col space-y-8 mb-8">
-            <Card className="space-y-8 p-8">
-              <CardTitle className="flex justify-between items-center">
-                <Label className="text-2xl font-bold">Sản phẩm</Label>
-              </CardTitle>
-              {orderDetail?.orderItems &&
-                orderDetail.orderItems.map((item) => (
-                  <Card key={item.id}>
-                    <CardContent>
-                      <div className="flex items-center justify-between mt-6">
-                        <div className="w-4/5 flex items-center space-x-4">
+          <Separator></Separator>
+          <div className="w-full h-fit flex items-center justify-end gap-3 py-5">
+            {(orderDetail?.currentStatus === "ON_HOLD" ||
+              orderDetail?.currentStatus === "PENDING" ||
+              orderDetail?.currentStatus === "CONFIRMED" ||
+              orderDetail?.currentStatus === "PREPARING") && (
+              <Button
+                onClick={() => {
+                  handleClickButtonCancel(orderDetail);
+                }}
+              >
+                <CircleOff className="h-5 w-5 mr-3" />
+                  {t('cancel_order')}
+              </Button>
+            )}
+            {(orderDetail?.currentStatus === "PENDING" ||
+              orderDetail?.currentStatus === "CONFIRMED" ||
+              orderDetail?.currentStatus === "PREPARING") && (
+              <Button
+                onClick={() => {
+                  handleClickButtonUpdate(orderDetail);
+                }}
+              >
+                <Pencil className="h-5 w-5 mr-3" />
+                  {t('update_status')}
+              </Button>
+            )}
+            {renderStatusBadge(orderDetail?.currentStatus)}
+          </div>
+
+          <div className="w-full h-fit flex flex-col justify-between gap-5">
+            <div className="w-full h-fit flex flex-col lg:flex-row gap-5">
+              <Card className="rounded-lg w-full">
+                <CardHeader className="py-3">
+                  <CardTitle className="text-[1.3em]">
+                    {t('customer_information')}
+                  </CardTitle>
+                </CardHeader>
+                <Separator></Separator>
+                <CardContent className="flex flex-col gap-3 py-3">
+                  <div className="flex items-center gap-3">
+                    <UserRoundCog />
+                    <span className="text-[1em]">
+                      {orderDetail?.userAccountName}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Mail />
+                    <span className="text-[1em]">
+                      {orderDetail?.userEmail || "[Chưa có email]"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Phone />
+                    <span className="text-[1em]">
+                      {orderDetail?.userPhone || "[Chưa có số điện thoại]"}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="rounded-lg w-full">
+                <CardHeader className="py-3">
+                  <CardTitle className="text-[1.3em]">{t('note')}</CardTitle>
+                </CardHeader>
+                <Separator></Separator>
+                <CardContent className="py-3">
+                  <span className="whitespace-wrap">
+                    {orderDetail?.note
+                      ? orderDetail.note
+                      : t('no_note')}
+                  </span>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="w-full h-fit flex flex-col gap-5">
+              <Card className="rounded-lg w-full">
+                <CardHeader className="py-3">
+                  <CardTitle className="text-[1.3em]">
+                    {t('product_list')}
+                  </CardTitle>
+                </CardHeader>
+                <Separator></Separator>
+                <CardContent className="lg:p-5 p-3 space-y-3">
+                  {orderDetail?.orderItems &&
+                    orderDetail.orderItems.map((item) => (
+                      <Card
+                        key={item.id}
+                        className="w-full flex flex-col items-start lg:flex-row lg:items-center justify-between p-3 cursor-pointer rounded-lg"
+                        onClick={() => {
+                          handleClickViewProductDetail(item.productSlug);
+                        }}
+                      >
+                        <div className="w-full flex items-center gap-2">
                           <Image
                             alt={item.productName}
-                            src={item.productMainImageUrl || StoreEmpty}
+                            src={item.productMainImageUrl || ProductNotFound}
                             height={100}
                             width={100}
-                            className="rounded-md transition-transform duration-300 hover:scale-125 hover:cursor-pointer hover:mr-2"
-                            onClick={() =>
-                              handleOnClickViewProductDetail(item.productSlug)
-                            }
+                            className="rounded-md border w-20 h-20 object-cover"
                           />
-                          <div className="flex flex-col space-y-2">
-                            <Label
-                              className="text-xl font-bold hover:text-2xl hover:cursor-pointer"
-                              onClick={() =>
-                                handleOnClickViewProductDetail(item.productSlug)
-                              }
+                          <div className="flex flex-col justify-start items-start">
+                            <span
+                              className="text-[em]"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/${item.productSlug}`);
+                              }}
                             >
                               {item.productName}
-                            </Label>
-                            <Label>{item.productNameBrand}</Label>
-                            <Label className="text-sm text-muted-foreground">
+                            </span>
+                            <span className="text-sm text-muted-foreground">
+                              {item.productNameBrand}
+                            </span>
+                            <span className="text-sm text-muted-foreground">
                               {item.values ? item.values.join(" | ") : ""}
-                            </Label>
+                            </span>
                           </div>
                         </div>
-                        <div className="w-1/5 flex flex-col items-end text-right">
+                        <div className="w-full flex flex-col items-end text-right">
                           <div className="flex items-center space-x-1">
-                            <Label className="text-2xl font-bold">
+                            <span className="text-[1.2em] font-bold">
                               {item.quantity}
-                            </Label>
-                            <Label>x {formatCurrency(item.price)}</Label>
+                            </span>
+                            <span>x {formatCurrency(item.price)}</span>
                           </div>
-                          <Label>
+                          <span className="text-[1.2em] text-red-primary font-bold">
                             {formatCurrency(item.quantity * item.price)}
-                          </Label>
+                          </span>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl font-bold">
-                  Tóm tắt đơn hàng
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-3 items-center">
-                    <Label className="text-left">Tổng cộng</Label>
-                    <Label className="text-center">
-                      {`${orderDetail?.orderItems.length} item(s)`}
-                    </Label>
-                    <Label className="text-right">
-                      {formatCurrency(orderDetail?.total)}
-                    </Label>
+                      </Card>
+                    ))}
+                </CardContent>
+              </Card>
+              <Card className="rounded-lg">
+                <CardHeader className="py-3">
+                  <CardTitle className="text-[1.3em]">
+                    {t('order_summary')}
+                  </CardTitle>
+                </CardHeader>
+                <Separator></Separator>
+                <CardContent className="py-5">
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-row justify-between items-center">
+                      <span className="text-[1em]">
+                        {t('total_item', {total:orderDetail?.orderItems.length})}
+                      </span>
+                      <span className="text-[1em]">
+                        {formatCurrency(orderDetail?.total)}
+                      </span>
+                    </div>
+                    <div className="flex flex-row justify-between items-center">
+                      <span className="text-[1em]">{t('shop_discount')}</span>
+                      <span className="text-[1em]">
+                        {`- ${formatCurrency(orderDetail?.discount)}`}
+                      </span>
+                    </div>
+                    <div className="flex flex-row justify-between items-center">
+                      <span className="text-[1em]">{t('total_payment')}</span>
+                      <span className="text-[1.2em] text-red-primary">
+                        {formatCurrency(
+                          orderDetail?.total - orderDetail?.discount,
+                        )}
+                      </span>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 items-center">
-                    <Label className="text-left">Shop giảm giá</Label>
-                    <Label className="text-right">
-                      {`- ${formatCurrency(orderDetail?.discount)}`}
-                    </Label>
-                  </div>
-                  <div className="grid grid-cols-2 items-center">
-                    <Label className="text-left">Tổng thanh toán</Label>
-                    <Label className="text-right font-bold">
-                      {formatCurrency(
-                        orderDetail?.total - orderDetail?.discount
-                      )}
-                    </Label>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          <div className="w-1/4 flex flex-col space-y-8 mb-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl font-bold">Khách hàng</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <UserRoundCog />
-                  <Label>{orderDetail?.userAccountName}</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Mail />
-                  <Label>{orderDetail?.userEmail || "(chưa có email)"}</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Phone />
-                  <Label>
-                    {orderDetail?.userPhone || "(chưa có số điện thoại)"}
-                  </Label>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl font-bold">Ghi chú</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Label>
-                  {orderDetail?.note ? orderDetail.note : "(không có ghi chú)"}
-                </Label>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
