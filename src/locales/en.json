@@ -108,6 +108,36 @@
       "total_item": "Total {total} (item(s))",
       "shop_discount": "Shop Discount",
       "total_payment": "Total Payment"
+    },
+    "product": {
+      "sort": "Sort",
+      "descreasing": "Descreasing",
+      "increasing": "Increasing",
+      "name": "Name",
+      "selling_price": "Selling Price",
+      "original_price": "Original Price",
+      "evaluate": "Evaluate",
+      "created_at": "Created At",
+      "unsort": "Unsort",
+      "public": "Public",
+      "hidden": "Hidden",
+      "show": "Show",
+      "locked": "Locked",
+      "list_product": "List Product ( {total} )",
+      "manage_all_product_of_the_store": "Manage All Product Of The Store",
+      "image": "Image",
+      "quantity": "Quantity",
+      "action": "Action",
+      "find_product": "Find Product ...",
+      "delete": "Delete",
+      "update": "Update",
+      "notify": "Notify",
+      "show_hidden_success": "Product {action} Successfully",
+      "show_hidden_fail": "Product {action} Fail: {error}",
+      "delete_success": "Product Deleted Successfully",
+      "delete_fail": "Product Deleted Fail: {error}",
+      "can_not_load_list_product": "Can not load list product: {error}"
+
     }
   },
   "AuthPage": {

@@ -108,6 +108,35 @@
       "total_item": "Tổng {total} (mục)",
       "shop_discount": "Giảm giá từ cửa hàng",
       "total_payment": "Tổng thanh toán"
+    },
+    "product": {
+      "sort": "Sắp xếp",
+      "descreasing": "Giảm dần",
+      "increasing": "Tăng dần",
+      "name": "Tên",
+      "selling_price": "Giá bán",
+      "original_price": "Giá gốc",
+      "evaluate": "Đánh giá",
+      "created_at": "Ngày tạo",
+      "unsort": "Không sắp xếp",
+      "public": "Công khai",
+      "hidden": "Ẩn",
+      "show": "Hiện",
+      "locked": "Bị khóa",
+      "list_product": "Danh sách sản phẩm ( {total} )",
+      "manage_all_product_of_the_store": "Quản lý tất cả sản phẩm của cửa hàng",
+      "image": "Hình ảnh",
+      "quantity": "Số lượng",
+      "action": "Hành động",
+      "find_product": "Tìm kiếm sản phẩm ...",
+      "delete": "Xóa",
+      "update": "Cập nhật",
+      "notify": "Thông báo",
+      "show_hidden_success": "Sản phẩm {action} thành công",
+      "show_hidden_fail": "Sản phẩm {action} thất bại: {error}",
+      "delete_success": "Sản phẩm được xóa thành công",
+      "delete_fail": "Sản phẩm xóa thất bại: {error}",
+      "can_not_load_list_product": "Không thể tải danh sách sản phẩm: {error}"
     }
   },
   "AuthPage": {
@@ -306,7 +335,7 @@
       "your_order_will_be_delivered_to_the_carried_soon": "Đơn hàng của bạn sẽ được giao đến bạn sớm",
       "order_receive_address": "Địa chỉ nhận hàng",
       "order_status": "Trạng thái đơn hàng",
-      "text_ask_about_product":"Hỏi về đơn hàng"
+      "text_ask_about_product": "Hỏi về đơn hàng"
     },
     "account": {
       "title": "Tài khoản của tôi",
