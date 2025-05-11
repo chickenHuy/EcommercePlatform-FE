@@ -20,6 +20,7 @@ import {
   uploadMainProductImage,
   uploadMainProductVideo,
 } from "@/api/vendor/productRequest";
+import { useTranslations } from "next-intl";
 
 export default function Content() {
   const [activeSection, setActiveSection] = useState("about");
@@ -30,6 +31,7 @@ export default function Content() {
   const [listComponents, setListComponent] = useState([]);
   const [isLoading, setIsLoading] = useState(null);
   const { toast } = useToast();
+  const t = useTranslations("Vendor.create_product");
 
   // State for basic information
   const [productImages, setProductImages] = useState([]);
@@ -62,6 +64,8 @@ export default function Content() {
     productDetails,
     productCategory,
     productDescription,
+    mainProductImage,
+    productBrand,
   ]);
 
   // State for detail information
@@ -78,7 +82,7 @@ export default function Content() {
 
       setIsCompleteDetail(allRequiredFilled);
     }
-  }, [formData, listComponents]);
+  }, [formData, listComponents, categoryIdSelected]);
 
   // State for seller information
   const [isHaveVariant, setIsHaveVariant] = useState(false);
@@ -103,7 +107,7 @@ export default function Content() {
         (variant) =>
           variant.name.trim() !== "" &&
           Array.isArray(variant.options) &&
-          variant.options.length > 0
+          variant.options.length > 0,
       );
 
       const hasValidVariantProducts = variantOfProducts.every(
@@ -112,7 +116,7 @@ export default function Content() {
           product.salePrice?.trim() !== "" &&
           product.quantity?.trim() !== "" &&
           Array.isArray(product.values) &&
-          product.values.length === Object.keys(variantData).length
+          product.values.length === Object.keys(variantData).length,
       );
 
       return hasValidVariantData && hasValidVariantProducts;
@@ -156,7 +160,7 @@ export default function Content() {
         .then((response) => {
           setListComponent(response.result);
         })
-        .catch((error) => {
+        .catch(() => {
           setListComponent([]);
         });
     }
@@ -196,24 +200,30 @@ export default function Content() {
     if (!isCompleteBasic) {
       toast({
         variant: "destructive",
-        title: "Lỗi",
-        description: "Vui lòng hoàn thành thông tin cơ bản của sản phẩm.",
+        title: t("notify"),
+        description: t("please_complete", {
+          info: t("basic_product_information"),
+        }),
       });
       return;
     }
     if (!isCompleteDetail) {
       toast({
         variant: "destructive",
-        title: "Lỗi",
-        description: "Vui lòng hoàn thành thông tin chi tiết của sản phẩm.",
+        title: t("notify"),
+        description: t("please_complete", {
+          info: t("advance_product_information"),
+        }),
       });
       return;
     }
     if (!isCompleteSale) {
       toast({
         variant: "destructive",
-        title: "Lỗi",
-        description: "Vui lòng hoàn thành thông tin bán hàng của sản phẩm.",
+        title: t("notify"),
+        description: t("please_complete", {
+          info: t("sales_product_information"),
+        }),
       });
       return;
     }
@@ -221,8 +231,10 @@ export default function Content() {
     if (!isCompleteOther) {
       toast({
         variant: "destructive",
-        title: "Lỗi",
-        description: "Vui lòng hoàn thành thông tin khác của sản phẩm.",
+        title: t("notify"),
+        description: t("please_complete", {
+          info: t("other_product_information"),
+        }),
       });
       return;
     }
@@ -258,12 +270,16 @@ export default function Content() {
       await uploadListProductImage(productImages, product.result.id);
       await uploadMainProductVideo(productVideo, product.result.id);
       toast({
-        variant: "success",
-        title: "Thành công",
-        description: "Tạo sản phẩm thành công.",
+        title: t("notify"),
+        description: t("create_successfully_product"),
       });
       setIsLoading(false);
     } catch (error) {
+      toast({
+        variant: "destructive",
+        title: t("notify"),
+        description: t("create_fail_product", { error: error.message }),
+      });
       setIsLoading(false);
     }
   };
@@ -278,7 +294,7 @@ export default function Content() {
           </div>
         )}
         <nav className="w-full h-full flex">
-          <ul className="space-x-4 flex flex-row justify-center items-center px-5 text-[14px]">
+          <ul className="space-x-4 flex flex-row justify-center items-center px-5 text-[.9em]">
             <li>
               <Link
                 activeClass={styles.active}
@@ -290,7 +306,7 @@ export default function Content() {
                   activeSection === "basic" ? styles.active : ""
                 }`}
               >
-                Thông Tin Cơ Bản
+                {t("basic_information")}
               </Link>
             </li>
             <li>
@@ -304,7 +320,7 @@ export default function Content() {
                   activeSection === "detail" ? styles.active : ""
                 }`}
               >
-                Thông Tin Chi Tiết
+                {t("advance_information")}
               </Link>
             </li>
             <li>
@@ -318,7 +334,7 @@ export default function Content() {
                   activeSection === "seller" ? styles.active : ""
                 }`}
               >
-                Thông Tin Bán Hàng
+                {t("sales_information")}
               </Link>
             </li>
             <li>
@@ -332,7 +348,7 @@ export default function Content() {
                   activeSection === "other" ? styles.active : ""
                 }`}
               >
-                Thông Tin Khác
+                {t("other_information")}
               </Link>
             </li>
           </ul>
@@ -340,10 +356,10 @@ export default function Content() {
       </header>
       <section
         id="basic"
-        className="h-fit min-h-screen flex flex-col items-start justify-center bg-white-primary mt-16"
+        className="h-fit flex flex-col items-start justify-center mt-[70px]"
       >
         <span className="px-5 py-3 font-[900]">
-          Thông tin cơ bản của sản phẩm
+          {t("basic_product_information")}
         </span>
         <BasicInformation
           productImages={productImages}
@@ -371,28 +387,19 @@ export default function Content() {
       <div className="p-5">
         <CompleteNotify
           isComplete={isCompleteBasic}
-          content="Hoàn thành thông tin cơ bản của sản phẩm."
+          content={t("complete", { info: t("basic_product_information") })}
         />
       </div>
       <div className="w-[97%] h-[1px] mt-5 mx-auto bg-white-secondary"></div>
       <section
         id="detail"
-        className="h-fit min-h-screen flex flex-col items-start justify-start bg-white-primary"
+        className="h-fit flex flex-col items-start justify-start"
       >
         <span className="px-5 py-3 font-[900]">
-          Thông tin chi tiết của sản phẩm
+          {t("advance_product_information")}
           <p className="flex flex-row items-center">
-            <span className="text-error-dark mr-3 text-xl">*</span>
-            <span className="italic text-sm">
-              Các thông tin về thông số kỹ thuật nên nhập cùng đơn vị.
-            </span>
-          </p>
-          <p className="flex flex-row items-center">
-            <span className="text-error-dark mr-3 text-xl">*</span>
-            <span className="italic text-sm">
-              Đối với các thông số kỹ thuật có nhiều giá trị, sử dụng ký tự "\"
-              ngăn cách giữa các giá trị.
-            </span>
+            <span className="text-red-primary mr-3 text-xl">*</span>
+            <span className="italic text-sm">{t("specification_note")}</span>
           </p>
         </span>
         <DetailInformation
@@ -404,15 +411,17 @@ export default function Content() {
       <div className="p-5">
         <CompleteNotify
           isComplete={isCompleteDetail}
-          content="Hoàn thành thông tin chi tiết của sản phẩm."
+          content={t("complete", { info: t("advance_product_information") })}
         />
       </div>
       <div className="w-[97%] h-[1px] mt-5 mx-auto bg-white-secondary"></div>
       <section
         id="seller"
-        className="h-fit min-h-screen flex flex-col items-start justify-start bg-white-primary"
+        className="h-fit flex flex-col items-start justify-start bg-white-primary"
       >
-        <span className="px-5 my-3 font-[900]">Thông tin bán hàng</span>
+        <span className="px-5 my-3 font-[900]">
+          {t("sales_product_information")}
+        </span>
         <SellerInformation
           isHaveVariant={isHaveVariant}
           setIsHaveVariant={setIsHaveVariant}
@@ -433,15 +442,17 @@ export default function Content() {
       <div className="p-5">
         <CompleteNotify
           isComplete={isCompleteSale}
-          content="Hoàn thành thông tin bán hàng của sản phẩm."
+          content={t("complete", { info: t("sales_product_information") })}
         />
       </div>
       <div className="w-[97%] h-[1px] mt-5 mx-auto bg-white-secondary"></div>
       <section
         id="other"
-        className="h-fit min-h-screen flex flex-col items-start justify-start bg-white-primary"
+        className="h-fit flex flex-col items-start justify-start bg-white-primary"
       >
-        <span className="px-5 my-3 font-[900]">Thông tin khác</span>
+        <span className="px-5 my-3 font-[900]">
+          {t("other_product_information")}
+        </span>
         <OtherImformation
           isDefaultDelivery={isDefaultDelivery}
           setIsDefaultDelivery={setIsDefaultDelivery}
@@ -450,16 +461,18 @@ export default function Content() {
       <div className="p-5">
         <CompleteNotify
           isComplete={isCompleteOther}
-          content="Hoàn thành thông tin khác của sản phẩm."
+          content={t("complete", { info: t("other_product_information") })}
         />
       </div>
       <div className="w-[97%] h-[1px] mt-5 mx-auto bg-white-secondary"></div>
       <div className="w-full h-fit flex flex-row justify-end items-center gap-5 p-5 pb-10">
-        <Button variant="destructive">Hủy</Button>
-        <Button onClick={() => handleSave(false)} variant="outline">
-          Lưu & Ẩn
+        <Button variant="outline">{t("button_cancel")}</Button>
+        <Button onClick={() => handleSave(false)}>
+          {t("button_save_hidden")}
         </Button>
-        <Button onClick={() => handleSave(true)}>Lưu & Hiển thị</Button>
+        <Button onClick={() => handleSave(true)}>
+          {t("button_save_show")}
+        </Button>
       </div>
     </div>
   );
