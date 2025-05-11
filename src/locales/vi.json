@@ -137,6 +137,25 @@
       "delete_success": "Sản phẩm được xóa thành công",
       "delete_fail": "Sản phẩm xóa thất bại: {error}",
       "can_not_load_list_product": "Không thể tải danh sách sản phẩm: {error}"
+    },
+    "create_product": {
+      "notify": "Thông báo",
+      "please_complete": "Vui lòng hoàn thành {info}",
+      "complete": "Hoàn thành {info}",
+      "basic_product_information": "Thông tin cơ bản về sản phẩm",
+      "advance_product_information": "Thông tin nâng cao về sản phẩm",
+      "sales_product_information": "Thông tin bán hàng của sản phẩm",
+      "other_product_information": "Thông tin khác của sản phẩm",
+      "basic_information": "Thông tin cơ bản",
+      "advance_information": "Thông tin nâng cao",
+      "sales_information": "Thông tin bán hàng",
+      "other_information": "Thông tin khác",
+      "create_successfully_product": "Tạo sản phẩm thành công",
+      "create_fail_product": "Tạo sản phẩm thất bại: {error}",
+      "specification_note": "Thông số kỹ thuật nên được nhập cùng một đơn vị",
+      "button_cancel": "Hủy",
+      "button_save_show": "Lưu & Hiển thị",
+      "button_save_hidden": "Lưu & Ẩn"
     }
   },
   "AuthPage": {

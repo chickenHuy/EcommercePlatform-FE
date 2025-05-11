@@ -137,7 +137,25 @@
       "delete_success": "Product Deleted Successfully",
       "delete_fail": "Product Deleted Fail: {error}",
       "can_not_load_list_product": "Can not load list product: {error}"
-
+    },
+    "create_product": {
+      "notify": "Notify",
+      "please_complete": "Please Complete {info}",
+      "complete": "Complete {info}",
+      "basic_product_information": "Basic Product Information",
+      "advance_product_information": "Advance Product Information",
+      "sales_product_information": "Sales Product Information",
+      "other_product_information": "Product Other Information",
+      "basic_information": "Basic Information",
+      "advance_information": "Advance Information",
+      "sales_information": "Sales Information",
+      "other_information": "Other Information",
+      "create_successfully_product": "Create Successfully Product",
+      "create_fail_product": "Create Fail Product: {error}",
+      "specification_note": "Specifications Should Be Entered In The Same Units",
+      "button_cancel": "Cancel",
+      "button_save_show": "Save & Show",
+      "button_save_hidden": "Save & Hidden"
     }
   },
   "AuthPage": {
