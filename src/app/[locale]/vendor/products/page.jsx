@@ -362,7 +362,7 @@ export default function ManageComponent() {
       <Toaster />
       <div className="flex items-start p-3">
         <Tabs defaultValue="available" value={tab} className="w-full h-fit">
-          <div className="flex items-center">
+          <div className="flex items-center justify-between">
             <TabsList className="shadow-md rounded-md">
               <TabsTrigger
                 className="min-w-28"
@@ -387,14 +387,25 @@ export default function ManageComponent() {
               </TabsTrigger>
             </TabsList>
 
-            <div className="ml-auto flex items-center gap-2">
-              <FilterSortDropdown
-                order={order}
-                sortBy={sortBy}
-                handleOrderChange={handleOrderChange}
-                handleSortChange={handleSortChange}
-                t={t}
-              />
+            <div className="w-fit h-fit flex flex-row justify-end items-center gap-3">
+              <div className="w-1/2 min-w-[400px] relative">
+                <Input
+                  className="pr-10 pl-5"
+                  placeholder={t("find_product")}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  value={search}
+                />
+                <Search className="h-5 w-5 absolute top-1/2 -translate-y-1/2 right-3" />
+              </div>
+              <div className="w-fit ml-auto flex items-center gap-2">
+                <FilterSortDropdown
+                  order={order}
+                  sortBy={sortBy}
+                  handleOrderChange={handleOrderChange}
+                  handleSortChange={handleSortChange}
+                  t={t}
+                />
+              </div>
             </div>
           </div>
 
@@ -408,15 +419,6 @@ export default function ManageComponent() {
                   <CardDescription className="text-[1em]">
                     {t("manage_all_product_of_the_store")}
                   </CardDescription>
-                  <div className="w-1/3 min-w-[400px] relative">
-                    <Input
-                      className="pr-10 pl-5"
-                      placeholder={t("find_product")}
-                      onChange={(e) => handleSearchChange(e.target.value)}
-                      value={search}
-                    />
-                    <Search className="h-5 w-5 absolute top-1/2 -translate-y-1/2 right-3" />
-                  </div>
                 </div>
               </CardHeader>
 
