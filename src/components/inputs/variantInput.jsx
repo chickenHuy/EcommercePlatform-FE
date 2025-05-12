@@ -45,7 +45,7 @@ const VariantInput = ({
   };
 
   return (
-    <div className="w-full flex flex-col gap-2">
+    <div className="w-full flex flex-col gap-3">
       <Input
         type="text"
         placeholder="Tên phân loại"
@@ -53,12 +53,12 @@ const VariantInput = ({
         onChange={(e) => onNameChange(e.target.value)}
       />
       {!variant.name.trim() && (
-        <span className="text-error-dark text-[13px] -translate-y-[5px]">
+        <span className="text-red-primary text-[13px] -translate-y-[5px] px-3">
           Không được để trống
         </span>
       )}
 
-      <div className="w-full flex flex-wrap gap-2 mt-2">
+      <div className="w-full flex flex-wrap gap-2">
         {variant.options.map((option, index) => (
           <div
             key={index}
@@ -69,7 +69,7 @@ const VariantInput = ({
               className="absolute top-[1px] right-[1px]"
               onClick={() => onRemoveOption(index)}
             >
-              <X className="w-4 h-4 hover:text-error-dark scale-90 hover:scale-105" />
+              <X className="w-4 h-4 hover:text-red-primary scale-90 hover:scale-105" />
             </button>
           </div>
         ))}
@@ -92,7 +92,7 @@ const VariantInput = ({
             }}
           />
           {isHasWhiteSpace && (
-            <span className="text-error-dark text-[13px] -translate-y-[5px]">
+            <span className="text-red-primary text-[13px] -translate-y-[5px]">
               Vui lòng kiểm tra lại. Đầu và cuối của chuỗi kí tự được nhập không
               được chứa khoảng trắng.
             </span>
