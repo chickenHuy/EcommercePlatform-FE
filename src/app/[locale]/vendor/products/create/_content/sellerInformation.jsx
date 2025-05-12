@@ -87,7 +87,7 @@ const SellerInformation = ({
       [variantName]: {
         ...prevData[variantName],
         options: prevData[variantName].options.filter(
-          (_, index) => index !== optionIndex
+          (_, index) => index !== optionIndex,
         ),
       },
     }));
@@ -103,18 +103,6 @@ const SellerInformation = ({
 
       return updatedData;
     });
-  };
-
-  const handleOriginalPriceChange = (e) => {
-    setOriginalPrice(e.target.value);
-  };
-
-  const handleSalePriceChange = (e) => {
-    setSalePrice(e.target.value);
-  };
-
-  const handleQuantityChange = (e) => {
-    setQuantity(e.target.value);
   };
 
   const handleInputChange = (index, field, value, isHaveVariant = true) => {
@@ -155,7 +143,7 @@ const SellerInformation = ({
       });
     } else {
       setVariantOfProducts((prevData) => {
-        const newData = [...prevData];
+      const newData = [...prevData];
         newData[index] = {
           ...newData[index],
           [field]: value,
@@ -179,7 +167,7 @@ const SellerInformation = ({
     function cartesianProduct(arrays) {
       return arrays.reduce(
         (acc, array) => acc.flatMap((d) => array.map((e) => [...d, e])),
-        [[]]
+        [[]],
       );
     }
 
@@ -209,18 +197,17 @@ const SellerInformation = ({
     <div className="text-[15px] w-full h-fit flex flex-col justify-center items-start px-5 gap-5">
       <div className="w-full h-fit flex flex-col justify-center items-start gap-4">
         <div className="w-full h-fit flex flex-col gap-1">
-          <span className="font-[900] italic">Phân loại sản phẩm</span>
+          <span className="font-[900]">Phân loại sản phẩm</span>
           {isHaveVariant && (
             <p className="flex flex-row items-center">
-              <span className="text-error-dark mr-3 text-xl">*</span>
-              <span className="italic text-sm">
-                Nên nhập đầy đủ và chính các các thông tin phân loại sản phẩm.
+              <span className="text-red-primary mr-3 text-xl">*</span>
+              <span>
+                Nên nhập đầy đủ và chính xác các thông tin phân loại sản phẩm.
               </span>
             </p>
           )}
           {!isHaveVariant && (
             <Button
-              variant="outline"
               onClick={() => {
                 setIsHaveVariant(true);
                 handleAddVariant();
@@ -281,41 +268,36 @@ const SellerInformation = ({
           </div>
         )}
         {isHaveVariant && (
-          <div className="w-full h-fit">
-            <div className="w-full h-fit flex flex-col gap-4">
-              {Object.keys(variantData).map((variantName) => (
-                <div
-                  key={variantName}
-                  className="relative w-full border p-5 rounded"
+          <div className="w-full h-fit flex flex-col gap-4">
+            {Object.keys(variantData).map((variantName) => (
+              <div
+                key={variantName}
+                className="relative w-full border px-5 py-7 rounded"
+              >
+                <button
+                  className="absolute top-[3px] right-[3px] text-red-500"
+                  onClick={() => handleRemoveVariant(variantName)}
                 >
-                  {/* Nút Close */}
-                  <button
-                    className="absolute top-[3px] right-[3px] text-red-500"
-                    onClick={() => handleRemoveVariant(variantName)}
-                  >
-                    <X className="w-4 h-4 hover:text-error-dark hover:scale-125" />
-                  </button>
+                  <X className="w-4 h-4 hover:text-error-dark hover:scale-125" />
+                </button>
 
-                  <VariantInput
-                    variantName={variantName}
-                    variant={variantData[variantName]}
-                    onNameChange={(value) =>
-                      handleVariantChange(variantName, "name", value)
-                    }
-                    onAddOption={(option) =>
-                      handleAddOption(variantName, option)
-                    }
-                    onRemoveOption={(optionIndex) =>
-                      handleRemoveOption(variantName, optionIndex)
-                    }
-                  />
-                </div>
-              ))}
-              <Button variant="outline" onClick={handleAddVariant}>
-                <Plus className="-translate-y-[2px]" />
-                <span className="font-[900]">Thêm nhóm phân loại</span>
-              </Button>
-            </div>
+                <VariantInput
+                  variantName={variantName}
+                  variant={variantData[variantName]}
+                  onNameChange={(value) =>
+                    handleVariantChange(variantName, "name", value)
+                  }
+                  onAddOption={(option) => handleAddOption(variantName, option)}
+                  onRemoveOption={(optionIndex) =>
+                    handleRemoveOption(variantName, optionIndex)
+                  }
+                />
+              </div>
+            ))}
+            <Button onClick={handleAddVariant}>
+              <Plus className="-translate-y-[2px]" />
+              <span className="font-[900]">Thêm nhóm phân loại</span>
+            </Button>
           </div>
         )}
       </div>
@@ -325,14 +307,14 @@ const SellerInformation = ({
             Thông tin chi tiết cho từng loại sản phẩm
           </span>
           <p className="flex flex-row items-center">
-            <span className="text-error-dark mr-3 text-xl">*</span>
+            <span className="text-red-primary mr-3 text-xl">*</span>
             <span className="italic text-sm">
               Đảm bảo đã nhập đầy đủ và chính xác các thông tin về phân loại sản
               phẩm trước khi nhập thông tin chi tiết cho từng loại sản phẩm.
             </span>
           </p>
           <p className="flex flex-row items-center">
-            <span className="text-error-dark mr-3 text-xl">*</span>
+            <span className="text-red-primary mr-3 text-xl">*</span>
             <span className="italic text-sm">
               Khi chỉnh sửa các thông tin về phân loại sản phẩm, các thông tin
               chi tiết về sản phẩm sẽ bị mất.
@@ -341,11 +323,11 @@ const SellerInformation = ({
         </div>
       )}
       {isHaveVariant && (
-        <div className="w-full h-fit flex flex-row xl:justify-between justify-center items-center flex-wrap gap-3">
+        <div className="w-full h-fit grid 2xl:grid-cols-4 lg:grid-cols-2 grid-cols-1 items-center gap-3">
           {variantOfProducts.map((variant, index) => (
-            <div key={index} className="variant-item p-4 border rounded">
-              <h4 className="w-full h-fit text-center font-[900]">{`${variant.values.join(
-                " | "
+            <div key={index} className="w-full variant-item p-4 border rounded">
+              <h4 className="w-full h-fit text-center font-[900] truncate">{`${variant.values.join(
+                " | ",
               )}`}</h4>
 
               <div className="w-full h-[1px] bg-white-secondary mt-2"></div>

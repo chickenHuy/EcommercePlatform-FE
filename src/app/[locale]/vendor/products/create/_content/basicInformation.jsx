@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 
 const BasicInformation = ({
   mainProductImage = null,
@@ -36,14 +37,16 @@ const BasicInformation = ({
   setProductBrand = null,
   isUpdate = false,
 }) => {
+  const t = useTranslations("Vendor.create_product");
+
   return (
-    <div className="w-full h-fit flex flex-row justify-between items-start gap-5 px-5 text-[15px]">
-      <div className="flex-grow flex flex-col justify-start items-center p-5 shadow-md rounded-md border-[0.5px] border-white-secondary">
+    <div className="w-full h-fit flex lg:flex-row flex-col justify-between items-start gap-5 px-5 text-[1em]">
+      <div className="w-full flex-grow flex flex-col justify-start items-center p-5 shadow-md rounded-md border-[0.5px]">
         {!isUpdate && (
-          <div className="w-full h-fit flex flex-col gap-3 mt-5">
+          <div className="w-full h-fit flex flex-col gap-3">
             <div>
-              Tải lên hình ảnh chính của sản phẩm
-              <span className="px-3 text-error font-[900]">( * )</span>
+              {t("upload_main_product_image")}
+              <span className="px-3 text-red-primary font-[900]">( * )</span>
             </div>
             <ImageDropzone
               onImageUpload={setMainProductImage}
@@ -53,10 +56,10 @@ const BasicInformation = ({
           </div>
         )}
         {!isUpdate && (
-          <div className="w-full h-fit flex flex-col gap-3">
+          <div className="w-full h-fit flex flex-col gap-3 mt-5">
             <div>
-              Tải lên các hình ảnh của sản phẩm
-              <span className="px-3 text-error font-[900]">( * )</span>
+              {t("upload_product_image")}
+              <span className="px-3 text-red-primary font-[900]">( * )</span>
             </div>
             <ImageDropzone onImageUpload={setProductImages} />
           </div>
@@ -64,8 +67,8 @@ const BasicInformation = ({
         {!isUpdate && (
           <div className="w-full h-fit flex flex-col gap-3 mt-5">
             <div>
-              Tải lên video của sản phẩm
-              <span className="px-3 text-error font-[900]">( * )</span>
+              {t("upload_product_video")}
+              <span className="px-3 text-red-primary font-[900]">( * )</span>
             </div>
             <VideoDropzone onVideoUpload={setProductVideo} />
           </div>
@@ -74,12 +77,12 @@ const BasicInformation = ({
           <div className="w-full h-fit flex flex-col justify-between items-center gap-3">
             <div className="w-full">
               <div>
-                Tên sản phẩm
-                <span className="px-3 text-error font-[900]">( * )</span>
+                {t("product_name")}
+                <span className="px-3 text-red-primary font-[900]">( * )</span>
               </div>
               <Input
                 type="text"
-                placeholder="Tên sản phẩm"
+                placeholder={t("product_name")}
                 value={productName}
                 onChange={(e) => setProductName(e.target.value)}
               />
@@ -87,8 +90,10 @@ const BasicInformation = ({
             {!isUpdate && (
               <div className="w-full">
                 <div>
-                  Ngành hàng
-                  <span className="px-3 text-error font-[900]">( * )</span>
+                  {t("product_category")}
+                  <span className="px-3 text-red-primary font-[900]">
+                    ( * )
+                  </span>
                 </div>
 
                 <Select
@@ -101,16 +106,18 @@ const BasicInformation = ({
                   }}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Chọn ngành hàng" />
+                    <SelectValue placeholder={t("product_category")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectLabel className="font-[900]">
-                        Danh sách ngành hàng
+                      <SelectLabel className="font-[900] text-center">
+                        {t("list_category")}
                       </SelectLabel>
-                      {listCategory.map((item) => {
+                      {listCategory.map((item, index) => {
                         return (
-                          <SelectItem value={item.id}>{item.name}</SelectItem>
+                          <SelectItem key={index} value={item.id}>
+                            {item.name}
+                          </SelectItem>
                         );
                       })}
                     </SelectGroup>
@@ -120,8 +127,8 @@ const BasicInformation = ({
             )}
             <div className="w-full">
               <div>
-                Thương hiệu
-                <span className="px-3 text-error font-[900]">( * )</span>
+                {t("product_brand")}
+                <span className="px-3 text-red-primary font-[900]">( * )</span>
               </div>
               <Select
                 value={productBrand}
@@ -133,16 +140,18 @@ const BasicInformation = ({
                 }}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Chọn thương hiệu" />
+                  <SelectValue placeholder={t("product_brand")} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectLabel className="font-[900]">
-                      Danh sách thương hiệu
+                    <SelectLabel className="font-[900] text-center">
+                      {t("list_brand")}
                     </SelectLabel>
                     {listBrand.map((item) => {
                       return (
-                        <SelectItem value={item.id}>{item.name}</SelectItem>
+                        <SelectItem key={item.id} value={item.id}>
+                          {item.name}
+                        </SelectItem>
                       );
                     })}
                   </SelectGroup>
@@ -152,14 +161,14 @@ const BasicInformation = ({
           </div>
           <div className="grid w-full gap-1.5">
             <div>
-              Nhập thông tin mô tả của sản phẩm
-              <span className="px-3 text-error font-[900]">( * )</span>
-              {
-                productDescription.trim().length > 255 && (<span className="text-error italic">Tối đa 255 ký tự</span>)
-              }
+              {t("product_description_information")}
+              <span className="px-3 text-red-primary font-[900]">( * )</span>
+              {productDescription.trim().length > 255 && (
+                <span className="text-red-primary">Tối đa 255 ký tự</span>
+              )}
             </div>
             <Textarea
-              placeholder="Nhập thông tin mô tả của sản phẩm"
+              placeholder={t("product_description_information")}
               id="message"
               value={productDescription}
               onChange={(e) => setProductDescription(e.target.value)}
@@ -167,11 +176,11 @@ const BasicInformation = ({
           </div>
           <div className="grid w-full gap-1.5">
             <div>
-              Nhập thông tin chi tiết của sản phẩm
-              <span className="px-3 text-error font-[900]">( * )</span>
+              {t("product_detail_information")}
+              <span className="px-3 text-red-primary font-[900]">( * )</span>
             </div>
             <Textarea
-              placeholder="Nhập thông tin chi tiết của sản phẩm"
+              placeholder={t("product_description_information")}
               id="details"
               value={productDetails}
               onChange={(e) => setProductDetails(e.target.value)}
@@ -179,46 +188,48 @@ const BasicInformation = ({
           </div>
         </div>
       </div>
-      <div className="min-w-[400px] h-full lg:flex hidden flex-col justify-start items-start gap-3 p-5 shadow-md rounded-md border-[0.5px] border-white-secondary">
+      <div className="w-full lg:w-[600px] h-full flex flex-col justify-start items-start gap-3 p-5 shadow-md rounded-md border-[0.5px] border-white-secondary">
         {!isUpdate && (
           <CompleteNotify
             isComplete={mainProductImage}
-            content="Tải lên hình ảnh chính của sản phẩm."
+            content={t("upload_main_product_image")}
           />
         )}
         {!isUpdate && (
           <CompleteNotify
             isComplete={productImages.length > 0}
-            content="Tải lên các hình ảnh của sản phẩm."
+            content={t("upload_product_image")}
           />
         )}
         {!isUpdate && (
           <CompleteNotify
             isComplete={productVideo}
-            content="Tải lên video của sản phẩm."
+            content={t("upload_product_video")}
           />
         )}
         <CompleteNotify
           isComplete={productName !== ""}
-          content="Cung cấp thông tin về tên sản phẩm."
+          content={t("provide_information_about", { info: t("product_name") })}
         />
         {!isUpdate && (
           <CompleteNotify
             isComplete={productCategory !== ""}
-            content="Chọn ngành hàng của sản phẩm."
+            content={t("select_product_category")}
           />
         )}
         <CompleteNotify
           isComplete={productBrand !== ""}
-          content="Chọn thương hiệu của sản phẩm."
+          content={t("select_product_brand")}
         />
         <CompleteNotify
-          isComplete={productDescription !== "" && productDescription.trim().length <= 255}
-          content="Cung cấp thông tin mô tả của sản phẩm."
+          isComplete={
+            productDescription !== "" && productDescription.trim().length <= 255
+          }
+          content={t("provide_information_about", { info: t("product_description_information") })}
         />
         <CompleteNotify
           isComplete={productDetails !== ""}
-          content="Cung cấp thông tin chi tiết của sản phẩm."
+          content={t("provide_information_about", { info: t("product_detail_information") })}
         />
       </div>
     </div>
