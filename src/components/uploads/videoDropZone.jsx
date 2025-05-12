@@ -2,9 +2,9 @@ import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
-// import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { Separator } from "@/components/ui/separator";
-import { X } from "lucide-react";
+import { CloudUploadIcon, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const VideoDropzone = ({
   onVideoUpload,
@@ -14,12 +14,13 @@ const VideoDropzone = ({
   const [video, setVideo] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [error, setError] = useState("");
+  const t = useTranslations("Vendor.create_product");
 
   const onDrop = useCallback(
     (acceptedFiles) => {
       const file = acceptedFiles[0];
       if (file.size > maxSize) {
-        setError(`Video size should not exceed ${maxSize / (1024 * 1024)} MB`);
+        setError(t("max_size_video", {size: maxSize / (1024 * 1024)}));
         return;
       }
 
@@ -76,10 +77,10 @@ const VideoDropzone = ({
         <input {...getInputProps()} />
         <div className="h-[150px] flex justify-center items-center">
           {isDragActive ? (
-            <p className="text-blue-600">Thả video vào đây...</p>
+            <p className="text-blue-600">{t("drop_video_here")}</p>
           ) : (
             <p className="text-gray-600">
-              {/* <CloudUploadIcon className="w-28 h-28 animate-bounce" /> */}
+              <CloudUploadIcon className="w-28 h-28 animate-bounce" />
             </p>
           )}
         </div>
@@ -107,9 +108,12 @@ const VideoDropzone = ({
 
       {/* Note about file size and number of images */}
       <p className="text-sm text-center text-gray-600 mt-4">
-        Kích thước tối đa của video là {maxSize / (1024 * 1024)} MB. Số lượng
-        video tối đa là 1.
+        {t("max_size_video", {size: maxSize / (1024 * 1024)})}
       </p>
+      <p className="text-sm text-center text-gray-600">
+        {t("max_number_video", {number: 1})}
+      </p>
+
 
       {isPopup && (
         <div className="mt-4 flex flex-row justify-end items-center gap-3">

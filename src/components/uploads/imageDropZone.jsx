@@ -2,11 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
-// import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { Separator } from "@/components/ui/separator";
-import { X } from "lucide-react";
+import { CloudUploadIcon, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { deleteListProductImage } from "@/api/vendor/productRequest";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 const ImageDropzone = ({
   multiple = true,
@@ -23,16 +24,19 @@ const ImageDropzone = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [error, setError] = useState("");
   const { toast } = useToast();
+  const t = useTranslations("Vendor.create_product");
 
   useEffect(() => {
     if (isUpdate) {
       if (!multiple && mainImageUrl) {
         setImages([{ preview: mainImageUrl }]);
       } else if (multiple && listImageUrl.length > 0) {
-        setImages(listImageUrl.map((image) => ({
-          id: image.id,
-          preview: image.url
-        })));
+        setImages(
+          listImageUrl.map((image) => ({
+            id: image.id,
+            preview: image.url,
+          })),
+        );
       }
     }
   }, []);
@@ -40,23 +44,23 @@ const ImageDropzone = ({
   const onDrop = useCallback(
     (acceptedFiles) => {
       if (multiple && images.length + acceptedFiles.length > maxFiles) {
-        setError(`You can only upload up to ${maxFiles} images.`);
+        setError(t("max_file_error", { total: maxFiles }));
         return;
       }
 
       const validImages = acceptedFiles.filter(
-        (file) => file.size <= maxFileSize
+        (file) => file.size <= maxFileSize,
       );
 
       if (validImages.length === 0) {
-        setError("All selected files exceed the maximum size limit.");
+        setError(t("max_size_image", { size: maxFileSize / (1024 * 1024) }));
         return;
       }
 
       const newImages = validImages.map((file) =>
         Object.assign(file, {
           preview: URL.createObjectURL(file),
-        })
+        }),
       );
 
       if (!multiple) {
@@ -66,52 +70,53 @@ const ImageDropzone = ({
           onImageUpload(newImages[0]);
         }
       } else {
-        setImages((prevImages) => [...prevImages, ...newImages]);
+        const newListImages = [...images, ...newImages];
+        setImages(newListImages);
         setError("");
         if (onImageUpload) {
-          onImageUpload(newImages);
+          onImageUpload(newListImages);
         }
       }
     },
-    [onImageUpload, maxFileSize, maxFiles, images, multiple]
+    [onImageUpload, maxFileSize, maxFiles, images, multiple],
   );
 
   const handleRemoveImage = async (index) => {
     if (isUpdate && !multiple) {
       toast({
         variant: "destructive",
-        title: "Lỗi",
-        description: "Không thể xóa, vui lòng chọn ảnh thay thế!!!",
-      })
+        title: t("notify"),
+        description: t("can_not_delete_image"),
+      });
       return;
     }
     if (isUpdate && multiple) {
       if (images.length <= 1) {
         toast({
           variant: "destructive",
-          title: "Lỗi",
-          description: "Danh sách ảnh không thể để trống!!!",
-        })
+          title: t("notify"),
+          description: t("list_image_empty"),
+        });
         return;
       }
       if (productId) {
         try {
-          await deleteListProductImage({
-            "listImageIds": [
-              images[index].id
-            ]
-          }, productId);
+          await deleteListProductImage(
+            {
+              listImageIds: [images[index].id],
+            },
+            productId,
+          );
           toast({
-            title: "Thông báo",
-            description: "Xóa hình ảnh thành công!!!",
-          })
-        }
-        catch (error) {
+            title: t("notify"),
+            description: t("image_delete_success"),
+          });
+        } catch (error) {
           toast({
             variant: "destructive",
-            title: "Lỗi",
-            description: "Xóa hỉnh ảnh thất bại!!!",
-          })
+            title: t("notify"),
+            description: t("image_delete_fail"),
+          });
         }
       }
     }
@@ -124,12 +129,9 @@ const ImageDropzone = ({
 
   const handleUploadImages = () => {
     if (onImageUpload) {
-      console.log('GGGGGGGGGGGGGGGGGGGGGGGG');
-      console.log(images);
-      // onImageUpload(images);
-      // onImageUpload((previous) => {
-      //   [...previous, ...images]
-      // });
+      onImageUpload((previous) => {
+        [...previous, ...images];
+      });
     }
   };
 
@@ -146,12 +148,13 @@ const ImageDropzone = ({
 
   const renderContent = () => (
     <div
-      className={`h-fit bg-white-primary p-6 rounded-lg shadow-lg ${isPopup ? "w-[40%] min-w-[400px] mx-auto" : "w-full min-w-[400px]"
-        }`}
+      className={`h-fit bg-white-primary p-6 rounded-lg shadow-lg ${
+        isPopup ? "w-[40%] min-w-[400px] mx-auto" : "w-full min-w-[400px]"
+      }`}
     >
       {isPopup && (
         <>
-          <h2 className="text-xl font-[900] text-center">Tải hình ảnh lên</h2>
+          <h2 className="font-[900] text-center">{t("upload_image")}</h2>
           <Separator className="mt-2 mb-4" />
         </>
       )}
@@ -163,20 +166,18 @@ const ImageDropzone = ({
         <input {...getInputProps()} />
         <div className="h-[150px] flex justify-center items-center">
           {isDragActive ? (
-            <p className="text-blue-600">Thả hình ảnh vào đây...</p>
+            <p>{t("drop_image_here")}</p>
           ) : (
             <p className="text-gray-600">
-              {/* <CloudUploadIcon className="w-28 h-28 animate-bounce" /> */}
+              <CloudUploadIcon className="w-24 h-24 animate-bounce" />
             </p>
           )}
         </div>
       </div>
 
       <div className="mt-4 text-center text-sm text-gray-600">
-        <p>
-          Kích thước tối đa của mỗi hình ảnh là {maxFileSize / (1024 * 1024)} MB
-        </p>
-        <p>Số lượng hình ảnh tối đa là {maxFiles}</p>
+        <p>{t("max_size_image", { size: maxFileSize / (1024 * 1024) })}</p>
+        <p>{t("max_number_image", { number: maxFiles })}</p>
       </div>
 
       {error && (
@@ -186,8 +187,11 @@ const ImageDropzone = ({
       )}
 
       <div
-        className={`${multiple ? "overflow-auto max-h-[250px] grid grid-cols-2 lg:grid-cols-3" : "grid grid-cols-1"
-          } gap-2 mt-4`}
+        className={`${
+          multiple
+            ? "overflow-auto max-h-[300px] grid grid-cols-2 lg:grid-cols-3"
+            : "grid grid-cols-1"
+        } gap-2 mt-4`}
       >
         {images.map((image, index) => (
           <div key={index} className="h-32 border relative">
@@ -195,8 +199,10 @@ const ImageDropzone = ({
               className="absolute top-[2px] right-[2px] scale-[0.65] hover:scale-75 cursor-pointer hover:text-error-dark"
               onClick={() => handleRemoveImage(index)}
             />
-            <img
+            <Image
               src={image.preview}
+              width={100}
+              height={100}
               alt={`Image ${index}`}
               className="w-full h-full object-contain"
             />
@@ -234,7 +240,7 @@ const ImageDropzone = ({
           <Dialog.Trigger asChild>
             <Button className="font-semibold text-sm flex flex-row justify-center items-end gap-3">
               Tải ảnh lên
-              {/* <CloudUploadIcon className="scale-90" /> */}
+              <CloudUploadIcon className="scale-90" />
             </Button>
           </Dialog.Trigger>
 
