@@ -198,8 +198,6 @@ export default function ManageOrderBySeller() {
     setIsDefaultChecked(type === "default");
     setIsUpdateChecked(type === "update");
     setIsCancelChecked(type === "cancel");
-    setListOrderId([]);
-    setSelectedListOrder([]);
   };
 
   const handleCheckboxOrder = (order, isChecked) => {

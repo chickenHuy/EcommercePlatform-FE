@@ -459,6 +459,37 @@
       "description_list": "Are you sure you want to remove the selected product {productLength} from your cart?",
       "button_cancel": "Cancel",
       "button_save": "Delete"
+    },
+    "update_cancel_order": {
+      "text_update": "Update",
+      "text_ok": "Confirm",
+      "text_update_status_order": "Update order status",
+      "text_cancel_order": "Confirm cancel order",
+      "text_action_type_update": "Are you sure you want to update the order status of {orderId}?",
+      "text_action_type_cancel": "Are you sure you want to cancel order {orderId}?",
+      "text_cancel": "Cancel"
+    },
+    "confirm_list_order_seller": {
+      "text_update": "Update",
+      "text_ok": "Confirm",
+      "text_update_list_status_order": "Update order list status",
+      "text_cancel_list_order": "Confirm cancel list order",
+      "text_action_type_update": "You have selected {orderListLength} order in the list to update status, please check the list again before updating status",
+      "text_action_type_cancel": "You have selected {orderListLength} orders in the list to cancel, please check the list again before canceling",
+      "waiting_for_payment": "Waiting For Payment",
+      "waiting_for_confirmation": "Waiting For Comfirmation",
+      "confirmed": "Confirmed",
+      "preparing": "Preparing",
+      "waiting_for_shipping": "Waiting For Shipping",
+      "delivered_to_the_carrier": "Deliveried To The Carrier",
+      "on_delivery": "On Delivery",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "text_order_code": "Order code",
+      "text_order_date": "Order date",
+      "text_status": "Status",
+      "text_total_amount": "Total amount",
+      "text_cancel": "Cancel"
     }
   },
   "Cart": {

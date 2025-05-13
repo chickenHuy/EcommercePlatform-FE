@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 export default function DialogUpdateOrCancelOrder(props) {
   const {
@@ -19,18 +20,19 @@ export default function DialogUpdateOrCancelOrder(props) {
     selectedOrder,
     actionType,
   } = props;
+  const t = useTranslations("Dialog.update_cancel_order");
 
   const performAction =
     actionType === "update" ? onUpdateOrderStatus : onCancelOrder;
-  const actionText = actionType === "update" ? "Cập nhật" : "Đồng ý";
+  const actionText = actionType === "update" ? t("text_update") : t("text_ok");
   const title =
     actionType === "update"
-      ? "Cập nhật trạng thái đơn hàng"
-      : "Xác nhận hủy đơn hàng";
+      ? t("text_update_status_order")
+      : t("text_cancel_order");
   const description =
     actionType === "update"
-      ? `Bạn có chắc chắn muốn cập nhật trạng thái đơn hàng ${selectedOrder.id} không?`
-      : `Bạn có chắc chắn muốn hủy đơn hàng ${selectedOrder.id} không?`;
+      ? t("text_action_type_update", {orderId: selectedOrder.id})
+      : t("text_action_type_cancel", {orderId: selectedOrder.id});
 
   return (
     <Dialog open={onOpen} onOpenChange={onClose}>
@@ -41,7 +43,7 @@ export default function DialogUpdateOrCancelOrder(props) {
         </DialogHeader>
         <DialogFooter className="flex justify-between">
           <Button variant="outline" onClick={onClose}>
-            Hủy bỏ
+            {t("text_cancel")}
           </Button>
           <Button variant="outline" onClick={performAction}>
             {actionText}
