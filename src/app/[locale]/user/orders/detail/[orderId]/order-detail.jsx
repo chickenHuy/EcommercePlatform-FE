@@ -738,7 +738,7 @@ c71 -146 313 -144 381 3 18 39 18 39 75 40 49 0 62 4 90 29 l33 29 3 207 3
                       handleCancelButtonClick(orderDetail);
                     }}
                   >
-                    {t("cancelled")}
+                    {t("cancel_order")}
                   </Button>
                 </div>
               ) : null}

@@ -13,6 +13,7 @@ import Image from "next/image"
 import { ProductInMessage } from "./productInMessage"
 import { OrderChatMessage } from "./orderInMessages"
 import { callChatbot } from "@/api/ai/chatbotRequest"
+import { useTranslations } from "next-intl"
 
 export function ChatMessages({
     room,
@@ -48,6 +49,7 @@ export function ChatMessages({
     const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false)
     const [autoScrollDisabled, setAutoScrollDisabled] = useState(true)
     const [chatbotMessages, setChatbotMessages] = useState([])
+    const t = useTranslations("Chat")
 
     // Load initial messages - only the most recent ones
     useEffect(() => {
@@ -473,7 +475,7 @@ export function ChatMessages({
                                 className="text-red-800 underline ml-2 p-0 h-auto"
                                 onClick={() => loadOlderMessages()}
                             >
-                                Retry
+                                {t("retry")}
                             </Button>
                         </div>
                     )}
@@ -541,7 +543,7 @@ export function ChatMessages({
                                                             )}
                                                         >
                                                             {msg.senderId === "chatbot" && (
-                                                                <span className="text-gray-500">Được gửi bởi Chatbot</span>
+                                                                <span className="text-gray-500">{t("sent_by_AI")}</span>
                                                             )}
                                                             <span className="text-gray-500">{formatMessageTime(msg.createdAt)}</span>
                                                         </div>
@@ -573,7 +575,7 @@ export function ChatMessages({
                                                 onClick={() => handleChatWithShop()}
                                             >
                                                 <User />
-                                                Chat với Shop
+                                                {t("chat_with_shop")}
                                             </Button>
                                         </div>
                                     )
@@ -647,12 +649,12 @@ export function ChatMessages({
 
                             {
                                 shopChat && (
-                                    <p className="flex justify-center">Vui lòng chờ người bán phản hồi...</p>
+                                    <p className="flex justify-center">{t("wait_seller")}</p>
                                 )
                             }
 
                             {(storeOnline && allMessages.length === 0) && (
-                                <p className="flex justify-center">Bắt đầu cuộc trò chuyện với người bán</p>
+                                <p className="flex justify-center">{t("start_chat_seller")}</p>
                             )}
 
                             {/* Typing indicator */}
@@ -724,7 +726,7 @@ export function ChatMessages({
                                 </div>
                             </div>
 
-                            <div className="mt-1.5 text-xs text-muted-foreground">Bạn đang hỏi về sản phẩm này</div>
+                            <div className="mt-1.5 text-xs text-muted-foreground">{t("asking_product")}</div>
                         </div>
 
                         {/* Nút đóng */}
@@ -744,7 +746,7 @@ export function ChatMessages({
                         <div className="p-3 bg-muted/30 border-b border-border flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <ShoppingBag className="h-4 w-4 text-muted-foreground" />
-                                <span className="font-medium text-sm">Đơn hàng: #{currentOrder.id}</span>
+                                <span className="font-medium text-sm">{t("order")} #{currentOrder.id}</span>
                             </div>
                             {/* Nút đóng */}
                             <XIcon className="text-black-primary h-4 w-4 bg-blue-primary rounded-sm"
@@ -776,7 +778,7 @@ export function ChatMessages({
 
                                         {currentOrder.orderItems[0].values && order.orderItems[0].values.length > 0 && (
                                             <div className="mt-1 text-xs text-muted-foreground">
-                                                Phân loại: {currentOrder.orderItems[0].values.join(", ")}
+                                                {t("classify")} {currentOrder.orderItems[0].values.join(", ")}
                                             </div>
                                         )}
 
@@ -803,7 +805,7 @@ export function ChatMessages({
                                     <div className="flex items-center gap-1 mb-2">
                                         <Package className="h-3.5 w-3.5 text-muted-foreground" />
                                         <span className="text-xs text-muted-foreground">
-                                            {order.orderItems.length - 1} sản phẩm khác trong đơn hàng này
+                                            {t("order_in_order", {itemsLength: order.orderItems.length - 1})}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-2">

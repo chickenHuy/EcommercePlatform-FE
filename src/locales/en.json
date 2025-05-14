@@ -394,7 +394,10 @@
       "your_order_will_be_delivered_to_the_carried_soon": "Your Order Will Be Delivered To The Carrier Soon",
       "order_receive_address": "Order Delivery Address",
       "order_status": "Order Status",
-      "text_ask_about_product": "Ask about order"
+      "text_ask_about_product": "Ask about order",
+      "text_note": "Note:",
+      "text_toast_cancel": "Order {orderId} has been successfully canceled",
+      "text_toast_fail": "Failed"
     },
     "account": {
       "title": "My Account",
@@ -465,6 +468,41 @@
       "description_list": "Are you sure you want to remove the selected product {productLength} from your cart?",
       "button_cancel": "Cancel",
       "button_save": "Delete"
+    },
+    "update_cancel_order": {
+      "text_update": "Update",
+      "text_ok": "Confirm",
+      "text_update_status_order": "Update order status",
+      "text_cancel_order": "Confirm cancel order",
+      "text_action_type_update": "Are you sure you want to update the order status of {orderId}?",
+      "text_action_type_cancel": "Are you sure you want to cancel order {orderId}?",
+      "text_cancel": "Cancel"
+    },
+    "confirm_list_order_seller": {
+      "text_update": "Update",
+      "text_ok": "Confirm",
+      "text_update_list_status_order": "Update order list status",
+      "text_cancel_list_order": "Confirm cancel list order",
+      "text_action_type_update": "You have selected {orderListLength} order in the list to update status, please check the list again before updating status",
+      "text_action_type_cancel": "You have selected {orderListLength} orders in the list to cancel, please check the list again before canceling",
+      "waiting_for_payment": "Waiting For Payment",
+      "waiting_for_confirmation": "Waiting For Comfirmation",
+      "confirmed": "Confirmed",
+      "preparing": "Preparing",
+      "waiting_for_shipping": "Waiting For Shipping",
+      "delivered_to_the_carrier": "Deliveried To The Carrier",
+      "on_delivery": "On Delivery",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "text_order_code": "Order code",
+      "text_order_date": "Order date",
+      "text_status": "Status",
+      "text_total_amount": "Total amount",
+      "text_cancel": "Cancel"
+    },
+    "view_review": {
+      "text_review_shop": "Review Shop",
+      "text_close": "Close"
     }
   },
   "Cart": {
@@ -586,5 +624,16 @@
     "text_have_media": "Have Image / Video",
     "text_classification": "Classification:",
     "text_no_reviews": "There are no reviews matching the filter"
+  },
+  "Chat": {
+    "retry": "Retry",
+    "sent_by_AI": "Sent by AI",
+     "chat_with_shop": "Chat with Shop",
+     "wait_seller": "Please wait for seller to respond...",
+     "start_chat_seller": "Start a chat with seller",
+     "asking_product": "You are asking about this product",
+     "order": "Order: ",
+     "classify": "Classify: ",
+     "order_in_order": "{itemsLength} other products in this order"
   }
 }

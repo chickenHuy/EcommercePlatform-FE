@@ -19,6 +19,7 @@ import {
 } from "../ui/table";
 import { formatCurrency, formatDate } from "@/utils";
 import { ScrollArea } from "../ui/scroll-area";
+import { useTranslations } from "next-intl";
 
 export default function DialogConfirmListOrderSeller(props) {
   const {
@@ -30,41 +31,40 @@ export default function DialogConfirmListOrderSeller(props) {
     onRemoveOrder,
     actionType,
   } = props;
+  const t = useTranslations("Dialog.confirm_list_order_seller");
 
   const performAction =
     actionType === "update" ? onUpdateListOrder : onCancelListOrder;
-  const actionText = actionType === "update" ? "Cập nhật" : "Đồng ý";
+  const actionText = actionType === "update" ? t("text_update") : t("text_ok");
   const title =
     actionType === "update"
-      ? "Cập nhật trạng thái danh sách đơn hàng"
-      : "Xác nhận hủy danh sách đơn hàng";
+      ? t("text_update_list_status_order")
+      : t("text_cancel_list_order");
   const description =
     actionType === "update"
-      ? `Bạn đã chọn ${selectedListOrder.length} đơn hàng trong danh sách để
-            cập nhật trạng thái, vui lòng kiểm tra lại danh sách trước khi cập nhật trạng thái`
-      : `Bạn đã chọn ${selectedListOrder.length} đơn hàng trong danh sách để
-            hủy, vui lòng kiểm tra lại danh sách trước khi hủy`;
+      ? t("text_action_type_update", {orderListLength: selectedListOrder.length})
+      : t("text_action_type_cancel", {orderListLength: selectedListOrder.length});
 
   function getCurrentStatus(status) {
     switch (status) {
       case "ON_HOLD":
-        return "Chờ thanh toán";
+        return t("waiting_for_payment");
       case "PENDING":
-        return "Chờ xác nhận";
+        return t("waiting_for_confirmation");
       case "CONFIRMED":
-        return "Đã xác nhận";
+        return t("confirmed");
       case "PREPARING":
-        return "Chuẩn bị hàng";
+        return t("preparing");
       case "WAITING_FOR_SHIPPING":
-        return "Chờ giao cho ĐVVC";
+        return t("waiting_for_shipping");
       case "PICKED_UP":
-        return "Đã giao cho ĐVVC";
+        return t("delivered_to_the_carrier");
       case "OUT_FOR_DELIVERY":
-        return "Đang giao hàng";
+        return t("on_delivery");
       case "DELIVERED":
-        return "Hoàn thành";
+        return t("completed");
       case "CANCELLED":
-        return "Đã hủy";
+        return t("cancelled");
     }
   }
 
@@ -80,10 +80,10 @@ export default function DialogConfirmListOrderSeller(props) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Mã đơn hàng</TableHead>
-                <TableHead>Ngày đặt hàng</TableHead>
-                <TableHead>Trạng thái</TableHead>
-                <TableHead>Tổng tiền</TableHead>
+                <TableHead>{t("text_order_code")}</TableHead>
+                <TableHead>{t("text_order_date")}</TableHead>
+                <TableHead>{t("text_status")}</TableHead>
+                <TableHead>{t("text_total_amount")}</TableHead>
                 <TableHead></TableHead>
               </TableRow>
             </TableHeader>
@@ -128,7 +128,7 @@ export default function DialogConfirmListOrderSeller(props) {
             onClick={onClose}
             className="w-full sm:w-auto"
           >
-            Hủy bỏ
+            {t("text_cancel")}
           </Button>
           <Button
             variant="outline"

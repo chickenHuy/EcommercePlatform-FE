@@ -373,7 +373,7 @@
       "re_purchase": "Mua lại",
       "cancel_order": "Hủy đơn hàng",
       "review": "Đánh giá",
-      "view_review": "Xem đánh giá cửa hàng",
+      "view_review": "Xem đánh giá shop",
       "search_orders": "Tìm kiếm đơn hàng theo Mã đơn hàng, Tên cửa hàng, Tên sản phẩm, ...",
       "no_notes": "[Không có ghi chú]",
       "classify": "Phân loại: ",
@@ -395,7 +395,10 @@
       "your_order_will_be_delivered_to_the_carried_soon": "Đơn hàng của bạn sẽ được giao đến bạn sớm",
       "order_receive_address": "Địa chỉ nhận hàng",
       "order_status": "Trạng thái đơn hàng",
-      "text_ask_about_product": "Hỏi về đơn hàng"
+      "text_ask_about_product": "Hỏi về đơn hàng",
+      "text_note": "Ghi chú:",
+      "text_toast_cancel": "Đơn hàng {orderId} đã được hủy thành công",
+      "text_toast_fail": "Thất bại"
     },
     "account": {
       "title": "Tài khoản của tôi",
@@ -467,6 +470,41 @@
       "description_list": "Bạn có chắc chắn muốn xóa {productLength} sản phẩm đã chọn khỏi giỏ hàng không?",
       "button_cancel": "Hủy bỏ",
       "button_save": "Xóa"
+    },
+    "update_cancel_order": {
+      "text_update": "Cập nhật",
+      "text_ok": "Đồng ý",
+      "text_update_status_order": "Cập nhật trạng thái đơn hàng",
+      "text_cancel_order": "Xác nhận hủy đơn hàng",
+      "text_action_type_update": "Bạn có chắc chắn muốn cập nhật trạng thái đơn hàng {orderId} không?",
+      "text_action_type_cancel": "Bạn có chắc chắn muốn hủy đơn hàng {orderId} không?",
+      "text_cancel": "Hủy bỏ"
+    },
+    "confirm_list_order_seller": {
+      "text_update": "Cập nhật",
+      "text_ok": "Đồng ý",
+      "text_update_list_status_order": "Cập nhật trạng thái danh sách đơn hàng",
+      "text_cancel_list_order": "Xác nhận hủy danh sách đơn hàng",
+      "text_action_type_update": "Bạn đã chọn {orderListLength} đơn hàng trong danh sách để cập nhật trạng thái, vui lòng kiểm tra lại danh sách trước khi cập nhật trạng thái",
+      "text_action_type_cancel": "Bạn đã chọn {orderListLength} đơn hàng trong danh sách để hủy, vui lòng kiểm tra lại danh sách trước khi hủy",
+      "waiting_for_payment": "Chờ thanh toán",
+      "waiting_for_confirmation": "Chờ xác nhận",
+      "confirmed": "Đã xác nhận",
+      "preparing": "Chuẩn bị hàng",
+      "waiting_for_shipping": "Chờ vận chuyển",
+      "delivered_to_the_carrier": "Đã giao cho đơn vị vận chuyển",
+      "on_delivery": "Đang vận chuyển",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy",
+      "text_order_code": "Mã đơn hàng",
+      "text_order_date": "Ngày đặt hàng",
+      "text_status": "Trạng thái",
+      "text_total_amount": "Tổng tiền",
+      "text_cancel": "Hủy bỏ"
+    },
+    "view_review": {
+      "text_review_shop": "Đánh Giá Shop",
+      "text_close": "Đóng"
     }
   },
   "Cart": {
@@ -588,5 +626,16 @@
     "text_have_media": "Có Hình Ảnh / Video",
     "text_classification": "Phân loại hàng:",
     "text_no_reviews": "Chưa có đánh giá phù hợp với bộ lọc"
+  },
+  "Chat": {
+    "retry": "Thử lại",
+    "sent_by_AI": "Được gửi bởi AI",
+    "chat_with_shop": "Chat với Shop",
+    "wait_seller": "Vui lòng chờ người bán phản hồi...",
+    "start_chat_seller": "Bắt đầu cuộc trò chuyện với người bán",
+    "asking_product": "Bạn đang hỏi về sản phẩm này",
+    "order": "Đơn hàng: ",
+    "classify": "Phân loại: ",
+    "order_in_order": "{itemsLength} sản phẩm khác trong đơn hàng này"
   }
 }
