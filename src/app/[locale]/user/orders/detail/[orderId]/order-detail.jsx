@@ -595,7 +595,7 @@ c71 -146 313 -144 381 3 18 39 18 39 75 40 49 0 62 4 90 29 l33 29 3 207 3
                       handleClickViewProductDetail(item.productSlug);
                     }}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="w-full flex items-center gap-2">
                       <Image
                         alt={item.productName}
                         src={item.productMainImageUrl || ProductNotFound}
