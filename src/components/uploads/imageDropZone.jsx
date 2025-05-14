@@ -19,6 +19,7 @@ const ImageDropzone = ({
   productId = null,
   mainImageUrl = "",
   listImageUrl = [],
+  setProductImagesDelete = null,
 }) => {
   const [images, setImages] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -70,11 +71,9 @@ const ImageDropzone = ({
           onImageUpload(newImages[0]);
         }
       } else {
-        const newListImages = [...images, ...newImages];
-        setImages(newListImages);
-        setError("");
+        setImages((prev) => [...prev, ...newImages]);
         if (onImageUpload) {
-          onImageUpload(newListImages);
+          onImageUpload((prev) => [...prev, ...newImages]);
         }
       }
     },
@@ -99,32 +98,17 @@ const ImageDropzone = ({
         });
         return;
       }
-      if (productId) {
-        try {
-          await deleteListProductImage(
-            {
-              listImageIds: [images[index].id],
-            },
-            productId,
-          );
-          toast({
-            title: t("notify"),
-            description: t("image_delete_success"),
-          });
-        } catch (error) {
-          toast({
-            variant: "destructive",
-            title: t("notify"),
-            description: t("image_delete_fail"),
-          });
-        }
+      if (productId && images[index].id) {
+        setProductImagesDelete((prev) => [...prev, images[index].id]);
       }
     }
     const newImages = images.filter((_, i) => i !== index);
-    setImages(newImages);
+    const newImagesUpload = newImages.filter((image) => !image.id);
+
     if (!isPopup) {
-      onImageUpload(newImages);
+      onImageUpload(newImagesUpload);
     }
+    setImages(newImages);
   };
 
   const handleUploadImages = () => {
