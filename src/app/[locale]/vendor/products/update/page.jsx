@@ -5,8 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import BasicInformation from "../create/_content/basicInformation";
 import {
+  deleteListProductImage,
   getProductById,
   updateProduct,
+  uploadListProductImage,
   uploadMainProductImage,
 } from "@/api/vendor/productRequest";
 import { useToast } from "@/hooks/use-toast";
@@ -27,12 +29,14 @@ export default function ProductUpdatePage() {
   const [isUpdate, setIsUpdate] = useState({
     basicInfo: false,
     mainImage: false,
+    listImage: false,
   });
   const [product, setProduct] = useState(null);
 
   const [listBrand, setListBrand] = useState([]);
   const [brandIdSelected, setBrandIdSelected] = useState(null);
   const [productImages, setProductImages] = useState([]);
+  const [productImagesDelete, setProductImagesDelete] = useState([]);
   const [mainProductImage, setMainProductImage] = useState(null);
   const [productVideo, setProductVideo] = useState(null);
   const [productName, setProductName] = useState("");
@@ -168,10 +172,43 @@ export default function ProductUpdatePage() {
   };
 
   const handleUpdateImageList = async () => {
-    toast({
-      title: "Thông báo",
-      description: "Chức năng cập nhật danh sách ảnh đang được phát triển.",
-    });
+    if (productImages.length === 0 && productImagesDelete.length === 0) {
+      toast({
+        title: t("notify"),
+        description: t("update_success", { info: t("product_image_list") }),
+      });
+      return;
+    }
+    try {
+      setIsUpdate((prev) => ({
+        ...prev,
+        listImage: true,
+      }));
+      if (productImages.length !== 0) {
+        await uploadListProductImage(productImages, product.id);
+      }
+      if (productImagesDelete.length !== 0) {
+        await deleteListProductImage(
+          { listImageIds: productImagesDelete },
+          product.id,
+        );
+      }
+      toast({
+        title: t("notify"),
+        description: t("update_success", { info: t("product_image_list") }),
+      });
+    } catch (error) {
+      toast({
+        title: t("notify"),
+        variant: "destructive",
+        description: t("update_fail", { error: error.message }),
+      });
+    } finally {
+      setIsUpdate((prev) => ({
+        ...prev,
+        listImage: false,
+      }));
+    }
   };
 
   const handleUpdateVideo = async () => {
@@ -251,7 +288,7 @@ export default function ProductUpdatePage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="px-5">
-          <div className="w-full flex flex-col gap-3">
+          <div className="w-full flex flex-col gap-3 px-1">
             <div className="text-[1em]">
               {t("upload_main_product_image")}
               <span className="px-3 text-red-primary font-[900]">( * )</span>
@@ -279,32 +316,36 @@ export default function ProductUpdatePage() {
         </CardContent>
       </Card>
 
-      {/* Image List Section */}
-      <Card className="mb-6 shadow-sm">
-        <CardHeader className="bg-gray-50">
-          <CardTitle className="text-lg">Danh sách hình ảnh</CardTitle>
-          <p className="text-sm text-gray-500">
-            Danh sách các hình ảnh sẽ được hiển thị trong trang thông tin chi
-            tiết của sản phẩm
-          </p>
+      <Card>
+        <CardHeader className="pb-0">
+          <CardTitle className="text-[1.2em] font-[900]">
+            {t("product_image_list")}
+          </CardTitle>
         </CardHeader>
-        <CardContent className="pt-4">
-          <div className="w-full flex flex-col gap-3">
+        <CardContent className="p-5">
+          <div className="w-full flex flex-col gap-3 px-1">
             <div>
-              Tải lên các hình ảnh của sản phẩm
-              <span className="px-3 text-error font-[900]">( * )</span>
+              {t("product_image_list")}
+              <span className="px-3 text-red-primary font-[900]">( * )</span>
             </div>
             <ImageDropzone
               onImageUpload={setProductImages}
               listImageUrl={product?.images}
               multiple={true}
               isUpdate={true}
-              id={product?.id}
+              productId={product?.id}
+              setProductImagesDelete={setProductImagesDelete}
             />
           </div>
           <div className="flex justify-end mt-4">
-            <Button onClick={handleUpdateImageList}>
-              Lưu danh sách hình ảnh
+            <Button className="relative" onClick={handleUpdateImageList}>
+              <span className={isUpdate["listImage"] ? "invisible" : ""}>
+                {t("update_info", { info: t("product_image_list") })}
+              </span>
+
+              {isUpdate["listImage"] && (
+                <div className="global_loading_icon white"></div>
+              )}
             </Button>
           </div>
         </CardContent>
