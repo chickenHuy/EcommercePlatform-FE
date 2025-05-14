@@ -14,7 +14,7 @@ const VideoDropzone = ({
   const [video, setVideo] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [error, setError] = useState("");
-  const t = useTranslations("Vendor.create_product");
+  const t = useTranslations("Vendor.create_update_product");
 
   const onDrop = useCallback(
     (acceptedFiles) => {

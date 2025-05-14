@@ -138,7 +138,7 @@
       "delete_fail": "Sản phẩm xóa thất bại: {error}",
       "can_not_load_list_product": "Không thể tải danh sách sản phẩm: {error}"
     },
-    "create_product": {
+    "create_update_product": {
       "notify": "Thông báo",
       "please_complete": "Vui lòng hoàn thành {info}",
       "complete": "Đã hoàn thành {info}",
@@ -190,7 +190,13 @@
       "shipping_information": "Thông tin vận chuyển",
       "use_default_delivery": "Sử dụng đơn vị vận chuyển mặc định",
       "option_true": "Có",
-      "option_false": "Không"
+      "option_false": "Không",
+      "load_product_fail": "Tải sản phẩm thất bại: {error}",
+      "product_id_not_found": "Không tìm thấy ID sản phẩm",
+      "update_info": "Cập nhật {info}",
+      "main_product_image": "Hình ảnh chính của sản phẩm",
+      "update_success": "Cập nhật {info} thành công",
+      "update_fail": "Cập nhật thất bại: {error}"
     }
   },
   "AuthPage": {

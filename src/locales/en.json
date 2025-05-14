@@ -138,7 +138,7 @@
       "delete_fail": "Product Deleted Fail: {error}",
       "can_not_load_list_product": "Can not load list product: {error}"
     },
-    "create_product": {
+    "create_update_product": {
       "notify": "Notify",
       "please_complete": "Please Complete {info}",
       "complete": "Complete {info}",
@@ -190,7 +190,13 @@
       "shipping_information": "Shipping Information",
       "use_default_delivery": "Use Default Delivery Service",
       "option_true": "Yes",
-      "option_false": "No"
+      "option_false": "No",
+      "load_product_fail": "Fail To Load Product: {error}",
+      "product_id_not_found": "Product ID Not Found",
+      "update_info": "Update {info}",
+      "main_product_image": "Main Product Image",
+      "update_success": "Update {info} Successfully",
+      "update_fail": "Update Fail: {error}"
     }
   },
   "AuthPage": {

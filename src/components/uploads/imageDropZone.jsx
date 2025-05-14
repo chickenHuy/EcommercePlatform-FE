@@ -24,7 +24,7 @@ const ImageDropzone = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [error, setError] = useState("");
   const { toast } = useToast();
-  const t = useTranslations("Vendor.create_product");
+  const t = useTranslations("Vendor.create_update_product");
 
   useEffect(() => {
     if (isUpdate) {
