@@ -37,7 +37,7 @@ const BasicInformation = ({
   setProductBrand = null,
   isUpdate = false,
 }) => {
-  const t = useTranslations("Vendor.create_product");
+  const t = useTranslations("Vendor.create_update_product");
 
   return (
     <div className="w-full h-fit flex lg:flex-row flex-col justify-between items-start gap-5 px-5 text-[1em]">

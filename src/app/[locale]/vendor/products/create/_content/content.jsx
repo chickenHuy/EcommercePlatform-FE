@@ -31,7 +31,7 @@ export default function Content() {
   const [listComponents, setListComponent] = useState([]);
   const [isLoading, setIsLoading] = useState(null);
   const { toast } = useToast();
-  const t = useTranslations("Vendor.create_product");
+  const t = useTranslations("Vendor.create_update_product");
 
   // State for basic information
   const [productImages, setProductImages] = useState([]);

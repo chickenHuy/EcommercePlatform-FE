@@ -11,7 +11,7 @@ const OtherInformation = ({
   isDefaultDelivery = false,
   setIsDefaultDelivery = null,
 }) => {
-  const t = useTranslations("Vendor.create_product");
+  const t = useTranslations("Vendor.create_update_product");
   return (
     <div className="text-[15px] w-full h-fit flex flex-col justify-center items-start px-5 gap-1">
       <span className="font-[900]">{t("shipping_information")}</span>
