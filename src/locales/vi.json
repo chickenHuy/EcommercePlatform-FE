@@ -620,5 +620,16 @@
     "text_have_media": "Có Hình Ảnh / Video",
     "text_classification": "Phân loại hàng:",
     "text_no_reviews": "Chưa có đánh giá phù hợp với bộ lọc"
+  },
+  "Chat": {
+    "retry": "Thử lại",
+    "sent_by_AI": "Được gửi bởi AI",
+    "chat_with_shop": "Chat với Shop",
+    "wait_seller": "Vui lòng chờ người bán phản hồi...",
+    "start_chat_seller": "Bắt đầu cuộc trò chuyện với người bán",
+    "asking_product": "Bạn đang hỏi về sản phẩm này",
+    "order": "Đơn hàng: ",
+    "classify": "Phân loại: ",
+    "order_in_order": "{itemsLength} sản phẩm khác trong đơn hàng này"
   }
 }

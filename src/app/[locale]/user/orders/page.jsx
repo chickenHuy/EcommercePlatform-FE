@@ -149,7 +149,6 @@ export default function OrderUser() {
   );
 
   const fetchOrderCounts = useCallback(async () => {
-    setLoadPage(true);
     try {
       const response = await Promise.all(
         listOrderStatus.map((status) => getAllOrderByUser(1, 1, sortBy, orderBy, "", status.filterKey))
@@ -157,9 +156,6 @@ export default function OrderUser() {
       setOrderCounts(response.reduce((acc, res, index) => ({ ...acc, [listOrderStatus[index].filterKey]: res.result.totalElements }), {}));
     } catch (error) {
       console.error("Error fetching order counts:", error);
-    }
-    finally {
-      setLoadPage(false);
     }
   }, []);
 

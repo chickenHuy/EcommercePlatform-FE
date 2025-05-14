@@ -618,5 +618,16 @@
     "text_have_media": "Have Image / Video",
     "text_classification": "Classification:",
     "text_no_reviews": "There are no reviews matching the filter"
+  },
+  "Chat": {
+    "retry": "Retry",
+    "sent_by_AI": "Sent by AI",
+     "chat_with_shop": "Chat with Shop",
+     "wait_seller": "Please wait for seller to respond...",
+     "start_chat_seller": "Start a chat with seller",
+     "asking_product": "You are asking about this product",
+     "order": "Order: ",
+     "classify": "Classify: ",
+     "order_in_order": "{itemsLength} other products in this order"
   }
 }
