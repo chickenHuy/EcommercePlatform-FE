@@ -14,11 +14,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCallback, useEffect, useState } from "react";
 import { getAllReviewByStoreId } from "@/api/user/reviewRequest";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 export function OrderViewReviewDialog(props) {
   const { onOpen, onClose, storeId } = props;
 
   const [listReview, setListReview] = useState([]);
+  const t = useTranslations("Dialog.view_review");
 
   const fetchAllReviewByStoreId = useCallback(async () => {
     try {
@@ -47,7 +49,7 @@ export function OrderViewReviewDialog(props) {
         <DialogContent className="z-[150] w-[90vw] max-w-[800px] h-[90vh] max-h-[800px]">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
-              Đánh Giá Shop
+              {t("text_review_shop")}
             </DialogTitle>
           </DialogHeader>
 
@@ -152,7 +154,7 @@ export function OrderViewReviewDialog(props) {
 
           <DialogFooter>
             <Button variant="outline" onClick={onClose}>
-              Đóng
+              {t("text_close")}
             </Button>
           </DialogFooter>
         </DialogContent>

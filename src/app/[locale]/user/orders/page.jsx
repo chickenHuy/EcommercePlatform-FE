@@ -108,11 +108,17 @@ export default function OrderUser() {
     if (!orderToCancel) return;
     try {
       await cancelOrderByUser(orderToCancel.id);
-      toast({ description: `Đơn hàng "${orderToCancel.id}" đã được hủy thành công` });
+      toast({
+        description: t("text_toast_cancel", {orderId: orderToCancel.id})
+      });
       fetchAllOrderByUser(true);
       setOpenDialog(false);
     } catch (error) {
-      toast({ title: "Thất bại", description: error.message, variant: "destructive" });
+      toast({
+        title: t("text_toast_fail"),
+        description: error.message,
+        variant: "destructive" 
+      });
     }
   };
 
@@ -159,7 +165,7 @@ export default function OrderUser() {
 
   useEffect(() => {
     fetchOrderCounts();
-  }, []);
+  }, [listOrder]);
 
   useEffect(() => {
     fetchAllOrderByUser(true);
@@ -184,7 +190,6 @@ export default function OrderUser() {
       checkIfOrderReviewed(order.id, isAnyOrderReviewed, setReviewedAnyOrder);
     });
   }, [listOrder]);
-
 
   const listOrderStatus = [
     { label: t('all'), filterKey: "" },
@@ -267,7 +272,7 @@ export default function OrderUser() {
             value={filter}
             className="w-[95%] h-fit min-h-full border rounded-md"
           >
-            <TabsList className="w-full flex items-center justify-between rounded-b-none rounede-t-sm h-10">
+            <TabsList className="w-full flex items-center justify-between rounded-b-none rounded-t-sm h-10">
               {listOrderStatus.map((item, index) => (
                 <TabsTrigger
                   key={index}
@@ -418,7 +423,7 @@ export default function OrderUser() {
                     <CardFooter className="flex flex-row px-4 py-2 gap-3 border-t-[1px]">
                       <span className="text-sm w-full max-w-[400px] h-9 border-[1px] px-3 py-2 rounded-sm overflow-auto">
                         {order.note
-                          ? `Ghi chú: ${order.note}`
+                          ? `${t("text_note")} ${order.note}`
                           : t('no_notes')}
                       </span>
                       <div className="flex items-center">
@@ -440,7 +445,7 @@ export default function OrderUser() {
                                 handleClickRePurchase(order.orderItems)
                               }
                             >
-                              Mua lại
+                              {t("re_purchase")}
                             </Button>
                           ) : null}
 
@@ -451,7 +456,7 @@ export default function OrderUser() {
                                 handleClickCancel(order);
                               }}
                             >
-                              Hủy đơn hàng
+                              {t("cancel_order")}
                             </Button>
                           ) : null}
 
@@ -463,7 +468,7 @@ export default function OrderUser() {
                                 handleClickReview(order);
                               }}
                             >
-                              Đánh giá
+                              {t("review")}
                             </Button>
                           ) : null}
 
@@ -474,7 +479,7 @@ export default function OrderUser() {
                                 handleClickViewReview(order);
                               }}
                             >
-                              Xem đánh giá shop
+                              {t("view_review")}
                             </Button>
                           ) : null}
                         </div>

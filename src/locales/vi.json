@@ -367,7 +367,7 @@
       "re_purchase": "Mua lại",
       "cancel_order": "Hủy đơn hàng",
       "review": "Đánh giá",
-      "view_review": "Xem đánh giá cửa hàng",
+      "view_review": "Xem đánh giá shop",
       "search_orders": "Tìm kiếm đơn hàng theo Mã đơn hàng, Tên cửa hàng, Tên sản phẩm, ...",
       "no_notes": "[Không có ghi chú]",
       "classify": "Phân loại: ",
@@ -389,7 +389,10 @@
       "your_order_will_be_delivered_to_the_carried_soon": "Đơn hàng của bạn sẽ được giao đến bạn sớm",
       "order_receive_address": "Địa chỉ nhận hàng",
       "order_status": "Trạng thái đơn hàng",
-      "text_ask_about_product": "Hỏi về đơn hàng"
+      "text_ask_about_product": "Hỏi về đơn hàng",
+      "text_note": "Ghi chú:",
+      "text_toast_cancel": "Đơn hàng {orderId} đã được hủy thành công",
+      "text_toast_fail": "Thất bại"
     },
     "account": {
       "title": "Tài khoản của tôi",
@@ -492,6 +495,10 @@
       "text_status": "Trạng thái",
       "text_total_amount": "Tổng tiền",
       "text_cancel": "Hủy bỏ"
+    },
+    "view_review": {
+      "text_review_shop": "Đánh Giá Shop",
+      "text_close": "Đóng"
     }
   },
   "Cart": {
