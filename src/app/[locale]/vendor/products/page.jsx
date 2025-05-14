@@ -51,9 +51,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/toaster";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
-import { ProductUpdateDialog } from "@/app/[locale]/vendor/products/_update/productUpdateDialog";
 import Loading from "@/components/loading";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 const FilterSortDropdown = ({
   order,
@@ -114,7 +114,6 @@ const ProductActionsMenu = ({
   tab,
   handleHideProduct,
   handleDeleteProduct,
-  openUpdateDialog,
   t,
 }) => (
   <DropdownMenu>
@@ -157,12 +156,14 @@ const ProductActionsMenu = ({
         <Trash2 className="h-4 w-4" />
       </DropdownMenuItem>
       <DropdownMenuSeparator />
-      <DropdownMenuItem
-        className="flex flex-row justify-between items-center cursor-pointer"
-        onClick={() => openUpdateDialog(product.id)}
-      >
-        <span>{t("update")}</span>
-        <Pencil className="h-4 w-4" />
+      <DropdownMenuItem>
+        <Link
+          className="w-full flex flex-row justify-between items-center cursor-pointer"
+          href={`/vendor/products/update?id=${product.id}`}
+        >
+          <span>{t("update")}</span>
+          <Pencil className="h-4 w-4" />
+        </Link>
       </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>
@@ -174,7 +175,6 @@ const ProductsTable = ({
   tab,
   handleHideProduct,
   handleDeleteProduct,
-  openUpdateDialog,
   t,
 }) => (
   <Table>
@@ -220,7 +220,6 @@ const ProductsTable = ({
               tab={tab}
               handleHideProduct={handleHideProduct}
               handleDeleteProduct={handleDeleteProduct}
-              openUpdateDialog={openUpdateDialog}
               t={t}
             />
           </TableCell>
@@ -241,9 +240,7 @@ const EmptyState = () => (
 );
 
 export default function ManageComponent() {
-  const [products, setProducts] = useState([]);
-  const [productSelected, setProductSelected] = useState(null);
-  const [isDialogUpdateOpen, setIsDialogUpdateOpen] = useState(false);
+  const [products, setProducts] = useState(null);
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [updated, setUpdated] = useState(false);
 
@@ -323,10 +320,6 @@ export default function ManageComponent() {
     }
   };
 
-  const openUpdateDialog = (id) => {
-    setProductSelected(id);
-    setIsDialogUpdateOpen(true);
-  };
 
   const loadProducts = async (page, sortBy, order, tab, search) => {
     setIsTableLoading(true);
@@ -352,7 +345,6 @@ export default function ManageComponent() {
   };
 
   useEffect(() => {
-    setProductSelected(null);
     loadProducts(currentPage, sortBy, order, tab, search);
     setUpdated(false);
   }, [tab, sortBy, order, search, currentPage, updated]);
@@ -421,8 +413,9 @@ export default function ManageComponent() {
                   </CardDescription>
                 </div>
               </CardHeader>
-
-              {products && products.length > 0 ? (
+              {!products ? (
+                <Loading />
+              ) : products && products.length > 0 ? (
                 <>
                   <CardContent>
                     {isTableLoading ? (
@@ -436,16 +429,9 @@ export default function ManageComponent() {
                         tab={tab}
                         handleHideProduct={handleHideProduct}
                         handleDeleteProduct={handleDeleteProduct}
-                        openUpdateDialog={openUpdateDialog}
                         t={t}
                       />
                     )}
-                    <ProductUpdateDialog
-                      productId={productSelected}
-                      isOpen={isDialogUpdateOpen}
-                      onClose={() => setIsDialogUpdateOpen(false)}
-                      setUpdated={setUpdated}
-                    />
                   </CardContent>
                   <CardFooter className="relative">
                     <div className="absolute right-1/2 translate-x-1/2">
