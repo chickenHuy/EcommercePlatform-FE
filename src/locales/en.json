@@ -195,6 +195,7 @@
       "product_id_not_found": "Product ID Not Found",
       "update_info": "Update {info}",
       "main_product_image": "Main Product Image",
+      "product_image_list": "Product Image List",
       "update_success": "Update {info} Successfully",
       "update_fail": "Update Fail: {error}"
     }

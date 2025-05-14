@@ -195,6 +195,7 @@
       "product_id_not_found": "Không tìm thấy ID sản phẩm",
       "update_info": "Cập nhật {info}",
       "main_product_image": "Hình ảnh chính của sản phẩm",
+      "product_image_list": "Danh sách hình ảnh sản phẩm",
       "update_success": "Cập nhật {info} thành công",
       "update_fail": "Cập nhật thất bại: {error}"
     }
