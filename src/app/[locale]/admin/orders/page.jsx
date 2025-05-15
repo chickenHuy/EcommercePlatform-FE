@@ -61,7 +61,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import DialogConfirmListOrderAdmin from "@/components/dialogs/dialogConfirmListOrderAdmin";
 
 export default function ManageOrderByAdmin() {
-  const pageSize = 10;
+  const pageSize = 2;
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(0);
@@ -90,6 +90,7 @@ export default function ManageOrderByAdmin() {
   const [isCancelChecked, setIsCancelChecked] = useState(false);
 
   const [selectedOrderIdSet, setSelectedOrderIdSet] = useState(new Set());
+  const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
 
   const handleNextPage = () => {
     if (currentPage < totalPage) {
@@ -153,6 +154,7 @@ export default function ManageOrderByAdmin() {
         setListOrderId([]);
         setSelectedListOrder([]);
         setSelectedOrderIdSet(new Set());
+        setIsSelectAllChecked(false)
         fetchAllOrderByAdmin();
       } catch (error) {
         toast({
@@ -177,6 +179,7 @@ export default function ManageOrderByAdmin() {
         setListOrderId([]);
         setSelectedListOrder([]);
         setSelectedOrderIdSet(new Set());
+        setIsSelectAllChecked(false)
         fetchAllOrderByAdmin();
       } catch (error) {
         toast({
@@ -196,6 +199,7 @@ export default function ManageOrderByAdmin() {
     setSelectedOrderIdSet(new Set());
     setListOrderId([]);
     setSelectedListOrder([]);
+    setIsSelectAllChecked(false);
 
     switch (type) {
       case "default":
@@ -288,6 +292,7 @@ export default function ManageOrderByAdmin() {
       setListOrderId([]);
       setSelectedListOrder([]);
       setSelectedOrderIdSet(new Set());
+      setIsSelectAllChecked(false)
       setIsDialogListOpen(false);
       fetchAllOrderByAdmin();
     } catch (error) {
@@ -308,6 +313,7 @@ export default function ManageOrderByAdmin() {
       setListOrderId([]);
       setSelectedListOrder([]);
       setSelectedOrderIdSet(new Set());
+      setIsSelectAllChecked(false)
       setIsDialogListOpen(false);
       fetchAllOrderByAdmin();
     } catch (error) {
@@ -336,6 +342,311 @@ export default function ManageOrderByAdmin() {
       )
     );
   };
+
+  const findUpdatedOrders = (orders) => {
+    const allowedStatuses = ["WAITING_FOR_SHIPPING", "PICKED_UP", "OUT_FOR_DELIVERY"]
+    return orders.filter(order => allowedStatuses.includes(order.currentStatus))
+  };
+
+  const findCancelledOrders = (orders) => {
+    const notAllowedStatuses = ["CANCELLED", "DELIVERED"]
+    return orders.filter(order => !notAllowedStatuses.includes(order.currentStatus))
+  };
+
+  const handleSelectAll = (isChecked) => {
+    console.log("isChecked: ", isChecked)
+    console.log("currentPage: ", currentPage)
+    console.log("isUpdateChecked: ", isUpdateChecked)
+    console.log("orders: ", orders)
+
+    setIsSelectAllChecked(isChecked)
+
+    if (isUpdateChecked && isChecked) {
+      const updatedOrders = findUpdatedOrders(orders)
+      console.log("updatedOrders: ", updatedOrders)
+
+      if (updatedOrders.length === 0) {
+        setIsSelectAllChecked(false)
+        toast({
+          description: "Trang này không có đơn hàng để cập nhật",
+          variant: "destructive",
+        });
+        return
+      }
+
+      const newOrders = updatedOrders.filter(
+        (order) => !selectedOrderIdSet.has(order.id)
+      );
+      console.log("newOrders: ", newOrders)
+
+      const newOrderIds = newOrders.map((order) => order.id)
+      console.log("newOrderIds: ", newOrderIds)
+
+      setListOrderId((prev) => [...prev, ...newOrderIds]);
+      setSelectedListOrder((prev) => [...prev, ...newOrders]);
+      setSelectedOrderIdSet((prev) => {
+        const newSet = new Set(prev);
+        newOrderIds.forEach((id) => newSet.add(id));
+        return newSet;
+      });
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          newOrderIds.includes(order.id)
+            ? { ...order, isChecked: true }
+            : order
+        )
+      );
+    }
+
+    if (isCancelChecked && isChecked) {
+      const cancelledOrders = findCancelledOrders(orders)
+      console.log("cancelledOrders: ", cancelledOrders)
+
+      if (cancelledOrders.length === 0) {
+        setIsSelectAllChecked(false)
+        toast({
+          description: "Trang này không có đơn hàng để hủy",
+          variant: "destructive",
+        });
+        return
+      }
+
+      const newOrders = cancelledOrders.filter(
+        (order) => !selectedOrderIdSet.has(order.id)
+      );
+      console.log("newOrders: ", newOrders)
+
+      const newOrderIds = newOrders.map((order) => order.id)
+      console.log("newOrderIds: ", newOrderIds)
+
+      setListOrderId((prev) => [...prev, ...newOrderIds]);
+      setSelectedListOrder((prev) => [...prev, ...newOrders]);
+      setSelectedOrderIdSet((prev) => {
+        const newSet = new Set(prev);
+        newOrderIds.forEach((id) => newSet.add(id));
+        return newSet;
+      });
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          newOrderIds.includes(order.id)
+            ? { ...order, isChecked: true }
+            : order
+        )
+      );
+    }
+
+    if (isUpdateChecked && !isChecked) {
+      const updatedOrders = findUpdatedOrders(orders)
+      console.log("updatedOrders: ", updatedOrders)
+
+      const updatedOrderIds = new Set(updatedOrders.map((order) => order.id));
+      console.log("updatedOrderIds: ", updatedOrderIds)
+
+      setSelectedListOrder((prev) =>
+        prev.filter((order) => !updatedOrderIds.has(order.id))
+      );
+
+      setListOrderId((prev) =>
+        prev.filter((id) => !updatedOrderIds.has(id))
+      );
+
+      setSelectedOrderIdSet((prev) => {
+        const newSet = new Set(prev);
+        updatedOrderIds.forEach((id) => newSet.delete(id));
+        return newSet;
+      });
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          updatedOrderIds.has(order.id)
+            ? { ...order, isChecked: false }
+            : order
+        )
+      );
+    }
+
+    if (isCancelChecked && !isChecked) {
+      const cancelledOrders = findCancelledOrders(orders)
+      console.log("cancelledOrders: ", cancelledOrders)
+
+      const cancelledOrderIds = new Set(cancelledOrders.map((order) => order.id));
+      console.log("cancelledOrderIds: ", cancelledOrderIds)
+
+      setSelectedListOrder((prev) =>
+        prev.filter((order) => !cancelledOrderIds.has(order.id))
+      );
+
+      setListOrderId((prev) =>
+        prev.filter((id) => !cancelledOrderIds.has(id))
+      );
+
+      setSelectedOrderIdSet((prev) => {
+        const newSet = new Set(prev);
+        cancelledOrderIds.forEach((id) => newSet.delete(id));
+        return newSet;
+      });
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          cancelledOrderIds.has(order.id)
+            ? { ...order, isChecked: false }
+            : order
+        )
+      );
+    }
+  };
+
+  function findOrdersOnlyIn(updatedOrders, selectedListOrder) {
+    const selectedIds = new Set(selectedListOrder.map(order => order.id));
+    const difference = updatedOrders.filter(order => !selectedIds.has(order.id));
+    return difference;
+  }
+
+
+  useEffect(() => {
+    console.log("currentPage: ", currentPage)
+    console.log("orders: ", orders)
+    console.log("isUpdateChecked: ", isUpdateChecked)
+    console.log("isCancelChecked: ", isCancelChecked)
+
+    if (isUpdateChecked) {
+      const updatedOrders = findUpdatedOrders(orders)
+      console.log("updatedOrders: ", updatedOrders)
+      console.log("selectedListOrder: ", selectedListOrder)
+
+      if (updatedOrders.length === 0) {
+        setIsSelectAllChecked(false)
+        return
+      }
+
+      const onlyInUpdated = findOrdersOnlyIn(updatedOrders, selectedListOrder)
+      console.log("onlyInUpdated: ", onlyInUpdated)
+
+      if (onlyInUpdated.length > 0) {
+        const onlyInUpdatedIds = new Set(onlyInUpdated.map(order => order.id));
+
+        const hasDiff =
+          selectedListOrder.some(order => onlyInUpdatedIds.has(order.id)) ||
+          listOrderId.some(id => onlyInUpdatedIds.has(id)) ||
+          orders.some(order => onlyInUpdatedIds.has(order.id) && order.isChecked === true);
+
+        if (hasDiff) {
+          setSelectedOrderIdSet(prev => {
+            const newSet = new Set(prev);
+            onlyInUpdatedIds.forEach(id => newSet.delete(id));
+            return newSet;
+          });
+
+          setSelectedListOrder(prev =>
+            prev.filter(order => !onlyInUpdatedIds.has(order.id))
+          );
+
+          setListOrderId(prev =>
+            prev.filter(id => !onlyInUpdatedIds.has(id))
+          );
+
+          setOrders(prevOrders =>
+            prevOrders.map(order =>
+              onlyInUpdatedIds.has(order.id)
+                ? { ...order, isChecked: false }
+                : order
+            )
+          );
+        }
+      }
+
+      if (selectedListOrder.length === 0) {
+        return
+      }
+
+      const isInclude = updatedOrders.every(updatedOrder =>
+        selectedListOrder.some(selectedOrder => selectedOrder.id === updatedOrder.id)
+      )
+      console.log("isInclude: ", isInclude)
+  
+      if (isInclude) {
+        setIsSelectAllChecked(true)
+      } else {
+        setIsSelectAllChecked(false)
+      }
+    }
+
+    if (isCancelChecked) {
+      const cancelledOrders = findCancelledOrders(orders)
+      console.log("cancelledOrders: ", cancelledOrders)
+      console.log("selectedListOrder: ", selectedListOrder)
+
+      if (cancelledOrders.length === 0) {
+        setIsSelectAllChecked(false)
+        return
+      }
+
+      const onlyInCancelled = findOrdersOnlyIn(cancelledOrders, selectedListOrder)
+      console.log("onlyInCancelled: ", onlyInCancelled)
+
+      if (onlyInCancelled.length > 0) {
+        const onlyInCancelledIds = new Set(onlyInCancelled.map(order => order.id));
+
+        const hasDiff =
+          selectedListOrder.some(order => onlyInCancelledIds.has(order.id)) ||
+          listOrderId.some(id => onlyInCancelledIds.has(id)) ||
+          orders.some(order => onlyInCancelledIds.has(order.id) && order.isChecked === true);
+
+        if (hasDiff) {
+          setSelectedOrderIdSet(prev => {
+            const newSet = new Set(prev);
+            onlyInCancelledIds.forEach(id => newSet.delete(id));
+            return newSet;
+          });
+
+          setSelectedListOrder(prev =>
+            prev.filter(order => !onlyInCancelledIds.has(order.id))
+          );
+
+          setListOrderId(prev =>
+            prev.filter(id => !onlyInCancelledIds.has(id))
+          );
+
+          setOrders(prevOrders =>
+            prevOrders.map(order =>
+              onlyInCancelledIds.has(order.id)
+                ? { ...order, isChecked: false }
+                : order
+            )
+          );
+        }
+      }
+        
+      if (selectedListOrder.length === 0) {
+        return
+      }
+      
+      const isInclude = cancelledOrders.every(cancelledOrder =>
+        selectedListOrder.some(selectedOrder => selectedOrder.id === cancelledOrder.id)
+      )
+      console.log("isInclude: ", isInclude)
+  
+      if (isInclude) {
+        setIsSelectAllChecked(true)
+      } else {
+        setIsSelectAllChecked(false)
+      }
+    }
+  }, [currentPage, orders])
+
+  useEffect(() => {
+    console.log("isSelectAllChecked: ", isSelectAllChecked)
+  }, [isSelectAllChecked])
+
+  useEffect(() => {
+    console.log("listOrderId: ", listOrderId)
+  }, [listOrderId])
+
+  useEffect(() => {
+    console.log("selectedListOrder: ", selectedListOrder)
+  }, [selectedListOrder])
 
   const fetchAllOrderByAdmin = useCallback(async () => {
     try {
@@ -627,7 +938,13 @@ export default function ManageOrderByAdmin() {
                     <TableRow>
                       <TableHead className="dark:text-gray-primary">
                         {/* Checkbox chọn tất cả checkbox ở 1 trang */}
-                        {(false) && <Checkbox />}
+                        {
+                          (isUpdateChecked || isCancelChecked) &&
+                          <Checkbox
+                            onCheckedChange={(checked) => handleSelectAll(checked)}
+                            checked={isSelectAllChecked}
+                          />
+                        }
                       </TableHead>
                       <TableHead className="dark:text-gray-primary">
                         Mã đơn hàng
