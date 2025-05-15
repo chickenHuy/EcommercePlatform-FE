@@ -35,6 +35,8 @@ import {
   Check,
   ListFilter,
   X,
+  Pencil,
+  CircleOff,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
@@ -57,7 +59,6 @@ import { useRouter } from "next/navigation";
 import DialogUpdateOrCancelOrder from "@/components/dialogs/dialogUpdateOrCancelOrder";
 import { Checkbox } from "@/components/ui/checkbox";
 import DialogConfirmListOrderAdmin from "@/components/dialogs/dialogConfirmListOrderAdmin";
-import { EditCalendar, EventBusy } from "@mui/icons-material";
 
 export default function ManageOrderByAdmin() {
   const pageSize = 10;
@@ -87,6 +88,8 @@ export default function ManageOrderByAdmin() {
   const [isDefaultChecked, setIsDefaultChecked] = useState(true);
   const [isUpdateChecked, setIsUpdateChecked] = useState(false);
   const [isCancelChecked, setIsCancelChecked] = useState(false);
+
+  const [selectedOrderIdSet, setSelectedOrderIdSet] = useState(new Set());
 
   const handleNextPage = () => {
     if (currentPage < totalPage) {
@@ -149,6 +152,7 @@ export default function ManageOrderByAdmin() {
         setOrderToUpdate(null);
         setListOrderId([]);
         setSelectedListOrder([]);
+        setSelectedOrderIdSet(new Set());
         fetchAllOrderByAdmin();
       } catch (error) {
         toast({
@@ -172,6 +176,7 @@ export default function ManageOrderByAdmin() {
         setSelectedOrder(null);
         setListOrderId([]);
         setSelectedListOrder([]);
+        setSelectedOrderIdSet(new Set());
         fetchAllOrderByAdmin();
       } catch (error) {
         toast({
@@ -184,27 +189,29 @@ export default function ManageOrderByAdmin() {
   };
 
   const handleCheckboxOption = (type) => {
+    setOrders((prevOrders) =>
+      prevOrders.map((order) => ({ ...order, isChecked: false }))
+    );
+
+    setSelectedOrderIdSet(new Set());
+    setListOrderId([]);
+    setSelectedListOrder([]);
+
     switch (type) {
       case "default":
         setIsDefaultChecked(true);
         setIsUpdateChecked(false);
         setIsCancelChecked(false);
-        setListOrderId([]);
-        setSelectedListOrder([]);
         break;
       case "update":
         setIsDefaultChecked(false);
         setIsUpdateChecked(true);
         setIsCancelChecked(false);
-        setListOrderId([]);
-        setSelectedListOrder([]);
         break;
       case "cancel":
         setIsDefaultChecked(false);
         setIsUpdateChecked(false);
         setIsCancelChecked(true);
-        setListOrderId([]);
-        setSelectedListOrder([]);
         break;
       default:
         break;
@@ -212,6 +219,16 @@ export default function ManageOrderByAdmin() {
   };
 
   const handleCheckboxOrder = (order, isChecked) => {
+    setSelectedOrderIdSet((prev) => {
+      const newSet = new Set(prev);
+      if (isChecked) {
+        newSet.add(order.id);
+      } else {
+        newSet.delete(order.id);
+      }
+      return newSet;
+    });
+
     setListOrderId((prev) => {
       if (isChecked) {
         return [...prev, order.id];
@@ -270,6 +287,7 @@ export default function ManageOrderByAdmin() {
       });
       setListOrderId([]);
       setSelectedListOrder([]);
+      setSelectedOrderIdSet(new Set());
       setIsDialogListOpen(false);
       fetchAllOrderByAdmin();
     } catch (error) {
@@ -289,6 +307,7 @@ export default function ManageOrderByAdmin() {
       });
       setListOrderId([]);
       setSelectedListOrder([]);
+      setSelectedOrderIdSet(new Set());
       setIsDialogListOpen(false);
       fetchAllOrderByAdmin();
     } catch (error) {
@@ -328,7 +347,12 @@ export default function ManageOrderByAdmin() {
         searchTerm,
         filterTab
       );
-      setOrders(response.result.data);
+      setOrders(
+        response.result.data.map((order) => ({
+          ...order,
+          isChecked: selectedOrderIdSet.has(order.id),
+        }))
+      );
       setTotalPage(response.result.totalPages);
       setTotalElement(response.result.totalElements);
       setHasNext(response.result.hasNext);
@@ -580,7 +604,7 @@ export default function ManageOrderByAdmin() {
                     <Label className="text-sm text-center hover:cursor-pointer">
                       Cập nhật
                     </Label>
-                    <EditCalendar className="h-6 w-6" />
+                    <Pencil className="h-6 w-6" />
                   </Button>
                 )}
                 {/* Button hủy nhiều */}
@@ -593,7 +617,7 @@ export default function ManageOrderByAdmin() {
                     <Label className="text-sm text-center hover:cursor-pointer">
                       Hủy
                     </Label>
-                    <EventBusy className="h-6 w-6" />
+                    <CircleOff className="h-6 w-6" />
                   </Button>
                 )}
               </div>
@@ -601,7 +625,10 @@ export default function ManageOrderByAdmin() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="dark:text-gray-primary"></TableHead>
+                      <TableHead className="dark:text-gray-primary">
+                        {/* Checkbox chọn tất cả checkbox ở 1 trang */}
+                        {(false) && <Checkbox />}
+                      </TableHead>
                       <TableHead className="dark:text-gray-primary">
                         Mã đơn hàng
                       </TableHead>
@@ -671,7 +698,7 @@ export default function ManageOrderByAdmin() {
                             )}
                           {isDefaultChecked && (
                             <div className="w-full flex justify-center">
-                              <Ban className="h-6 w-6 text-error-dark" />
+                              <Ban className="h-6 w-6 text-error-dark opacity-50" />
                             </div>
                           )}
                         </TableCell>
@@ -720,7 +747,7 @@ export default function ManageOrderByAdmin() {
                                 }}
                                 className="w-full sm:w-auto"
                               >
-                                <EditCalendar />
+                                <Pencil />
                               </Button>
                             )}
                             {order.currentStatus !== "DELIVERED" &&
@@ -733,14 +760,14 @@ export default function ManageOrderByAdmin() {
                                   }}
                                   className="w-full sm:w-auto"
                                 >
-                                  <EventBusy />
+                                  <CircleOff />
                                 </Button>
                               )}
                             {order.currentStatus === "DELIVERED" && (
                               <Check className="w-full sm:w-auto" />
                             )}
                             {order.currentStatus === "CANCELLED" && (
-                              <X className="w-full sm:w-auto" />
+                              <X className="w-full sm:w-auto opacity-50" />
                             )}
                           </div>
                         </TableCell>
