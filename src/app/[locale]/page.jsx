@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import ProductGrid from "./search/productGrid";
 import ProductBestSelling from "@/components/user/home/product-best-selling";
 import ProductSuggestions from "@/components/user/home/product-suggestions";
+import { useInstantTransition } from "framer-motion";
 
 export default function HomePage() {
+  const t = useInstantTransition("Search");
   return (
     <main className="flex min-h-screen flex-col justify-between m-auto p-12">
       <div className="text-8xl ml-20 mb-20 mr-20 mt-20">
@@ -28,7 +30,7 @@ export default function HomePage() {
         />
       </div>
       <div className="w-full md:px-20 px-0">
-        <ProductGrid />
+        <ProductGrid t={t} />
       </div>
       <ProductBestSelling />
       <ProductSuggestions />

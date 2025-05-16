@@ -1,189 +1,284 @@
 "use client";
-import Cookies from "js-cookie";
-import { User, ShoppingCartIcon } from 'lucide-react';
+
+import {
+  User,
+  ShoppingCartIcon,
+  Menu,
+  X,
+  SquareChevronRight,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SearchWithSuggestions } from "../searchBars/userSearch";
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { countQuantity } from "@/api/cart/countItem";
 import { changeQuantity } from "@/store/features/cartSlice";
-import ShoppingCard from '../card/shoppingCard';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
-import { get, post } from '@/lib/httpClient';
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import ShoppingCard from "../card/shoppingCard";
+import { get } from "@/lib/httpClient";
 import WishlistPopup from "../popUp/wishListPopUp";
 import { StoreChat } from "../chat/storeChat";
 import { useTranslations } from "next-intl";
-import { Logo } from "../logo";
-import HKKUptechLogo from "../logo/logo";
+import { Logo, LogoText } from "../logo";
+import UserMenuComponent from "../user-menu";
 
-const UserHeader = () => {
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+} from "@/components/ui/dropdown-menu";
+
+const MainHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isCartVisible, setIsCartVisible] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const pathname = usePathname();
   const dispatch = useDispatch();
-  const router = useRouter();
-  const [user, setUser] = useState(null);
+  const quantity = useSelector((state) => state.cartReducer.count);
   const t = useTranslations("MainHeader");
 
-  const getMe = async () => {
-    await get("/api/v1/users/info").then((res) => {
-      setUser(res.result);
-    }).catch((err) => {
+  const hiddenPaths = [
+    "/admin",
+    "/vendor",
+    "/user",
+    "/auth",
+    "/checkout",
+    "/cart",
+    "/status",
+  ];
+
+  const isHeaderVisible = !hiddenPaths.some((path) => pathname.includes(path));
+
+  const fetchUserAndCart = async () => {
+    try {
+      setIsLoading(true);
+      const [userRes, cartRes] = await Promise.all([
+        get("/api/v1/users/info"),
+        countQuantity(),
+      ]);
+      setUser(userRes.result);
+      dispatch(changeQuantity(cartRes.result.quantity));
+    } catch {
       setUser(null);
-    })
-  }
-
-  useEffect(() => {
-    countQuantity().then((data) => {
-      dispatch(changeQuantity(data.result.quantity));
-    }).catch((err) => {
       dispatch(changeQuantity(0));
-    });
-
-    getMe();
-
-
-  }, [dispatch])
-
-  const quantity = useSelector((state) => state.cartReducer.count);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
+    if (!user) {
+      fetchUserAndCart();
+    }
+  }, [pathname]);
 
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-  const isHeaderVisible =
-    !pathname.includes("/admin") &&
-    !pathname.includes("/vendor") &&
-    !pathname.includes("/user") &&
-    !pathname.includes("/auth") &&
-    !pathname.includes("/checkout") &&
-    !pathname.includes("/cart") &&
-    !pathname.includes("/status");
+  useEffect(() => {
+    // Close mobile menu when route changes
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   if (!isHeaderVisible) return null;
 
+  const roleLink =
+    user?.lastRole === "USER"
+      ? "/register-store"
+      : user?.lastRole === "SELLER"
+        ? "/vendor/"
+        : user?.lastRole === "ADMIN"
+          ? "/admin"
+          : "/";
 
-  const handleMyAccount = () => {
-    router.push("/user");
-  }
-
-  const handleLogout = async () => {
-    const token = Cookies.get(process.env.NEXT_PUBLIC_JWT_NAME);
-    await post("/api/v1/auths/log-out", { token: token }).then(() => {
-      Cookies.remove(process.env.NEXT_PUBLIC_JWT_NAME);
-    }).catch((err) => {
-      console.log(err);
-    })
-    router.push("/auth");
-  }
+  const roleText =
+    user?.lastRole === "USER"
+      ? t("text_become_seller")
+      : user?.lastRole === "SELLER"
+        ? t("text_go_to_seller_page")
+        : user?.lastRole === "ADMIN"
+          ? t("text_go_to_admin_page")
+          : "";
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 pt-2 transition-transform duration-300 ${isScrolled ? "-translate-y-2 bg-black-primary" : "translate-y-0"
-        }`}
+      className={`w-full h-fit fixed top-0 left-0 right-0 z-50 pt-2 transition-transform duration-500 ${
+        isScrolled ? "-translate-y-2 bg-black-primary" : "translate-y-0"
+      }`}
     >
-      <div className="container mx-auto px-4 sm:px-6">
+      <div className="mx-auto px-4 sm:px-6 lg:px-20 xl:px-28">
         <div className="w-full bg-black-primary text-white rounded-lg">
-          <div className="flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6">
-            <Link
-              href="/"
-              className="text-sm font-bold text-white-primary hover:text-white-tertiary transition-colors"
-            >
-              <HKKUptechLogo />
-            </Link>
-            <Link
-              href={user?.lastRole === "USER" ? "/register-store" : user?.lastRole === "SELLER" ? "/vendor/" : user?.lastRole === "ADMIN" ? "/admin" : "/"}
-              className="text-s font-normal ml-2 text-white-primary/40 hover:text-white-tertiary transition-colors"
-            >
-              {user?.lastRole === "USER" ? t("text_become_seller") : ""}
-              {user?.lastRole === "SELLER" ? t("text_go_to_seller_page") : ""}
-              {user?.lastRole === "ADMIN" ? t("text_go_to_admin_page") : ""}
-            </Link>
+          <div className="flex items-center justify-between h-14 sm:h-16 px-2 sm:px-4 lg:px-6">
+            {/* Logo and Brand */}
+            <div className="w-fit h-fit flex flex-row justify-center items-center gap-1 sm:gap-3">
+              <Link href="/" className="flex items-center">
+                <Logo width={40} color="#f1f1f1" />
+                <div className="hidden sm:block">
+                  <LogoText height={20} color="#f1f1f1" />
+                </div>
+              </Link>
+              <Link
+                href={roleLink}
+                className="text-[.9em] text-white-tertiary hover:text-white-primary hidden lg:block"
+              >
+                {roleText}
+              </Link>
+            </div>
 
-            <div className="flex-1 flex justify-center px-4">
+            {/* Search Bar - Hidden on Mobile & Tablet */}
+            <div className="hidden lg:flex flex-1 justify-center px-4">
               <SearchWithSuggestions t={t} />
             </div>
 
-            <div className="flex items-center space-x-4">
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center gap-1">
               <WishlistPopup t={t} />
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  {user ? (<Button size="icon" variant="ghost">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage className="h-6 w-6" src={user.imageUrl} >
-
-                      </AvatarImage>
-                      <AvatarFallback>
-                        <User className="h-5 w-5" />
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>) : (<Button
+                  <Button
                     variant="ghost"
                     size="icon"
-                    className="text-white-primary"
+                    className="text-white-primary relative"
                   >
-                    <User className="h-5 w-5" />
-                  </Button>)}
+                    <ShoppingCartIcon className="h-5 w-5" />
+                    {quantity > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-primary text-white-primary text-[.8em] rounded-full w-[18px] h-[18px] flex items-center justify-center">
+                        {quantity}
+                      </span>
+                    )}
+                  </Button>
                 </DropdownMenuTrigger>
-                {user ? (<DropdownMenuContent className="w-56">
-                  <DropdownMenuLabel className="truncate">{user ? user.name : "My Account"}</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => handleMyAccount()}>
-                    {t('text_account')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleLogout()}>
-                    {t("text_log_out")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>) : (
-                  <DropdownMenuContent className="w-56">
-                    <DropdownMenuItem>
-                      <Link href="/auth">
-                        {t("text_auth")}
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>)}
-              </DropdownMenu>
-              <div
-                className="relative"
-                onMouseEnter={() => setIsCartVisible(true)}
-                onMouseLeave={() => setIsCartVisible(false)}
-              >
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-white-primary relative"
+                <DropdownMenuContent
+                  align="end"
+                  className="my-3 shadow-none border-none w-[360px] bg-transparent-primary p-0"
                 >
-                  <ShoppingCartIcon className="h-5 w-5" />
-                  {quantity > 0 && (
-                    <div className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-primary text-[10px] font-bold flex items-center justify-center">
-                      {quantity}
-                    </div>
-                  )}
-                </Button>
-                {isCartVisible && <ShoppingCard t={t} />}
+                  <ShoppingCard t={t} />
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <div className="relative mx-2">
+                <StoreChat
+                  websocketUrl="http://localhost:8080/api/v1/ws"
+                  isStore={false}
+                  productId=""
+                  orderId=""
+                />
               </div>
-              <div
-                className="relative"
+
+              {isLoading ? (
+                <div className="w-[150px] h-11 rounded-md shadow-sm shadow-white-tertiary relative">
+                  <div className="global_loading_icon white"></div>
+                </div>
+              ) : user ? (
+                <UserMenuComponent user={user} />
+              ) : (
+                <Link
+                  href="/auth"
+                  className="w-[150px] h-11 rounded-md shadow-sm shadow-white-tertiary text-white-secondary flex justify-center items-center gap-3"
+                >
+                  <User className="h-5 w-5 -translate-y-[2px]" />
+                  <span>Login</span>
+                </Link>
+              )}
+            </div>
+
+            {/* Mobile & Tablet Search - Full Width */}
+            <div className="lg:hidden flex-1 mx-2">
+              <SearchWithSuggestions t={t} />
+            </div>
+
+            <div className="lg:hidden flex items-center">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-white-primary relative"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
-                <StoreChat websocketUrl={"http://localhost:8080/api/v1/ws"} isStore={false} productId={""} orderId={""} />
-              </div>
+                {isMobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+                {quantity > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-primary text-white-primary text-[.8em] rounded-full w-[18px] h-[18px] flex items-center justify-center">
+                    {quantity}
+                  </span>
+                )}
+              </Button>
             </div>
           </div>
+
+          {isMobileMenuOpen && (
+            <div className="flex flex-col gap-2 lg:hidden bg-black-primary border-t border-black-tertiary px-3 pt-3 rounded-b-lg">
+              {roleText && (
+                <Link
+                  href={roleLink}
+                  className="text-white-primary w-full h-fit p-3 flex flex-row items-center justify-start gap-3 rounded-md shadow-sm shadow-white-tertiary"
+                >
+                  <SquareChevronRight />
+                  <span>{roleText}</span>
+                </Link>
+              )}
+
+              <div className="relative">
+                <Link
+                  href="/cart"
+                  className="text-white-primary w-full h-fit p-3 flex flex-row items-center justify-start gap-3 rounded-md shadow-sm shadow-white-tertiary"
+                >
+                  <ShoppingCartIcon className="h-5 w-5" />
+                  <span>Cart</span>
+                </Link>
+                {quantity > 0 && (
+                  <span className="absolute top-1/2 -translate-y-1/2 right-3 bg-red-primary text-white-primary text-[.8em] rounded-full w-[18px] h-[18px] flex items-center justify-center">
+                    {quantity}
+                  </span>
+                )}
+              </div>
+
+              <WishlistPopup t={t} isPhone={true} />
+
+              <div className="flex flex-row justify-between items-center pt-1 border-t border-black-tertiary -translate-y-3">
+                <StoreChat
+                  websocketUrl="http://localhost:8080/api/v1/ws"
+                  isStore={false}
+                  productId=""
+                  orderId=""
+                />
+
+                <div className="pt-2 pb-3">
+                  {isLoading ? (
+                    <div className="h-11 rounded-md shadow-md shadow-white-tertiary relative">
+                      <div className="global_loading_icon white"></div>
+                    </div>
+                  ) : user ? (
+                    <UserMenuComponent user={user} />
+                  ) : (
+                    <Link
+                      href="/auth"
+                      className="h-11 rounded-md shadow-md shadow-white-tertiary text-white-secondary flex items-center gap-3 px-4"
+                    >
+                      <User className="h-5 w-5" />
+                      <span>Login</span>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>
   );
 };
 
-export default UserHeader;
-
+export default MainHeader;
