@@ -123,6 +123,50 @@
   }
 }
 
+.skeleton-item {
+  min-width: 120px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: hsl(var(--muted)); 
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-circle {
+  border-radius: 9999px;
+  background-color: hsl(var(--muted-foreground)); 
+}
+
+.skeleton-line {
+  border-radius: 4px;
+  background-color: hsl(var(--muted-foreground)); 
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
 /* Disable UI */
 .rdp-weekdays {
   display: none;
