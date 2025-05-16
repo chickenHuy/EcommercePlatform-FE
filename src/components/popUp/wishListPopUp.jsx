@@ -12,7 +12,7 @@ import EmptyImage from "@/assets/images/brandEmpty.jpg";
 import StoreImage from "@/assets/images/storeEmpty.jpg";
 import Loading from "../loading";
 
-export default function WishlistPopup({ t }) {
+export default function WishlistPopup({ t, isPhone = false }) {
   const [isLoading, setLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(null);
 
@@ -52,14 +52,26 @@ export default function WishlistPopup({ t }) {
     <>
       <Dialog>
         <DialogTrigger asChild>
-          <button className="relative p-2 text-white-secondary hover:text-black-secondary hover:bg-white-secondary rounded-md">
-            <Heart className="w-5 h-5" />
-            {wishlistData.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-primary text-white-primary text-[.8em] rounded-full w-[18px] h-[18px] flex items-center justify-center">
-                {wishlistData.length}
-              </span>
-            )}
-          </button>
+          {isPhone ? (
+            <button className="w-full h-fit relative p-3 text-white-primary rounded-md shadow-sm shadow-white-tertiary hover:shadow-white-primary flex flex-row justify-start items-center gap-3">
+              <Heart className="w-5 h-5" />
+              <span>Wishlist</span>
+              {wishlistData.length > 0 && (
+                <span className="absolute top-1/2 -translate-y-1/2 right-3 bg-red-primary text-white-primary text-[.8em] rounded-full w-[18px] h-[18px] flex items-center justify-center">
+                  {wishlistData.length}
+                </span>
+              )}
+            </button>
+          ) : (
+            <button className="relative p-2 text-white-secondary hover:text-black-secondary hover:bg-white-secondary rounded-md">
+              <Heart className="w-5 h-5" />
+              {wishlistData.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-primary text-white-primary text-[.8em] rounded-full w-[18px] h-[18px] flex items-center justify-center">
+                  {wishlistData.length}
+                </span>
+              )}
+            </button>
+          )}
         </DialogTrigger>
 
         <DialogTitle />
