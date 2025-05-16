@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { CircleUserRound, LogOut } from "lucide-react";
+import { CircleUserRound, LogOut, ShoppingBag } from "lucide-react";
 import { ChevronDown } from "lucide-react";
 import { ChevronUp } from "lucide-react";
 import { Store } from "lucide-react";
@@ -28,6 +28,7 @@ import { localeDetector } from "@/utils";
 import Image from "next/image";
 import Cookies from "js-cookie";
 import { post } from "@/lib/httpClient";
+import Link from "next/link";
 
 const UserMenuComponent = (props) => {
   const { user } = props;
@@ -124,23 +125,37 @@ const UserMenuComponent = (props) => {
           </span>
         </div>
         <DropdownMenuSeparator />
-        {user.roles.some((role) => role.name === "SELLER") && (
-          <DropdownMenuItem
-            className="flex flex-row justify-start items-center gap-3 px-3 cursor-pointer"
-            onClick={() => router.push("/vendor/store")}
+        <DropdownMenuItem>
+          <Link
+            className="flex flex-row justify-start items-center gap-3 px-3"
+            href="/"
           >
-            <Store />
-            {t("userOptionsMenu.shop-information")}
+            <ShoppingBag />
+            {t("userOptionsMenu.home_page")}
+          </Link>
+        </DropdownMenuItem>
+
+        {user.roles.some((role) => role.name === "SELLER") && (
+          <DropdownMenuItem>
+            <Link
+              className="flex flex-row justify-start items-center gap-3 px-3"
+              href="/vendor/store"
+            >
+              <Store />
+              {t("userOptionsMenu.shop-information")}
+            </Link>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem
-          className="flex flex-row justify-start items-center gap-3 px-3 cursor-pointer"
-          onClick={() => router.push("/user")}
-        >
-          <UserRoundPen />
-          {t("userOptionsMenu.account-information")}
+        <DropdownMenuItem>
+          <Link
+            className="flex flex-row justify-start items-center gap-3 px-3"
+            href="/user"
+          >
+            <UserRoundPen />
+            {t("userOptionsMenu.account-information")}
+          </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem className="flex flex-row justify-start items-center gap-3 px-3 cursor-pointer">
+        <DropdownMenuItem className="flex flex-row justify-start items-center gap-3 px-5 cursor-pointer">
           <Languages />
           <span className="flex-grow">{t("userOptionsMenu.language")}</span>
           <Select
@@ -150,7 +165,7 @@ const UserMenuComponent = (props) => {
             }}
           >
             <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Chọn ngôn ngữ" />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="vi">Tiếng Việt</SelectItem>
@@ -159,7 +174,7 @@ const UserMenuComponent = (props) => {
           </Select>
         </DropdownMenuItem>
         <DropdownMenuItem
-          className="flex flex-row justify-start items-center gap-3 px-3 cursor-pointer"
+          className="flex flex-row justify-start items-center gap-3 px-5 cursor-pointer"
           onClick={() => handleLogout()}
         >
           <LogOut />
@@ -171,4 +186,3 @@ const UserMenuComponent = (props) => {
 };
 
 export default UserMenuComponent;
-
