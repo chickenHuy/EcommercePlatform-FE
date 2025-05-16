@@ -66,8 +66,8 @@ export const LogoText = (props) => {
       >
         <g
           transform="translate(0,49) scale(0.13,-0.13)"
-          fill="#000000"
-          stroke="#000000"
+          fill={props.color || "#000000"}
+          stroke="none"
         >
           <path
             d="M156 391 c-4 -5 -1 -11 6 -13 14 -5 18 -179 5 -215 -8 -21 -5 -23 28

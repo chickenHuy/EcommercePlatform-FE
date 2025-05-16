@@ -339,7 +339,7 @@ const SellerInformation = ({
                     const value = e.target.value;
                     handleInputChange(index, "originalPrice", value);
                   }}
-                  className="w-fit p-2 border border-gray-300 rounded mt-1"
+                  className="w-1/2 p-2 border border-gray-300 rounded mt-1"
                 />
               </div>
 
@@ -351,7 +351,7 @@ const SellerInformation = ({
                     const value = e.target.value;
                     handleInputChange(index, "salePrice", value);
                   }}
-                  className="w-fit p-2 border border-gray-300 rounded mt-1"
+                  className="w-1/2 p-2 border border-gray-300 rounded mt-1"
                 />
               </div>
 
@@ -363,7 +363,7 @@ const SellerInformation = ({
                     const value = e.target.value;
                     handleInputChange(index, "quantity", value);
                   }}
-                  className="w-fit p-2 border border-gray-300 rounded mt-1"
+                  className="w-1/2 p-2 border border-gray-300 rounded mt-1"
                 />
               </div>
               <div className="my-2 w-full h-fit flex flex-row justify-between items-center gap-3">
@@ -375,7 +375,7 @@ const SellerInformation = ({
                     handleInputChange(index, "available", newValue === "true")
                   }
                 >
-                  <SelectTrigger className="max-w-[190px] bg-gray-200 border rounded p-2">
+                  <SelectTrigger className="w-1/2 bg-gray-200 border rounded p-2">
                     <SelectValue placeholder="Chọn trạng thái" />
                   </SelectTrigger>
                   <SelectContent>
