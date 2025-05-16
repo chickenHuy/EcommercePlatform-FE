@@ -4,16 +4,17 @@ import ProductCard from "@/components/card/productCard";
 import { useDispatch, useSelector } from "react-redux";
 import { searchProducts } from "@/api/search/searchApi";
 import { useInView } from "react-intersection-observer";
-import Loading from "@/components/loading";
 import { get, post } from "@/lib/httpClient";
 import { setWishList } from "@/store/features/wishListSlice";
+import { useTranslations } from "next-intl";
 
-export default function ProductGrid({t}) {
+export default function ProductGrid() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const { ref, inView } = useInView();
+  const t = useTranslations("Search");
   const storeId = useSelector((state) => state.searchFilter);
   const searchParams = useSelector((state) => state.searchFilter);
   const limit = 16;
@@ -37,7 +38,7 @@ export default function ProductGrid({t}) {
           setHasMore(false);
         } else {
           setProducts((prevProducts) =>
-            isInitialLoad ? newProducts : [...prevProducts, ...newProducts]
+            isInitialLoad ? newProducts : [...prevProducts, ...newProducts],
           );
           setPage(res.result.nextPage);
         }
@@ -47,7 +48,7 @@ export default function ProductGrid({t}) {
         setLoading(false);
       }
     },
-    [searchParams, page, loading, hasMore]
+    [searchParams, page, loading, hasMore],
   );
 
   useEffect(() => {
@@ -75,7 +76,7 @@ export default function ProductGrid({t}) {
         .then((res) => {
           dispatch(setWishList(res.result));
         })
-        .catch((err) => {
+        .catch(() => {
           dispatch(setWishList([]));
         });
     } catch (error) {
@@ -87,34 +88,56 @@ export default function ProductGrid({t}) {
     }
   };
 
-  return (
-    <div
-      className="grid gap-4"
-      style={{
-        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-      }}
-    >
-      {products.map((product) => (
-        <ProductCard
-          key={product.id}
-          productId={product.id}
-          name={product.name}
-          price={product.salePrice}
-          originalPrice={product.originalPrice}
-          mainImageUrl={product.mainImageUrl}
-          videoUrl={product.videoUrl}
-          rating={product.rating}
-          onViewDetail={() => handleViewDetail(product)}
-          onAddToFavorites={() => handleAddToFavorites(product.id)}
-          isFavorite={favorites.includes(product.id)}
-          link={product.slug}
-        />
-      ))}
-      {hasMore && (
-        <div ref={ref} className="col-span-full flex justify-center p-4">
-          {loading && <Loading />}
-        </div>
-      )}
+  const SkeletonItem = () => (
+    <div className="skeleton-item w-full aspect-square">
+      <div className="skeleton-line w-full aspect-square" />
+      <div className="skeleton-line w-full h-[30px]" />
     </div>
+  );
+
+  return (
+    <>
+      <h3 className="text-[1.3em] text-red-primary text-center border-b py-3">
+        Danh Sách Sản Phẩm
+      </h3>
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+        {products.map((product) => (
+          <ProductCard
+            key={product.id}
+            productId={product.id}
+            name={product.name}
+            price={product.salePrice}
+            originalPrice={product.originalPrice}
+            mainImageUrl={product.mainImageUrl}
+            videoUrl={product.videoUrl}
+            rating={product.rating}
+            onViewDetail={() => handleViewDetail(product)}
+            onAddToFavorites={() => handleAddToFavorites(product.id)}
+            isFavorite={favorites.includes(product.id)}
+            link={product.slug}
+          />
+        ))}
+        {hasMore && (
+          <div ref={ref} className="col-span-full flex justify-center">
+            {loading && (
+              <div className="w-full grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+                <SkeletonItem />
+                <SkeletonItem />
+                <SkeletonItem />
+                <SkeletonItem />
+                <SkeletonItem />
+                <SkeletonItem />
+                <SkeletonItem />
+                <SkeletonItem />
+                <SkeletonItem />
+                <SkeletonItem />
+                <SkeletonItem />
+                <SkeletonItem />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
