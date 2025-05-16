@@ -1,9 +1,7 @@
 "use client";
-import { ListFilter, MoreHorizontal } from "lucide-react";
+import { CirclePlus, ListFilter, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import {
   Card,
   CardContent,
@@ -34,7 +32,6 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { PaginationAdminTable } from "@/components/paginations/pagination";
 import { Toaster } from "@/components/ui/toaster";
 import DialogEditComponent from "@/components/dialogs/dialogEditComponent";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useEffect, useState } from "react";
 import {
   createComponent,
@@ -278,7 +275,7 @@ export default function ManageComponent() {
                     }
                     nameButton={"Thêm mới"}
                     typeDisplay={"button"}
-                    icon={<AddCircleOutlineIcon />}
+                    icon={<CirclePlus />}
                     handleSaveChange={handleCreateComponent}
                   />
                 </div>
@@ -363,7 +360,7 @@ export default function ManageComponent() {
                                             id={component.id}
                                             initValue={component.name}
                                             name={"Sửa"}
-                                            icon={<EditIcon />}
+                                            icon={<Pencil />}
                                             content={"Sửa thành phần"}
                                             nameButton={"Lưu thay đổi"}
                                             handleSaveChange={
@@ -380,7 +377,7 @@ export default function ManageComponent() {
                                           }
                                         >
                                           <span>Xoá</span>
-                                          <DeleteIcon className="scale-75" />
+                                          <Trash2 className="scale-75" />
                                         </DropdownMenuItem>
                                       </DropdownMenuContent>
                                     </DropdownMenu>

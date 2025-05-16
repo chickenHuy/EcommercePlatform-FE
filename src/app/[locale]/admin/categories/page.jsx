@@ -1,8 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ListFilter, PlusCircle } from "lucide-react";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { ListFilter, PlusCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -284,7 +283,7 @@ export default function ManageCategories() {
                                 handleDeleteButtonClick(category);
                               }}
                             >
-                              <DeleteIcon className="h-4 w-4" />
+                              <Trash2 className="h-4 w-4" />
                               <span className="sr-only">Xoá</span>
                             </Button>
                           </TableCell>

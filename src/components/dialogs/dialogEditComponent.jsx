@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import {
@@ -24,6 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { CircleHelp } from "lucide-react";
 
 const FormSchema = z.object({
   name: z
@@ -119,7 +119,7 @@ export default function DialogEditComponent(props) {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="scale-75">
-                  <HelpOutlineIcon />
+                  <CircleHelp />
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>
