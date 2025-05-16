@@ -18,6 +18,8 @@ import {
   Phone,
   UserRound,
   UserRoundCog,
+  Pencil,
+  CircleOff
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -32,7 +34,6 @@ import {
 } from "@/api/admin/orderRequest";
 import { Toaster } from "@/components/ui/toaster";
 import DialogUpdateOrCancelOrder from "@/components/dialogs/dialogUpdateOrCancelOrder";
-import { EditCalendar, EventBusy } from "@mui/icons-material";
 
 export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -209,7 +210,7 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
                   handleClickButtonCancel(orderDetail);
                 }}
               >
-                <EventBusy className="h-6 w-6 mr-2" />
+                <CircleOff className="h-6 w-6 mr-2" />
                 Hủy đơn hàng
               </Button>
             )}
@@ -222,7 +223,7 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
                 handleClickButtonUpdate(orderDetail);
               }}
             >
-              <EditCalendar className="h-6 w-6 mr-2" />
+              <Pencil className="h-6 w-6 mr-2" />
               Cập nhật trạng thái
             </Button>
           )}
