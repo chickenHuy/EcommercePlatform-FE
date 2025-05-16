@@ -77,7 +77,7 @@ export default function ManageOrderBySeller() {
   const dispatch = useDispatch();
   const { toast } = useToast();
 
-  const pageSize = 2;
+  const pageSize = 4;
   const [orders, setOrders] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
