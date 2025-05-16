@@ -61,7 +61,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import DialogConfirmListOrderAdmin from "@/components/dialogs/dialogConfirmListOrderAdmin";
 
 export default function ManageOrderByAdmin() {
-  const pageSize = 2;
+  const pageSize = 10;
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(0);
@@ -498,12 +498,11 @@ export default function ManageOrderByAdmin() {
     }
   };
 
-  function findOrdersOnlyIn(updatedOrders, selectedListOrder) {
+  const findOrdersOnlyIn = (updatedOrders, selectedListOrder) => {
     const selectedIds = new Set(selectedListOrder.map(order => order.id));
     const difference = updatedOrders.filter(order => !selectedIds.has(order.id));
     return difference;
   }
-
 
   useEffect(() => {
     console.log("currentPage: ", currentPage)
@@ -909,7 +908,6 @@ export default function ManageOrderByAdmin() {
                 {isUpdateChecked && (
                   <Button
                     className="flex items-center space-x-2"
-                    variant="outline"
                     onClick={handleClickButtonUpdateList}
                   >
                     <Label className="text-sm text-center hover:cursor-pointer">
@@ -922,7 +920,6 @@ export default function ManageOrderByAdmin() {
                 {isCancelChecked && (
                   <Button
                     className="flex items-center space-x-2"
-                    variant="outline"
                     onClick={handleClickButtonCancelList}
                   >
                     <Label className="text-sm text-center hover:cursor-pointer">
@@ -936,16 +933,15 @@ export default function ManageOrderByAdmin() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="dark:text-gray-primary">
-                        {/* Checkbox chọn tất cả checkbox ở 1 trang */}
-                        {
-                          (isUpdateChecked || isCancelChecked) &&
-                          <Checkbox
-                            onCheckedChange={(checked) => handleSelectAll(checked)}
-                            checked={isSelectAllChecked}
-                          />
-                        }
-                      </TableHead>
+                      {
+                        (isUpdateChecked || isCancelChecked) && (
+                          <TableHead className="dark:text-gray-primary">
+                            <Checkbox
+                              onCheckedChange={(checked) => handleSelectAll(checked)}
+                              checked={isSelectAllChecked}
+                            />
+                          </TableHead>
+                      )}
                       <TableHead className="dark:text-gray-primary">
                         Mã đơn hàng
                       </TableHead>
@@ -965,12 +961,11 @@ export default function ManageOrderByAdmin() {
                         Phương thức
                       </TableHead>
                       <TableHead className="dark:text-gray-primary">
-                        Trạng thái
-                      </TableHead>
-                      <TableHead className="dark:text-gray-primary">
                         Tổng tiền
                       </TableHead>
-                      <TableHead className="dark:text-gray-primary"></TableHead>
+                      <TableHead className="dark:text-gray-primary">
+                        Trạng thái
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -980,45 +975,43 @@ export default function ManageOrderByAdmin() {
                         onClick={() => handleClickViewOrderDetail(order.id)}
                         className="h-[65px] hover:cursor-pointer"
                       >
-                        <TableCell
-                          className="font-medium text-center min-w-16"
-                          onClick={(e) => {
-                            if (isUpdateChecked || isCancelChecked) {
-                              e.stopPropagation();
-                            }
-                          }}
-                        >
-                          {/*Checkbox cập nhật nhiều Order */}
-                          {isUpdateChecked &&
-                            (order.currentStatus === "WAITING_FOR_SHIPPING" ||
-                              order.currentStatus === "PICKED_UP" ||
-                              order.currentStatus === "OUT_FOR_DELIVERY") && (
-                              <Checkbox
-                                className="m-4"
-                                checked={order.isChecked || false}
-                                onCheckedChange={(checked) =>
-                                  handleCheckboxOrder(order, checked)
+                        {
+                          (isUpdateChecked || isCancelChecked) && (
+                            <TableCell
+                              className="font-medium text-center min-w-16"
+                              onClick={(e) => {
+                                if (isUpdateChecked || isCancelChecked) {
+                                  e.stopPropagation();
                                 }
-                              />
-                            )}
-                          {/*Checkbox hủy nhiều Order */}
-                          {isCancelChecked &&
-                            order.currentStatus !== "DELIVERED" &&
-                            order.currentStatus !== "CANCELLED" && (
-                              <Checkbox
-                                className="m-4"
-                                checked={order.isChecked || false}
-                                onCheckedChange={(checked) =>
-                                  handleCheckboxOrder(order, checked)
-                                }
-                              />
-                            )}
-                          {isDefaultChecked && (
-                            <div className="w-full flex justify-center">
-                              <Ban className="h-6 w-6 text-error-dark opacity-50" />
-                            </div>
-                          )}
-                        </TableCell>
+                              }}
+                            >
+                              {/*Checkbox cập nhật nhiều Order */}
+                              {isUpdateChecked &&
+                                (order.currentStatus === "WAITING_FOR_SHIPPING" ||
+                                  order.currentStatus === "PICKED_UP" ||
+                                  order.currentStatus === "OUT_FOR_DELIVERY") && (
+                                  <Checkbox
+                                    className="m-4"
+                                    checked={order.isChecked || false}
+                                    onCheckedChange={(checked) =>
+                                      handleCheckboxOrder(order, checked)
+                                    }
+                                  />
+                                )}
+                              {/*Checkbox hủy nhiều Order */}
+                              {isCancelChecked &&
+                                order.currentStatus !== "DELIVERED" &&
+                                order.currentStatus !== "CANCELLED" && (
+                                  <Checkbox
+                                    className="m-4"
+                                    checked={order.isChecked || false}
+                                    onCheckedChange={(checked) =>
+                                      handleCheckboxOrder(order, checked)
+                                    }
+                                  />
+                              )}
+                            </TableCell>
+                        )}
                         <TableCell className="font-medium text-center">
                           {order.id}
                         </TableCell>
@@ -1044,50 +1037,42 @@ export default function ManageOrderByAdmin() {
                           </Badge>
                         </TableCell>
                         <TableCell className="font-medium text-center">
-                          <Badge variant="outline">
-                            {getCurrentStatusOrder(order.currentStatus)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="font-medium text-center">
                           {formatCurrency(order.grandTotal)}
                         </TableCell>
                         <TableCell className="font-medium text-center">
-                          <div className="min-w-16 flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-2">
-                            {(order.currentStatus === "WAITING_FOR_SHIPPING" ||
-                              order.currentStatus === "PICKED_UP" ||
-                              order.currentStatus === "OUT_FOR_DELIVERY") && (
-                              <Button
-                                variant="outline"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleClickUpdateStatus(order);
-                                }}
-                                className="w-full sm:w-auto"
-                              >
-                                <Pencil />
-                              </Button>
-                            )}
-                            {order.currentStatus !== "DELIVERED" &&
-                              order.currentStatus !== "CANCELLED" && (
+                          <div className="w-fit h-fit flex lg:flex-row flex-col items-center justify-center gap-2 mx-auto">
+                            <Button variant="outline" className="w-fit cursor-default">
+                              {getCurrentStatusOrder(order.currentStatus)}
+                            </Button>
+                            <div className="flex flex-row justify-center items-center gap-2">
+                              {(order.currentStatus === "WAITING_FOR_SHIPPING" ||
+                                order.currentStatus === "PICKED_UP" ||
+                                order.currentStatus === "OUT_FOR_DELIVERY") && (
                                 <Button
-                                  variant="outline"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleClickButtonCancel(order);
+                                    handleClickUpdateStatus(order);
                                   }}
-                                  className="w-full sm:w-auto"
+                                  className="w-fit mx-auto"
                                 >
-                                  <CircleOff />
+                                  <Pencil className="w-5 h-5" />
                                 </Button>
                               )}
-                            {order.currentStatus === "DELIVERED" && (
-                              <Check className="w-full sm:w-auto" />
-                            )}
-                            {order.currentStatus === "CANCELLED" && (
-                              <X className="w-full sm:w-auto opacity-50" />
-                            )}
+                              {order.currentStatus !== "DELIVERED" &&
+                                order.currentStatus !== "CANCELLED" && (
+                                  <Button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleClickButtonCancel(order);
+                                    }}
+                                    className="w-fit mx-auto"
+                                  >
+                                    <CircleOff className="w-5 h-5" />
+                                  </Button>
+                                )}
+                            </div>
                           </div>
-                        </TableCell>
+                        </TableCell>                        
                       </TableRow>
                     ))}
                   </TableBody>
