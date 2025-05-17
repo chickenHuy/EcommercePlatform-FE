@@ -16,7 +16,7 @@ export default function ProductDetailSuggestions({ productId, t }) {
     const fetchRecommendProduct = async () => {
       try {
         const response = await getRecommendProduct(productId);
-        setListProduct(response.result);
+        setListProduct(response.data);
       } catch (error) {
         console.error(error);
       }
