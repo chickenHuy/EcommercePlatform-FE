@@ -16,6 +16,7 @@ export default function ProductBestSelling() {
   const scrollContainerRef = useRef(null);
   const videoRefs = useRef([]);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const t = useTranslations("Search");
 
   const fetchProductBestSelling = useCallback(async () => {
     try {
@@ -144,8 +145,8 @@ export default function ProductBestSelling() {
   return (
     <div className="w-full pb-4">
       <Toaster />
-      <h3 className="text-[1.3em] text-red-primary text-center border-b py-3">
-        Sản Phẩm Bán Chạy
+      <h3 className="text-[1.3em] text-center border-b pb-2">
+        {t("best_selling_products")}
       </h3>
 
       <div className="relative group">
@@ -159,7 +160,7 @@ export default function ProductBestSelling() {
                 <SkeletonItem key={index} />
               ))
             : listProduct.map((product, index) => (
-                <div key={index} className="min-w-[150px]">
+                <div key={index} className="lg:min-w-[150px] sm:min-w-[130px] min-w-[100px]">
                   <ProductCard
                     key={product.id}
                     name={product.name}

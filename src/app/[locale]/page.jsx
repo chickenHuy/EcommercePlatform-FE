@@ -41,7 +41,7 @@ export default function HomePage() {
     Slider13,
   ];
   return (
-    <main className="flex min-h-screen flex-col justify-between gap-3 m-auto xl:px-28 lg:px-20 sm:px-6 px-4 py-24">
+    <main className="flex min-h-screen flex-col justify-between gap-7 m-auto xl:px-28 lg:px-20 sm:px-6 px-4 py-24">
       <div className="w-full lg:h-fit h-fit grid grid-cols-1 lg:grid-cols-2 grid-rows-2 lg:grid-rows-1 gap-2">
         <ImageSlider images={images} />
 
