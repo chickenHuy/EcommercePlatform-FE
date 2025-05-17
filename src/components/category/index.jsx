@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getAllCategory } from "@/api/user/categoryRequest";
 import IconNotFound from "../../../public/images/categoryNotFound.png";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 const ListCategoryComponent = () => {
   const [listCategory, setListCategory] = useState([]);
@@ -39,14 +40,19 @@ const ListCategoryComponent = () => {
   };
 
   const SkeletonItem = () => (
-    <div className="skeleton-item w-[300px] h-[300px] relative">
-      <div className="skeleton-line w-[80%] h-[40px] absolute bottom-5" />
+    <div className="skeleton-item lg:w-[300px] lg:h-[300px] sm:w-[200px] sm:h-[200px] w-[100px] h-[100px] relative">
+      <div className="skeleton-line w-[80%] sm:h-[40px] h-[20px] absolute bottom-5" />
     </div>
   );
 
   return (
     <div className="relative w-full h-fit">
-      <h3 className="sm:text-[2.3em] text-[1.3em]">{t("product_category")}</h3>
+      <div className="w-full h-fit flex flex-row justify-between items-center px-3">
+        <h3 className="text-[1.2em] font-[900]">{t("product_category")}</h3>
+        <Link className="underline" href="#">
+          See All
+        </Link>
+      </div>
 
       <button
         onClick={() => scroll("left")}
@@ -66,17 +72,17 @@ const ListCategoryComponent = () => {
           : listCategory.map((category) => (
               <div
                 key={category.id}
-                className="lg:w-[300px] lg:h-[300px] sm:w-[200px] sm:h-[200px] w-[100px] h-[100px] flex-shrink-0 flex flex-col items-center gap-2 relative"
+                className="lg:w-[300px] lg:h-[300px] sm:w-[200px] sm:h-[200px] w-[100px] h-[100px] flex-shrink-0 flex flex-col items-center gap-2 relative group"
               >
                 <div className="w-full h-full relative">
                   <Image
                     src={category.imageUrl || IconNotFound}
                     alt={category.name}
                     fill
-                    className="object-cover rounded-md shadow-md"
+                    className="object-cover rounded-xl shadow-md"
                   />
                 </div>
-                <p className="w-[80%] sm:p-2 p-1 sm:rounded-md rounded-sm absolute sm:bottom-5 bottom-3 left-1/2 -translate-x-1/2 lg:text-[.9em] sm:text-[.8em] text-[.7em] text-white-primary text-center truncate backdrop-blur-sm bg-white-tertiary/50">
+                <p className="w-[80%] sm:p-2 p-1 sm:rounded-md rounded-sm absolute sm:bottom-5 bottom-3 lg:text-[.9em] sm:text-[.8em] text-[.7em] text-white-primary text-center truncate backdrop-blur-sm bg-white-tertiary/50 group-hover:block hidden animate-fade-in-quick">
                   {category.name.toUpperCase()}
                 </p>
               </div>
