@@ -68,7 +68,7 @@ const UserMenuComponent = (props) => {
 
   return (
     <DropdownMenu open={isShowUserMenu} onOpenChange={setIsShowUserMenu}>
-      <DropdownMenuTrigger className="outline-none px-3 py-2 max-w-[200px] rounded-md shadow-sm shadow-white-tertiary">
+      <DropdownMenuTrigger className="outline-none px-3 py-2 max-w-[200px]">
         <div className="flex flex-row justify-center items-center gap-2 cursor-pointer">
           {user?.imageUrl ? (
             <Image
