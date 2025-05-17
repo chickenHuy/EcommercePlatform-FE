@@ -77,7 +77,7 @@ export default function ManageOrderBySeller() {
   const dispatch = useDispatch();
   const { toast } = useToast();
 
-  const pageSize = 4;
+  const pageSize = 10;
   const [orders, setOrders] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
@@ -860,7 +860,7 @@ export default function ManageOrderBySeller() {
                       <TableRow>
                         {/* Checkbox chọn nhiều order trên 1 trang */}
                         {(isUpdateChecked || isCancelChecked) && (
-                          <TableHead>
+                          <TableHead className="min-w-8">
                             <Checkbox
                               checked={isSelectAllChecked}
                               onCheckedChange={(checked) => handleSelectAll(checked)}

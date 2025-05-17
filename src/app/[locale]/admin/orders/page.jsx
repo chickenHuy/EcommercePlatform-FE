@@ -31,10 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
 import {
   ArrowUpDown,
-  Ban,
-  Check,
   ListFilter,
-  X,
   Pencil,
   CircleOff,
 } from "lucide-react";

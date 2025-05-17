@@ -184,6 +184,7 @@ const ProductsTable = ({
         <TableHead>{t("image")}</TableHead>
         <TableHead>{t("name")}</TableHead>
         <TableHead>{t("quantity")}</TableHead>
+        <TableHead>{t("sold")}</TableHead>
         <TableHead>{t("selling_price")}</TableHead>
         <TableHead>{t("original_price")}</TableHead>
         <TableHead>{t("evaluate")}</TableHead>
@@ -207,6 +208,7 @@ const ProductsTable = ({
           </TableCell>
           <TableCell>{product.name}</TableCell>
           <TableCell className="text-center">{product.quantity}</TableCell>
+          <TableCell className="text-center">{product.sold}</TableCell>
           <TableCell className="text-center">
             {formatCurrency(product.salePrice)}
           </TableCell>
@@ -343,6 +345,10 @@ export default function ManageComponent() {
       setIsTableLoading(false);
     }
   };
+
+  useEffect(() => {
+    console.log("products: ", products)
+  }, [products])
 
   useEffect(() => {
     loadProducts(currentPage, sortBy, order, tab, search);
