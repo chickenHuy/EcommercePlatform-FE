@@ -27,7 +27,7 @@ export default function ProductCard({
 }) {
   return (
     <Link href={`/${link}`} passHref className="w-full h-full relative">
-      <Card className="w-full h-full overflow-hidden flex flex-col rounded-md border-white-secondary shadow-sm hover:shadow-lg hover:scale-[1.015] transition duration-100">
+      <Card className="w-full h-full overflow-hidden flex flex-col rounded-md border-[0px] shadow-sm hover:shadow-md hover:scale-[1.015] hover:border-[1px] hover:border-white-secondary transition duration-100">
         <CardHeader className="p-0 relative">
           <div className="relative w-full aspect-square overflow-hidden">
             {videoUrl ? (
@@ -77,7 +77,7 @@ export default function ProductCard({
           )}
         </CardHeader>
 
-        <CardContent className="p-2 flex flex-col justify-between gap-1">
+        <CardContent className="p-2 flex flex-col justify-between gap-1 bg-blue-primary">
           <CardTitle className="text-[1em] text-ellipsis truncate">
             {name}
           </CardTitle>
@@ -96,11 +96,11 @@ export default function ProductCard({
           </div>
 
           <div className="flex items-center">
-            <span className="text-[1em] text-red-primary">
+            <span className="sm:text-[1em] text-[.8em] text-red-primary">
               {formatPrice(price)}
             </span>
             {originalPrice && (
-              <span className="mx-2 text-[1em] text-black-primary/50 line-through">
+              <span className="mx-2 sm:text-[1em] text-[.8em] text-black-primary/50 line-through">
                 {formatPrice(originalPrice)}
               </span>
             )}
