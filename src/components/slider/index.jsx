@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
+import { Button } from "../ui/button";
 
-const ImageSlider = ({ images = [], interval = 5000 }) => {
+const ImageSlider = ({ images = [], interval = 7000 }) => {
   const [[current, direction], setCurrent] = useState([0, 0]);
 
   useEffect(() => {
@@ -35,7 +36,7 @@ const ImageSlider = ({ images = [], interval = 5000 }) => {
   };
 
   return (
-    <div className="relative w-full h-full overflow-hidden rounded-md shadow-md">
+    <div className="relative w-full h-full overflow-hidden rounded-md shadow-md animate-fade-in">
       <AnimatePresence custom={direction} mode="wait">
         <motion.div
           key={current}
@@ -47,25 +48,37 @@ const ImageSlider = ({ images = [], interval = 5000 }) => {
           transition={{ duration: 0.5 }}
           className="absolute w-full h-full"
         >
-          <Image
-            src={images[current]}
-            alt={`Slide ${current + 1}`}
-            fill
-            className="object-cover"
-            priority
-          />
+          <div className="w-full h-full relative">
+            <Image
+              src={images[current].url}
+              alt={`Slide ${current + 1}`}
+              width={2000}
+              heidht={2000}
+              className="object-cover w-full h-full"
+              priority
+            />
+          </div>
+          <div
+            className={`absolute w-fit h-fit flex flex-col items-end gap-3 px-5 py-3 rounded-md text-white-primary backdrop-blur-md ${images[current].background === "white" ? "bg-white-primary/50" : "bg-black-primary/50"} bottom-3 right-3 animate-fade-in`}
+          >
+            <h3>{images[current].description}</h3>
+            <Button>
+              {images[current].button}
+              <ChevronRight className="p-1" />
+            </Button>
+          </div>
         </motion.div>
       </AnimatePresence>
 
       <button
         onClick={prevSlide}
-        className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-2 rounded-full z-10"
+        className={`absolute top-1/2 left-4 transform -translate-y-1/2 text-white p-2 rounded-full z-10 ${images[current].background === "white" ? "bg-white-primary/50 hover:bg-white-primary/70" : "bg-black-primary/50 hover:bg-black-primary/70"}`}
       >
         <ChevronLeft className="h-5 w-5" />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-2 rounded-full z-10"
+        className={`absolute top-1/2 right-4 transform -translate-y-1/2 text-white p-2 rounded-full z-10 ${images[current].background === "white" ? "bg-white-primary/50 hover:bg-white-primary/70" : "bg-black-primary/50 hover:bg-black-primary/70"}`}
       >
         <ChevronRight className="h-5 w-5" />
       </button>
