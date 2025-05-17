@@ -97,8 +97,8 @@ export default function ProductGrid() {
 
   return (
     <>
-      <h3 className="text-[1.3em] text-red-primary text-center border-b py-3">
-        Danh Sách Sản Phẩm
+      <h3 className="text-[1.3em] text-center border-b pb-2">
+        {t("product_list")}
       </h3>
       <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
         {products.map((product) => (
