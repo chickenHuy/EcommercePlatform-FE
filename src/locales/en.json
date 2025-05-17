@@ -590,7 +590,10 @@
     "text_suggest_for_you": "Suggest for you",
     "text_product_photo": "Product photo",
     "text_store_not_found": "Store not found",
-    "text_number_product": "Number products: "
+    "text_number_product": "Number products: ",
+    "product_category": "Product Category",
+    "best_selling_products": "Best Selling Products",
+    "product_list": "Products List"
   },
   "Slug": {
     "text_oops": "Oops! No product found",

@@ -592,7 +592,10 @@
     "text_suggest_for_you": "Gợi ý cho bạn",
     "text_product_photo": "Ảnh sản phẩm",
     "text_store_not_found": "Không tìm thấy cửa hàng",
-    "text_number_product": "Số sản phẩm: "
+    "text_number_product": "Số sản phẩm: ",
+    "product_category": "Danh Mục Sản Phẩm",
+    "best_selling_products": "Sản Phẩm Bán Chạy",
+    "product_list": "Danh Sách Sản Phẩm"
   },
   "Slug": {
     "text_oops": "Oops! Không tìm thấy sản phẩm",
