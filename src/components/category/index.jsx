@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getAllCategory } from "@/api/user/categoryRequest";
-import IconNotFound from "../../../public/images/iconNotFound.png";
+import IconNotFound from "../../../public/images/categoryNotFound.png";
 import { useTranslations } from "next-intl";
 
 const ListCategoryComponent = () => {
