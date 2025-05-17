@@ -60,36 +60,41 @@ export default function ShoppingCard({ t }) {
           {t("text_new_products_added")}
         </h3>
       </div>
-      <div className="max-h-[400px] overflow-y-auto flex flex-col gap-1 p-2">
+      <div className="max-h-[400px] overflow-y-auto flex no-scrollbar flex-col gap-1 p-2">
         {cartItems.map((item) => (
           <Link
             href={`/${item.slug}`}
             key={item.id}
-            className="flex items-center gap-2 p-1 border border-white-secondary shadow-sm rounded-md"
+            className="w-full flex flex-col items-center gap-2 p-1 border border-white-secondary shadow-sm rounded-md"
           >
-            <Image
-              src={item.image || ShopEmpty}
-              alt={item.name}
-              width={100}
-              height={100}
-              className="object-contain rounded-sm w-14 h-14 shadow-sm border"
-            />
-            <div className="flex-grow">
-              <h4 className="text-[.9em] truncate">
-                {item.name}
-              </h4>
-              <p className="text-[.9em] text-red-primary">
-                ₫{item.salePrice.toLocaleString()}
-              </p>
+            <div className="w-full flex flex-row items-center gap-2">
+              <Image
+                src={item.image || ShopEmpty}
+                alt={item.name}
+                width={100}
+                height={100}
+                className="object-contain rounded-sm w-14 h-14 shadow-sm border"
+              />
+              <div className="w-full flex-grow truncate">
+                <h4 className="text-[.9em]">
+                  {item.name}
+                </h4>
+                <p className="text-[.9em] text-red-primary">
+                  ₫{item.salePrice.toLocaleString()}
+                </p>
+              </div>
             </div>
-            {item.value && (
-              item.value.map((value) => (
-              <Badge key={value} className="bg-white-primary text-red-primary border rounded-sm truncate">
-                  {value}
-              </Badge>
+            <div className="w-full flex flex-row items-center justify-end gap-2">
+              {item.value && (
+                item.value.map((value) => (
+                  <Badge key={value} className="bg-white-primary text-red-primary border rounded-sm truncate">
+                    {value}
+                  </Badge>
 
-              ))
-            )}
+                ))
+              )}
+            </div>
+
           </Link>
         ))}
       </div>
