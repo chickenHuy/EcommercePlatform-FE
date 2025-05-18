@@ -186,6 +186,10 @@
   -ms-overflow-style: none;
 }
 
+.main_grid_layout {
+  display: flex;
+}
+
 /* Disable UI */
 .rdp-weekdays {
   display: none;
