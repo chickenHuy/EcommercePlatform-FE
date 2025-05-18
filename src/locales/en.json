@@ -592,7 +592,9 @@
     "text_product_photo": "Product photo",
     "text_store_not_found": "Store not found",
     "text_number_product": "Number products: ",
-    "product_category": "Product Category",
+    "list_category": "Categories List",
+    "list_brand": "Brands List",
+    "see_all": "See All",
     "best_selling_products": "Best Selling Products",
     "product_list": "Products List"
   },
