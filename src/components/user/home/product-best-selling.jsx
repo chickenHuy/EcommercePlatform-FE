@@ -41,14 +41,14 @@ export default function ProductBestSelling() {
   };
 
   const SkeletonItem = () => (
-    <div className="skeleton-item flex flex-col lg:min-w-[250px] sm:min-w-[200px] min-w-[100px] aspect-[3/4]">
+    <div className="skeleton-item flex flex-col lg:min-w-[200px] sm:min-w-[150px] min-w-[100px] aspect-[3/4]">
       <div className="skeleton-line w-full h-3/4" />
       <div className="skeleton-line w-full h-1/4" />
     </div>
   );
 
   return (
-    <div className="w-full h-fit flex flex-row justify-start items-center bg-black-secondary lg:py-14 sm:py-10 py-8 rounded-xl shadow-sm">
+    <div className="w-full h-fit flex flex-row justify-start items-center bg-black-secondary lg:py-12 sm:py-10 py-8 sm:rounded-xl rounded-md">
       <Toaster />
       <div className="lg:min-w-[200px] sm:min-w-[150px] min-w-[100px] text-white-primary flex flex-col justify-center items-center gap-3 h-fit px-3 relative">
         <ChartNoAxesCombined className="lg:w-20 lg:h-20 w-10 h-10" />
@@ -85,7 +85,7 @@ export default function ProductBestSelling() {
           : listProduct.map((product, index) => (
               <div
                 key={product.id || index}
-                className="lg:min-w-[250px] sm:min-w-[200px] min-w-[100px]"
+                className="lg:min-w-[200px] sm:min-w-[150px] min-w-[100px]"
               >
                 <ProductCard
                   name={product.name}
