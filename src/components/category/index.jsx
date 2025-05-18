@@ -80,14 +80,14 @@ const ListCategoryComponent = ({ isPage = false }) => {
       <div className="w-full h-fit flex flex-row justify-between items-center px-3">
         {!isPage ? (
           <>
-            <h3 className="text-[1.2em] font-[900]">{t("product_category")}</h3>
+            <h3 className="text-[1.2em] font-[900]">{t("list_category")}</h3>
             <Link className="underline" href="/categories">
-              See All
+              {t("see_all")}
             </Link>
           </>
         ) : (
           <h3 className="sm:text-[2.2em] text-[1.5em] font-[900] w-full text-center animate-fade-in">
-            {t("product_category").toUpperCase()}
+            {t("list_category").toUpperCase()}
           </h3>
         )}
       </div>
