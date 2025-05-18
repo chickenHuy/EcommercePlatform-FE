@@ -18,10 +18,12 @@ import ListCategoryComponent from "@/components/category";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import useInView from "@/hooks/use-visible";
+import ListBrandComponent from "@/components/brand";
 
 export default function HomePage() {
   const [refBestSelingProduct, isBestSelingProduct] = useInView();
   const [refListCategory, isListCategory] = useInView();
+  const [refListBrand, isListBrand] = useInView();
 
   const images = [
     {
@@ -138,6 +140,12 @@ export default function HomePage() {
         className={`sm:px-3 px-1 xl:pt-14 lg:pt-10 sm:pt-8 pt-6 ${isBestSelingProduct ? "animate-fade-in-up" : "opacity-0"}`}
       >
         <ProductBestSelling />
+      </div>
+      <div
+        ref={refListBrand}
+        className={`w-full h-fit xl:pt-14 lg:pt-10 sm:pt-8 pt-6 ${isListBrand ? "animate-fade-in-up" : "opacity-0"}`}
+      >
+        <ListBrandComponent />
       </div>
 
       <ProductGrid />
