@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 import { getAllCategory, getCategoryPage } from "@/api/user/categoryRequest";
 import IconNotFound from "../../../public/images/categoryNotFound.png";
 import { useTranslations } from "next-intl";
@@ -27,7 +27,7 @@ const ListCategoryComponent = ({ isPage = false }) => {
 
           const categoriesWithHeight = categories.map((element) => ({
             ...element,
-            height: Math.random() * (window.innerWidth/4) + 200,
+            height: Math.random() * (window.innerWidth / 4) + 200,
           }));
 
           setListCategory(categoriesWithHeight);
@@ -55,11 +55,14 @@ const ListCategoryComponent = ({ isPage = false }) => {
   };
 
   const SkeletonItem = () => {
-    const height = Math.random() * (window.innerWidth/4) + 200;
+    const height = Math.random() * (window.innerWidth / 4) + 200;
 
     if (isPage) {
       return (
-        <div style={{ height: height }} className="skeleton-item relative sm:mb-5 mb-3">
+        <div
+          style={{ height: height }}
+          className="skeleton-item relative sm:mb-5 mb-3"
+        >
           <div className="skeleton-line w-[80%] sm:h-[40px] h-[20px] absolute bottom-5" />
         </div>
       );
@@ -144,6 +147,7 @@ const ListCategoryComponent = ({ isPage = false }) => {
               className="lg:w-[150px] lg:h-[300px] sm:w-[100px] sm:h-[200px] w-[50px] h-[100px] flex-shrink-0 flex justify-center items-center bg-white-secondary/50 hover:bg-white-secondary rounded-xl"
             >
               See All
+              <ChevronsRight className="p-1" />
             </Link>
           </div>
 
