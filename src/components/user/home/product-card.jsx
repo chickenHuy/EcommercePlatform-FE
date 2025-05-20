@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ProductPlaceHoler } from "@/assets/images/productPlaceholder.png";
 
-export default function ProductCard({ listProduct, loadRef, hasNext, loadPage }) {
+export default function ProductCard({ listProduct, loadRef, hasNext, loadPage, isPage }) {
     const formatPrice = (price) => {
         if (price < 1000000000) {
             return new Intl.NumberFormat("vi-VN", {
@@ -34,7 +34,8 @@ export default function ProductCard({ listProduct, loadRef, hasNext, loadPage })
         <div className="w-full md:px-20 px-4 pb-4 mt-8">
             <div className="flex flex-col mb-4 space-y-[8px]">
                 <Label className="text-3xl font-bold text-center text-red-primary">
-                    Sản phẩm gợi ý
+                    {isPage === "home" && 'Sản phẩm gợi ý'}
+                    {isPage === "slug" && 'CÓ THỂ BẠN CŨNG THÍCH'}
                 </Label>
                 <div className="w-full h-[2px] bg-red-primary bg-opacity-75"></div>
             </div>
@@ -50,8 +51,9 @@ export default function ProductCard({ listProduct, loadRef, hasNext, loadPage })
                                 <div className="relative aspect-square">
                                     <video
                                         src={product.videoUrl}
-                                        loop
+                                        autoPlay
                                         muted
+                                        loop
                                         playsInline
                                         className="w-full h-full object-cover"
                                     />

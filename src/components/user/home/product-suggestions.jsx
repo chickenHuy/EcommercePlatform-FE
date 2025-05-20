@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { ProductPlaceHoler } from "@/assets/images/productPlaceholder.png"
 import { getAccount } from "@/api/user/accountRequest"
 import { getRecommendListProduct } from "@/api/ai/recommendRequest"
 import ProductCard from "./product-card"
@@ -97,6 +96,7 @@ export default function ProductSuggestions() {
       loadRef={loadRef}
       hasNext={hasNext}
       loadPage={loadPage}
+      isPage="home"
     />
   } else {
     return <ProductCard
@@ -104,6 +104,7 @@ export default function ProductSuggestions() {
       loadRef={loadRef}
       hasNext={hasNext}
       loadPage={loadPage}
+      isPage="home"
     />
   }
 }

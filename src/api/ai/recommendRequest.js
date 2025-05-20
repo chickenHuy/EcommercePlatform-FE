@@ -22,10 +22,10 @@ export const getRecommendListProduct = async (userId, currentPage, pageSize, lim
   }
 };
 
-export const getRecommendProduct = async (productId) => {
+export const getRecommendProduct = async (productId, currentPage, pageSize, limitAll) => {
   try {
     const response = await fetch(
-      `http://localhost:5000/api/v1/ai/recommend/product?product_id=${productId}&page=${1}&size=${48}&limit_all=${240}`,
+      `http://localhost:5000/api/v1/ai/recommend/product?product_id=${productId}&page=${currentPage}&size=${pageSize}&limit_all=${limitAll}`,
       {
         method: "GET",
         headers: {

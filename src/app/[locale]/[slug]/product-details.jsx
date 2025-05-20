@@ -364,7 +364,7 @@ export default function ProductDetail({ product, t }) {
                 <Store className="mr-2"></Store>
                 {t("text_view_shop")}
               </Button>
-              <StoreChat storeId={product.store.id} productId={productId}  websocketUrl={"http://localhost:8080/api/v1/ws"} isStore={false} t={t} />
+              <StoreChat storeId={product.store.id} productId={productId} websocketUrl={"http://localhost:8080/api/v1/ws"} isStore={false} t={t} />
             </div>
           </div>
         </div>
@@ -384,7 +384,7 @@ export default function ProductDetail({ product, t }) {
 
         <Separator className="my-8" />
 
-        <ProductDetailSuggestions productId={product.id} t={t} />
+        <ProductDetailSuggestions productId={product.id} />
 
         <div className="mx-auto px-4 bg-white-primary">
           <Suspense fallback={<Loading></Loading>}>
