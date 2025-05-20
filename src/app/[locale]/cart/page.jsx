@@ -103,8 +103,6 @@ export default function CartUser() {
       localStorage.getItem("listCartItemFromOrder") || "[]"
     );
 
-    console.log("listCartItemFromOrder: ", listCartItemFromOrder);
-
     if (listCartItemFromOrder.length > 0 && listCart.length > 0) {
       const updatedSelectedListCartItem = listCartItemFromOrder
         .map((newItem) => {
@@ -485,7 +483,6 @@ export default function CartUser() {
         ),
       }))
       .filter((cart) => cart.items.length > 0);
-    console.log("selectedCartWithItem: ", selectedCartWithItem);
     if (selectedCartWithItem.length === 0) {
       toast({
         title: t("toast_title_fail"),

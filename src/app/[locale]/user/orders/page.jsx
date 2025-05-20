@@ -72,7 +72,7 @@ export default function OrderUser() {
         listOrderItem.map(async (orderItem) => {
           const response = await addToCart({
             productId: orderItem.productId,
-            variantId: orderItem.variantId,
+            variantId: orderItem.variantId === null ? "" : orderItem.variantId,
             quantity: 1,
           });
           dispatch(changeQuantity((prev) => prev + 1));
@@ -83,7 +83,7 @@ export default function OrderUser() {
       localStorage.setItem("listCartItemFromOrder", JSON.stringify(listCartItemFromOrder));
       router.push("/cart");
     } catch (error) {
-      toast({ title: "Mua lại thất bại", description: error.message, variant: "destructive" });
+      toast({ title: t("text_repurchase_fail"), description: error.message, variant: "destructive" });
     }
   };
 
@@ -109,7 +109,7 @@ export default function OrderUser() {
     try {
       await cancelOrderByUser(orderToCancel.id);
       toast({
-        description: t("text_toast_cancel", {orderId: orderToCancel.id})
+        description: t("text_toast_cancel", { orderId: orderToCancel.id })
       });
       fetchAllOrderByUser(true);
       setOpenDialog(false);
@@ -117,7 +117,7 @@ export default function OrderUser() {
       toast({
         title: t("text_toast_fail"),
         description: error.message,
-        variant: "destructive" 
+        variant: "destructive"
       });
     }
   };
