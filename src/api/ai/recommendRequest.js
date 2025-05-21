@@ -1,7 +1,7 @@
-export const getRecommendListProduct = async (userId) => {
+export const getRecommendListProduct = async (userId, currentPage, pageSize, limitAll, limitUser, limitOne) => {
   try {
     const response = await fetch(
-      `http://localhost:5000/api/v1/ai/recommend/list_product?user_id=${userId}&page=${1}&size=${48}&limit_all=${240}&limit_user=${240}&limit_one=${240}`,
+      `http://localhost:5000/api/v1/ai/recommend/list_product?user_id=${userId}&page=${currentPage}&size=${pageSize}&limit_all=${limitAll}&limit_user=${limitUser}&limit_one=${limitOne}`,
       {
         method: "GET",
         headers: {
@@ -22,10 +22,10 @@ export const getRecommendListProduct = async (userId) => {
   }
 };
 
-export const getRecommendProduct = async (productId) => {
+export const getRecommendProduct = async (productId, currentPage, pageSize, limitAll) => {
   try {
     const response = await fetch(
-      `http://localhost:5000/api/v1/ai/recommend/product?product_id=${productId}&page=${1}&size=${48}&limit_all=${240}`,
+      `http://localhost:5000/api/v1/ai/recommend/product?product_id=${productId}&page=${currentPage}&size=${pageSize}&limit_all=${limitAll}`,
       {
         method: "GET",
         headers: {

@@ -401,7 +401,8 @@
       "text_ask_about_product": "Hỏi về đơn hàng",
       "text_note": "Ghi chú:",
       "text_toast_cancel": "Đơn hàng {orderId} đã được hủy thành công",
-      "text_toast_fail": "Thất bại"
+      "text_toast_fail": "Thất bại",
+      "text_repurchase_fail": "Mua lại thất bại"
     },
     "account": {
       "title": "Tài khoản của tôi",

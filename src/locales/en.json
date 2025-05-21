@@ -400,7 +400,8 @@
       "text_ask_about_product": "Ask about order",
       "text_note": "Note:",
       "text_toast_cancel": "Order {orderId} has been successfully canceled",
-      "text_toast_fail": "Failed"
+      "text_toast_fail": "Failed",
+      "text_repurchase_fail": "Repurchase failed"
     },
     "account": {
       "title": "My Account",
