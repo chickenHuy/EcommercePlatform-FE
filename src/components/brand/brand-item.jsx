@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import IconNotFound from "../../../public/images/categoryNotFound.png";
 import useInView from "@/hooks/use-visible";
+import Link from "next/link";
 
 const BrandCard = ({ brand }) => {
   const [ref, isInView] = useInView();
@@ -22,11 +23,12 @@ const BrandCard = ({ brand }) => {
   }, []);
 
   return (
-    <div
+    <Link
       ref={(el) => {
         ref.current = el;
         containerRef.current = el;
       }}
+      href={`/search?brandId=${brand.id}`}
       style={{ height: brand.height }}
       className={`w-full h-full flex flex-col items-center gap-2 relative group mb-3 sm:mb-5 ${isInView ? "animate-fade-in-up" : "opacity-0"}`}
     >
@@ -52,7 +54,7 @@ const BrandCard = ({ brand }) => {
           {brand.name.toUpperCase()}
         </p>
       )}
-    </div>
+    </Link>
   );
 };
 

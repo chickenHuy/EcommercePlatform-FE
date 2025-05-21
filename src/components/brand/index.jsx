@@ -27,7 +27,10 @@ const ListBrandComponent = ({ isPage = false }) => {
 
           const brandsWithHeight = brands.map((element) => ({
             ...element,
-            height: Math.random() * (window.innerWidth / 10) + 150 + window.innerWidth/30,
+            height:
+              Math.random() * (window.innerWidth / 10) +
+              150 +
+              window.innerWidth / 30,
           }));
 
           setListBrand(brandsWithHeight);
@@ -121,7 +124,8 @@ const ListBrandComponent = ({ isPage = false }) => {
                   <SkeletonItem key={index} />
                 ))
               : listBrand.map((brand) => (
-                  <div
+                  <Link
+                    href={`/search?brandId=${brand.id}`}
                     key={brand.id}
                     className="lg:w-[200px] lg:h-[200px] sm:w-[150px] sm:h-[150px] w-[70px] h-[70px] flex-shrink-0 flex flex-col items-center gap-2 relative group"
                   >
@@ -136,7 +140,7 @@ const ListBrandComponent = ({ isPage = false }) => {
                     <p className="w-[80%] sm:p-2 p-1 sm:rounded-md rounded-sm absolute top-[45%] lg:text-[.9em] sm:text-[.8em] text-[.7em] text-white-primary text-center truncate backdrop-blur-sm bg-white-tertiary/50 group-hover:block hidden animate-fade-in-quick">
                       {brand.name.toUpperCase()}
                     </p>
-                  </div>
+                  </Link>
                 ))}
           </div>
         </>
