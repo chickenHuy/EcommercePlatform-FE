@@ -148,7 +148,7 @@ export default function ProductGrid({ maxCol = 6 }) {
           </div>
         )}
       </div>
-      {products && products.length === 0 && (
+      {!loading && products && products.length === 0 && (
         <Image src={Empty} alt="Order Not Found" className="w-1/2 mx-auto" />
       )}
     </>
