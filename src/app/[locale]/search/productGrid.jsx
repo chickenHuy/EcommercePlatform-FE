@@ -8,9 +8,11 @@ import { get, post } from "@/lib/httpClient";
 import { setWishList } from "@/store/features/wishListSlice";
 import { useTranslations } from "next-intl";
 import clsx from "clsx";
+import Empty from "@/assets/images/ReviewEmpty.png";
+import Image from "next/image";
 
 export default function ProductGrid({ maxCol = 6 }) {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
@@ -108,8 +110,8 @@ export default function ProductGrid({ maxCol = 6 }) {
 
   return (
     <>
-      <div className={`grid gap-3 grid-cols-2 ${gridCols}`}>
-        {products.map((product) => (
+      <div className={`w-full grid gap-3 grid-cols-2 ${gridCols}`}>
+        {products?.map((product) => (
           <ProductCard
             key={product.id}
             productId={product.id}
@@ -126,9 +128,9 @@ export default function ProductGrid({ maxCol = 6 }) {
           />
         ))}
         {hasMore && (
-          <div ref={ref} className="col-span-full flex justify-center">
+          <div ref={ref} className="w-full col-span-full flex justify-center">
             {loading && (
-              <div className="w-full grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+              <div className={`w-full grid gap-3 grid-cols-2 ${gridCols}`}>
                 <SkeletonItem />
                 <SkeletonItem />
                 <SkeletonItem />
@@ -146,6 +148,9 @@ export default function ProductGrid({ maxCol = 6 }) {
           </div>
         )}
       </div>
+      {products && products.length === 0 && (
+        <Image src={Empty} alt="Order Not Found" className="w-1/2 mx-auto" />
+      )}
     </>
   );
 }

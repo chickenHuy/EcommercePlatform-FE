@@ -132,7 +132,7 @@ export default function SearchPage() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-auto p-4">
+          <div className="flex-1 overflow-auto w-full p-4">
             <Suspense fallback={<Loading />}>
               <ProductGrid maxCol={4} t={t} />
             </Suspense>
