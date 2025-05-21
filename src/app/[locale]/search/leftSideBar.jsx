@@ -27,11 +27,13 @@ import {
   setRating as setSelectedRating,
   setCategories as setSelectedCategories,
 } from "@/store/features/userSearchSlice";
+import { useSearchParams } from "next/navigation";
 
 export default function ModernLeftSideBar({ t }) {
   const [categories, setCategories] = React.useState(null);
   const [brands, setBrands] = React.useState([]);
   const [isLoadingBrands, setIsLoadingBrands] = React.useState(true);
+  const searchParam = useSearchParams();
   const minPrice = useSelector((state) => state.searchFilter.minPrice);
   const maxPrice = useSelector((state) => state.searchFilter.maxPrice);
   const dispatch = useDispatch();
@@ -40,6 +42,8 @@ export default function ModernLeftSideBar({ t }) {
   );
   const ratings = [5, 4, 3, 2, 1];
   const selectedRating = useSelector((state) => state.searchFilter.rating);
+
+  console.log(selectedBrands);
 
   const handlePriceChange = (value) => {
     dispatch(setMinPrice(value[0]));
@@ -55,8 +59,29 @@ export default function ModernLeftSideBar({ t }) {
   );
 
   React.useEffect(() => {
-    console.log(selectedCategory + " HAA");
-  }, [selectedCategory]);
+    dispatch(resetFilters());
+  }, []);
+
+  React.useEffect(() => {
+    if (!categories) return;
+
+    const brandIdFromURL = Number(searchParam.get("brandId")) || null;
+    const categoryIdFromURL = Number(searchParam.get("categoryId")) || null;
+
+    if (brandIdFromURL && !selectedBrands.includes(brandIdFromURL)) {
+      dispatch(setSelectedBrands([brandIdFromURL]));
+    }
+
+    if (categoryIdFromURL) {
+      const categoryIdNumber = parseInt(categoryIdFromURL, 10);
+      dispatch(setMainCategoryId(categoryIdNumber));
+      const childCategoryIds = getChildCategoryIds(
+        categories,
+        categoryIdNumber,
+      );
+      dispatch(setSelectedCategories(childCategoryIds));
+    }
+  }, [categories]);
 
   const handleBrandChange = (brand, checked) => {
     checked

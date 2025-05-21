@@ -23,14 +23,14 @@ const ProductGrid = lazy(() => import("./productGrid"));
 export default function SearchPage() {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+
   const searchParam = useSearchParams();
   const dispatch = useDispatch();
   const t = useTranslations("Search");
-
+  const storeId = searchParam.get("storeId");
   const order = useSelector((state) => state.searchFilter.order);
   const sortBy = useSelector((state) => state.searchFilter.sortBy);
-  const storeId = searchParam.get("storeId");
-  const [isDesktop, setIsDesktop] = useState(false);
 
   const handleOrderChange = () => {
     if (!order) {
