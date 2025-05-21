@@ -1,70 +1,59 @@
 import Link from "next/link";
-import { Home } from "lucide-react";
 import Image from "next/image";
-import Placeholder from "@/assets/images/placeholder.png";
+import { Home } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { getCategory } from "@/api/search/searchApi";
 
-export default function SearchHeader({t}) {
+export default function SearchHeader({ t }) {
   const mainCategoryId = useSelector(
-    (state) => state.searchFilter.mainCategoryId
+    (state) => state.searchFilter.mainCategoryId,
   );
-
   const keyword = useSelector((state) => state.searchFilter.search);
   const [category, setCategory] = useState(null);
+
   useEffect(() => {
     if (mainCategoryId) {
       getCategory(mainCategoryId)
-        .then((data) => {
-          setCategory(data.result);
-        })
-        .catch((error) => {
-          console.log(error)
-        });
+        .then((data) => setCategory(data.result))
+        .catch((error) => console.error(error));
     }
   }, [mainCategoryId]);
+
+  if (mainCategoryId) {
+    return (
+      <div className="relative w-full aspect-[3/2] max-h-[600px] animate-fade-in">
+        {category?.image_url && (
+          <Image
+            src={category?.image_url}
+            alt="Background"
+            fill
+            className="object-cover rounded-xl shadow-md"
+          />
+        )}
+        <div className="absolute bottom-5 left-5 w-fit h-fit lg:p-10 p-5 rounded-xl flex flex-col justify-center items-start backdrop-blur-md bg-black-primary/30 animate-fade-in-up">
+          <div className="flex items-center space-x-2 lg:text-[1em] text-[.9em] text-white-primary">
+            <Link href="/">
+              <Home className="p-1" />
+            </Link>
+            <span>/</span>
+            <Link href="/categories">{t("text_category")}</Link>
+            <span>/</span>
+            <span>{category?.name}</span>
+          </div>
+
+          <h1 className="lg:text-[4em] sm:text-[2.5em] text-[1.5em] font-[900] text-white-primary">
+            {category?.name}
+          </h1>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <>
-      {" "}
-      {mainCategoryId ? (
-        <div className="relative min-h-[360px] bg-[#14161F]">
-          <div className="absolute inset-0">
-            <Image
-              src={category?.image_url ? category.image_url : Placeholder}
-              alt="Headphone background"
-              fill
-              className="object-cover object-center opacity-50"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#e9e9e9]/20 via-[#e9e9e9]/50 to-transparent" />
-          </div>
-
-          <div className="relative container mx-auto px-12 pt-[160px]">
-            <div className="flex items-center space-x-2 text-sm text-white-primary">
-              <Link href="/" className="">
-                <Home className="h-4 w-4" />
-              </Link>
-              /
-              <Link href="/category" className="">
-                {t("text_category")}
-              </Link>
-              /<h1 className="text-white-primary">{category?.name}</h1>
-            </div>
-
-            <h1 className="mt-4 text-[80px] font-light leading-tight tracking-tight text-white-primary">
-              {category?.name}
-            </h1>
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-center min-h-[100px] bg-black-primary ">
-          <div className="mx-auto pt-20 pb-2 text-white-primary">
-            {t("text_search_result")} "
-            <span className="text-red-primary">{keyword}</span>"
-          </div>
-        </div>
-      )}
-    </>
+    <div className="w-fit h-fit mx-auto px-10 py-1 bg-black-primary rounded-full text-white-primary animate-fade-in">
+      {t("text_search_result")}
+      <span className="text-red-primary pl-2">{'"' + keyword + '"'}</span>
+    </div>
   );
 }

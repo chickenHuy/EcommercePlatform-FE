@@ -7,8 +7,9 @@ import { useInView } from "react-intersection-observer";
 import { get, post } from "@/lib/httpClient";
 import { setWishList } from "@/store/features/wishListSlice";
 import { useTranslations } from "next-intl";
+import clsx from "clsx";
 
-export default function ProductGrid() {
+export default function ProductGrid({ maxCol = 6 }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -19,6 +20,17 @@ export default function ProductGrid() {
   const searchParams = useSelector((state) => state.searchFilter);
   const limit = 16;
 
+  const gridCols = clsx("grid-cols-2", {
+    "sm:grid-cols-2": maxCol === 4,
+    "sm:grid-cols-3": maxCol >= 6,
+
+    "lg:grid-cols-2": maxCol === 4,
+    "lg:grid-cols-4": maxCol >= 6,
+
+    "xl:grid-cols-4": maxCol === 4,
+    "xl:grid-cols-6": maxCol >= 6,
+  });
+
   const favorites = useSelector((state) => state.wishListReducer.wishList);
   const dispatch = useDispatch();
 
@@ -27,7 +39,6 @@ export default function ProductGrid() {
       if (loading || (!hasMore && !isInitialLoad) || page == null) return;
       setLoading(true);
       try {
-        console.log("searchParams" + searchParams);
         const res = await searchProducts({
           ...searchParams,
           page: isInitialLoad ? 1 : page,
@@ -97,10 +108,7 @@ export default function ProductGrid() {
 
   return (
     <>
-      <h3 className="text-[1.3em] text-center border-b pb-2">
-        {t("product_list")}
-      </h3>
-      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+      <div className={`grid gap-3 grid-cols-2 ${gridCols}`}>
         {products.map((product) => (
           <ProductCard
             key={product.id}
