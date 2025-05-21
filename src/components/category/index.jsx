@@ -124,7 +124,8 @@ const ListCategoryComponent = ({ isPage = false }) => {
                   <SkeletonItem key={index} />
                 ))
               : listCategory.map((category) => (
-                  <div
+                  <Link
+                    href={`/search?categoryId=${category.id}`}
                     key={category.id}
                     className="lg:w-[300px] lg:h-[300px] sm:w-[200px] sm:h-[200px] w-[100px] h-[100px] flex-shrink-0 flex flex-col items-center gap-2 relative group"
                   >
@@ -139,7 +140,7 @@ const ListCategoryComponent = ({ isPage = false }) => {
                     <p className="w-[80%] sm:p-2 p-1 sm:rounded-md rounded-sm absolute sm:bottom-5 bottom-3 lg:text-[.9em] sm:text-[.8em] text-[.7em] text-white-primary text-center truncate backdrop-blur-sm bg-white-tertiary/50 group-hover:block hidden animate-fade-in-quick">
                       {category.name.toUpperCase()}
                     </p>
-                  </div>
+                  </Link>
                 ))}
             <Link
               key="see_all"

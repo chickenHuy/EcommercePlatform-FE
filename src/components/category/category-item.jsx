@@ -1,13 +1,15 @@
 import Image from "next/image";
 import IconNotFound from "../../../public/images/categoryNotFound.png";
 import useInView from "@/hooks/use-visible";
+import Link from "next/link";
 
 const CategoryCard = ({ category }) => {
   const [ref, isInView] = useInView();
 
   return (
-    <div
+    <Link
       ref={ref}
+      href={`search?categoryId=${category.id}`}
       style={{ height: category.height }}
       className={`w-full flex flex-col items-center gap-2 relative group mb-3 sm:mb-5 ${isInView ? "animate-fade-in-up" : "opacity-0"}`}
     >
@@ -24,7 +26,7 @@ const CategoryCard = ({ category }) => {
           {category.name.toUpperCase()}
         </p>
       )}
-    </div>
+    </Link>
   );
 };
 
