@@ -82,7 +82,7 @@ const ListBrandComponent = ({ isPage = false }) => {
 
   return (
     <div className="relative w-full h-fit">
-      <div className="w-full h-fit flex flex-row justify-between items-center px-10">
+      <div className="w-full h-fit flex flex-row justify-between items-center px-3">
         {!isPage ? (
           <>
             <h3 className="text-[1.2em] font-[900]">{t("list_brand")}</h3>
