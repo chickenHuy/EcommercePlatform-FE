@@ -8,28 +8,30 @@ import {
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-export function ProductSpecifications({components,t}) {
+export function ProductSpecifications({ components, t }) {
   const validComponents = components.filter(
-    (component) => component.value && component.value.trim() !== ""
+    (component) => component.value && component.value.trim() !== "",
   );
 
   if (validComponents.length === 0) {
-    return (<></>);
+    return <></>;
   }
 
   return (
     <Card className="border-none shadow-none">
-      <CardHeader className="">
-        <CardTitle className="text-2xl font-bold">{t("text_specifications")}</CardTitle>
+      <CardHeader className="px-0">
+        <CardTitle className="text-[1.5em] text-center">
+          {t("text_specifications")}
+        </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-0">
         <Table>
-          <TableHeader className="hover">
-            <TableRow className="bg-black-primary bg-opacity-90">
-              <TableHead className="text-white-primary font-semibold">
+          <TableHeader>
+            <TableRow className="bg-black-primary hover:bg-black-primary">
+              <TableHead className="text-white-primary text-[1em] border-t-black-primary border-l-black-primary">
                 {t("text_name")}
               </TableHead>
-              <TableHead className="text-white-primary font-semibold">
+              <TableHead className="text-white-primary text-[1em] border-t-black-primary border-r-black-primary">
                 {t("text_value")}
               </TableHead>
             </TableRow>
@@ -39,15 +41,13 @@ export function ProductSpecifications({components,t}) {
               <TableRow
                 key={component.valueId}
                 className={
-                  index % 2 === 0
-                    ? "bg-white-primary"
-                    : "bg-blue-primary bg-opacity-50"
+                  index % 2 === 0 ? "bg-white-primary" : "bg-blue-tertiary hover:bg-blue-tertiary"
                 }
               >
-                <TableCell className="font-medium text-black-primary w-1/3 text-center">
+                <TableCell className="text-[1em] w-1/3 text-center">
                   {component.name}
                 </TableCell>
-                <TableCell className="text-black-primary text-center">
+                <TableCell className="text-[1em] w-2/3 text-center">
                   {component.value}
                 </TableCell>
               </TableRow>
