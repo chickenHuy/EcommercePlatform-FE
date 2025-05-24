@@ -1,5 +1,5 @@
 import { usePathname } from "next/navigation";
-import OpenCageGeocoder from 'opencage-api-client';
+import OpenCageGeocoder from "opencage-api-client";
 
 // Detect the current locale of the website
 export const localeDetector = () => {
@@ -40,3 +40,37 @@ export const formatCurrency = (value) => {
   });
   return value < 0 ? `- ${formatted}` : formatted;
 };
+
+// Get first frame of video in Cloudinary
+export function getCloudinaryThumbnail(videoUrl, options = {}) {
+  const {
+    offset = 1,
+    width = 400,
+    height = 300,
+    crop = "fill",
+    quality = "auto",
+    format = "jpg",
+  } = options;
+
+  try {
+    const url = new URL(videoUrl);
+    const parts = url.pathname.split("/");
+
+    const uploadIndex = parts.indexOf("upload");
+    if (uploadIndex === -1) throw new Error("Invalid Cloudinary URL");
+
+    const transformation = `so_${offset},w_${width},h_${height},c_${crop},q_${quality}`;
+    parts.splice(uploadIndex + 1, 0, transformation);
+    parts[parts.length - 1] = parts[parts.length - 1].replace(
+      /\.\w+$/,
+      `.${format}`,
+    );
+
+    url.pathname = parts.join("/");
+    return url.toString();
+  } catch (err) {
+    console.error("Failed to create thumbnail URL:", err.message);
+    return "";
+  }
+}
+
