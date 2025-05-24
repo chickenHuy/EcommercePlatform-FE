@@ -77,11 +77,11 @@ export default function WishlistPopup({ t, isPhone = false }) {
         <DialogTitle />
         <DialogDescription />
 
-        <DialogContent className="sm:min-w-[50%] max-w-[400px] rounded-lg p-0">
-          <h2 className="text-[1.3em] text-center font-[900] border-b py-3">
+        <DialogContent className="sm:min-w-[50%] max-w-[400px] rounded-lg p-0 border-none text-white-primary">
+          <h2 className="text-[1.3em] text-center font-[900] border-b py-3 bg-black-primary rounded-t-lg">
             {t("text_favorite_product")}
           </h2>
-          <div className="max-h-[500px] overflow-auto">
+          <div className="max-h-[500px] overflow-auto text-black-primary">
             <div className="flex flex-col gap-3 p-3">
               {isLoading && <Loading />}
 
