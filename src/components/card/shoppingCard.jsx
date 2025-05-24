@@ -54,8 +54,8 @@ export default function ShoppingCard({ t }) {
   }
 
   return (
-    <Card className="w-[360px] p-0 overflow-auto">
-      <div className="p-3 border-b">
+    <Card className="w-[360px] p-0 overflow-auto border-none">
+      <div className="p-3 border-b bg-black-primary text-white-primary">
         <h3 className="text-[.9em] text-center">
           {t("text_new_products_added")}
         </h3>
@@ -65,47 +65,42 @@ export default function ShoppingCard({ t }) {
           <Link
             href={`/${item.slug}`}
             key={item.id}
-            className="w-full flex flex-col items-center gap-2 p-1 border border-white-secondary shadow-sm rounded-md"
+            className="w-full flex flex-col items-center gap-2 p-1 shadow-md rounded-md"
           >
-            <div className="w-full flex flex-row items-center gap-2">
+            <div className="w-full flex flex-row items-start justify-start gap-2">
               <Image
                 src={item.image || ShopEmpty}
                 alt={item.name}
                 width={100}
                 height={100}
-                className="object-contain rounded-sm w-14 h-14 shadow-sm border"
+                className="object-contain rounded-sm h-full aspect-square shadow-md"
               />
-              <div className="w-full flex-grow truncate">
-                <h4 className="text-[.9em]">
-                  {item.name}
-                </h4>
-                <p className="text-[.9em] text-red-primary">
+              <div className="w-full flex flex-col justify-start items-start flex-grow">
+                <h4 className="text-[.9em] line-clamp-2">{item.name}</h4>
+                <p className="text-[1.1em] text-red-primary">
                   ₫{item.salePrice.toLocaleString()}
                 </p>
+                <div className="w-full flex flex-row flex-wrap items-center justify-end gap-2">
+                  {item.value &&
+                    item.value.map((value) => (
+                      <div
+                        key={value}
+                        className="bg-white-primary text-red-primary border rounded-sm truncate px-2 text-[.9em]"
+                      >
+                        {value}
+                      </div>
+                    ))}
+                </div>
               </div>
             </div>
-            <div className="w-full flex flex-row items-center justify-end gap-2">
-              {item.value && (
-                item.value.map((value) => (
-                  <Badge key={value} className="bg-white-primary text-red-primary border rounded-sm truncate">
-                    {value}
-                  </Badge>
-
-                ))
-              )}
-            </div>
-
           </Link>
         ))}
       </div>
-      <div className="p-2">
-        <div className="text-[.9em] py-2 text-center">
+      <div className="p-2 border-t">
+        <div className="text-[.9em] pb-2 text-center">
           {t("text_count", { count })}
         </div>
-        <Button
-          className="w-full bg-red-primary text-white-primary"
-          asChild
-        >
+        <Button className="w-full bg-red-primary text-white-primary" asChild>
           <Link href="/cart">{t("text_view_cart")}</Link>
         </Button>
       </div>
