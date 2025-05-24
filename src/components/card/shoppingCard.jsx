@@ -5,7 +5,6 @@ import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Badge } from "../ui/badge";
 import { getTop5CartItems } from "@/api/cart/getTop5CartItem";
 import ShopEmpty from "@/assets/images/storeEmpty.jpg";
 import { useSelector } from "react-redux";
@@ -65,7 +64,7 @@ export default function ShoppingCard({ t }) {
           <Link
             href={`/${item.slug}`}
             key={item.id}
-            className="w-full flex flex-col items-center gap-2 p-1 shadow-md rounded-md"
+            className="w-full flex flex-col items-center gap-2 p-1 shadow-sm border rounded-md"
           >
             <div className="w-full flex flex-row items-start justify-start gap-2">
               <Image
@@ -73,7 +72,7 @@ export default function ShoppingCard({ t }) {
                 alt={item.name}
                 width={100}
                 height={100}
-                className="object-contain rounded-sm h-full aspect-square shadow-md"
+                className="object-contain rounded-sm h-full aspect-square shadow-sm"
               />
               <div className="w-full flex flex-col justify-start items-start flex-grow">
                 <h4 className="text-[.9em] line-clamp-2">{item.name}</h4>
