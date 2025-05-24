@@ -1,35 +1,45 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState, Suspense, lazy } from "react";
-import { Star, ShoppingCart, Heart, Minus, Plus, Store } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { ProductSpecifications } from "./product-specifications";
-import StoreEmpty from "@/assets/images/storeEmpty.jpg";
-import { ProductMediaViewer } from "./product-media-viewer";
-import { addToCart } from "@/api/cart/addToCart";
-import { Toaster } from "@/components/ui/toaster";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+
 import { useDispatch, useSelector } from "react-redux";
 import { changeQuantity } from "@/store/features/cartSlice";
-import { useRouter } from "next/navigation";
 import { setStore } from "@/store/features/userSearchSlice";
-import { get, post, put } from "@/lib/httpClient";
 import { setWishList } from "@/store/features/wishListSlice";
+
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Toaster } from "@/components/ui/toaster";
+
 import Loading from "@/components/loading";
 import { useToast } from "@/hooks/use-toast";
-import ProductDetailSuggestions from "./product-detail-suggestions";
 import { StoreChat } from "@/components/chat/storeChat";
+import ProductDetailSuggestions from "./product-detail-suggestions";
+import { ProductMediaViewer } from "./product-media-viewer";
+import { ProductSpecifications } from "./product-specifications";
 
-const ReviewLazy = lazy(() => import("./reviewPage"));
+import StoreEmpty from "@/assets/images/storeEmpty.jpg";
+
+import { Star, ShoppingCart, Heart, Minus, Plus, Store } from "lucide-react";
+
+import { addToCart } from "@/api/cart/addToCart";
+import { get, post, put } from "@/lib/httpClient";
+import Link from "next/link";
+import Reviews from "./reviewPage";
 
 export default function ProductDetail({ product, t }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [availableOptions, setAvailableOptions] = useState({});
-  const [productId, setProductId] = useState(product.id);
+
   const { toast } = useToast();
+
+  const currentPrice = selectedVariant?.salePrice || product.salePrice;
+  const currentOriginalPrice =
+    selectedVariant?.originalPrice || product.originalPrice;
 
   const initializeAvailableOptions = () => {
     const initialOptions = {};
@@ -46,8 +56,8 @@ export default function ProductDetail({ product, t }) {
   const getValidVariants = (attributes) => {
     return product.variants.filter((variant) =>
       Object.entries(attributes).every(([attr, val]) =>
-        variant.values.some((v) => v.attribute === attr && v.value === val)
-      )
+        variant.values.some((v) => v.attribute === attr && v.value === val),
+      ),
     );
   };
 
@@ -67,12 +77,12 @@ export default function ProductDetail({ product, t }) {
           validVariants.flatMap((v) =>
             v.values
               .filter((val) => val.attribute === attr.name)
-              .map((val) => val.value)
-          )
+              .map((val) => val.value),
+          ),
         );
       } else {
         newAvailableOptions[attr.name] = new Set(
-          attr.values.map((v) => v.value)
+          attr.values.map((v) => v.value),
         );
       }
     });
@@ -83,8 +93,8 @@ export default function ProductDetail({ product, t }) {
     ) {
       const exactMatch = validVariants.find((v) =>
         v.values.every(
-          (val) => newSelectedAttributes[val.attribute] === val.value
-        )
+          (val) => newSelectedAttributes[val.attribute] === val.value,
+        ),
       );
       setSelectedVariant(exactMatch || null);
 
@@ -103,10 +113,6 @@ export default function ProductDetail({ product, t }) {
     setQuantity((prev) => Math.max(1, Math.min(prev + change, maxQuantity)));
   };
 
-  const currentPrice = selectedVariant?.salePrice || product.salePrice;
-  const currentOriginalPrice =
-    selectedVariant?.originalPrice || product.originalPrice;
-
   const isAttributeDisabled = (attributeName, value) => {
     if (Object.keys(selectedAttributes).length === 0) return false;
 
@@ -124,9 +130,8 @@ export default function ProductDetail({ product, t }) {
       quantity: quantity,
     };
 
-    console.log(request);
     try {
-      const rs = await addToCart(request);
+      await addToCart(request);
       const qty = oldQuantity + quantity;
       dispatch(changeQuantity(qty));
       toast({
@@ -154,7 +159,7 @@ export default function ProductDetail({ product, t }) {
         .then((res) => {
           dispatch(setWishList(res.result));
         })
-        .catch((err) => {
+        .catch(() => {
           dispatch(setWishList([]));
         });
     } catch (error) {
@@ -172,76 +177,78 @@ export default function ProductDetail({ product, t }) {
     router.push("/search");
   };
 
-
   useEffect(() => {
     const productId = product.id;
     const changeCount = async (productId) => {
       try {
         await put(`/api/v1/view_product/change_count/${productId}`);
       } catch (error) {
-        console.error(error);
+        toast({
+          title: t("toast_title_error_product_wishlist"),
+          description: error.message,
+          variant: "destructive",
+        });
       }
     };
     changeCount(productId);
   }, [product.id]);
 
   return (
-    <div className="flex-col bg-opacity-60 bg-blue-primary">
+    <div className="w-full h-fit xl:px-28 lg:px-20 sm:px-6 px-4 py-20 flex flex-col gap-7">
       <Toaster />
-      <div className="mx-auto px-4 h-1 bg-blue-primary w-3/4"></div>
-      <div className="mx-auto px-4 bg-white-primary mt-20 w-3/4">
-        <div className="grid gap-8 md:grid-cols-2 mt-2">
-          <ProductMediaViewer product={product} />
-          <div
-            className={
-              `space-y-6 mt-2` + product.quantity === 0
-                ? "opacity-50 pointer-events-none relative"
-                : ""
-            }
-          >
+      <div className="w-full h-fit shadow-md rounded-md p-3">
+        <div className="grid gap-7 md:grid-cols-2">
+          <div className="w-full h-fit relative">
             {product.quantity === 0 && (
-              <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
-                <div className="bg-red-primary text-white-primary font-bold text-3xl py-1 px-3 rounded-lg shadow-md transform rotate-45">
+              <div className={`w-full h-full absolute top-0 left-0 z-20`}>
+                <div className="bg-black-primary text-white-primary h-24 absolute w-24 top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full flex items-center justify-center">
                   {t("text_sold_out")}
                 </div>
               </div>
             )}
-
+            <ProductMediaViewer product={product} />
+          </div>
+          <div
+            className={`w-full h-fit flex flex-col gap-3 animate-fade-in ${
+              product.quantity === 0 ? "opacity-50 pointer-events-none" : ""
+            }`}
+          >
             <div>
-              <h1 className="text-3xl font-bold">{product.name}</h1>
-              <div className="mt-2 flex items-center space-x-2">
-                <div className="flex">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`h-5 w-5 ${star <= (product.rating || 0)
-                        ? "text-yellow-primary fill-current"
+              <h1 className="text-[1.1em] sm:text-[1.3em] lg:text-[1.6em] line-clamp-2">
+                {product.name}
+              </h1>
+
+              <div className="flex items-center">
+                <span className="text-[1em] pr-1 translate-y-[2px]">
+                  {product.rating || 0}
+                </span>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`h-4 w-4 ${
+                      star <= (product.rating || 0)
+                        ? "text-yellow-primary fill-yellow-primary"
                         : "text-gray-secondary"
-                        }`}
-                    />
-                  ))}
-                </div>
-                <span className="text-sm text-gray-500">
-                  {product.reviewCount ? `(${product.reviewCount} ${t("text_review")})` : null}
+                    }`}
+                  />
+                ))}
+                <span className="text-[1em] pl-3 translate-y-[2px]">
+                  {product.reviewCount
+                    ? `(${product.reviewCount} ${t("text_review")})`
+                    : `0 ${t("text_review")}`}
                 </span>
               </div>
             </div>
 
-            <Separator className="my-8" />
-
-            <div className="rounded-lg bg-white-secondary p-4">
-              <div className="font-light">{product.description}</div>
-            </div>
-
-            <div className="rounded-lgp-4">
-              <span className="text-3xl font-bold text-red-primary">
+            <div className="flex flex-row items-center gap-3 rounded-sm p-5 my-3 bg-white-secondary/30">
+              <span className="text-[2em] text-red-primary">
                 {currentPrice.toLocaleString("vi-VN", {
                   style: "currency",
                   currency: "VND",
                 })}
               </span>
               {currentOriginalPrice > currentPrice && (
-                <span className="ml-2 text-sm text-black-tertiary line-through">
+                <span className="text-[1em] text-black-tertiary line-through">
                   {currentOriginalPrice.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
@@ -252,8 +259,8 @@ export default function ProductDetail({ product, t }) {
 
             {product.attributes.map((attribute) => (
               <div key={attribute.id}>
-                <h3 className="font-semibold">{attribute.name}</h3>
-                <div className="mt-2 flex flex-wrap gap-2">
+                <h3 className="text[1em]">{attribute.name}</h3>
+                <div className="mt-1 flex flex-wrap gap-3">
                   {attribute.values.map((value) => (
                     <Button
                       key={value.id}
@@ -267,7 +274,7 @@ export default function ProductDetail({ product, t }) {
                       }
                       disabled={isAttributeDisabled(
                         attribute.name,
-                        value.value
+                        value.value,
                       )}
                     >
                       {value.value}
@@ -277,9 +284,9 @@ export default function ProductDetail({ product, t }) {
               </div>
             ))}
 
-            <div className="mt-1">
-              <h3 className="font-semibold">{t("text_quantity")}</h3>
-              <div className="mt-2 flex items-center space-x-2">
+            <div>
+              <h3 className="text-[1em]">{t("text_quantity")}</h3>
+              <div className="mt-1 flex items-center space-x-1">
                 <Button
                   variant="outline"
                   size="icon"
@@ -299,7 +306,7 @@ export default function ProductDetail({ product, t }) {
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
-                <span className="text-sm text-black-tertiary">
+                <span className="text-[.9em] px-2">
                   {selectedVariant
                     ? selectedVariant.quantity
                     : product.quantity}{" "}
@@ -308,9 +315,9 @@ export default function ProductDetail({ product, t }) {
               </div>
             </div>
 
-            <div className="flex space-x-4 mt-2">
+            <div className="flex flex-wrap gap-3 mt-5">
               <Button
-                className="flex-1 bg-red-primary bg-opacity-90"
+                className="flex-grow bg-red-primary text-[1em]"
                 size="lg"
                 disabled={!selectedVariant && product.variants.length > 0}
                 onClick={() => addProductToCart()}
@@ -321,76 +328,88 @@ export default function ProductDetail({ product, t }) {
               <Button
                 variant="outline"
                 size="lg"
+                className="sm:w-fit w-full"
                 onClick={() => handleLoveProduct()}
               >
                 <Heart className="h-5 w-5" />
               </Button>
             </div>
-            <Separator className="my-8" />
           </div>
         </div>
       </div>
-      <Separator className="my-8" />
 
-      <div className="mx-auto px-4 bg-blue-primary rounded-lg">
-        <div className="bg-blue-primary border-none">
-          <div className="p-4 w-3/4 mx-auto text-center">
-            <h2 className="text-2xl font-bold">{t("text_shop_info")}</h2>
-            <div className="mt-4 flex mx-auto w-fit items-center space-x-4">
-              <Image
-                src={
-                  product.store.imageUrl ? product.store.imageUrl : StoreEmpty
-                }
-                alt={product.store.name}
-                width={64}
-                height={64}
-                className="rounded-full"
-              />
-              <div>
-                <h3 className="font-semibold">{product.store.name}</h3>
-                {product.store.rating ? (
-                  <p className="text-sm text-black-tertiary">
-                    {t("text_review_upcase")}{product.store.rating?.toFixed(1)}/5.0
-                  </p>
-                ) : (
-                  t("text_not_review")
-                )}
-              </div>
+      <div className="w-full h-fit p-5 bg-blue-tertiary rounded-md shadow-md animate-fade-in">
+        <div className="w-full h-fit flex flex-col gap-5 justify-center items-center">
+          <h2 className="text-[1.5em]">{t("text_shop_info")}</h2>
+          <div className="flex flex-col items-center justify-center gap-3">
+            <Image
+              src={product.store.imageUrl ? product.store.imageUrl : StoreEmpty}
+              alt={product.store.name}
+              width={100}
+              height={100}
+              className="object-cover shadow-md rounded-full aspect-square"
+            />
+            <div>
+              <h3 className="text-[1.3em]">{product.store.name}</h3>
+              {product.store.rating ? (
+                <p className="text-[1em] text-center">
+                  {t("text_review_upcase")}
+                  {product.store.rating?.toFixed(1)}/5.0
+                </p>
+              ) : (
+                <p className="text-[1em] text-center">{t("text_not_review")}</p>
+              )}
+            </div>
+          </div>
+          <div className="w-fit h-fit flex flex-row gap-3">
+            <Link href={`/search?storeId=${product.store.id}`}>
               <Button
-                className="mr-auto"
                 variant="outline"
                 onClick={() => handleOnClickViewShop(product.store.id)}
               >
-                <Store className="mr-2"></Store>
+                <Store className="mr-1 p-1"></Store>
                 {t("text_view_shop")}
               </Button>
-              <StoreChat storeId={product.store.id} productId={productId} websocketUrl={"http://localhost:8080/api/v1/ws"} isStore={false} t={t} />
-            </div>
+            </Link>
+            <StoreChat
+              storeId={product.store.id}
+              productId={product.id}
+              websocketUrl={"http://localhost:8080/api/v1/ws"}
+              isStore={false}
+              t={t}
+            />
           </div>
         </div>
       </div>
-      <div className="mx-auto px-4 rounded-lg w-3/4">
-        <Separator className="my-8" />
-        <div className="bg-white-primary">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold">{t("text_product_detail")}</h2>
+      <div className="w-full h-fit py-14 lg:px-14 sm:px-7 px-3 shadow-md rounded-md">
+        <div className="flex flex-col gap-7">
+          <div>
+            <h2 className="text-[1.5em] text-center">
+              {t("text_product_description")}
+            </h2>
             <div
-              className="prose mt-4 max-w-none"
+              className="text-[1em]"
+              dangerouslySetInnerHTML={{ __html: product.description }}
+            />
+          </div>
+
+          <div>
+            <h2 className="text-[1.5em] text-center">
+              {t("text_product_detail")}
+            </h2>
+            <div
+              className="text-[1em]"
               dangerouslySetInnerHTML={{ __html: product.details }}
             />
           </div>
           <ProductSpecifications components={product.components || []} t={t} />
         </div>
 
-        <Separator className="my-8" />
+        <Separator className="my-7" />
 
         <ProductDetailSuggestions productId={product.id} />
 
-        <div className="mx-auto px-4 bg-white-primary">
-          <Suspense fallback={<Loading></Loading>}>
-            <ReviewLazy productId={product.id} t={t} />
-          </Suspense>
-        </div>
+        <Reviews productId={product.id} t={t} />
       </div>
     </div>
   );
