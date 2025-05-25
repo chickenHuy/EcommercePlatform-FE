@@ -13,12 +13,14 @@ import CategoryCard from "./category-item";
 const ListCategoryComponent = ({ isPage = false }) => {
   const [listCategory, setListCategory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [height, setHeight] = useState(0);
   const scrollRef = useRef(null);
   const t = useTranslations("Search");
 
   useEffect(() => {
     const fetchCategories = async () => {
       setIsLoading(true);
+      setHeight(Math.random() * (window.innerWidth / 4) + 200);
       try {
         let response = null;
         if (isPage) {
@@ -55,8 +57,6 @@ const ListCategoryComponent = ({ isPage = false }) => {
   };
 
   const SkeletonItem = () => {
-    const height = Math.random() * (window.innerWidth / 4) + 200;
-
     if (isPage) {
       return (
         <div
@@ -100,11 +100,11 @@ const ListCategoryComponent = ({ isPage = false }) => {
         >
           {isLoading
             ? Array.from({ length: 16 }).map((_, index) => (
-                <SkeletonItem key={index} />
-              ))
+              <SkeletonItem key={index} />
+            ))
             : listCategory.map((category) => (
-                <CategoryCard key={category.id} category={category} />
-              ))}
+              <CategoryCard key={category.id} category={category} />
+            ))}
         </Masonry>
       ) : (
         <>
@@ -121,27 +121,27 @@ const ListCategoryComponent = ({ isPage = false }) => {
           >
             {isLoading
               ? Array.from({ length: 20 }).map((_, index) => (
-                  <SkeletonItem key={index} />
-                ))
+                <SkeletonItem key={index} />
+              ))
               : listCategory.map((category) => (
-                  <Link
-                    href={`/search?categoryId=${category.id}`}
-                    key={category.id}
-                    className="lg:w-[300px] lg:h-[300px] sm:w-[200px] sm:h-[200px] w-[100px] h-[100px] flex-shrink-0 flex flex-col items-center gap-2 relative group"
-                  >
-                    <div className="w-full h-full relative">
-                      <Image
-                        src={category.imageUrl || IconNotFound}
-                        alt={category.name}
-                        fill
-                        className="object-cover rounded-xl shadow-md"
-                      />
-                    </div>
-                    <p className="w-[80%] sm:p-2 p-1 sm:rounded-md rounded-sm absolute sm:bottom-5 bottom-3 lg:text-[.9em] sm:text-[.8em] text-[.7em] text-white-primary text-center truncate backdrop-blur-sm bg-white-tertiary/50 group-hover:block hidden animate-fade-in-quick">
-                      {category.name.toUpperCase()}
-                    </p>
-                  </Link>
-                ))}
+                <Link
+                  href={`/search?categoryId=${category.id}`}
+                  key={category.id}
+                  className="lg:w-[300px] lg:h-[300px] sm:w-[200px] sm:h-[200px] w-[100px] h-[100px] flex-shrink-0 flex flex-col items-center gap-2 relative group"
+                >
+                  <div className="w-full h-full relative">
+                    <Image
+                      src={category.imageUrl || IconNotFound}
+                      alt={category.name}
+                      fill
+                      className="object-cover rounded-xl shadow-md"
+                    />
+                  </div>
+                  <p className="w-[80%] sm:p-2 p-1 sm:rounded-md rounded-sm absolute sm:bottom-5 bottom-3 lg:text-[.9em] sm:text-[.8em] text-[.7em] text-white-primary text-center truncate backdrop-blur-sm bg-white-tertiary/50 group-hover:block hidden animate-fade-in-quick">
+                    {category.name.toUpperCase()}
+                  </p>
+                </Link>
+              ))}
             <Link
               key="see_all"
               href="/categories"
