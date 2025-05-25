@@ -11,15 +11,17 @@ import clsx from "clsx";
 import Empty from "@/assets/images/ReviewEmpty.png";
 import Image from "next/image";
 
-export default function ProductGrid({ maxCol = 6 }) {
+export default function ProductGrid({ maxCol = 6, storeParam = null }) {
   const [products, setProducts] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
+
   const { ref, inView } = useInView();
-  const t = useTranslations("Search");
-  const storeId = useSelector((state) => state.searchFilter);
+
   const searchParams = useSelector((state) => state.searchFilter);
+  const t = useTranslations("Search");
+  const storeId = storeParam;
   const limit = 16;
 
   const gridCols = clsx("grid-cols-2", {
@@ -43,6 +45,7 @@ export default function ProductGrid({ maxCol = 6 }) {
       try {
         const res = await searchProducts({
           ...searchParams,
+          ...{ store: storeId },
           page: isInitialLoad ? 1 : page,
           limit: limit,
         });
