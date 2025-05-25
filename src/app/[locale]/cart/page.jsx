@@ -1,60 +1,67 @@
 "use client";
 
-import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import Image from "next/image";
-import StoreEmpty from "@/assets/images/storeEmpty.jpg";
-import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
-import { CircularProgress, Rating } from "@mui/material";
-import { Button } from "@/components/ui/button";
-import { Minus, PiggyBank, Plus, Trash } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { useCallback, useEffect, useState } from "react";
+
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+
+import { Rating } from "@mui/material";
+import { Minus, Plus, Trash } from "lucide-react";
+import { useInView } from "react-intersection-observer";
+
+import { useDispatch } from "react-redux";
+import { setCheckout } from "@/store/features/checkoutSlice";
+import { setStore } from "@/store/features/userSearchSlice";
+
 import {
   changeQuantity,
   deleteCartItem,
   getAllCart,
   getQuantityCartItem,
 } from "@/api/cart/cartRequest";
-import { useInView } from "react-intersection-observer";
-import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
-import { setStore } from "@/store/features/userSearchSlice";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/toaster";
-import { setCheckout } from "@/store/features/checkoutSlice";
+
+import { useToast } from "@/hooks/use-toast";
+
 import DialogConfirmCart from "@/components/dialogs/dialogConfirmCart";
-import UserHeader from "@/components/headers/mainHeader";
-import { useTranslations } from "next-intl";
 import { CartItemVariantSelector } from "./cartItemVariantSelector";
+
+import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
+import StoreEmpty from "@/assets/images/storeEmpty.jpg";
+
+import { useTranslations } from "next-intl";
+import Loading from "@/components/loading";
+import Link from "next/link";
 
 export default function CartUser() {
   const [listCart, setListCart] = useState([]);
   const [nextPage, setNextPage] = useState(1);
-  const pageSize = 4;
   const [hasNext, setHasNext] = useState(false);
   const [loadPage, setLoadPage] = useState(true);
   const [loadListCart, setLoadListCart] = useState(false);
-  const { ref: loadRef, inView } = useInView();
-
   const [selectedListCartItem, setSelectedListCartItem] = useState([]);
-
-  const { toast } = useToast();
-  const router = useRouter();
-  const dispatch = useDispatch();
-
   const [cartItemToDelete, setCartItemToDelete] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [actionType, setActionType] = useState("");
+  const [inputValues, setInputValues] = useState({});
+
+  const pageSize = 4;
+  const router = useRouter();
+  const dispatch = useDispatch();
   const t = useTranslations("Cart");
+  const listCartMapped = listCart.filter((cart) => cart.items.length > 0);
+
+  const { ref: loadRef, inView } = useInView();
+  const { toast } = useToast();
 
   const fetchAllCart = useCallback(
     async (isInitialLoad = false) => {
-      if (isInitialLoad) {
-        setLoadPage(false);
-      }
-
       setLoadListCart(true);
       try {
         if (!isInitialLoad) {
@@ -63,7 +70,7 @@ export default function CartUser() {
 
         const response = await getAllCart(
           isInitialLoad ? 1 : nextPage,
-          pageSize
+          pageSize,
         );
 
         const newListCart = response.result.data;
@@ -74,7 +81,7 @@ export default function CartUser() {
           setHasNext(response.result.hasNext);
         } else if (newListCart.length > 0) {
           setListCart((prevListCart) =>
-            isInitialLoad ? newListCart : [...prevListCart, ...newListCart]
+            isInitialLoad ? newListCart : [...prevListCart, ...newListCart],
           );
           setNextPage(response.result.nextPage);
           setHasNext(response.result.hasNext);
@@ -83,9 +90,10 @@ export default function CartUser() {
         console.error("Error during fetchAllCart: ", error);
       } finally {
         setLoadListCart(false);
+        setLoadPage(false);
       }
     },
-    [nextPage]
+    [nextPage],
   );
 
   useEffect(() => {
@@ -100,7 +108,7 @@ export default function CartUser() {
 
   useEffect(() => {
     const listCartItemFromOrder = JSON.parse(
-      localStorage.getItem("listCartItemFromOrder") || "[]"
+      localStorage.getItem("listCartItemFromOrder") || "[]",
     );
 
     if (listCartItemFromOrder.length > 0 && listCart.length > 0) {
@@ -109,7 +117,7 @@ export default function CartUser() {
           const allItems = listCart.flatMap((cart) => cart.items);
 
           const foundItem = allItems.find(
-            (item) => String(item.id) === String(newItem.id)
+            (item) => String(item.id) === String(newItem.id),
           );
 
           return foundItem || null;
@@ -145,8 +153,8 @@ export default function CartUser() {
     } else {
       setSelectedListCartItem(
         selectedListCartItem.filter(
-          (selectedItem) => selectedItem.id !== cartItem.id
-        )
+          (selectedItem) => selectedItem.id !== cartItem.id,
+        ),
       );
     }
   };
@@ -155,43 +163,45 @@ export default function CartUser() {
     return (
       cartItem.available === true &&
       selectedListCartItem.some(
-        (selectedItem) => selectedItem.id === cartItem.id
+        (selectedItem) => selectedItem.id === cartItem.id,
       )
     );
   };
 
   const handleCheckedCart = (cart, isChecked) => {
     const availableListCartItem = cart.items.filter(
-      (item) => item.available === true
+      (item) => item.available === true,
     );
 
     if (isChecked) {
       const newListCartItem = availableListCartItem.filter(
         (item) =>
           !selectedListCartItem.find(
-            (selectedItem) => selectedItem.id === item.id
-          )
+            (selectedItem) => selectedItem.id === item.id,
+          ),
       );
       setSelectedListCartItem([...selectedListCartItem, ...newListCartItem]);
     } else {
       setSelectedListCartItem(
         selectedListCartItem.filter(
           (selectedItem) =>
-            !availableListCartItem.find((item) => item.id === selectedItem.id)
-        )
+            !availableListCartItem.find((item) => item.id === selectedItem.id),
+        ),
       );
     }
   };
 
   const checkedCart = (cart) => {
     const availableListCartItem = cart.items.filter(
-      (item) => item.available === true
+      (item) => item.available === true,
     );
 
     return (
       availableListCartItem.length > 0 &&
       availableListCartItem.every((item) =>
-        selectedListCartItem.some((selectedItem) => selectedItem.id === item.id)
+        selectedListCartItem.some(
+          (selectedItem) => selectedItem.id === item.id,
+        ),
       )
     );
   };
@@ -203,7 +213,7 @@ export default function CartUser() {
           ...all,
           ...cart.items.filter((item) => item.available === true),
         ],
-        []
+        [],
       );
       setSelectedListCartItem(allAvailableCartItem);
     } else {
@@ -215,11 +225,11 @@ export default function CartUser() {
     const allAvailableCartItem = listCart.reduce(
       (count, cart) =>
         count + cart.items.filter((item) => item.available === true).length,
-      0
+      0,
     );
 
     const selectedAvailableCartItem = selectedListCartItem.filter(
-      (item) => item.available === true
+      (item) => item.available === true,
     ).length;
 
     return (
@@ -240,7 +250,7 @@ export default function CartUser() {
   const countTotalProduct = (listCart) => {
     return listCart.reduce((total, cart) => {
       const availableItems = cart.items.filter(
-        (item) => item.available === true
+        (item) => item.available === true,
       );
       return total + availableItems.length;
     }, 0);
@@ -277,7 +287,7 @@ export default function CartUser() {
           return { ...item, quantity: quantityUpdate };
         }
         return item;
-      })
+      }),
     );
   };
 
@@ -299,7 +309,7 @@ export default function CartUser() {
           }
           return item;
         }),
-      }))
+      })),
     );
   };
 
@@ -309,6 +319,7 @@ export default function CartUser() {
       updateQuantityUI(cartItemId, quantityUpdate);
       updateSelectedListCartItem(cartItemId, quantityUpdate);
       toast({
+        title: t("notify"),
         description: t("change_quantity_success"),
       });
     } catch (error) {
@@ -319,8 +330,6 @@ export default function CartUser() {
       });
     }
   };
-
-  const [inputValues, setInputValues] = useState({});
 
   const handleChangeInput = (cartItem, newQuantity) => {
     const quantityUpdate = parseInt(newQuantity, 10);
@@ -415,7 +424,7 @@ export default function CartUser() {
           ...cart,
           items: cart.items.filter((item) => item.id !== cartItem.id),
         }))
-        .filter((cart) => cart.items.length > 0)
+        .filter((cart) => cart.items.length > 0),
     );
   };
 
@@ -428,7 +437,10 @@ export default function CartUser() {
         setActionType("");
         setOpenDialog(false);
         toast({
-          description: t("toast_description_delete_one", { productName: cartItemToDelete.name }),
+          title: t("notify"),
+          description: t("toast_description_delete_one", {
+            productName: cartItemToDelete.name,
+          }),
         });
       } catch (error) {
         toast({
@@ -459,7 +471,7 @@ export default function CartUser() {
         await deleteCartItem(cartItem.id);
         updateListCart(cartItem);
         setSelectedListCartItem((prevItems) =>
-          prevItems.filter((item) => item.id !== cartItem.id)
+          prevItems.filter((item) => item.id !== cartItem.id),
         );
       } catch (error) {
         break;
@@ -468,7 +480,10 @@ export default function CartUser() {
     setActionType("");
     setOpenDialog(false);
     toast({
-      description: t("toast_description_delete_list", { productLength: selectedListCartItem.length }),
+      title: t("notify"),
+      description: t("toast_description_delete_list", {
+        productLength: selectedListCartItem.length,
+      }),
     });
   };
 
@@ -478,8 +493,8 @@ export default function CartUser() {
         ...cart,
         items: cart.items.filter((item) =>
           selectedListCartItem.some(
-            (selectedItem) => selectedItem.id === item.id
-          )
+            (selectedItem) => selectedItem.id === item.id,
+          ),
         ),
       }))
       .filter((cart) => cart.items.length > 0);
@@ -549,333 +564,317 @@ export default function CartUser() {
     return value < 0 ? `- ${formatted}` : formatted;
   };
 
-  const listCartMapped = listCart.filter((cart) => cart.items.length > 0);
-
   return (
     <>
       <Toaster />
-
-      {loadPage && (
-        <div className="fixed inset-0 flex flex-col justify-center items-center z-[500] gap-4 bg-black-primary">
-          <CircularProgress></CircularProgress>
-          <Label className="text-2xl text-white-primary">
-            {t("message_load_page")}
-          </Label>
-        </div>
-      )}
+      {loadPage && <Loading />}
 
       {!loadPage && (
-        <div className="min-h-screen min-w-[1200px] flex flex-col bg-blue-primary">
-          <UserHeader />
-
-          <div className="min-h-16 flex justify-between items-center mx-20 mt-4 bg-white-primary shadow-xl">
-            <div className="w-1/2 flex items-center">
-              <div className="w-1/6 flex justify-center">
-                {/* Checkbox cart và cartItem */}
-                {hasCheckboxAll && (
-                  <Checkbox
-                    checked={checkedAll()}
-                    onCheckedChange={(checked) => handleCheckedAll(checked)}
-                  />
-                )}
-              </div>
-              <Label className="w-5/6 text-sm">{t("text_product")}</Label>
+        <div className="w-full h-fit min-h-screen xl:px-28 lg:px-20 sm:px-6 px-4 pt-20 lg:pb-32 pb-48 bg-blue-tertiary">
+          <div className="w-full h-full flex flex-col gap-3 shadow-md rounded-md p-3 bg-white-primary">
+            <div className="flex justify-end items-center py-3">
+              <span className="text-[1em]">{t("text_select_all")}</span>
+              {hasCheckboxAll && (
+                <Checkbox
+                  checked={checkedAll()}
+                  className="mx-3 -translate-y-[2px]"
+                  onCheckedChange={(checked) => handleCheckedAll(checked)}
+                />
+              )}
             </div>
-            <div className="w-1/2 flex items-center gap-8">
-              <Label className="w-1/4 text-sm text-center line-clamp-1 text-black-primary text-opacity-50">
-                {t("text_unit_price")}
-              </Label>
-              <Label className="w-1/4 text-sm text-center line-clamp-1 text-black-primary text-opacity-50">
-                {t("text_quantity")}
-              </Label>
-              <Label className="w-1/4 text-sm text-center line-clamp-1 text-black-primary text-opacity-50">
-                {t("text_amount")}
-              </Label>
-              <Label className="w-1/4 text-sm text-center line-clamp-1 text-black-primary text-opacity-50">
-                {t("text_action")}
-              </Label>
-            </div>
-          </div>
 
-          <div className="flex flex-col mx-20 my-8 gap-8 min-h-screen relative">
-            {listCartMapped.length > 0 &&
-              listCartMapped.map((cart, index) => (
-                <Card key={index} className="rounded-none">
-                  <CardTitle className="min-h-16 flex items-center border-b bg-gradient-to-r from-white-primary to-white-secondary">
-                    <div className="w-1/12 flex justify-center">
-                      {/*Checkbox (cart)*/}
-                      {hasCheckboxCart(cart) && (
-                        <Checkbox
-                          checked={checkedCart(cart)}
-                          onCheckedChange={(checked) =>
-                            handleCheckedCart(cart, checked)
-                          }
+            <div className="w-full h-full flex flex-col gap-7">
+              {listCartMapped.length > 0 &&
+                listCartMapped.map((cart, index) => (
+                  <Card
+                    key={index}
+                    className="rounded-md shadow-sm animate-fade-in-up"
+                  >
+                    <CardTitle className="w-full h-fit p-3 flex flex-row items-center border-b">
+                      <div className="w-fit pl-2 pr-4 flex items-center">
+                        {hasCheckboxCart(cart) && (
+                          <Checkbox
+                            checked={checkedCart(cart)}
+                            onCheckedChange={(checked) =>
+                              handleCheckedCart(cart, checked)
+                            }
+                          />
+                        )}
+                      </div>
+
+                      <Link
+                        href={`/search?storeId=${cart.storeId}`}
+                        className="flex items-center gap-3 cursor-pointer"
+                      >
+                        <Image
+                          alt={cart.storeName}
+                          src={cart.avatarStore || StoreEmpty}
+                          height={50}
+                          width={50}
+                          className="rounded-full object-cover aspect-square shadow-md"
                         />
-                      )}
-                    </div>
 
-                    <div
-                      onClick={() => handleClickViewShop(cart.storeId)}
-                      className="flex items-center space-x-4 hover:cursor-pointer"
-                    >
-                      <Image
-                        alt={cart.storeName}
-                        src={cart.avatarStore || StoreEmpty}
-                        height={30}
-                        width={30}
-                        className="rounded-full"
-                      />
+                        <span className="text-[1.2em]">{cart.storeName}</span>
 
-                      <Label className="text-lg hover:cursor-pointer">
-                        {cart.storeName}
-                      </Label>
+                        <Rating
+                          value={cart.ratingStore}
+                          precision={0.1}
+                          readOnly
+                        />
+                      </Link>
+                    </CardTitle>
 
-                      <Rating
-                        value={cart.ratingStore}
-                        precision={0.1}
-                        readOnly
-                      />
-                    </div>
-                  </CardTitle>
-
-                  <CardContent className="flex flex-col p-0">
-                    {cart.items.length > 0 &&
-                      cart.items.map((item) => (
-                        <div
-                          key={item.id}
-                          className="min-h-32 flex items-center border-b"
-                        >
-                          <div className="w-1/2 flex items-center">
-                            <div className="w-1/6 flex justify-center">
-                              {/*Checkbox (cartItem)*/}
-                              {hasCheckboxCartItem(item) && (
-                                <Checkbox
-                                  checked={checkedCartItem(item)}
-                                  onCheckedChange={(checked) =>
-                                    handleCheckedCartItem(item, checked)
-                                  }
-                                />
-                              )}
-                            </div>
-
-                            <div className="w-5/6 flex items-center">
-                              <div className="w-2/3 flex items-center gap-[4px] relative">
-                                <Image
-                                  alt={item.name}
-                                  src={item.image || StoreEmpty}
-                                  height={80}
-                                  width={80}
-                                  onClick={() => {
-                                    handleClickViewProduct(item.productSlug);
-                                  }}
-                                  className="rounded-md object-contain w-20 h-20 hover:cursor-pointer hover:scale-110"
-                                />
-
-                                <div className="flex flex-col gap-[8px]">
-                                  <Label
-                                    className="text-lg line-clamp-2 hover:cursor-pointer hover:text-xl"
-                                    onClick={() => {
-                                      handleClickViewProduct(item.productSlug);
-                                    }}
-                                  >
-                                    {item.name}
-                                  </Label>
-                                  <div className="flex items-center gap-[4px]">
-                                    <Image
-                                      alt={item.brand}
-                                      src={item.logoBrand || StoreEmpty}
-                                      height={28}
-                                      width={28}
-                                      className="rounded-md"
+                    <CardContent className="flex flex-col p-0">
+                      {cart.items.length > 0 &&
+                        cart.items.map((item) => (
+                          <div
+                            key={item.id}
+                            className="w-full h-fit px-3 flex 2xl:flex-row flex-col items-center border-b"
+                          >
+                            <div className="2xl:w-1/2 w-full 2xl:border-none border-b lg:flex-row flex-col py-3 h-fit flex items-center">
+                              <div className="w-full h-28 py-3 flex-1 flex items-center relative border-b lg:border-none">
+                                <div className="w-fit pl-2 pr-3 flex items-center">
+                                  {hasCheckboxCartItem(item) && (
+                                    <Checkbox
+                                      checked={checkedCartItem(item)}
+                                      onCheckedChange={(checked) =>
+                                        handleCheckedCartItem(item, checked)
+                                      }
                                     />
-                                    <Label className="text-sm">
-                                      {item.brand}
-                                    </Label>
-                                  </div>
+                                  )}
                                 </div>
 
-                                {!hasCheckboxCartItem(item) && (
-                                  <div className="absolute w-full h-full flex flex-col justify-center items-center rounded-xl bg-gray-primary bg-opacity-50">
-                                    <Label className="text-2xl text-red-primary font-bold text-opacity-75 -rotate-6 bg-black-primary bg-opacity-5 p-[8px] rounded-xl">
-                                      {t("text_insufficient_quantity")}
-                                    </Label>
+                                <Link
+                                  href={`/${item.productSlug}`}
+                                  className="lg:w-2/3 w-full h-fit flex items-start gap-3"
+                                >
+                                  <Image
+                                    alt={item.name}
+                                    src={item.image || StoreEmpty}
+                                    height={100}
+                                    width={100}
+                                    className="rounded-md shadow-md object-cover aspect-square"
+                                  />
+
+                                  <div className="flex flex-col gap-3 h-full items-start">
+                                    <span className="text-[1.1em] line-clamp-2">
+                                      {item.name}
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                      <Image
+                                        alt={item.brand}
+                                        src={item.logoBrand || StoreEmpty}
+                                        height={25}
+                                        width={25}
+                                        className="rounded-md object-cover aspect-square shadow-md"
+                                      />
+                                      <span className="text-[1em] text-muted-foreground">
+                                        {item.brand}
+                                      </span>
+                                    </div>
                                   </div>
-                                )}
+
+                                  {!hasCheckboxCartItem(item) && (
+                                    <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center rounded-md bg-white-primary bg-opacity-70">
+                                      <span className="text-[1em] text-white-primary bg-black-primary py-3 px-5 rounded-md">
+                                        {t("text_insufficient_quantity")}
+                                      </span>
+                                    </div>
+                                  )}
+                                </Link>
                               </div>
 
-                              <div className="w-1/3 px-2">
-                                <div className="flex justify-between items-start gap-2">
-                                  <div className="flex flex-col">
-                                    <Label className="text-sm text-black-primary text-opacity-50 hover:cursor-pointer">
-                                      {t("text_classification")}
-                                    </Label>
-                                    <Label className="text-sm hover:cursor-pointer text-black">
-                                      {item.value ? item.value.join(" | ") : t("text_nothing")}
-                                    </Label>
+                              <div className="lg:w-1/3 w-full px-3 h-28 py-3 flex flex-col justify-start gap-3 lg:border-l">
+                                <span className="text-[.9em] text-center w-full text-muted-foreground">
+                                  {t("text_classification")}
+                                </span>
+
+                                <div className="flex items-center justify-between my-auto gap-2">
+                                  <div className="flex flex-row flex-wrap gap-2">
+                                    {item.value ? (
+                                      item.value.map((value, index) => (
+                                        <span
+                                          key={index}
+                                          className="text-[.9em] text-muted-foreground border rounded-sm shadow-sm px-2"
+                                        >
+                                          {value}
+                                        </span>
+                                      ))
+                                    ) : (
+                                      <span className="text-[.9em] text-muted-foreground">
+                                        {t("text_nothing")}
+                                      </span>
+                                    )}
                                   </div>
 
                                   {item.value && (
-                                    <CartItemVariantSelector cartItemId={item.id} />
+                                    <CartItemVariantSelector
+                                      cartItemId={item.id}
+                                    />
                                   )}
                                 </div>
                               </div>
+                            </div>
 
+                            <div className="2xl:w-1/2 w-full flex flex-col lg:flex-row items-center">
+                              <div className="lg:w-[60%] w-full h-28 py-3 flex flex-row">
+                                <div className="w-[50%] px-3 h-full flex flex-col justify-start items-center 2xl:border-l">
+                                  <span className="text-[.9em] text-muted-foreground">
+                                    {t("text_unit_price")}
+                                  </span>
 
+                                  <div className="w-full flex flex-col items-center my-auto">
+                                    <span className="w-full text-center text-[1.2em] text-red-primary truncate">
+                                      {formatCurrency(item.salePrice || 0)}
+                                    </span>
+                                    <span className="w-full text-center text-[1em] text-muted-foreground line-through">
+                                      {formatCurrency(item.originalPrice || 0)}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="w-[50%] h-full px-3 flex flex-col justify-start items-center border-l">
+                                  <span className="text-[.9em]  text-muted-foreground">
+                                    {t("text_quantity")}
+                                  </span>
+
+                                  <div className="flex flex-row items-center justify-center gap-1 my-auto">
+                                    <Button
+                                      variant="outline"
+                                      className="w-11 h-8"
+                                      onClick={() => handleClickMinus(item)}
+                                    >
+                                      <Minus className="h-5 w-5" />
+                                    </Button>
+
+                                    <Input
+                                      value={
+                                        inputValues[item.id] ?? item.quantity
+                                      }
+                                      onChange={(e) =>
+                                        handleOnChangeInput(
+                                          item,
+                                          e.target.value,
+                                        )
+                                      }
+                                      onKeyDown={(e) =>
+                                        handleOnKeyDownInput(item, e)
+                                      }
+                                      onBlur={(e) => handleOnBlurInput(item, e)}
+                                      type="number"
+                                      className="w-[70px] h-8 text-[1em] text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    />
+
+                                    <Button
+                                      variant="outline"
+                                      className="w-11 h-8"
+                                      onClick={() => handleClickPlus(item)}
+                                    >
+                                      <Plus className="h-5 w-5" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="lg:w-[40%] w-full lg:border-none border-t h-28 py-3 flex flex-row">
+                                <div className="lg:w-[80%] w-1/2 h-full flex flex-col items-center justify-between lg:border-l">
+                                  <span className="text-[.9em] text-muted-foreground">
+                                    {t("text_amount")}
+                                  </span>
+                                  <span className="w-full text-center text-[1.3em] text-red-primary truncate my-auto">
+                                    {formatCurrency(
+                                      item.quantity * item.salePrice || 0,
+                                    )}
+                                  </span>
+                                </div>
+
+                                <div className="lg:w-[20%] w-1/2 h-full pl-3 flex justify-center items-center border-l">
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                      handleClickDeleteOne(item);
+                                    }}
+                                  >
+                                    <Trash className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
                             </div>
                           </div>
+                        ))}
+                    </CardContent>
 
-                          <div className="w-1/2 flex items-center gap-8">
-                            <div className="w-1/4 flex flex-col justify-center items-center gap-[4px]">
-                              <Label className="text-sm text-red-primary">
-                                {formatCurrency(item.salePrice || 0)}
-                              </Label>
-                              <Label className="text-sm text-black-primary text-opacity-50 line-through truncate">
-                                {formatCurrency(item.originalPrice || 0)}
-                              </Label>
-                            </div>
-
-                            <div className="w-1/4 flex justify-center items-center gap-[4px]">
-                              <Button
-                                variant="outline"
-                                className="w-[48px] h-8"
-                                onClick={() => handleClickMinus(item)}
-                              >
-                                <Minus className="h-5 w-5" />
-                              </Button>
-
-                              <Input
-                                value={inputValues[item.id] ?? item.quantity}
-                                onChange={(e) =>
-                                  handleOnChangeInput(item, e.target.value)
-                                }
-                                onKeyDown={(e) => handleOnKeyDownInput(item, e)}
-                                onBlur={(e) => handleOnBlurInput(item, e)}
-                                type="number"
-                                className="w-[80px] h-8 text-lg text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                              />
-
-                              <Button
-                                variant="outline"
-                                className="w-[48px] h-8"
-                                onClick={() => handleClickPlus(item)}
-                              >
-                                <Plus className="h-5 w-5" />
-                              </Button>
-                            </div>
-
-                            <Label className="w-1/4 text-sm text-center">
-                              {formatCurrency(
-                                item.quantity * item.salePrice || 0
-                              )}
-                            </Label>
-
-                            <div className="w-1/4 flex justify-center">
-                              <Button
-                                variant="outline"
-                                onClick={() => {
-                                  handleClickDeleteOne(item);
-                                }}
-                              >
-                                <Trash className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                  </CardContent>
-
-                  <CardFooter className="min-h-16 p-0">
-                    <PiggyBank className="w-1/12 text-sm text-error-dark" />
-                    <div className="w-11/12 flex items-center gap-[4px]">
-                      <Label className="text-sm">{t("text_savings")}</Label>
-                      <Label className="text-lg font-bold text-red-primary">
+                    <CardFooter className="w-full bg-re h-fit p-3 flex flex-row items-center justify-end gap-3">
+                      <span className="text-[.9em] text-muted-foreground">
+                        {t("text_savings")}
+                      </span>
+                      <span className="text-[1em]">
                         {formatCurrency(totalSavingsOneCart(cart.items) || 0)}
-                      </Label>
-                    </div>
-                  </CardFooter>
-                </Card>
-              ))}
+                      </span>
+                    </CardFooter>
+                  </Card>
+                ))}
 
-            {listCartMapped.length === 0 && (
-              <div className="min-h-screen flex flex-col items-center justify-center">
-                <Image
-                  alt="ảnh trống"
-                  src={ReviewEmpty}
-                  width={200}
-                  height={200}
-                />
-                <Label className="text-xl text-center">{t("text_empty_cart")}</Label>
-              </div>
-            )}
-
-            {loadListCart && (
-              <div className="w-full h-16 flex items-center justify-center">
-                <div className="flex space-x-4">
-                  <div className="w-4 h-4 bg-red-primary rounded-full animate-bounce"></div>
-                  <div className="w-4 h-4 bg-red-primary rounded-full animate-bounce [animation-delay:-.1s]"></div>
-                  <div className="w-4 h-4 bg-red-primary rounded-full animate-bounce [animation-delay:-.5s]"></div>
+              {!loadPage && listCartMapped.length === 0 && (
+                <div className="min-h-screen flex items-center justify-center">
+                  <Image
+                    alt="Empty Image"
+                    src={ReviewEmpty}
+                    width={300}
+                    height={300}
+                  />
                 </div>
-              </div>
-            )}
+              )}
 
-            {!loadListCart && hasNext && (
-              <div
-                ref={loadRef}
-                className="absolute bottom-0 w-full h-16"
-              ></div>
-            )}
+              {loadListCart && <Loading />}
+
+              {!loadListCart && hasNext && (
+                <div
+                  ref={loadRef}
+                  className="absolute bottom-0 w-full h-16"
+                ></div>
+              )}
+            </div>
           </div>
 
-          <div className="min-h-20 flex justify-between items-center mx-20 bg-white-primary shadow-xl sticky bottom-0 border-t">
-            <div className="w-1/2 flex items-center">
-              <div className="w-1/6 flex justify-center">
-                {/*Checkbox cart và cartItem*/}
-                {hasCheckboxAll && (
-                  <Checkbox
-                    checked={checkedAll()}
-                    onCheckedChange={(checked) => handleCheckedAll(checked)}
-                  />
-                )}
+          <div className="w-full h-fit xl:px-28 lg:px-20 sm:px-6 px-4 fixed bottom-0 left-0">
+            <div className="w-full h-fit flex flex-row gap-2 flex-wrap justify-between items-center py-4 px-3 rounded-t-md shadow-md bg-black-primary">
+              <div className="w-fit flex flex-row gap-3 items-center">
+                <Button
+                  variant="outline"
+                  onClick={() => handleCheckedAll(!checkedAll())}
+                >
+                  {t("text_select_all")} ({countTotalProduct(listCart)})
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={() => handleClickDeleteAll()}
+                >
+                  {t("text_delete")} ({selectedListCartItem.length})
+                </Button>
               </div>
-
-              <div className="w-5/6 flex justify-between items-center gap-4">
-                <div className="flex items-center gap-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleCheckedAll(!checkedAll())}
-                  >
-                    {t("text_select_all")} ({countTotalProduct(listCart)})
-                  </Button>
-
-                  {/*Button xóa tất cả*/}
-                  <Button
-                    variant="outline"
-                    onClick={() => handleClickDeleteAll()}
-                  >
-                    {t("text_delete")} ({selectedListCartItem.length})
-                  </Button>
-                </div>
-                <Label className="text-sm text-center line-clamp-2">
+              <div className="flex flex-row flex-wrap items-center text-white-primary">
+                <span className="text-[1em] px-3 border-l">
                   {t("text_savings")}:{" "}
                   {formatCurrency(
-                    totalSavingsListCartItem(selectedListCartItem) || 0
+                    totalSavingsListCartItem(selectedListCartItem) || 0,
                   )}
-                </Label>
-              </div>
-            </div>
+                </span>
 
-            <div className="w-1/2 flex justify-center items-center gap-8">
-              <div className="flex items-center gap-[4px]">
-                <Label className="text-sm text-center line-clamp-2">
-                  {t("text_total_payment")} ({selectedListCartItem.length} {t("text_product_lower")}):
-                </Label>
-                <Label className="text-xl font-bold text-center line-clamp-2">
-                  {formatCurrency(totalPriceAll(selectedListCartItem) || 0)}
-                </Label>
+                <div className="flex items-center gap-1 px-3 border-l">
+                  <span className="text-[1em]">
+                    {t("text_total_payment")} ({selectedListCartItem.length}{" "}
+                    {t("text_product_lower")}):
+                  </span>
+                  <span className="text-[1.3em]">
+                    {formatCurrency(totalPriceAll(selectedListCartItem) || 0)}
+                  </span>
+                </div>
               </div>
 
               <Button
-                className="w-1/4 bg-red-primary rounded-md"
+                className="flex-grow min-w-[300px] bg-red-primary hover:bg-red-primary/90 rounded-md text-[1em]"
                 onClick={() => handleCheckout()}
               >
                 {t("text_checkout")}
