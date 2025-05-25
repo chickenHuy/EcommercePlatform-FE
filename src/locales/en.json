@@ -510,6 +510,7 @@
     }
   },
   "Cart": {
+    "notify": "Notify",
     "message_load_page": "Loading data...",
     "text_product": "Product",
     "text_unit_price": "Unit price",

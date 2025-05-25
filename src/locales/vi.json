@@ -512,6 +512,7 @@
     }
   },
   "Cart": {
+    "notify": "Thông báo",
     "message_load_page": "Đang tải dữ liệu...",
     "text_product": "Sản phẩm",
     "text_unit_price": "Đơn giá",
