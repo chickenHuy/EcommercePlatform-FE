@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/toaster";
-import { formatCurrency, formatDate } from "@/utils";
+import { formatCurrency } from "@/utils";
 import {
   ChevronLeft,
   CircleOff,
@@ -21,6 +21,7 @@ import {
   updateOneOrderBySeller,
 } from "@/api/vendor/orderRequest";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -44,10 +45,6 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
     setOrderToUpdate(orderDetail);
     setSelectedOrder(orderDetail);
     setActionType("update");
-  };
-
-  const handleClickViewProductDetail = (slug) => {
-    router.push(`/${slug}`);
   };
 
   const handleClickComback = () => {
@@ -117,11 +114,11 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
 
   function renderStatusBadge(currentStatus) {
     const statusMap = {
-      DELIVERED: t('order_delivered_successfully'),
-      CANCELLED: t('order_has_been_cancelled'),
-      WAITING_FOR_SHIPPING: t('waiting_for_shipping_pickup'),
-      PICKED_UP: t('shipping_unit_successfully_picked_up'),
-      OUT_FOR_DELIVERY: t('order_is_being_delivered_to_customer'),
+      DELIVERED: t("order_delivered_successfully"),
+      CANCELLED: t("order_has_been_cancelled"),
+      WAITING_FOR_SHIPPING: t("waiting_for_shipping_pickup"),
+      PICKED_UP: t("shipping_unit_successfully_picked_up"),
+      OUT_FOR_DELIVERY: t("order_is_being_delivered_to_customer"),
     };
 
     return statusMap[currentStatus] ? (
@@ -136,7 +133,7 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
       <Toaster />
 
       <div className="w-full h-fit flex flex-col justify-center items-center py-20">
-        <div className="w-[98%] border rounded-md shadow-md p-3">
+        <div className="w-[98%]">
           <div className="flex lg:items-center items-start justify-between py-3 gap-3">
             <div
               className="cursor-pointer hover:bg-white-secondary rounded-sm hover:shadow-md"
@@ -166,7 +163,7 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
                 }}
               >
                 <CircleOff className="h-5 w-5 mr-3" />
-                  {t('cancel_order')}
+                {t("cancel_order")}
               </Button>
             )}
             {(orderDetail?.currentStatus === "PENDING" ||
@@ -178,7 +175,7 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
                 }}
               >
                 <Pencil className="h-5 w-5 mr-3" />
-                  {t('update_status')}
+                {t("update_status")}
               </Button>
             )}
             {renderStatusBadge(orderDetail?.currentStatus)}
@@ -189,7 +186,7 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
               <Card className="rounded-lg w-full">
                 <CardHeader className="py-3">
                   <CardTitle className="text-[1.3em]">
-                    {t('customer_information')}
+                    {t("customer_information")}
                   </CardTitle>
                 </CardHeader>
                 <Separator></Separator>
@@ -216,14 +213,12 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
               </Card>
               <Card className="rounded-lg w-full">
                 <CardHeader className="py-3">
-                  <CardTitle className="text-[1.3em]">{t('note')}</CardTitle>
+                  <CardTitle className="text-[1.3em]">{t("note")}</CardTitle>
                 </CardHeader>
                 <Separator></Separator>
                 <CardContent className="py-3">
                   <span className="whitespace-wrap">
-                    {orderDetail?.note
-                      ? orderDetail.note
-                      : t('no_note')}
+                    {orderDetail?.note ? orderDetail.note : t("no_note")}
                   </span>
                 </CardContent>
               </Card>
@@ -232,19 +227,17 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
               <Card className="rounded-lg w-full">
                 <CardHeader className="py-3">
                   <CardTitle className="text-[1.3em]">
-                    {t('product_list')}
+                    {t("product_list")}
                   </CardTitle>
                 </CardHeader>
                 <Separator></Separator>
-                <CardContent className="lg:p-5 p-3 space-y-3">
+                <CardContent className="p-3 space-y-3">
                   {orderDetail?.orderItems &&
                     orderDetail.orderItems.map((item) => (
-                      <Card
+                      <Link
                         key={item.id}
-                        className="w-full flex flex-col items-start lg:flex-row lg:items-center justify-between p-3 cursor-pointer rounded-lg"
-                        onClick={() => {
-                          handleClickViewProductDetail(item.productSlug);
-                        }}
+                        href={`/${item.productSlug}`}
+                        className="w-full flex flex-col items-start lg:flex-row lg:items-center justify-between p-3 cursor-pointer border shadow-sm rounded-md"
                       >
                         <div className="w-full flex items-center gap-2">
                           <Image
@@ -283,14 +276,14 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
                             {formatCurrency(item.quantity * item.price)}
                           </span>
                         </div>
-                      </Card>
+                      </Link>
                     ))}
                 </CardContent>
               </Card>
               <Card className="rounded-lg">
                 <CardHeader className="py-3">
                   <CardTitle className="text-[1.3em]">
-                    {t('order_summary')}
+                    {t("order_summary")}
                   </CardTitle>
                 </CardHeader>
                 <Separator></Separator>
@@ -298,20 +291,22 @@ export default function ViewOrderDetailSeller({ orderDetail, refreshPage }) {
                   <div className="flex flex-col gap-3">
                     <div className="flex flex-row justify-between items-center">
                       <span className="text-[1em]">
-                        {t('total_item', {total:orderDetail?.orderItems.length})}
+                        {t("total_item", {
+                          total: orderDetail?.orderItems.length,
+                        })}
                       </span>
                       <span className="text-[1em]">
                         {formatCurrency(orderDetail?.total)}
                       </span>
                     </div>
                     <div className="flex flex-row justify-between items-center">
-                      <span className="text-[1em]">{t('shop_discount')}</span>
+                      <span className="text-[1em]">{t("shop_discount")}</span>
                       <span className="text-[1em]">
                         {`- ${formatCurrency(orderDetail?.discount)}`}
                       </span>
                     </div>
                     <div className="flex flex-row justify-between items-center">
-                      <span className="text-[1em]">{t('total_payment')}</span>
+                      <span className="text-[1em]">{t("total_payment")}</span>
                       <span className="text-[1.2em] text-red-primary">
                         {formatCurrency(
                           orderDetail?.total - orderDetail?.discount,
