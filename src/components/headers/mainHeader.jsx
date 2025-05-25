@@ -46,7 +46,6 @@ const MainHeader = () => {
     "/user",
     "/auth",
     "/checkout",
-    "/cart",
     "/status",
   ];
 
