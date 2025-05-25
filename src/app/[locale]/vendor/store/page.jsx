@@ -108,7 +108,7 @@ export default function ManageStoreInfo() {
   };
 
   return (
-    <div className="w-full h-full pt-24 xl:px-10 px-5">
+    <div className="w-full h-full pt-20 px-3">
       <Toaster />
       <Card className="shadow-lg rounded-lg text-[1em]">
         <CardHeader className="w-2/3 text-center border-b py-5 mx-auto">
