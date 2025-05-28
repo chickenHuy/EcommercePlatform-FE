@@ -17,7 +17,7 @@ export default function VerifyEmail() {
       verifyEmail(emailToken)
         .then(() => {
           window.location.href =
-            "https://nguyenthanhhuy.id.vn/en/auth";
+            `${process.env.NEXT_PUBLIC_BASE_URL}/en/auth`;
         })
         .catch((error) => {
           console.error("Verify email failed:", error);
