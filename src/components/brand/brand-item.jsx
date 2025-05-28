@@ -40,7 +40,7 @@ const BrandCard = ({ brand }) => {
         }}
       >
         <Image
-          src={brand.imageUrl || IconNotFound}
+          src={brand.logoUrl || IconNotFound}
           alt={brand.name}
           fill
           className="object-cover rounded-full shadow-md hover:scale-[1.03] transition duration-300"

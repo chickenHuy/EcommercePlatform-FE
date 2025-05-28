@@ -131,7 +131,7 @@ const ListBrandComponent = ({ isPage = false }) => {
                   >
                     <div className="w-full h-full relative">
                       <Image
-                        src={brand.imageUrl || IconNotFound}
+                        src={brand.logoUrl || IconNotFound}
                         alt={brand.name}
                         fill
                         className="object-cover rounded-full shadow-md"
