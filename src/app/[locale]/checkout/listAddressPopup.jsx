@@ -16,7 +16,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-export default function listAdress(props) {
+export default function ListAddress(props) {
     const { open, onOpenChange, defaultId, addresses, setDefaultAddress, setHasNew, hasNew, t } = props;
     const [selectedAddressId, setSelectedAddressId] = useState(defaultId);
     const handleRadioChange = (addressId) => {

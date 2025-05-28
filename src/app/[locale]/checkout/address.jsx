@@ -2,9 +2,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
-import ListAddress from "./listAddressPopup";
 import { getAddresses } from "@/api/user/addressRequest";
 import { useCallback, useState, useEffect } from "react";
+import ListAddress from "./listAddressPopup";
 
 export default function Address(props) {
 
