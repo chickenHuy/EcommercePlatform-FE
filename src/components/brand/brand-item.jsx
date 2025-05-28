@@ -43,7 +43,7 @@ const BrandCard = ({ brand }) => {
           src={brand.logoUrl || IconNotFound}
           alt={brand.name}
           fill
-          className="object-cover rounded-full shadow-md border-white-secondary hover:scale-[1.03] transition duration-300"
+          className="object-cover rounded-full shadow-md border border-white-secondary hover:scale-[1.03] transition duration-300"
         />
       </div>
       {isInView && (
