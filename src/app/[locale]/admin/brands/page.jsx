@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpDown, MoreHorizontal, PlusCircle } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, Pencil, PlusCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,8 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -327,7 +325,7 @@ export default function ManageBrand() {
                                   className="flex items-center justify-between cursor-pointer"
                                 >
                                   Sửa
-                                  <EditIcon />
+                                  <Pencil />
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onSelect={(e) => e.preventDefault()}
@@ -335,7 +333,7 @@ export default function ManageBrand() {
                                   className="flex items-center justify-between cursor-pointer"
                                 >
                                   Xoá
-                                  <DeleteIcon />
+                                  <Trash2 />
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
