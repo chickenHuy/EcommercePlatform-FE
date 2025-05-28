@@ -17,7 +17,7 @@ export default function VerifyEmail() {
       verifyEmail(emailToken)
         .then(() => {
           window.location.href =
-            "http://localhost:3000/en/auth";
+            "https://nguyenthanhhuy.id.vn/en/auth";
         })
         .catch((error) => {
           console.error("Verify email failed:", error);
