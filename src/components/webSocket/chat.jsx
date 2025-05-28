@@ -4,7 +4,7 @@ import useWebSocket from "@/utils/websocket/websocket";
 import { MessageCircle, Send } from "lucide-react";
 
 const WebSocketChat = ({ roomIds }) => {
-  const { getMessagesByRoom, subscribeRoom, unsubscribeRoom, sendMessage, connected } = useWebSocket("http://localhost:8080/api/v1/ws");
+  const { getMessagesByRoom, subscribeRoom, unsubscribeRoom, sendMessage, connected } = useWebSocket(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/ws`);
   const [input, setInput] = useState("");
   const [selectedRoom, setSelectedRoom] = useState(roomIds[0]);
   // Sử dụng ref để lưu danh sách room đã subscribe hiện tại
