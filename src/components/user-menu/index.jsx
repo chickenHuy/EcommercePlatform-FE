@@ -24,17 +24,17 @@ import { Store } from "lucide-react";
 import { UserRoundPen } from "lucide-react";
 import { Languages } from "lucide-react";
 import { useState } from "react";
-import { localeDetector } from "@/utils";
 import Image from "next/image";
 import Cookies from "js-cookie";
 import { post } from "@/lib/httpClient";
 import Link from "next/link";
+import { useLocaleDetector } from "@/utils";
 
 const UserMenuComponent = (props) => {
   const { user } = props;
   const [isShowUserMenu, setIsShowUserMenu] = useState(false);
   const router = useRouter();
-  const locale = localeDetector() ? "en" : "vi";
+  const locale = useLocaleDetector() ? "en" : "vi";
   const t = useTranslations("VendorHeader");
   const pathName = usePathname();
 

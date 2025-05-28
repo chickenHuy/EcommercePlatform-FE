@@ -1,8 +1,7 @@
 import { usePathname } from "next/navigation";
-import OpenCageGeocoder from "opencage-api-client";
 
 // Detect the current locale of the website
-export const localeDetector = () => {
+export const useLocaleDetector = () => {
   return usePathname().includes("/en");
 };
 
