@@ -153,7 +153,7 @@ export function ChatRoomList({
                         </div>
                     ))
                 ) : (
-                    <div className="p-4 text-center text-gray-tertiary">No stores found matching "{searchQuery}"</div>
+                    <div className="p-4 text-center text-gray-tertiary">No stores found matching &quot;{searchQuery}&quot;</div>
                 )}
 
                 {/* Loading indicator */}
