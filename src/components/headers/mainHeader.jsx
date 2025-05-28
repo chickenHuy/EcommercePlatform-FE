@@ -167,7 +167,7 @@ const MainHeader = () => {
 
               <div className="relative mx-2">
                 <StoreChat
-                  websocketUrl="http://localhost:8080/api/v1/ws"
+                  websocketUrl={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/ws`}
                   isStore={false}
                   productId=""
                   orderId=""
@@ -248,7 +248,7 @@ const MainHeader = () => {
 
               <div className="flex flex-row justify-between items-center pt-1 border-t border-black-tertiary -translate-y-3">
                 <StoreChat
-                  websocketUrl="http://localhost:8080/api/v1/ws"
+                  websocketUrl=`${process.env.NEXT_PUBLIC_API_URL}/api/v1/ws`
                   isStore={false}
                   productId=""
                   orderId=""

@@ -462,7 +462,7 @@ export default function OrderUser() {
                         <StoreChat
                           storeId={order.storeId}
                           orderId={order.id}
-                          websocketUrl={"http://localhost:8080/api/v1/ws"}
+                          websocketUrl={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/ws`}
                           isStore={false}
                           t={t}
                           order={order}
