@@ -7,6 +7,7 @@ import { listRooms, listMessages } from "@/api/chat/chat"
 import useWebSocket from "@/utils/websocket/websocket"
 import { Portal } from "./portal"
 import { AnimatePresence, motion } from 'framer-motion'
+import { Button } from "../ui/button"
 
 export default function StoreChatPage({ storeId, userId, websocketUrl, isStore, productId, orderId }) {
     const [selectedRoom, setSelectedRoom] = useState(null)
