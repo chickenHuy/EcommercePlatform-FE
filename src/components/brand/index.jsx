@@ -134,7 +134,7 @@ const ListBrandComponent = ({ isPage = false }) => {
                         src={brand.logoUrl || IconNotFound}
                         alt={brand.name}
                         fill
-                        className="object-cover rounded-full shadow-md"
+                        className="object-cover rounded-full shadow-md border"
                       />
                     </div>
                     <p className="w-[80%] sm:p-2 p-1 sm:rounded-md rounded-sm absolute top-[45%] lg:text-[.9em] sm:text-[.8em] text-[.7em] text-white-primary text-center truncate backdrop-blur-sm bg-white-tertiary/50 group-hover:block hidden animate-fade-in-quick">
