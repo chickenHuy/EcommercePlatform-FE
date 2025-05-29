@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { ChartNoAxesCombined, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getProductBestSelling } from "@/api/user/homeRequest";
 import ProductCard from "@/components/card/productCard";
+import ProductBestSellerImage from "../../../../public/images/product-best-seller.png";
 import { useTranslations } from "next-intl";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -51,7 +52,7 @@ export default function ProductBestSelling() {
     <div className="w-full h-fit flex flex-row justify-start items-center bg-black-secondary lg:py-12 sm:py-10 py-8 sm:rounded-xl rounded-md">
       <Toaster />
       <div className="lg:min-w-[200px] sm:min-w-[150px] min-w-[100px] text-white-primary flex flex-col justify-center items-center gap-3 h-fit px-3 relative">
-        <ChartNoAxesCombined className="lg:w-20 lg:h-20 w-10 h-10" />
+        <Image src={ProductBestSellerImage} height={300} width={300} className="w-full aspect-square"></Image>
         <h3 className="lg:text-[1.3em] sm:text-[1.1em] text-[.9em] text-center">
           {t("best_selling_products")}
         </h3>
@@ -80,25 +81,25 @@ export default function ProductBestSelling() {
       >
         {isLoading
           ? Array.from({ length: 20 }).map((_, index) => (
-              <SkeletonItem key={index} />
-            ))
+            <SkeletonItem key={index} />
+          ))
           : listProduct.map((product, index) => (
-              <div
-                key={product.id || index}
-                className="lg:max-w-[250px] sm:max-w-[150px] max-w-[100px]"
-              >
-                <ProductCard
-                  name={product.name}
-                  price={product.salePrice}
-                  originalPrice={product.originalPrice}
-                  mainImageUrl={product.mainImageUrl}
-                  videoUrl={product.videoUrl}
-                  rating={product.rating}
-                  isFavorite={false}
-                  link={product.slug}
-                />
-              </div>
-            ))}
+            <div
+              key={product.id || index}
+              className="lg:max-w-[250px] sm:max-w-[150px] max-w-[100px]"
+            >
+              <ProductCard
+                name={product.name}
+                price={product.salePrice}
+                originalPrice={product.originalPrice}
+                mainImageUrl={product.mainImageUrl}
+                videoUrl={product.videoUrl}
+                rating={product.rating}
+                isFavorite={false}
+                link={product.slug}
+              />
+            </div>
+          ))}
       </div>
     </div>
   );
