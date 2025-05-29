@@ -85,7 +85,7 @@ export default function ProductBestSelling() {
           : listProduct.map((product, index) => (
               <div
                 key={product.id || index}
-                className="lg:min-w-[200px] sm:min-w-[150px] min-w-[100px]"
+                className="lg:max-w-[250px] sm:max-w-[150px] max-w-[100px]"
               >
                 <ProductCard
                   name={product.name}
