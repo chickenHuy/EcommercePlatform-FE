@@ -7,6 +7,7 @@ import ProductCard from "@/components/card/productCard";
 import ProductBestSellerImage from "../../../../public/images/product-best-seller.png";
 import { useTranslations } from "next-intl";
 import { Toaster } from "@/components/ui/toaster";
+import Image from "next/image";
 
 export default function ProductBestSelling() {
   const [listProduct, setListProduct] = useState([]);
