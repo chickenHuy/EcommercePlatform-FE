@@ -52,7 +52,7 @@ export default function ProductBestSelling() {
   return (
     <div className="w-full h-fit flex flex-row justify-start items-center bg-black-secondary lg:py-12 sm:py-10 py-8 sm:rounded-xl rounded-md">
       <Toaster />
-      <div className="lg:max-w-[250px] sm:max-w-[150px] max-w-[100px] text-white-primary flex flex-col justify-center items-center gap-3 h-fit px-3 relative">
+      <div className="lg:max-w-[200px] sm:max-w-[150px] max-w-[100px] text-white-primary flex flex-col justify-center items-center gap-3 h-fit px-7 relative">
         <Image src={ProductBestSellerImage} height={300} width={300} className="w-full aspect-square"></Image>
 
         <button
