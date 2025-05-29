@@ -73,3 +73,14 @@ export function getCloudinaryThumbnail(videoUrl, options = {}) {
   }
 }
 
+export function getThreeSecondVideoUrl(originalUrl) {
+  const uploadSegment = "/upload/";
+  const transformation = "so_0,du_3/";
+
+  if (!originalUrl.includes(uploadSegment)) {
+    return originalUrl;
+  }
+
+  return originalUrl.replace(uploadSegment, `${uploadSegment}${transformation}`);
+}
+

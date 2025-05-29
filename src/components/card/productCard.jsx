@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import IconNotFound from "../../../public/images/iconNotFound.png";
 import Link from "next/link";
+import { getThreeSecondVideoUrl } from "@/utils";
 
 function formatPrice(price) {
   return new Intl.NumberFormat("vi-VN", {
@@ -26,13 +27,13 @@ export default function ProductCard({
   link,
 }) {
   return (
-    <Link href={`/${link}`} passHref className="w-full h-full relative">
-      <Card className="w-full h-full overflow-hidden flex flex-col rounded-md border-[0px] shadow-sm hover:shadow-md hover:scale-[1.015] hover:border-[1px] hover:border-white-secondary transition duration-100">
+    <Link href={`/${link}`} passHref className="w-full h-full relative group">
+      <Card className="w-full h-full bg-blue-tertiary overflow-hidden flex flex-col rounded-md border shadow-sm group-hover:shadow-md transition duration-150">
         <CardHeader className="p-0 relative">
-          <div className="relative w-full aspect-square overflow-hidden">
+          <div className="relative w-full aspect-square group-hover:-translate-y-[6px] transition duration-150">
             {videoUrl ? (
               <video
-                src={videoUrl}
+                src={getThreeSecondVideoUrl(videoUrl)}
                 loop
                 muted
                 autoPlay
@@ -44,7 +45,7 @@ export default function ProductCard({
                 src={mainImageUrl || IconNotFound}
                 alt={name}
                 fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105 rounded-t-md"
+                className="object-cover"
               />
             )}
             {mainImageUrl && videoUrl && (
@@ -77,7 +78,7 @@ export default function ProductCard({
           )}
         </CardHeader>
 
-        <CardContent className="p-2 flex flex-col justify-between gap-1 bg-blue-primary">
+        <CardContent className="p-2 flex flex-col justify-between gap-1">
           <CardTitle className="text-[1em] text-ellipsis truncate">
             {name}
           </CardTitle>
