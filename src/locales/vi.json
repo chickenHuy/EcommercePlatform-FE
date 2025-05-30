@@ -582,6 +582,7 @@
     "text_search_result": "Kết quả tìm kiếm cho từ khoá",
     "text_brand": "Thương hiệu",
     "text_sale_price": "Giá bán",
+    "text_view_detail": "Xem chi tiết",
     "text_review": "Đánh giá",
     "text_upward": "Trở lên",
     "text_sold":"Đã bán: {number}",
