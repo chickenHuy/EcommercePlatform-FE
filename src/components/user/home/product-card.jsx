@@ -26,6 +26,7 @@ export default function ListProductSuggess({ listProduct, loadRef, hasNext, load
             <div className={`w-full grid gap-3 grid-cols-2 ${gridCols}`}>
                 {listProduct.map((product) => (
                     <ProductCard
+                        key={product.id}
                         name={product.name}
                         price={product.salePrice}
                         originalPrice={product.originalPrice}
