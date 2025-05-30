@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense, lazy } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -177,21 +177,21 @@ export default function ProductDetail({ product, t }) {
     router.push("/search");
   };
 
-  useEffect(() => {
-    const productId = product.id;
-    const changeCount = async (productId) => {
-      try {
-        await put(`/api/v1/view_product/change_count/${productId}`);
-      } catch (error) {
-        toast({
-          title: t("toast_title_error_product_wishlist"),
-          description: error.message,
-          variant: "destructive",
-        });
-      }
-    };
-    changeCount(productId);
-  }, [product.id]);
+  // useEffect(() => {
+  //   const productId = product.id;
+  //   const changeCount = async (productId) => {
+  //     try {
+  //       await put(`/api/v1/view_product/change_count/${productId}`);
+  //     } catch (error) {
+  //       toast({
+  //         title: t("toast_title_error_product_wishlist"),
+  //         description: error.message,
+  //         variant: "destructive",
+  //       });
+  //     }
+  //   };
+  //   changeCount(productId);
+  // }, [product.id]);
 
   return (
     <div className="w-full h-fit xl:px-28 lg:px-20 sm:px-6 px-4 py-20 flex flex-col gap-7">
