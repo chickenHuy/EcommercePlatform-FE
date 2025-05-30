@@ -50,28 +50,11 @@ export default function ProductBestSelling() {
   );
 
   return (
-    <div className="w-full h-fit flex flex-row justify-start items-center bg-black-secondary lg:py-12 sm:py-10 py-8 sm:rounded-xl rounded-md">
-      <Toaster />
-      <div className="lg:max-w-[200px] sm:max-w-[150px] max-w-[100px] text-white-primary flex flex-col justify-center items-center gap-3 h-fit px-3 relative">
-        <Image src={ProductBestSellerImage} height={300} width={300} className="w-full aspect-square"></Image>
-
-        <button
-          aria-label="Scroll Right"
-          onClick={() => scroll("right")}
-          className="absolute left-1/2 -bottom-2 translate-y-full translate-x-1/3 z-20 flex items-center justify-center lg:p-3 p-[6px] rounded-full bg-white-primary/50 shadow-md hover:bg-white-primary hover:text-black-primary"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
-
-        <button
-          aria-label="Scroll Left"
-          onClick={() => scroll("left")}
-          className="absolute right-1/2 -bottom-2 translate-y-full -translate-x-1/3 z-20 flex items-center justify-center lg:p-3 p-[6px] rounded-full bg-white-primary/50 shadow-md hover:bg-white-primary hover:text-black-primary"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
+    <div className="w-full h-fit flex flex-col justify-start items-center bg-black-secondary lg:pb-12 sm:pb-10 pb-8 pt-3 sm:rounded-xl rounded-md relative">
+      <div className="w-full h-fit text-white-primary flex flex-row justify-start items-center gap-3 px-5">
+        <h3 class="text-[1.2em] font-[900]">{t("best_selling_products")}</h3>
+        <Image src={ProductBestSellerImage} height={70} width={70} className="w-14 h-14 aspect-square"></Image>
       </div>
-
       <div
         ref={scrollContainerRef}
         className="flex flex-row overflow-x-auto lg:gap-5 gap-3 scroll-smooth no-scrollbar p-3"
@@ -99,6 +82,21 @@ export default function ProductBestSelling() {
             </div>
           ))}
       </div>
+      <button
+        aria-label="Scroll Right"
+        onClick={() => scroll("right")}
+        className="absolute top-1/2 right-[3px] flex items-center justify-center lg:p-3 p-[6px] rounded-full bg-white-primary/50 shadow-md hover:bg-white-primary hover:text-black-primary"
+      >
+        <ChevronRight className="h-5 w-5" />
+      </button>
+
+      <button
+        aria-label="Scroll Left"
+        onClick={() => scroll("left")}
+        className="absolute top-1/2 left-[3px] z-20 flex items-center justify-center lg:p-3 p-[6px] rounded-full bg-white-primary/50 shadow-md hover:bg-white-primary hover:text-black-primary"
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </button>
     </div>
   );
 }
