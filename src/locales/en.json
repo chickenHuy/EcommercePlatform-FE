@@ -583,6 +583,7 @@
     "text_review": "Review",
     "text_upward": "Upward",
     "text_clear_all": "Clear all",
+    "text_sold":"Sold: {number}",
     "text_sort_by": "Sort by",
     "text_post_date": "Post date",
     "text_original_price": "Original price",

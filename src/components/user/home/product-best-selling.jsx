@@ -57,7 +57,7 @@ export default function ProductBestSelling() {
       </div>
       <div
         ref={scrollContainerRef}
-        className="flex flex-row overflow-x-auto lg:gap-5 gap-3 scroll-smooth no-scrollbar p-3"
+        className="max-w-full flex flex-row overflow-x-auto lg:gap-5 gap-3 scroll-smooth no-scrollbar p-3"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {isLoading
@@ -67,7 +67,7 @@ export default function ProductBestSelling() {
           : listProduct.map((product, index) => (
             <div
               key={product.id || index}
-              className="lg:max-w-[250px] sm:max-w-[150px] max-w-[100px]"
+              className="lg:min-w-[250px] min-w-[150px] lg:max-w-[250px] max-w-[150px]"
             >
               <ProductCard
                 name={product.name}
@@ -75,7 +75,9 @@ export default function ProductBestSelling() {
                 originalPrice={product.originalPrice}
                 mainImageUrl={product.mainImageUrl}
                 videoUrl={product.videoUrl}
+                sold={product.sold}
                 rating={product.rating}
+                showRating = {false}
                 isFavorite={false}
                 link={product.slug}
               />

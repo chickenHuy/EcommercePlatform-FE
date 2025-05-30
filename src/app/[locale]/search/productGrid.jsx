@@ -123,6 +123,8 @@ export default function ProductGrid({ maxCol = 6, storeParam = null }) {
             originalPrice={product.originalPrice}
             mainImageUrl={product.mainImageUrl}
             videoUrl={product.videoUrl}
+            brandName={product.brandName}
+            sold={product.sold}
             rating={product.rating}
             onViewDetail={() => handleViewDetail(product)}
             onAddToFavorites={() => handleAddToFavorites(product.id)}

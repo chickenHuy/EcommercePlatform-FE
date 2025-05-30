@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import IconNotFound from "../../../public/images/iconNotFound.png";
 import Link from "next/link";
 import { getThreeSecondVideoUrl } from "@/utils";
+import { useTranslations } from "next-intl";
 
 function formatPrice(price) {
   return new Intl.NumberFormat("vi-VN", {
@@ -21,14 +22,19 @@ export default function ProductCard({
   originalPrice,
   mainImageUrl,
   videoUrl,
+  sold = 0,
+  brandName = null,
   rating,
+  showRating = true,
   onAddToFavorites,
   isFavorite,
   link,
 }) {
+  const t = useTranslations("Search");
+
   return (
     <Link href={`/${link}`} passHref className="w-full h-full relative group">
-      <Card className="w-full h-full bg-blue-tertiary overflow-hidden flex flex-col rounded-md border shadow-sm transition duration-150">
+      <Card className="w-full h-full bg-white-primary overflow-hidden flex flex-col rounded-md border shadow-sm transition duration-150">
         <CardHeader className="p-0 relative">
           <div className="relative w-full aspect-square group-hover:-translate-y-[6px] transition duration-150">
             {videoUrl ? (
@@ -70,41 +76,48 @@ export default function ProductCard({
               }}
             >
               <Heart
-                className={`w-4 h-4 ${
-                  isFavorite ? "fill-red-primary text-red-primary" : ""
-                }`}
+                className={`w-4 h-4 ${isFavorite ? "fill-red-primary text-red-primary" : ""
+                  }`}
               />
             </Button>
           )}
         </CardHeader>
 
-        <CardContent className="p-2 flex flex-col justify-between gap-1">
-          <CardTitle className="text-[1em] text-ellipsis truncate">
+        <CardContent className="p-2 flex flex-col justify-between gap-2">
+          <CardTitle className="w-full h-12 text-[1em] line-clamp-2">
             {name}
           </CardTitle>
-          <div className="flex items-center gap-1">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`w-[12px] h-[12px] ${
-                  i < Math.round(rating)
-                    ? "text-yellow-primary fill-yellow-primary"
-                    : ""
-                }`}
-              />
-            ))}
-            <span className="text-[.8em]">{rating && rating.toFixed(1)}</span>
+          {brandName && (
+            <div className="w-fit sm:text-[1em] text-[.8em] rounded-sm px-3 py-1 bg-blue-tertiary">
+              {brandName}
+            </div>
+          )}
+          <div className="w-full flex flex-row flex-wrap justify-between items-center gap-1">
+            <div className="flex items-center gap-1">
+              {showRating &&
+                [...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`w-[12px] h-[12px] ${i < Math.round(rating)
+                      ? "text-yellow-primary fill-yellow-primary"
+                      : ""
+                      }`}
+                  />
+                ))}
+              <span className="text-[.8em]">{rating && rating.toFixed(1)}</span>
+            </div>
+            <span className="text-[.8em]">{t("text_sold", { number: sold })}</span>
           </div>
 
-          <div className="flex items-center">
-            <span className="sm:text-[1em] text-[.8em] text-red-primary">
-              {formatPrice(price)}
-            </span>
+          <div className="w-full flex flex-row flex-wrap justify-between items-center">
             {originalPrice && (
-              <span className="mx-2 sm:text-[1em] text-[.8em] text-black-primary/50 line-through">
+              <span className="sm:text-[1em] text-[.8em] text-black-primary/50 line-through">
                 {formatPrice(originalPrice)}
               </span>
             )}
+            <span className="sm:text-[1.2em] text-[.9em] text-red-primary">
+              {formatPrice(price)}
+            </span>
           </div>
         </CardContent>
       </Card>
