@@ -8,7 +8,6 @@ import IconNotFound from "../../../public/images/iconNotFound.png";
 import Link from "next/link";
 import { getThreeSecondVideoUrl } from "@/utils";
 import { useTranslations } from "next-intl";
-import { preProcessFile } from "typescript";
 
 function formatPrice(price) {
   return new Intl.NumberFormat("vi-VN", {
