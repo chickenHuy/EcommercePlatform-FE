@@ -1,668 +1,604 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect, useCallback } from "react"
-import { ChevronUp, ChevronDown, Heart, Share, ShoppingCart, Star, Play, Loader2, Search, Copy, Check } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { searchProducts } from "@/api/search/searchApi"
-import Link from "next/link"
-import { get, post } from "@/lib/httpClient"
-import { useDispatch } from "react-redux"
-import { setWishList } from "@/store/features/wishListSlice"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
+import { useState, useRef, useEffect, useCallback } from "react";
+import {
+  ChevronUp,
+  ChevronDown,
+  Heart,
+  Share,
+  Star,
+  Play,
+  Copy,
+  Check,
+  ExternalLink,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { searchProducts } from "@/api/search/searchApi";
+import Link from "next/link";
+import { get, post, del } from "@/lib/httpClient";
+import { useDispatch } from "react-redux";
+import { setWishList } from "@/store/features/wishListSlice";
 import ProductPlaceholder from "@/assets/images/productPlaceholder.png";
+import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
+import Image from "next/image";
+import Loading from "../loading";
+import { useTranslations } from "next-intl";
 
-function formatPrice(price) {
-    const numPrice = typeof price === "string" ? Number.parseFloat(price) : price
-    return new Intl.NumberFormat("vi-VN", {
-        style: "currency",
-        currency: "VND",
-        minimumFractionDigits: 0,
-    }).format(numPrice)
-}
+const formatPrice = (price) => {
+  const numPrice = typeof price === "string" ? Number.parseFloat(price) : price;
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0,
+  }).format(numPrice);
+};
 
-function VideoPlayer({ product, isActive }) {
-    const videoRef = useRef(null)
-    const [isPlaying, setIsPlaying] = useState(false)
-    const [isLoading, setIsLoading] = useState(true)
+const calculateDiscount = (originalPrice, salePrice) => {
+  const original =
+    typeof originalPrice === "string"
+      ? Number.parseFloat(originalPrice)
+      : originalPrice;
+  const sale =
+    typeof salePrice === "string" ? Number.parseFloat(salePrice) : salePrice;
+  return Math.round(((original - sale) / original) * 100);
+};
 
+const VideoPlayer = ({ product, isActive }) => {
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        if (videoRef.current) {
-            if (isActive) {
-                videoRef.current.play().catch(() => {
-                    setIsPlaying(false)
-                })
-                setIsPlaying(true)
-            } else {
-                videoRef.current.pause()
-                setIsPlaying(false)
-            }
-        }
-    }, [isActive])
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
 
-    const togglePlay = () => {
-        if (videoRef.current) {
-            if (isPlaying) {
-                videoRef.current.pause()
-                setIsPlaying(false)
-            } else {
-                videoRef.current.play().catch(() => {
-                    setIsPlaying(false)
-                })
-                setIsPlaying(true)
-            }
-        }
+    if (isActive) {
+      video.play().catch(() => setIsPlaying(false));
+      setIsPlaying(true);
+    } else {
+      video.pause();
+      setIsPlaying(false);
     }
+  }, [isActive]);
 
-    const handleLoadedData = () => {
-        setIsLoading(false)
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isPlaying) {
+      video.pause();
+      setIsPlaying(false);
+    } else {
+      video.play().catch(() => setIsPlaying(false));
+      setIsPlaying(true);
     }
+  };
 
-    return (
-        <div className="w-full h-screen flex items-center justify-center bg-black-primary">
-            <div className="relative max-w-96 h-[80vh] rounded-sm">
-                <video
-                    ref={videoRef}
-                    className="w-full h-full object-cover rounded-sm"
-                    loop
-                    playsInline
-                    poster={product.mainImageUrl}
-                    onClick={togglePlay}
-                    onLoadedData={handleLoadedData}
-                    crossOrigin="anonymous"
-                >
-                    <source src={product.videoUrl} type="video/mp4" />
-                </video>
+  return (
+    <div className="relative w-full h-full lg:py-2 py-0 flex items-center justify-center bg-gradient-to-br from-slate-900 to-black">
+      <Image src={product.mainImageUrl} fill alt="Product Video" className="object-cover"></Image>
+      <div className="absolute w-full h-full top-0 left-0 backdrop-blur-md bg-white-primary/10">
+      </div>
+      <div className="relative h-full aspect-[9/16] rounded-md overflow-hidden shadow-md">
+        <video
+          ref={videoRef}
+          className="w-full h-full object-cover"
+          loop
+          playsInline
+          poster={product.mainImageUrl}
+          onClick={togglePlay}
+          onLoadedData={() => setIsLoading(false)}
+          crossOrigin="anonymous"
+        >
+          <source src={product.videoUrl} type="video/mp4" />
+        </video>
 
-                {/* Loading Overlay */}
-                {isLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black-primary/50">
-                        <Loader2 className="w-8 h-8 text-white-primary animate-spin" />
-                    </div>
-                )}
+        {isLoading && <div className="global_loading_icon black"></div>}
 
-                {/* Play/Pause Overlay */}
-                {!isPlaying && !isLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black-primary/20">
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            className="w-20 h-20 rounded-full bg-white-primary/20 backdrop-blur-sm hover:bg-white-primary/30"
-                            onClick={togglePlay}
-                        >
-                            <Play className="w-10 h-10 text-white-primary fill-white-primary" />
-                        </Button>
-                    </div>
-                )}
-            </div>
-        </div>
-    )
-}
-
-export default function TikTokProductViewer({
-    initialSize = 10,
-    searchPlaceholder = "Tìm kiếm sản phẩm...",
-}) {
-    const [products, setProducts] = useState([])
-    const [currentIndex, setCurrentIndex] = useState(0)
-    const [isLiked, setIsLiked] = useState(false)
-    const [likedProducts, setLikedProducts] = useState(new Set())
-    const [loading, setLoading] = useState(false)
-    const [hasMore, setHasMore] = useState(true)
-    const [page, setPage] = useState(1)
-    const [keyword, setKeyword] = useState("")
-    const [searchInput, setSearchInput] = useState("")
-    const [showSearch, setShowSearch] = useState(false)
-    const [error, setError] = useState(null)
-
-    const containerRef = useRef(null)
-    const searchTimeoutRef = useRef()
-
-    const currentProduct = products[currentIndex]
-
-    const [showShareDialog, setShowShareDialog] = useState(false)
-    const [copySuccess, setCopySuccess] = useState(false)
-
-    const generateShareLink = (product) => {
-        const baseUrl = typeof window !== "undefined" ? window.location.origin : ""
-        return `${baseUrl}/${product.slug}`
-    }
-
-    const handleShare = () => {
-        setShowShareDialog(true)
-    }
-
-    const handleCopyLink = async () => {
-        if (!currentProduct) return
-
-        const shareLink = generateShareLink(currentProduct)
-
-        try {
-            await navigator.clipboard.writeText(shareLink)
-            setCopySuccess(true)
-            setTimeout(() => {
-                setCopySuccess(false)
-                setShowShareDialog(false)
-            }, 1500)
-        } catch (err) {
-            // Fallback for older browsers
-            const textArea = document.createElement("textarea")
-            textArea.value = shareLink
-            document.body.appendChild(textArea)
-            textArea.select()
-            document.execCommand("copy")
-            document.body.removeChild(textArea)
-
-            setCopySuccess(true)
-            setTimeout(() => {
-                setCopySuccess(false)
-                setShowShareDialog(false)
-            }, 1500)
-        }
-    }
-
-    const handleNativeShare = async () => {
-        if (!currentProduct) return
-
-        const shareLink = generateShareLink(currentProduct)
-
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: currentProduct.name,
-                    text: `Xem sản phẩm ${currentProduct.name} với giá ${formatPrice(currentProduct.salePrice)}`,
-                    url: shareLink,
-                })
-            } catch (err) {
-                console.log("Share cancelled or failed")
-            }
-        } else {
-            handleCopyLink()
-        }
-    }
-
-
-    const dispatch = useDispatch();
-
-    // Fetch products from API
-    const fetchProducts = useCallback(
-        async (pageNum, searchKeyword = "", reset = false) => {
-            if (loading) return
-
-            setLoading(true)
-            setError(null)
-
-            try {
-                const data = await searchProducts({
-                    search: searchKeyword,
-                    page: pageNum,
-                    limit: initialSize,
-                })
-
-
-                const newProducts = data.result.data
-
-                if (reset) {
-                    setProducts(newProducts)
-                    setCurrentIndex(0)
-                } else {
-                    setProducts((prev) => [...prev, ...newProducts])
-                }
-
-                // Check if there are more pages
-                const totalPages = data.result.totalPages
-                setHasMore(totalPages ? pageNum < totalPages : newProducts.length === initialSize)
-            } catch (err) {
-                setError(err instanceof Error ? err.message : "Có lỗi xảy ra khi tải dữ liệu")
-                console.error("Error fetching products:", err)
-            } finally {
-                setLoading(false)
-            }
-        },
-        [initialSize, loading],
-    )
-
-    // Initial load
-    useEffect(() => {
-        fetchProducts(1, keyword, true)
-    }, [])
-
-    // Handle search
-    const handleSearch = useCallback(
-        (searchTerm) => {
-            setKeyword(searchTerm)
-            setPage(1)
-            fetchProducts(1, searchTerm, true)
-        },
-        [fetchProducts],
-    )
-
-    // Debounced search
-    useEffect(() => {
-        if (searchTimeoutRef.current) {
-            clearTimeout(searchTimeoutRef.current)
-        }
-
-        searchTimeoutRef.current = setTimeout(() => {
-            if (searchInput !== keyword) {
-                handleSearch(searchInput)
-            }
-        }, 500)
-
-        return () => {
-            if (searchTimeoutRef.current) {
-                clearTimeout(searchTimeoutRef.current)
-            }
-        }
-    }, [searchInput, keyword, handleSearch])
-
-    // Load more products when reaching near the end
-    const loadMoreProducts = useCallback(() => {
-        if (hasMore && !loading && currentIndex >= products.length - 2) {
-            const nextPage = page + 1
-            setPage(nextPage)
-            fetchProducts(nextPage, keyword, false)
-        }
-    }, [hasMore, loading, currentIndex, products.length, page, keyword, fetchProducts])
-
-    const scrollToIndex = (index) => {
-        if (containerRef.current && index >= 0 && index < products.length) {
-            const targetScroll = index * window.innerHeight
-            containerRef.current.scrollTo({
-                top: targetScroll,
-                behavior: "smooth",
-            })
-            setCurrentIndex(index)
-        }
-    }
-
-    const handleScroll = useCallback(() => {
-        if (containerRef.current) {
-            const scrollTop = containerRef.current.scrollTop
-            const newIndex = Math.round(scrollTop / window.innerHeight)
-
-            if (newIndex !== currentIndex && newIndex >= 0 && newIndex < products.length) {
-                setCurrentIndex(newIndex)
-
-                // Update like state based on current product
-                const productId = products[newIndex]?.id
-                setIsLiked(productId ? likedProducts.has(productId) : false)
-
-                // Load more products if near the end
-                if (newIndex >= products.length - 2) {
-                    loadMoreProducts()
-                }
-            }
-        }
-    }, [currentIndex, products.length, likedProducts, loadMoreProducts])
-
-    const goToPrevious = () => {
-        if (currentIndex > 0) {
-            scrollToIndex(currentIndex - 1)
-        }
-    }
-
-    const goToNext = () => {
-        if (currentIndex < products.length - 1) {
-            scrollToIndex(currentIndex + 1)
-        } else {
-            loadMoreProducts()
-        }
-    }
-
-    const toggleLike = async () => {
-        if (currentProduct) {
-            const newLikedProducts = new Set(likedProducts)
-            if (likedProducts.has(currentProduct.id)) {
-                newLikedProducts.delete(currentProduct.id)
-            } else {
-                try {
-                    await post(`/api/v1/users/follow/${currentProduct.id}`);
-                    get(`/api/v1/users/listFollowedProduct`)
-                        .then((res) => {
-                            dispatch(setWishList(res.result));
-                        })
-                        .catch(() => {
-                            dispatch(setWishList([]));
-                        });
-                } catch (error) {
-                    console.log("error like product")
-                }
-                newLikedProducts.add(currentProduct.id)
-            }
-            setLikedProducts(newLikedProducts)
-            setIsLiked(!isLiked)
-        }
-    }
-
-    useEffect(() => {
-        const container = containerRef.current
-        if (container) {
-            container.addEventListener("scroll", handleScroll)
-            return () => container.removeEventListener("scroll", handleScroll)
-        }
-    }, [handleScroll])
-
-    // Update like state when current product changes
-    useEffect(() => {
-        if (currentProduct) {
-            setIsLiked(likedProducts.has(currentProduct.id))
-        }
-    }, [currentProduct, likedProducts])
-
-    if (products.length === 0 && loading) {
-        return (
-            <div className="w-full h-screen bg-black-primary flex items-center justify-center">
-                <div className="text-center">
-                    <div className="global_loading_icon white"></div>
-                </div>
-            </div>
-        )
-    }
-
-    if (products.length === 0 && error) {
-        return (
-            <div className="w-full h-screen bg-black-primary flex items-center justify-center">
-                <div className="text-center">
-                    <p className="text-white-primary mb-4">{error}</p>
-                    <Button onClick={() => fetchProducts(1, keyword, true)} className="bg-white-primary/20 text-white-primary hover:bg-white-primary/30">
-                        Thử lại
-                    </Button>
-                </div>
-            </div>
-        )
-    }
-
-    if (products.length === 0) {
-        return (
-            <div className="w-full h-screen bg-black-primary flex items-center justify-center">
-                <p className="text-white-primary">Không tìm thấy sản phẩm nào</p>
-            </div>
-        )
-    }
-
-    const discount = currentProduct
-        ? Math.round(
-            ((Number.parseFloat(currentProduct.originalPrice) - Number.parseFloat(currentProduct.salePrice)) /
-                Number.parseFloat(currentProduct.originalPrice)) *
-            100,
-        )
-        : 0
-
-    return (
-        <div className="relative w-full h-screen overflow-hidden bg-black-primary">
-            {/* Scrollable Video Container */}
-            <div
-                ref={containerRef}
-                className="w-full h-full overflow-y-scroll snap-y snap-mandatory scrollbar-hide"
-                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        {!isPlaying && !isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[1px]">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="w-20 h-20 rounded-full backdrop-blur-md hover:bg-transparent-primary border border-white-primary transition-all duration-300 hover:scale-110"
+              onClick={togglePlay}
             >
-                {products.map((product, index) => (
-                    <div key={product.id} className="snap-start">
-                        <VideoPlayer product={product} isActive={index === currentIndex} />
-                    </div>
-                ))}
+              <Play className="w-10 h-10 text-white-primary fill-white-primary ml-1" />
+            </Button>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/20 pointer-events-none" />
+        <ProductInfo product={product} />
+      </div>
+    </div>
+  );
+};
 
-                {/* Loading indicator at the bottom */}
-                {loading && hasMore && (
-                    <div className="h-screen flex items-center justify-center bg-black-primary">
-                        <Loader2 className="w-8 h-8 text-white-primary animate-spin" />
-                    </div>
-                )}
+const ProductInfo = ({ product }) => {
+  const discount = calculateDiscount(product.originalPrice, product.salePrice);
+  const t = useTranslations("Search");
+
+  return (
+    <div className="absolute w-full h-fit bottom-0 left-0 p-2 z-10 text-white-primary bg-[rgba(0,0,0,0.3)] rounded-t-md">
+      <div className="space-y-1">
+        <h2 className="lg:text-[1.2em] text-[1em] line-clamp-2">
+          {product.name}
+        </h2>
+        <div className="flex items-center justify-between text-[.9em">
+          {product.rating && (
+            <div className="flex items-center gap-1">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`w-[12px] h-[12px] ${i < Math.round(product.rating)
+                    ? "text-yellow-primary fill-yellow-primary"
+                    : ""
+                    }`}
+                />
+              ))}
+              <span >{product.rating.toFixed(1)}</span>
             </div>
+          )}
+          <span className="text-[.9em]">
+            {t("text_sold", { number: product.sold })}
+          </span>
+        </div>
 
-            {/* Fixed UI Overlays */}
-            {currentProduct && (
-                <>
-                    {/* Top Brand Badge */}
-                    <div className="absolute top-6 left-6 z-10">
-                        <Badge variant="secondary" className="bg-white-primary/20 backdrop-blur-sm text-white-primary border-white-primary/30">
-                            {currentProduct.brandName}
-                        </Badge>
-                    </div>
+        <Badge className="text-white-primary text-[.9em] border-0 rounded-sm bg-transparent-primary border border-white-primary">
+          {product.brandName}
+        </Badge>
 
-                    {/* Right Side Actions */}
-                    <div className="absolute right-4 bottom-32 flex flex-col gap-4 z-30">
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            className={`w-12 h-12 rounded-full backdrop-blur-sm ${isLiked ? "bg-red-primary/80 text-white-primary" : "bg-white-primary/20 text-white-primary"} hover:bg-white-primary/30`}
-                            onClick={toggleLike}
-                        >
-                            <Heart className={`w-6 h-6 ${isLiked ? "fill-current" : ""}`} />
-                        </Button>
+        <div className="flex items-center justify-end gap-3">
+          {discount > 0 && (
+            <Badge className="text-white-primary text-[.9em] border-0 rounded-sm bg-red-primary">
+              -{discount}%
+            </Badge>
+          )}
+          <span className="text-white-secondary text-[1em] line-through">
+            {formatPrice(product.originalPrice)}
+          </span>
+          <span className="text-white-primary text-[1.3em]">
+            {formatPrice(product.salePrice)}
+          </span>
+        </div>
+      </div>
 
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            className="w-12 h-12 rounded-full bg-white-primary/20 backdrop-blur-sm text-white-primary hover:bg-white-primary/30"
-                            onClick={handleShare}
-                        >
-                            <Share className="w-6 h-6" />
-                        </Button>
-                    </div>
+      <Link href={`/${product.slug}`} className="block">
+        <Button className="w-full text-black-primary py-4 rounded-md shadow-md transition-all duration-300 border border-white-primary bg-transparent-primary hover:bg-white-primary text-white-primary hover:text-black-primary">
+          <span className="mr-2">{t("text_view_detail")}</span>
+          <ExternalLink className="w-4 h-4" />
+        </Button>
+      </Link>
+    </div>
+  );
+};
 
-                    {/* Navigation Controls */}
-                    <div className="absolute right-6 top-1/2 transform -translate-y-1/2 flex flex-col gap-2 z-20">
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            className="w-10 h-10 rounded-full bg-white-primary/20 backdrop-blur-sm text-white-primary hover:bg-white-primary/30"
-                            onClick={goToPrevious}
-                            disabled={currentIndex === 0}
-                        >
-                            <ChevronUp className="w-5 h-5" />
-                        </Button>
+const ShareDialog = ({ product, isOpen, onClose }) => {
+  const [copySuccess, setCopySuccess] = useState(false);
 
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            className="w-10 h-10 rounded-full bg-white-primary/20 backdrop-blur-sm text-white-primary hover:bg-white-primary/30"
-                            onClick={goToNext}
-                            disabled={currentIndex === products.length - 1 && !hasMore}
-                        >
-                            <ChevronDown className="w-5 h-5" />
-                        </Button>
-                    </div>
+  const generateShareLink = (product) => {
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+    return `${baseUrl}/${product.slug}`;
+  };
 
-                    {/* Progress Indicator */}
-                    <div className="absolute left-6 top-1/2 transform -translate-y-1/2 flex flex-col gap-2 z-20 max-h-64 overflow-hidden">
-                        {products.slice(Math.max(0, currentIndex - 5), currentIndex + 6).map((_, relativeIndex) => {
-                            const actualIndex = Math.max(0, currentIndex - 5) + relativeIndex
-                            return (
-                                <div
-                                    key={actualIndex}
-                                    className={`w-1 h-6 rounded-full transition-all duration-300 ${actualIndex === currentIndex ? "bg-white-primary" : "bg-white-primary/30"
-                                        }`}
-                                />
-                            )
-                        })}
-                        {hasMore && <div className="w-1 h-6 rounded-full bg-white-primary/10" />}
-                    </div>
+  const handleCopyLink = async () => {
+    if (!product) return;
 
-                    {/* Bottom Product Info */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
-                        <div className="bg-gradient-to-t from-black-primary/80 via-black-primary/60 to-transparent-primary pt-8 -mt-8">
-                            <div className="space-y-4">
-                                <h2 className="text-white-primary text-xl font-bold leading-tight line-clamp-2">{currentProduct.name}</h2>
+    const shareLink = generateShareLink(product);
 
-                                <div className="flex items-center gap-4">
-                                    {currentProduct.rating && (
-                                        <div className="flex items-center gap-1">
-                                            <Star className="w-4 h-4 text-yellow-primary/80 fill-current" />
-                                            <span className="text-white-primary text-sm font-medium">{currentProduct.rating}</span>
-                                        </div>
-                                    )}
-                                    <span className="text-white-primary/80 text-sm">Đã bán: {currentProduct.sold}</span>
-                                    <span className="text-white-primary/80 text-sm">Còn lại: {currentProduct.quantity}</span>
-                                </div>
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      setCopySuccess(true);
+      setTimeout(() => {
+        setCopySuccess(false);
+        onClose();
+      }, 1500);
+    } catch (err) {
+      const textArea = document.createElement("textarea");
+      textArea.value = shareLink;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
 
-                                <div className="flex items-center gap-3">
-                                    <span className="text-white-primary text-2xl font-bold">{formatPrice(currentProduct.salePrice)}</span>
-                                    <span className="text-white-primary/60 text-lg line-through">
-                                        {formatPrice(currentProduct.originalPrice)}
-                                    </span>
-                                    {discount > 0 && (
-                                        <Badge variant="destructive" className="bg-red-primary text-white-primary">
-                                            -{discount}%
-                                        </Badge>
-                                    )}
-                                </div>
+      setCopySuccess(true);
+      setTimeout(() => {
+        setCopySuccess(false);
+        onClose();
+      }, 1500);
+    }
+  };
 
-                                <Link href={`/${currentProduct.slug}`} passHref className="w-full h-full relative group">
-                                    <Button
-                                        className="w-3/4 mx-auto justify-center flex bg-gradient-to-r from-red-primary to-white-primary/80 hover:from-red-600 hover:to-white-primary/70 text-white-primary font-semibold py-3 rounded-full"
-                                    >
-                                        Xem chi tiết
-                                    </Button>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </>
-            )
-            }
+  const shareToSocial = (platform) => {
+    if (!product) return;
 
-            <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-                <DialogContent className="bg-black-primary/90 backdrop-blur-md border-white-primary/20 text-white-primary max-w-md">
-                    <DialogHeader>
-                        <DialogTitle className="text-white-primary flex items-center gap-2">
-                            <Share className="w-5 h-5" />
-                            Chia sẻ sản phẩm
-                        </DialogTitle>
-                    </DialogHeader>
+    const shareLink = generateShareLink(product);
+    const text = `Xem sản phẩm ${product.name} với giá ${formatPrice(product.salePrice)}`;
 
-                    {currentProduct && (
-                        <div className="space-y-4">
-                            {/* Product Preview */}
-                            <div className="flex gap-3 p-3 bg-white-primary/10 rounded-lg">
-                                <img
-                                    src={currentProduct.mainImageUrl || ProductPlaceholder}
-                                    alt={currentProduct.name}
-                                    className="w-16 h-16 object-cover rounded"
-                                />
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="font-medium text-sm line-clamp-2">{currentProduct.name}</h3>
-                                    <p className="text-red-primary font-bold text-sm">{formatPrice(currentProduct.salePrice)}</p>
-                                </div>
-                            </div>
+    const urls = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}&quote=${encodeURIComponent(text)}`,
+      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareLink)}`,
+      zalo: `https://zalo.me/share/sms?text=${encodeURIComponent(text + " " + shareLink)}`,
+    };
 
-                            {/* Share Link */}
-                            <div className="space-y-3">
-                                <label className="text-sm font-medium">Link sản phẩm:</label>
-                                <div className="flex gap-2">
-                                    <Input
-                                        value={generateShareLink(currentProduct)}
-                                        readOnly
-                                        className="bg-white-primary/10 border-white-primary/20 text-white-primary text-sm"
-                                    />
-                                    <Button
-                                        size="sm"
-                                        onClick={handleCopyLink}
-                                        className={`px-3 ${copySuccess ? "bg-black-primary hover:bg-red-primary" : "bg-blue-primary hover:bg-blue-primary/80"} text-white`}
-                                        disabled={copySuccess}
-                                    >
-                                        {copySuccess ? (
-                                            <>
-                                                <Check className="w-4 h-4 mr-1" />
-                                                Đã copy
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Copy className="w-4 h-4 mr-1" />
-                                                Copy
-                                            </>
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
+    window.open(urls[platform], "_blank");
+  };
 
-                            {/* Share Options */}
-                            <div className="space-y-3">
-                                <label className="text-sm font-medium">Chia sẻ qua:</label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={handleNativeShare}
-                                        className="bg-white-primary/10 border-white-primary/20 text-white-primary hover:bg-white-primary/20"
-                                    >
-                                        <Share className="w-4 h-4 mr-2" />
-                                        Chia sẻ
-                                    </Button>
+  if (!product) return null;
 
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={handleCopyLink}
-                                        className="bg-white-primary/10 border-white-primary/20 text-white-primary hover:bg-white-primary/20"
-                                    >
-                                        <Copy className="w-4 h-4 mr-2" />
-                                        Copy link
-                                    </Button>
-                                </div>
-                            </div>
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-gradient-to-br from-slate-900/95 to-black/95 backdrop-blur-xl border-white/10 text-white max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-white flex items-center gap-2">
+            <Share className="w-5 h-5 text-blue-400" />
+            Chia sẻ sản phẩm
+          </DialogTitle>
+        </DialogHeader>
 
-                            {/* Social Share Buttons */}
-                            <div className="grid grid-cols-3 gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => {
-                                        const shareLink = generateShareLink(currentProduct)
-                                        const text = `Xem sản phẩm ${currentProduct.name} với giá ${formatPrice(currentProduct.salePrice)}`
-                                        window.open(
-                                            `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}&quote=${encodeURIComponent(text)}`,
-                                            "_blank",
-                                        )
-                                    }}
-                                    className="bg-blue-600 hover:bg-blue-700 border-blue-600 text-white"
-                                >
-                                    Facebook
-                                </Button>
+        <div className="space-y-6">
+          {/* Product Preview */}
+          <div className="flex gap-3 p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
+            <img
+              src={product.mainImageUrl || ProductPlaceholder}
+              alt={product.name}
+              className="w-16 h-16 object-cover rounded-lg"
+            />
+            <div className="flex-1 min-w-0">
+              <h3 className="font-medium text-sm line-clamp-2 mb-2">
+                {product.name}
+              </h3>
+              <p className="text-red-400 font-bold text-sm">
+                {formatPrice(product.salePrice)}
+              </p>
+            </div>
+          </div>
 
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => {
-                                        const shareLink = generateShareLink(currentProduct)
-                                        const text = `Xem sản phẩm ${currentProduct.name} với giá ${formatPrice(currentProduct.salePrice)}`
-                                        window.open(
-                                            `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareLink)}`,
-                                            "_blank",
-                                        )
-                                    }}
-                                    className="bg-sky-500 hover:bg-sky-600 border-sky-500 text-white"
-                                >
-                                    Twitter
-                                </Button>
+          {/* Share Link */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-white/80">
+              Link sản phẩm:
+            </label>
+            <div className="flex gap-2">
+              <Input
+                value={generateShareLink(product)}
+                readOnly
+                className="bg-white/5 border-white/20 text-white text-sm backdrop-blur-sm"
+              />
+              <Button
+                size="sm"
+                onClick={handleCopyLink}
+                className={`px-4 transition-all duration-300 ${copySuccess
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-blue-600 hover:bg-blue-700"
+                  }`}
+                disabled={copySuccess}
+              >
+                {copySuccess ? (
+                  <>
+                    <Check className="w-4 h-4 mr-1" />
+                    Đã copy
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 mr-1" />
+                    Copy
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
 
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => {
-                                        const shareLink = generateShareLink(currentProduct)
-                                        const text = `Xem sản phẩm ${currentProduct.name} với giá ${formatPrice(currentProduct.salePrice)} ${shareLink}`
-                                        window.open(`https://zalo.me/share/sms?text=${encodeURIComponent(text)}`, "_blank")
-                                    }}
-                                    className="bg-blue-500 hover:bg-blue-600 border-blue-500 text-white"
-                                >
-                                    Zalo
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-                </DialogContent>
-            </Dialog>
+          {/* Social Share Buttons */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-white/80">
+              Chia sẻ qua:
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => shareToSocial("facebook")}
+                className="bg-blue-600/20 hover:bg-blue-600/30 border-blue-500/30 text-blue-300 hover:text-blue-200 transition-all duration-300"
+              >
+                Facebook
+              </Button>
 
-            {/* Custom CSS for hiding scrollbar */}
-            <style jsx>{`
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => shareToSocial("twitter")}
+                className="bg-sky-600/20 hover:bg-sky-600/30 border-sky-500/30 text-sky-300 hover:text-sky-200 transition-all duration-300"
+              >
+                Twitter
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => shareToSocial("zalo")}
+                className="bg-blue-600/20 hover:bg-blue-600/30 border-blue-500/30 text-blue-300 hover:text-blue-200 transition-all duration-300"
+              >
+                Zalo
+              </Button>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default function TikTokProductViewer({ initialSize = 10 }) {
+  const [products, setProducts] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [likedProducts, setLikedProducts] = useState(new Set());
+  const [firstLoad, setFirstLoad] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+
+  const containerRef = useRef(null);
+  const dispatch = useDispatch();
+  const currentProduct = products[currentIndex];
+  const isLiked = currentProduct ? likedProducts.has(currentProduct.id) : false;
+
+  const fetchProducts = useCallback(
+    async (pageNum, searchKeyword = "", reset = false) => {
+      if (!firstLoad && loading) return;
+
+      try {
+        setLoading(true);
+        const data = await searchProducts({
+          search: searchKeyword,
+          page: pageNum,
+          limit: initialSize,
+        });
+
+        const newProducts = data.result.data;
+
+        if (reset) {
+          setProducts(newProducts);
+          setCurrentIndex(0);
+        } else {
+          setProducts((prev) => [...prev, ...newProducts]);
+        }
+
+        const totalPages = data.result.totalPages;
+        setHasMore(
+          totalPages
+            ? pageNum < totalPages
+            : newProducts.length === initialSize,
+        );
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setFirstLoad(false);
+        setLoading(false);
+      }
+    },
+    [initialSize, loading],
+  );
+
+  useEffect(() => {
+    initWishList();
+    fetchProducts(1, true);
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'ArrowUp') {
+        goToPrevious();
+      } else if (event.key === 'ArrowDown') {
+        goToNext()
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  const loadMoreProducts = useCallback(() => {
+    if (hasMore && !loading && currentIndex >= products.length - 2) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchProducts(nextPage, false);
+    }
+  }, [
+    hasMore,
+    loading,
+    currentIndex,
+    products.length,
+    page,
+    fetchProducts,
+  ]);
+
+  const scrollToIndex = (index) => {
+    if (containerRef.current && index >= 0 && index < products.length) {
+      const targetScroll = index * window.innerHeight;
+      containerRef.current.scrollTo({
+        top: targetScroll,
+        behavior: "smooth",
+      });
+      setCurrentIndex(index);
+    }
+  };
+
+  const handleScroll = useCallback(() => {
+    if (containerRef.current) {
+      const scrollTop = containerRef.current.scrollTop;
+      const newIndex = Math.round(scrollTop / window.innerHeight);
+
+      if (
+        newIndex !== currentIndex &&
+        newIndex >= 0 &&
+        newIndex < products.length
+      ) {
+        setCurrentIndex(newIndex);
+
+        if (newIndex >= products.length - 2) {
+          loadMoreProducts();
+        }
+      }
+    }
+  }, [currentIndex, products.length, loadMoreProducts]);
+
+  const goToPrevious = () => {
+    if (currentIndex > 0) {
+      scrollToIndex(currentIndex - 1);
+    }
+  };
+
+  const goToNext = () => {
+    if (currentIndex < products.length - 1) {
+      scrollToIndex(currentIndex + 1);
+    } else {
+      loadMoreProducts();
+    }
+  };
+
+  const initWishList = async () => {
+    const response = await getWishList();
+    if (!response) return;
+    const wishList = new Set();
+    response.result.map((product) => {
+      wishList.add(product.productId);
+    })
+    setLikedProducts(wishList);
+  }
+
+  const getWishList = async () => {
+    try {
+      const response = await get(`/api/v1/users/listFollowedProduct`);
+      return response;
+    } catch (error) {
+      console.error("Error liking product:", error);
+    }
+  }
+
+  const toggleLike = async () => {
+    if (!currentProduct) return;
+
+    const newLikedProducts = new Set(likedProducts);
+    if (likedProducts.has(currentProduct.id)) {
+      await del(`/api/v1/users/unFollow/${currentProduct.id}`);
+      newLikedProducts.delete(currentProduct.id);
+    } else {
+
+      await post(`/api/v1/users/follow/${currentProduct.id}`);
+      const response = await getWishList();
+      dispatch(setWishList(response.result));
+      newLikedProducts.add(currentProduct.id);
+      console.log(newLikedProducts);
+    }
+    setLikedProducts(newLikedProducts);
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
+      return () => container.removeEventListener("scroll", handleScroll);
+    }
+  }, [handleScroll]);
+
+  if (products.length === 0 && loading) {
+    return (
+      <Loading />
+    );
+  }
+
+  if (!loading && products.length === 0) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Image src={ReviewEmpty} width={300} height={300} alt="Review Empty"></Image>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-full overflow-hidden rounded-md border shadow-sm">
+      <div
+        ref={containerRef}
+        className="w-full h-full overflow-y-scroll snap-y snap-mandatory no-scrollbar"
+      >
+        {products.map((product, index) => (
+          <div key={product.id} className="h-full snap-start">
+            <VideoPlayer product={product} isActive={index === currentIndex} />
+          </div>
+        ))}
+
+        {loading && hasMore && (
+          <Loading />
+        )}
+      </div>
+
+      {currentProduct && (
+        <>
+          <div className="absolute right-2 bottom-[150px] flex flex-col gap-3 z-20">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="w-10 h-10 rounded-full backdrop-blur-md bg-white-primary/50 border transition-all duration-300"
+              onClick={toggleLike}
+            >
+              <Heart className={`w-5 h-5 ${isLiked ? "text-red-primary fill-red-primary" : ""}`} />
+            </Button>
+
+            <Button
+              size="icon"
+              variant="ghost"
+              className="w-10 h-10 rounded-full backdrop-blur-md bg-white-primary/50 border transition-all duration-300"
+              onClick={() => setShowShareDialog(true)}
+            >
+              <Share className="w-5 h-5" />
+            </Button>
+          </div>
+
+          <div className="absolute right-2 top-1/2 flex flex-col gap-3 z-20">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="w-10 h-10 rounded-full backdrop-blur-md bg-white-primary/50 border transition-all duration-300"
+              onClick={goToPrevious}
+              disabled={currentIndex === 0}
+            >
+              <ChevronUp className="w-5 h-5" />
+            </Button>
+
+            <Button
+              size="icon"
+              variant="ghost"
+              className="w-10 h-10 rounded-full backdrop-blur-md bg-white-primary/50 border transition-all duration-300"
+              onClick={goToNext}
+              disabled={currentIndex === products.length - 1 && !hasMore}
+            >
+              <ChevronDown className="w-5 h-5" />
+            </Button>
+          </div>
+        </>
+      )}
+
+      <ShareDialog
+        product={currentProduct}
+        isOpen={showShareDialog}
+        onClose={() => setShowShareDialog(false)}
+      />
+
+      <style jsx>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }
       `}</style>
-        </div >
-    )
+    </div>
+  );
 }
