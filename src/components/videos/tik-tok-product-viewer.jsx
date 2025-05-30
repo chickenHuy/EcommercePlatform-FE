@@ -127,7 +127,7 @@ const ProductInfo = ({ product }) => {
   const t = useTranslations("Search");
 
   return (
-    <div className="absolute w-full h-fit bottom-0 left-0 p-2 z-10 text-white-primary bg-[rgba(0,0,0,0.3)] rounded-t-md">
+    <div className="absolute w-full h-fit bottom-0 left-0 p-2 pt-3 z-10 text-white-primary bg-[rgba(0,0,0,0.3)] rounded-t-md">
       <div className="space-y-1">
         <h2 className="lg:text-[1.2em] text-[1em] line-clamp-2">
           {product.name}
@@ -183,6 +183,7 @@ const ProductInfo = ({ product }) => {
 
 const ShareDialog = ({ product, isOpen, onClose }) => {
   const [copySuccess, setCopySuccess] = useState(false);
+  const t = useTranslations("Search");
 
   const generateShareLink = (product) => {
     const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
@@ -221,7 +222,7 @@ const ShareDialog = ({ product, isOpen, onClose }) => {
     if (!product) return;
 
     const shareLink = generateShareLink(product);
-    const text = `Xem sản phẩm ${product.name} với giá ${formatPrice(product.salePrice)}`;
+    const text = `View the product ${product.name} with price ${formatPrice(product.salePrice)}`;
 
     const urls = {
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}&quote=${encodeURIComponent(text)}`,
@@ -236,37 +237,47 @@ const ShareDialog = ({ product, isOpen, onClose }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gradient-to-br from-slate-900/95 to-black/95 backdrop-blur-xl border-white/10 text-white max-w-md">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-white flex items-center gap-2">
-            <Share className="w-5 h-5 text-blue-400" />
-            Chia sẻ sản phẩm
+          <DialogTitle className="flex items-center gap-3">
+            <Share className="w-5 h-5 -translate-y-[2px]" />
+            {t("text_share_product")}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Product Preview */}
-          <div className="flex gap-3 p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
-            <img
+        <div className="space-y-5">
+          <div className="flex flex-row gap-3 p-2 rounded-md border shadow-sm">
+            <Image
               src={product.mainImageUrl || ProductPlaceholder}
               alt={product.name}
-              className="w-16 h-16 object-cover rounded-lg"
-            />
+              width={300}
+              height={300}
+              className="w-20 h-20 object-cover rounded-md shadow-sm"
+            ></Image>
             <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-sm line-clamp-2 mb-2">
+              <h3 className="text-[1em] line-clamp-2">
                 {product.name}
               </h3>
-              <p className="text-red-400 font-bold text-sm">
-                {formatPrice(product.salePrice)}
-              </p>
+              <div className="w-full flex flex-row flex-wrap items-center gap-1">
+                {product.originalPrice &&
+                  <p className="text-[.8em] line-through text-white-tertiary">
+                    {formatPrice(product.originalPrice)}
+                  </p>
+                }
+                <p className="text-[1em]">
+                  {formatPrice(product.salePrice)}
+                </p>
+              </div>
+              <Badge className="text-black-primary text-[.8em] rounded-sm bg-transparent-primary border border-black-primary">
+                {product.brandName}
+              </Badge>
             </div>
           </div>
 
-          {/* Share Link */}
-          <div className="space-y-3">
-            <label className="text-sm font-medium text-white/80">
-              Link sản phẩm:
-            </label>
+          <div>
+            <span className="text-[.9em]">
+              {t("text_link_product")}
+            </span>
             <div className="flex gap-2">
               <Input
                 value={generateShareLink(product)}
@@ -274,18 +285,17 @@ const ShareDialog = ({ product, isOpen, onClose }) => {
                 className="bg-white/5 border-white/20 text-white text-sm backdrop-blur-sm"
               />
               <Button
-                size="sm"
                 onClick={handleCopyLink}
                 className={`px-4 transition-all duration-300 ${copySuccess
-                  ? "bg-green-600 hover:bg-green-700"
-                  : "bg-blue-600 hover:bg-blue-700"
+                  ? "bg-black-tertiary"
+                  : ""
                   }`}
                 disabled={copySuccess}
               >
                 {copySuccess ? (
                   <>
                     <Check className="w-4 h-4 mr-1" />
-                    Đã copy
+                    Copied
                   </>
                 ) : (
                   <>
@@ -297,35 +307,30 @@ const ShareDialog = ({ product, isOpen, onClose }) => {
             </div>
           </div>
 
-          {/* Social Share Buttons */}
-          <div className="space-y-3">
-            <label className="text-sm font-medium text-white/80">
-              Chia sẻ qua:
-            </label>
+          <div>
             <div className="grid grid-cols-3 gap-3">
               <Button
-                variant="outline"
                 size="sm"
+                variant="outline"
                 onClick={() => shareToSocial("facebook")}
-                className="bg-blue-600/20 hover:bg-blue-600/30 border-blue-500/30 text-blue-300 hover:text-blue-200 transition-all duration-300"
+                className="bg-[#0866FF] hover:bg-[#0866FF]/90 text-[.9em] border-0 hover:text-white-primary text-white-primary transition-all duration-300"
               >
                 Facebook
               </Button>
 
               <Button
-                variant="outline"
                 size="sm"
                 onClick={() => shareToSocial("twitter")}
-                className="bg-sky-600/20 hover:bg-sky-600/30 border-sky-500/30 text-sky-300 hover:text-sky-200 transition-all duration-300"
+                className="text-[.9em] border-0 transition-all duration-300"
               >
                 Twitter
               </Button>
 
               <Button
-                variant="outline"
                 size="sm"
+                variant="outline"
                 onClick={() => shareToSocial("zalo")}
-                className="bg-blue-600/20 hover:bg-blue-600/30 border-blue-500/30 text-blue-300 hover:text-blue-200 transition-all duration-300"
+                className="bg-[#005ae0] hover:bg-[#005ae0]/90 text-[.9em] border-0 hover:text-white-primary text-white-primary transition-all duration-300"
               >
                 Zalo
               </Button>
