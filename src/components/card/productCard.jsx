@@ -8,6 +8,7 @@ import IconNotFound from "../../../public/images/iconNotFound.png";
 import Link from "next/link";
 import { getThreeSecondVideoUrl } from "@/utils";
 import { useTranslations } from "next-intl";
+import { preProcessFile } from "typescript";
 
 function formatPrice(price) {
   return new Intl.NumberFormat("vi-VN", {
@@ -25,6 +26,7 @@ export default function ProductCard({
   sold = 0,
   brandName = null,
   rating,
+  percentDiscount = null,
   showRating = true,
   onAddToFavorites,
   isFavorite,
@@ -34,6 +36,9 @@ export default function ProductCard({
 
   return (
     <Link href={`/${link}`} passHref className="w-full h-full relative group">
+      {percentDiscount &&
+        <div className="w-fit h-fit px-1 rounded-sm bg-red-primary text-[.8em] text-white-primary absolute top-[5px] left-[5px] z-20">{"-" + percentDiscount + "%"}</div>
+      }
       <Card className="w-full h-full bg-white-primary overflow-hidden flex flex-col rounded-md border shadow-sm transition duration-150">
         <CardHeader className="p-0 relative">
           <div className="relative w-full aspect-square group-hover:-translate-y-[6px] transition duration-150">

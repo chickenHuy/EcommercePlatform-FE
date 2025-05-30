@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import ProductGrid from "./search/productGrid";
 import ProductBestSelling from "@/components/user/home/product-best-selling";
 import ProductSuggestions from "@/components/user/home/product-suggestions";
 import ImageSlider from "@/components/slider";
@@ -137,7 +136,7 @@ export default function HomePage() {
       </div>
       <div
         ref={refBestSelingProduct}
-        className={`sm:px-3 px-1 xl:pt-14 lg:pt-10 sm:pt-8 pt-6 ${isBestSelingProduct ? "animate-fade-in-up" : "opacity-0"}`}
+        className={`w-full h-fit xl:px-28 lg:px-20 sm:px-6 px-4 xl:pt-14 lg:pt-10 sm:pt-8 pt-6 ${isBestSelingProduct ? "animate-fade-in-up" : "opacity-0"}`}
       >
         <ProductBestSelling />
       </div>
@@ -148,7 +147,11 @@ export default function HomePage() {
         <ListBrandComponent />
       </div>
 
-      <ProductSuggestions />
+      <div
+        className="w-full h-fit xl:px-28 lg:px-20 sm:px-6 px-4 xl:pt-14 lg:pt-10 sm:pt-8 pt-6 animate-fade-in-up"
+      >
+        <ProductSuggestions />
+      </div>
     </main>
   );
 }

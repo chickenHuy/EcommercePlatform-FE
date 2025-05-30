@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { getAccount } from "@/api/user/accountRequest"
 import { getRecommendListProduct } from "@/api/ai/recommendRequest"
-import ProductCard from "./product-card"
+import ListProductSuggess from "./product-card"
 import { useInView } from "react-intersection-observer"
 import { getProductBestInteraction } from "@/api/user/homeRequest"
 
@@ -91,7 +91,7 @@ export default function ProductSuggestions() {
   }, [inView])
 
   if (listRecommendProduct.length >= 6) {
-    return <ProductCard
+    return <ListProductSuggess
       listProduct={listRecommendProduct}
       loadRef={loadRef}
       hasNext={hasNext}
@@ -99,7 +99,7 @@ export default function ProductSuggestions() {
       isPage="home"
     />
   } else {
-    return <ProductCard
+    return <ListProductSuggess
       listProduct={listInteractionProduct}
       loadRef={loadRef}
       hasNext={hasNext}
