@@ -93,9 +93,9 @@ export default function ProductCard({
             </div>
           )}
           <div className="w-full flex flex-row flex-wrap justify-between items-center gap-1">
-            <div className="flex items-center gap-1">
-              {showRating &&
-                [...Array(5)].map((_, i) => (
+            {showRating &&
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
                     className={`w-[12px] h-[12px] ${i < Math.round(rating)
@@ -104,8 +104,9 @@ export default function ProductCard({
                       }`}
                   />
                 ))}
-              <span className="text-[.8em]">{rating && rating.toFixed(1)}</span>
-            </div>
+                <span className="text-[.8em]">{rating && rating.toFixed(1)}</span>
+              </div>
+            }
             <span className="text-[.8em]">{t("text_sold", { number: sold })}</span>
           </div>
 
