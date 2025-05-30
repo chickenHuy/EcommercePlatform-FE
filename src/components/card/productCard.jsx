@@ -28,7 +28,7 @@ export default function ProductCard({
 }) {
   return (
     <Link href={`/${link}`} passHref className="w-full h-full relative group">
-      <Card className="w-full h-full bg-blue-tertiary overflow-hidden flex flex-col rounded-md border shadow-sm group-hover:shadow-md transition duration-150">
+      <Card className="w-full h-full bg-blue-tertiary overflow-hidden flex flex-col rounded-md border shadow-sm transition duration-150">
         <CardHeader className="p-0 relative">
           <div className="relative w-full aspect-square group-hover:-translate-y-[6px] transition duration-150">
             {videoUrl ? (
@@ -38,7 +38,7 @@ export default function ProductCard({
                 muted
                 autoPlay
                 playsInline
-                className="w-full h-full object-cover"
+                className="w-full aspect-square object-cover"
               />
             ) : (
               <Image

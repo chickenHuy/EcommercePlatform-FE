@@ -148,7 +148,6 @@ export default function HomePage() {
         <ListBrandComponent />
       </div>
 
-      <ProductGrid />
       <ProductSuggestions />
     </main>
   );

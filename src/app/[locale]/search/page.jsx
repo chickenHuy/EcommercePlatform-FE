@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, lazy, useEffect } from "react";
+import { useState, useEffect } from "react";
 import SearchHeader from "./headerSearch";
 import { Button } from "@/components/ui/button";
 import { ArrowDownUp, ArrowUpWideNarrow, Filter, Store, X } from "lucide-react";
@@ -17,8 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setOrder, setSortBy } from "@/store/features/userSearchSlice";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import Loading from "@/components/loading";
-const ProductGrid = lazy(() => import("./productGrid"));
+import ProductGrid from "./productGrid";
 
 export default function SearchPage() {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
@@ -133,9 +132,7 @@ export default function SearchPage() {
           </div>
 
           <div className="flex-1 overflow-auto w-full p-4">
-            <Suspense fallback={<Loading />}>
-              <ProductGrid maxCol={4} t={t} storeParam={storeId} />
-            </Suspense>
+            <ProductGrid maxCol={4} t={t} storeParam={storeId} />
           </div>
         </div>
 
