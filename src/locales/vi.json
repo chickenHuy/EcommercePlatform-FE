@@ -583,6 +583,8 @@
     "text_brand": "Thương hiệu",
     "text_sale_price": "Giá bán",
     "text_view_detail": "Xem chi tiết",
+    "text_share_product": "Chia sẻ sản phẩm",
+    "text_link_product": "Đường dẫn của sản phẩm",
     "text_review": "Đánh giá",
     "text_upward": "Trở lên",
     "text_sold":"Đã bán: {number}",
