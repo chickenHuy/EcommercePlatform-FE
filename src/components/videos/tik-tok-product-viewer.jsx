@@ -549,7 +549,7 @@ export default function TikTokProductViewer({ initialSize = 10 }) {
 
       {currentProduct && (
         <>
-          <div className="absolute right-2 bottom-[150px] flex flex-col gap-3 z-20">
+          <div className="absolute right-2 bottom-[10%] flex flex-col gap-3 z-20">
             <Button
               size="icon"
               variant="ghost"
@@ -569,7 +569,7 @@ export default function TikTokProductViewer({ initialSize = 10 }) {
             </Button>
           </div>
 
-          <div className="absolute right-2 top-1/2 flex flex-col gap-3 z-20">
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
             <Button
               size="icon"
               variant="ghost"

@@ -52,6 +52,7 @@ const ListBrandComponent = ({ isPage = false }) => {
     if (!isPage && scrollRef.current && !isHovering) {
       const interval = setInterval(() => {
         const container = scrollRef.current;
+        if (!container) return;
         if (
           container.scrollLeft + container.offsetWidth >=
           container.scrollWidth
@@ -105,11 +106,11 @@ const ListBrandComponent = ({ isPage = false }) => {
         >
           {isLoading
             ? Array.from({ length: 32 }).map((_, index) => (
-                <SkeletonItem key={index} />
-              ))
+              <SkeletonItem key={index} />
+            ))
             : listBrand.map((brand) => (
-                <BrandCard key={brand.id} brand={brand} />
-              ))}
+              <BrandCard key={brand.id} brand={brand} />
+            ))}
         </Masonry>
       ) : (
         <>
@@ -121,27 +122,27 @@ const ListBrandComponent = ({ isPage = false }) => {
           >
             {isLoading
               ? Array.from({ length: 20 }).map((_, index) => (
-                  <SkeletonItem key={index} />
-                ))
+                <SkeletonItem key={index} />
+              ))
               : listBrand.map((brand) => (
-                  <Link
-                    href={`/search?brandId=${brand.id}`}
-                    key={brand.id}
-                    className="lg:w-[200px] lg:h-[200px] sm:w-[150px] sm:h-[150px] w-[70px] h-[70px] flex-shrink-0 flex flex-col items-center gap-2 relative group"
-                  >
-                    <div className="w-full h-full relative">
-                      <Image
-                        src={brand.logoUrl || IconNotFound}
-                        alt={brand.name}
-                        fill
-                        className="object-cover rounded-full shadow-md border border-white-secondary"
-                      />
-                    </div>
-                    <p className="w-[80%] sm:p-2 p-1 sm:rounded-md rounded-sm absolute top-[45%] lg:text-[.9em] sm:text-[.8em] text-[.7em] text-white-primary text-center truncate backdrop-blur-sm bg-white-tertiary/50 group-hover:block hidden animate-fade-in-quick">
-                      {brand.name.toUpperCase()}
-                    </p>
-                  </Link>
-                ))}
+                <Link
+                  href={`/search?brandId=${brand.id}`}
+                  key={brand.id}
+                  className="lg:w-[200px] lg:h-[200px] sm:w-[150px] sm:h-[150px] w-[70px] h-[70px] flex-shrink-0 flex flex-col items-center gap-2 relative group"
+                >
+                  <div className="w-full h-full relative">
+                    <Image
+                      src={brand.logoUrl || IconNotFound}
+                      alt={brand.name}
+                      fill
+                      className="object-cover rounded-full shadow-md border border-white-secondary"
+                    />
+                  </div>
+                  <p className="w-[80%] sm:p-2 p-1 sm:rounded-md rounded-sm absolute top-[45%] lg:text-[.9em] sm:text-[.8em] text-[.7em] text-white-primary text-center truncate backdrop-blur-sm bg-white-tertiary/50 group-hover:block hidden animate-fade-in-quick">
+                    {brand.name.toUpperCase()}
+                  </p>
+                </Link>
+              ))}
           </div>
         </>
       )}
