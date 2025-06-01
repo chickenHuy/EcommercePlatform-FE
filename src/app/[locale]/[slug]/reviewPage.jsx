@@ -326,7 +326,6 @@ export default function Reviews({ productId, t }) {
                 width={200}
                 height={200}
                 className="rounded-sm object-cover"
-                unoptimized={true}
               />
               <Label className="text-xl text-black-primary text-opacity-50">
                 {t("text_no_reviews")}
