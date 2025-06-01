@@ -566,6 +566,7 @@
     "text_cash_on_delivery": "Cash on delivery",
     "text_note_payment_method": "Collection fee: ₫0 VND. Shipping fee discount (if any) also applies to collection fee",
     "text_VN_PAY": "VN PAY",
+    "text_payment_detail": "Payment Details",
     "text_total_price": "Total price",
     "text_total_shipping_cost": "Total shipping cost",
     "text_total_discount_voucher": "Total discount voucher",

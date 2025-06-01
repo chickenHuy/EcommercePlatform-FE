@@ -568,6 +568,7 @@
     "text_cash_on_delivery": "Thanh toán khi nhận hàng",
     "text_note_payment_method": "Phí thu hộ: ₫0 VND. Ưu đãi về phí vận chuyển (nếu có) áp dụng cả với phí thu hộ",
     "text_VN_PAY": "VN PAY",
+    "text_payment_detail": "Chi tiết thanh toán",
     "text_total_price": "Tổng tiền hàng",
     "text_total_shipping_cost": "Tổng tiền phí vận chuyển",
     "text_total_discount_voucher": "Tổng cộng Voucher giảm giá",
