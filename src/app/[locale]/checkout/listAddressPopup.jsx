@@ -61,7 +61,7 @@ export default function ListAddress(props) {
                             </DialogTitle>
                         </DialogHeader>
                         <ScrollArea className="grid gap-4 max-h-[360px] px-4 pt-4">
-                            {addresses.length === 0 ? (
+                            {addresses && addresses.length === 0 ? (
                                 <Loading />
                             ) : (
 
@@ -72,7 +72,6 @@ export default function ListAddress(props) {
                                             className={`p-4 border m-1 rounded-md flex flex-col`}
                                         >
                                             <div className="flex justify-between items-center">
-                                                {/* Radio Button */}
                                                 <label className="flex items-center gap-2 cursor-pointer">
                                                     <input
                                                         type="radio"
@@ -88,7 +87,6 @@ export default function ListAddress(props) {
                                                 </label>
                                             </div>
 
-                                            {/* Thông tin địa chỉ */}
                                             <div className="mt-2 space-y-1">
                                                 <p className="text-sm">{address.first_line}</p>
                                                 <p className="text-sm">{address.second_line}</p>
