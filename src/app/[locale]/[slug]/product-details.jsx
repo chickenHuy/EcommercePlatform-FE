@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/toaster";
 
-import Loading from "@/components/loading";
 import { useToast } from "@/hooks/use-toast";
 import { StoreChat } from "@/components/chat/storeChat";
 import ProductDetailSuggestions from "./product-detail-suggestions";
@@ -406,10 +405,11 @@ export default function ProductDetail({ product, t }) {
         </div>
 
         <Separator className="my-7" />
+        <Reviews productId={product.id} t={t} />
 
+        <Separator className="my-7" />
         <ProductDetailSuggestions productId={product.id} />
 
-        <Reviews productId={product.id} t={t} />
       </div>
     </div>
   );
