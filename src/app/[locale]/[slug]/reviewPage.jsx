@@ -11,7 +11,7 @@ import { Star } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import StoreEmpty from "@/assets/images/storeEmpty.jpg";
-import ReviewEmpty from "@/assets/images/reviewEmpty.png";
+import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
 import Loading from "@/components/loading";
 import { useInView } from "react-intersection-observer";
 import { formatDate, getCloudinaryThumbnail } from "@/utils";
