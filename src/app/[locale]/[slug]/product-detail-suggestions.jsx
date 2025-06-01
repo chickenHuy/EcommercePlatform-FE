@@ -23,6 +23,7 @@ export default function ProductDetailSuggestions({ productId }) {
         pageSize,
         limitAll,
       );
+
       setListProduct((prev) => (isInitialLoad ? response.data : [...prev, ...response.data]))
       setCurrentPage(response.nextPage)
       setHasNext(response.hasNext)
@@ -47,13 +48,10 @@ export default function ProductDetailSuggestions({ productId }) {
     return null;
   }
 
-  if (listProduct.length >= 6) {
-    return <ProductCard
-      listProduct={listProduct}
-      loadRef={loadRef}
-      hasNext={hasNext}
-      loadPage={loadPage}
-      isPage="slug"
-    />
-  }
+  return <ProductCard
+    listProduct={listProduct}
+    loadRef={loadRef}
+    hasNext={hasNext}
+    loadPage={loadPage}
+  />
 }
