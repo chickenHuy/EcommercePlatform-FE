@@ -4,6 +4,7 @@ import { getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import StoreProvider from "@/store/storeProvider";
 import MainHeader from "@/components/headers/mainHeader";
+import MainFooter from "@/components/footer";
 
 const helveticalNeue = localFont({
   src: [
@@ -41,6 +42,7 @@ export default async function RootLayout({ children, params }) {
           <body className={helveticalNeue.className}>
             <MainHeader />
             {children}
+            <MainFooter />
           </body>
         </NextIntlClientProvider>
       </StoreProvider>
