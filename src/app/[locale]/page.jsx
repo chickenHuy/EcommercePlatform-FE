@@ -18,11 +18,13 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import useInView from "@/hooks/use-visible";
 import ListBrandComponent from "@/components/brand";
+import TikTokProductPanner from "@/components/videos/tik-tok-product-panner";
 
 export default function HomePage() {
   const [refBestSelingProduct, isBestSelingProduct] = useInView();
   const [refListCategory, isListCategory] = useInView();
   const [refListBrand, isListBrand] = useInView();
+  const [refTikTokPanner, isTikTokPanner] = useInView();
 
   const images = [
     {
@@ -139,6 +141,12 @@ export default function HomePage() {
         className={`w-full h-fit xl:px-28 lg:px-20 sm:px-6 px-4 xl:pt-14 lg:pt-10 sm:pt-8 pt-6 ${isBestSelingProduct ? "animate-fade-in-up" : "opacity-0"}`}
       >
         <ProductBestSelling />
+      </div>
+      <div
+        ref={refTikTokPanner}
+        className={`w-full h-fit xl:px-28 lg:px-20 sm:px-6 px-4 xl:pt-14 lg:pt-10 sm:pt-8 pt-6 ${isTikTokPanner ? "animate-fade-in-up" : "opacity-0"}`}
+      >
+        <TikTokProductPanner />
       </div>
       <div
         ref={refListBrand}
