@@ -14,9 +14,21 @@ import {
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Logo, LogoText } from "../logo";
+import { usePathname } from "next/navigation";
 
 const MainFooter = () => {
+    const pathname = usePathname();
     const t = useTranslations("MainFooter");
+
+    const hiddenPaths = [
+        "/admin",
+        "/vendor",
+        "/auth",
+        "/videos"
+    ];
+
+    const isHeaderVisible = !hiddenPaths.some((path) => pathname.includes(path));
+    if (!isHeaderVisible) return null;
 
     const categories = [
         { href: "/category/electronics", label: t("electronics") || "Electronics" },

@@ -45,6 +45,7 @@ const MainHeader = () => {
     "/vendor",
     "/user",
     "/auth",
+    "/videos"
   ];
 
   const isHeaderVisible = !hiddenPaths.some((path) => pathname.includes(path));
@@ -108,9 +109,8 @@ const MainHeader = () => {
 
   return (
     <header
-      className={`w-full h-fit fixed top-0 left-0 right-0 z-50 pt-2 transition-transform duration-500 ${
-        isScrolled ? "-translate-y-2 bg-black-primary" : "translate-y-0"
-      }`}
+      className={`w-full h-fit fixed top-0 left-0 right-0 z-50 pt-2 transition-transform duration-500 ${isScrolled ? "-translate-y-2 bg-black-primary" : "translate-y-0"
+        }`}
     >
       <div className="mx-auto px-4 sm:px-6 lg:px-20 xl:px-28">
         <div className="w-full bg-black-primary text-white rounded-lg">
