@@ -36,7 +36,7 @@ export function ProductMediaViewer({ product }) {
 
   return (
     <div className="space-y-3">
-      <div className="relative aspect-[4/3] rounded-md border shadow-sm overflow-hidden animate-fade-in">
+      <div className="relative aspect-square rounded-md border shadow-sm overflow-hidden animate-fade-in">
         {mediaItems[selectedIndex].type === "image" ? (
           <MediaViewer
             thumbnailUrl={mediaItems[selectedIndex].url}
@@ -78,7 +78,7 @@ export function ProductMediaViewer({ product }) {
             key={item.id}
             onClick={() => setSelectedIndex(index)}
             className={cn(
-              "relative w-20 h-20 aspect-square overflow-hidden rounded-md shadow-sm",
+              "relative lg:w-20 lg:h-20 w-14 h-14 aspect-square overflow-hidden rounded-md shadow-sm",
               selectedIndex === index
                 ? "ring-1 ring-primary"
                 : "border hover:border-black-primary",

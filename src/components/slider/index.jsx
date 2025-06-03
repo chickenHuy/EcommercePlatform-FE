@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 const ImageSlider = ({ images = [], interval = 7000 }) => {
   const [[current, direction], setCurrent] = useState([0, 0]);
@@ -62,10 +63,12 @@ const ImageSlider = ({ images = [], interval = 7000 }) => {
             className={`absolute w-fit h-fit flex flex-col items-end gap-3 px-5 py-3 rounded-md text-white-primary backdrop-blur-md ${images[current].background === "white" ? "bg-white-primary/50" : "bg-black-primary/50"} bottom-3 right-3 animate-fade-in`}
           >
             <h3>{images[current].description}</h3>
-            <Button>
-              {images[current].button}
-              <ChevronRight className="p-1" />
-            </Button>
+            <Link href={images[current].redirect} >
+              <Button>
+                {images[current].button}
+                <ChevronRight className="p-1" />
+              </Button>
+            </Link>
           </div>
         </motion.div>
       </AnimatePresence>
@@ -88,9 +91,8 @@ const ImageSlider = ({ images = [], interval = 7000 }) => {
           <div
             key={i}
             onClick={() => setCurrent(([prev]) => [i, i > prev ? 1 : -1])}
-            className={`h-2 w-2 rounded-full cursor-pointer transition-all ${
-              current === i ? "bg-white" : "bg-white/40"
-            }`}
+            className={`h-2 w-2 rounded-full cursor-pointer transition-all ${current === i ? "bg-white" : "bg-white/40"
+              }`}
           />
         ))}
       </div>

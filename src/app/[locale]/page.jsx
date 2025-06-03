@@ -19,6 +19,7 @@ import { ChevronRight } from "lucide-react";
 import useInView from "@/hooks/use-visible";
 import ListBrandComponent from "@/components/brand";
 import TikTokProductPanner from "@/components/videos/tik-tok-product-panner";
+import Link from "next/link";
 
 export default function HomePage() {
   const [refBestSelingProduct, isBestSelingProduct] = useInView();
@@ -45,7 +46,7 @@ export default function HomePage() {
       url: Slider3,
       description: "Khám phá thế giới qua ống kính",
       button: "Camera",
-      redirect: "",
+      redirect: "/search?categoryId=9",
       background: "black",
     },
     {
@@ -94,10 +95,12 @@ export default function HomePage() {
                   height={300}
                   alt="Home Image"
                 />
-                <Button className="absolute bottom-3 right-3 backdrop-blur-md bg-white-tertiary/50 group-hover:flex hidden animate-fade-in-quick">
-                  Camera
-                  <ChevronRight className="p-1" />
-                </Button>
+                <Link href="/search?categoryId=9">
+                  <Button className="absolute bottom-3 right-3 backdrop-blur-md bg-white-tertiary/50 group-hover:flex hidden animate-fade-in-quick">
+                    Camera
+                    <ChevronRight className="p-1" />
+                  </Button>
+                </Link>
               </div>
               <div className="w-full h-full relative group">
                 <Image
