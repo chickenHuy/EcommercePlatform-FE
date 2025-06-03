@@ -4,15 +4,12 @@ import Loading from "@/components/loading";
 
 const CallBackPage = () => {
   useEffect(() => {
-    // Lấy các tham số từ URL
     const query = window.location.search;
     const params = new URLSearchParams(query);
 
-    // Lấy giá trị từ các tham số cụ thể
     const vnpResponseCode = params.get("vnp_ResponseCode");
     const vnpTxnRef = params.get("vnp_TxnRef");
 
-    // Kiểm tra điều kiện và chuyển hướng
     if (vnpResponseCode === "00" && vnpTxnRef) {
       window.location.href = `/status/${vnpTxnRef}`;
     } else {
