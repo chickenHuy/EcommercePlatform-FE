@@ -121,6 +121,8 @@ module.exports = {
       "fade-in": "fadeIn 1s ease-in-out forwards",
       "fade-in-quick": "fadeIn 0.5s ease-in-out forwards",
       "fade-in-up": "fadeInUp 1s ease-out forwards",
+      "spin": "spin 2s linear infinite",
+      "ping": "ping 3s cubic-bezier(0, 0, 0.2, 1) infinite",
     },
     keyframes: {
       fadeIn: {
