@@ -24,7 +24,8 @@ const MainFooter = () => {
         "/admin",
         "/vendor",
         "/auth",
-        "/videos"
+        "/videos",
+        "/user"
     ];
 
     const isHeaderVisible = !hiddenPaths.some((path) => pathname.includes(path));
