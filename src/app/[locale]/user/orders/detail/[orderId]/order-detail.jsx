@@ -447,7 +447,7 @@ c71 -146 313 -144 381 3 18 39 18 39 75 40 49 0 62 4 90 29 l33 29 3 207 3
               </div>
               {(orderDetail?.currentStatus === "PICKED_UP" ||
                 orderDetail?.currentStatus === "OUT_FOR_DELIVERY") &&
-              !reviewedAnyOrder[orderDetail.id] ? (
+                !reviewedAnyOrder[orderDetail.id] ? (
                 <span className="text-[1.1em] text-center shadow-md px-5 py-2 rounded-md border text-success-dark border-success-dark">
                   {t("your_order_will_be_delivered_to_you_soon")}
                 </span>
@@ -457,7 +457,7 @@ c71 -146 313 -144 381 3 18 39 18 39 75 40 49 0 62 4 90 29 l33 29 3 207 3
                 orderDetail?.currentStatus === "CONFIRMED" ||
                 orderDetail?.currentStatus === "PREPARING" ||
                 orderDetail?.currentStatus === "WAITING_FOR_SHIPPING") &&
-              !reviewedAnyOrder[orderDetail.id] ? (
+                !reviewedAnyOrder[orderDetail.id] ? (
                 <span className="text-[1.1em] text-center shadow-md px-5 py-2 rounded-md text-success-dark border border-success-dark">
                   {t("your_order_will_be_delivered_to_the_carried_soon")}
                 </span>
@@ -632,29 +632,6 @@ c71 -146 313 -144 381 3 18 39 18 39 75 40 49 0 62 4 90 29 l33 29 3 207 3
                           {formatCurrency(item.price - item.discount)}
                         </span>
                       </div>
-
-                      <div className="flex items-center gap-2">
-                        {orderDetail?.currentStatus === "DELIVERED" &&
-                        !reviewedAllOrder[orderDetail.id] ? (
-                          <Button
-                            onClick={() => {
-                              handleClickReview(orderDetail);
-                            }}
-                          >
-                            {t("review")}
-                          </Button>
-                        ) : null}
-                        {orderDetail?.currentStatus === "DELIVERED" ||
-                        orderDetail?.currentStatus === "CANCELLED" ? (
-                          <Button
-                            onClick={() =>
-                              handleClickRePurchase(orderDetail?.orderItems)
-                            }
-                          >
-                            {t("re_purchase")}
-                          </Button>
-                        ) : null}
-                      </div>
                     </div>
                   </Card>
                 ))}
@@ -699,6 +676,29 @@ c71 -146 313 -144 381 3 18 39 18 39 75 40 49 0 62 4 90 29 l33 29 3 207 3
                       {formatCurrency(orderDetail?.grandTotal)}
                     </span>
                   </div>
+                </div>
+
+                <div className="w-full flex items-center justify-end gap-2">
+                  {orderDetail?.currentStatus === "DELIVERED" &&
+                    !reviewedAllOrder[orderDetail.id] ? (
+                    <Button
+                      onClick={() => {
+                        handleClickReview(orderDetail);
+                      }}
+                    >
+                      {t("review")}
+                    </Button>
+                  ) : null}
+                  {orderDetail?.currentStatus === "DELIVERED" ||
+                    orderDetail?.currentStatus === "CANCELLED" ? (
+                    <Button
+                      onClick={() =>
+                        handleClickRePurchase(orderDetail?.orderItems)
+                      }
+                    >
+                      {t("re_purchase")}
+                    </Button>
+                  ) : null}
                 </div>
               </CardContent>
             </Card>
