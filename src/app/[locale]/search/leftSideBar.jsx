@@ -43,8 +43,6 @@ export default function ModernLeftSideBar({ t }) {
   const ratings = [5, 4, 3, 2, 1];
   const selectedRating = useSelector((state) => state.searchFilter.rating);
 
-  console.log(selectedBrands);
-
   const handlePriceChange = (value) => {
     dispatch(setMinPrice(value[0]));
     dispatch(setMaxPrice(value[1]));
