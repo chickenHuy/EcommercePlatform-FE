@@ -24,13 +24,16 @@ import {
 import { searchProducts } from "@/api/search/searchApi";
 import Link from "next/link";
 import { get, post, del } from "@/lib/httpClient";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setWishList } from "@/store/features/wishListSlice";
 import ProductPlaceholder from "@/assets/images/productPlaceholder.png";
 import ReviewEmpty from "@/assets/images/ReviewEmpty.png";
 import Image from "next/image";
 import Loading from "../loading";
 import { useTranslations } from "next-intl";
+import { set } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "../ui/toaster";
 
 const formatPrice = (price) => {
   const numPrice = typeof price === "string" ? Number.parseFloat(price) : price;
@@ -236,7 +239,7 @@ const ShareDialog = ({ product, isOpen, onClose }) => {
   if (!product) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={onClose} preventScroll={false}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
@@ -345,8 +348,8 @@ const ShareDialog = ({ product, isOpen, onClose }) => {
 export default function TikTokProductViewer({ initialSize = 10 }) {
   const [products, setProducts] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentProduct, setCurrentProduct] = useState(null);
   const [likedProducts, setLikedProducts] = useState(new Set());
-  const [firstLoad, setFirstLoad] = useState(true);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
@@ -354,78 +357,98 @@ export default function TikTokProductViewer({ initialSize = 10 }) {
 
   const containerRef = useRef(null);
   const dispatch = useDispatch();
-  const currentProduct = products[currentIndex];
   const isLiked = currentProduct ? likedProducts.has(currentProduct.id) : false;
+  const search = useSelector((state) => state.searchFilter.search);
+  const { toast } = useToast();
 
-  const fetchProducts = useCallback(
-    async (pageNum, searchKeyword = "", reset = false) => {
-      if (!firstLoad && loading) return;
+  const fetchProducts = useCallback(async (pageNum, reset = false) => {
+    try {
+      setLoading(true);
+      const data = await searchProducts({
+        search: search,
+        page: pageNum,
+        limit: initialSize,
+      });
 
-      try {
-        setLoading(true);
-        const data = await searchProducts({
-          search: searchKeyword,
-          page: pageNum,
-          limit: initialSize,
-        });
+      const newProducts = data.result.data;
 
-        const newProducts = data.result.data;
-
-        if (reset) {
-          setProducts(newProducts);
-          setCurrentIndex(0);
-        } else {
-          setProducts((prev) => [...prev, ...newProducts]);
-        }
-
-        const totalPages = data.result.totalPages;
-        setHasMore(
-          totalPages
-            ? pageNum < totalPages
-            : newProducts.length === initialSize,
-        );
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setFirstLoad(false);
-        setLoading(false);
+      if (reset) {
+        setProducts(newProducts);
+        setCurrentIndex(0);
+      } else {
+        setProducts((prev) => [...prev, ...newProducts]);
       }
-    },
-    [initialSize, loading],
-  );
 
-  useEffect(() => {
-    initWishList();
-    fetchProducts(1, true);
-
-    const handleKeyDown = (event) => {
-      if (event.key === 'ArrowUp') {
-        goToPrevious();
-      } else if (event.key === 'ArrowDown') {
-        goToNext()
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
+      const totalPages = data.result.totalPages;
+      setHasMore(
+        totalPages
+          ? pageNum < totalPages
+          : newProducts.length === initialSize
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [initialSize, search]);
 
   const loadMoreProducts = useCallback(() => {
-    if (hasMore && !loading && currentIndex >= products.length - 2) {
+    if (hasMore && !loading) {
       const nextPage = page + 1;
       setPage(nextPage);
       fetchProducts(nextPage, false);
     }
-  }, [
-    hasMore,
-    loading,
-    currentIndex,
-    products.length,
-    page,
-    fetchProducts,
-  ]);
+  }, [hasMore, loading, page, fetchProducts]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const index = parseInt(entry.target.dataset.index, 10);
+          setCurrentIndex(index);
+          setCurrentProduct(products[index]);
+          if (index >= products.length - 1) {
+            loadMoreProducts();
+          }
+        }
+      });
+    }, { threshold: 0.5 });
+
+    const elements = containerRef.current?.querySelectorAll("[data-index]");
+    elements?.forEach((el) => observer.observe(el));
+
+    return () => {
+      elements?.forEach((el) => observer.unobserve(el));
+      observer.disconnect();
+    };
+  }, [products, loadMoreProducts]);
+
+  useEffect(() => {
+    const init = async () => {
+      setProducts([]);
+      const response = await getWishList();
+      if (response) {
+        const wishList = new Set(response.result.map((p) => p.productId));
+        setLikedProducts(wishList);
+      }
+      fetchProducts(1, true);
+    };
+
+    init();
+
+    const handleKeyDown = (event) => {
+      if (event.key === "ArrowUp") {
+        goToPrevious();
+      } else if (event.key === "ArrowDown") {
+        goToNext();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [fetchProducts, search]);
 
   const scrollToIndex = (index) => {
     if (containerRef.current && index >= 0 && index < products.length) {
@@ -437,25 +460,6 @@ export default function TikTokProductViewer({ initialSize = 10 }) {
       setCurrentIndex(index);
     }
   };
-
-  const handleScroll = useCallback(() => {
-    if (containerRef.current) {
-      const scrollTop = containerRef.current.scrollTop;
-      const newIndex = Math.round(scrollTop / window.innerHeight);
-
-      if (
-        newIndex !== currentIndex &&
-        newIndex >= 0 &&
-        newIndex < products.length
-      ) {
-        setCurrentIndex(newIndex);
-
-        if (newIndex >= products.length - 2) {
-          loadMoreProducts();
-        }
-      }
-    }
-  }, [currentIndex, products.length, loadMoreProducts]);
 
   const goToPrevious = () => {
     if (currentIndex > 0) {
@@ -471,55 +475,42 @@ export default function TikTokProductViewer({ initialSize = 10 }) {
     }
   };
 
-  const initWishList = async () => {
-    const response = await getWishList();
-    if (!response) return;
-    const wishList = new Set();
-    response.result.map((product) => {
-      wishList.add(product.productId);
-    })
-    setLikedProducts(wishList);
-  }
-
   const getWishList = async () => {
     try {
       const response = await get(`/api/v1/users/listFollowedProduct`);
       return response;
     } catch (error) {
-      console.error("Error liking product:", error);
+      console.error("Error fetching wishlist:", error);
     }
-  }
+  };
 
   const toggleLike = async () => {
     if (!currentProduct) return;
-
     const newLikedProducts = new Set(likedProducts);
-    if (likedProducts.has(currentProduct.id)) {
-      await del(`/api/v1/users/unFollow/${currentProduct.id}`);
-      newLikedProducts.delete(currentProduct.id);
-    } else {
 
-      await post(`/api/v1/users/follow/${currentProduct.id}`);
-      const response = await getWishList();
-      dispatch(setWishList(response.result));
-      newLikedProducts.add(currentProduct.id);
-      console.log(newLikedProducts);
+    try {
+      if (likedProducts.has(currentProduct.id)) {
+        await del(`/api/v1/users/unFollow/${currentProduct.id}`);
+        newLikedProducts.delete(currentProduct.id);
+      } else {
+        await post(`/api/v1/users/follow/${currentProduct.id}`);
+        const response = await getWishList();
+        dispatch(setWishList(response.result));
+        newLikedProducts.add(currentProduct.id);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: "An error occurred: " + error.message,
+      })
     }
+
     setLikedProducts(newLikedProducts);
   };
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
-      return () => container.removeEventListener("scroll", handleScroll);
-    }
-  }, [handleScroll]);
-
   if (products.length === 0 && loading) {
-    return (
-      <Loading />
-    );
+    return <Loading />;
   }
 
   if (!loading && products.length === 0) {
@@ -532,19 +523,21 @@ export default function TikTokProductViewer({ initialSize = 10 }) {
 
   return (
     <div className="relative w-full h-full overflow-hidden rounded-md border shadow-sm">
+      <Toaster />
       <div
         ref={containerRef}
         className="w-full h-full overflow-y-scroll snap-y snap-mandatory no-scrollbar"
       >
         {products.map((product, index) => (
-          <div key={product.id} className="h-full snap-start">
+          <div
+            key={index}
+            data-index={index}
+            className="h-full snap-start"
+          >
             <VideoPlayer product={product} isActive={index === currentIndex} />
           </div>
         ))}
-
-        {loading && hasMore && (
-          <Loading />
-        )}
+        {loading && hasMore && <Loading />}
       </div>
 
       {currentProduct && (
@@ -563,7 +556,9 @@ export default function TikTokProductViewer({ initialSize = 10 }) {
               size="icon"
               variant="ghost"
               className="w-10 h-10 rounded-full backdrop-blur-md bg-white-primary/50 border transition-all duration-300"
-              onClick={() => setShowShareDialog(true)}
+              onClick={(e) => {
+                setShowShareDialog(true)
+              }}
             >
               <Share className="w-5 h-5" />
             </Button>
@@ -598,12 +593,7 @@ export default function TikTokProductViewer({ initialSize = 10 }) {
         isOpen={showShareDialog}
         onClose={() => setShowShareDialog(false)}
       />
-
-      <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </div>
   );
 }
+

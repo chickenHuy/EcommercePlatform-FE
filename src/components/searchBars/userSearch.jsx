@@ -15,7 +15,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { getSuggestions } from "@/api/search/searchApi";
 import { useDispatch } from "react-redux";
 import { setSearch } from "@/store/features/userSearchSlice";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export function SearchWithSuggestions({ className, t }) {
   const [query, setQuery] = React.useState("");
@@ -28,6 +28,7 @@ export function SearchWithSuggestions({ className, t }) {
 
   const debouncedQuery = useDebounce(query, 300);
   const dispatch = useDispatch();
+  const pathname = usePathname();
   const router = useRouter();
 
   React.useEffect(() => {
@@ -84,15 +85,18 @@ export function SearchWithSuggestions({ className, t }) {
         setIsExpanded(false);
 
         if (selectedIndex >= 0) {
-          const selectedItem = suggestions[selectedIndex];
-          setQuery(selectedItem);
+          const suggestion = suggestions[selectedIndex];
+          setQuery(suggestion);
+          dispatch(setSearch(suggestion));
         } else {
           dispatch(setSearch(query));
-          if (router.pathname !== "/search") {
-            router.push("/search");
-          }
-          inputRef.current?.blur();
         }
+
+        if (!pathname.includes('/videos')) {
+          router.push("/search");
+        }
+
+        inputRef.current?.blur();
         break;
     }
   };
@@ -156,7 +160,7 @@ export function SearchWithSuggestions({ className, t }) {
                     onSelect={() => handleSuggestionSelect(item)}
                     className={cn(
                       selectedIndex === index &&
-                        "bg-accent text-accent-foreground",
+                      "bg-accent text-accent-foreground",
                     )}
                   >
                     <Search className="mr-2 h-4 w-4" />
