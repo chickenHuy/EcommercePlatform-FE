@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import IconNotFound from "../../../public/images/iconNotFound.png";
 import Link from "next/link";
-import { getThreeSecondVideoUrl } from "@/utils";
+import { getSomeSecondVideoUrl } from "@/utils";
 import { useTranslations } from "next-intl";
+import { useRef } from "react";
 
 function formatPrice(price) {
   return new Intl.NumberFormat("vi-VN", {
@@ -32,9 +33,27 @@ export default function ProductCard({
   link,
 }) {
   const t = useTranslations("Search");
+  const videoRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {
+      });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  };
+
+
 
   return (
-    <Link href={`/${link}`} passHref className="w-full h-full relative group">
+    <Link href={`/${link}`} passHref className="w-full h-full relative group" onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}>
       {percentDiscount &&
         <div className="w-fit h-fit px-1 rounded-sm bg-red-primary text-[.8em] text-white-primary absolute top-[5px] left-[5px] z-20">{"-" + percentDiscount + "%"}</div>
       }
@@ -43,10 +62,10 @@ export default function ProductCard({
           <div className="relative w-full aspect-square group-hover:-translate-y-[6px] transition duration-150">
             {videoUrl ? (
               <video
-                src={getThreeSecondVideoUrl(videoUrl)}
+                ref={videoRef}
+                src={getSomeSecondVideoUrl(videoUrl)}
                 loop
                 muted
-                autoPlay
                 playsInline
                 className="w-full aspect-square object-cover"
               />
