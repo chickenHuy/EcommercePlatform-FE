@@ -59,7 +59,7 @@ export default function HomePage() {
     {
       url: Slider5,
       description: "Sắc nét đến từng điểm ảnh",
-      button: "Macbook",
+      button: "Laptop",
       redirect: "",
       background: "white",
     },
@@ -80,11 +80,13 @@ export default function HomePage() {
                 height={500}
                 alt="Home Image"
               />
-              <Button className="absolute bottom-1/2 right-1/2 translate-x-1/2 translate-y-1/2 w-24 h-24 rounded-full backdrop-blur-md bg-white-tertiary/50 group-hover:bg-black-primary transition duration-300">
-                Shop Now
-                <ChevronRight className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-1/3 p-1 rotate-90 hidden group-hover:block" />
-                <ChevronRight className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-2/3 rotate-90 hidden group-hover:block" />
-              </Button>
+              <Link href="#shop_now">
+                <Button className="absolute bottom-1/2 right-1/2 translate-x-1/2 translate-y-1/2 w-24 h-24 rounded-full backdrop-blur-md bg-white-tertiary/50 group-hover:bg-black-primary transition duration-300">
+                  Shop Now
+                  <ChevronRight className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-1/3 p-1 rotate-90 hidden group-hover:block" />
+                  <ChevronRight className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-2/3 rotate-90 hidden group-hover:block" />
+                </Button>
+              </Link>
             </div>
             <div className="w-full h-1/3 flex flex-row gap-2">
               <div className="w-full h-full relative group">
@@ -152,6 +154,7 @@ export default function HomePage() {
         <TikTokProductPanner />
       </div>
       <div
+        id="shop_now"
         ref={refListBrand}
         className={`w-full h-fit xl:pt-14 lg:pt-10 sm:pt-8 pt-6 ${isListBrand ? "animate-fade-in-up" : "opacity-0"}`}
       >
