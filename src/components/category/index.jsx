@@ -60,8 +60,7 @@ const ListCategoryComponent = ({ isPage = false }) => {
     if (isPage) {
       return (
         <div
-          style={{ height: height }}
-          className="skeleton-item relative sm:mb-5 mb-3"
+          className="skeleton-item w-full aspect-[3/4] relative sm:mb-5 mb-3"
         >
           <div className="skeleton-line w-[80%] sm:h-[40px] h-[20px] absolute bottom-5" />
         </div>
@@ -93,19 +92,27 @@ const ListCategoryComponent = ({ isPage = false }) => {
       </div>
 
       {isPage ? (
-        <Masonry
-          breakpointCols={{ default: 4, 1024: 3, 767: 2 }}
-          className="main_grid_layout gap-3 sm:gap-5 mt-5"
-          columnClassName="main_grid_item"
-        >
-          {isLoading
-            ? Array.from({ length: 16 }).map((_, index) => (
-              <SkeletonItem key={index} />
-            ))
-            : listCategory.map((category) => (
+        isLoading ? (
+          <div className="w-full grid gap-3 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {
+              Array.from({ length: 16 }).map((_, index) => (
+                <SkeletonItem key={index} />
+              ))
+            }
+
+          </div>
+        ) : (
+          < Masonry
+            breakpointCols={{ default: 4, 1024: 3, 767: 2 }}
+            className="main_grid_layout gap-3 sm:gap-5 mt-5"
+            columnClassName="main_grid_item"
+          >
+            {listCategory.map((category) => (
               <CategoryCard key={category.id} category={category} />
             ))}
-        </Masonry>
+          </Masonry>
+        )
+
       ) : (
         <>
           <button
@@ -159,8 +166,9 @@ const ListCategoryComponent = ({ isPage = false }) => {
             <ChevronRight className="w-5 h-5" />
           </button>
         </>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 
