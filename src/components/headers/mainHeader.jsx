@@ -45,7 +45,6 @@ const MainHeader = () => {
     "/vendor",
     "/user",
     "/auth",
-    "/videos"
   ];
 
   const isHeaderVisible = !hiddenPaths.some((path) => pathname.includes(path));
