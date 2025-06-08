@@ -10,8 +10,9 @@ import { useTranslations } from "next-intl";
 import clsx from "clsx";
 import Empty from "@/assets/images/ReviewEmpty.png";
 import Image from "next/image";
+import { resetFilters } from "@/store/features/userSearchSlice";
 
-export default function ProductGrid({ maxCol = 6, storeParam = null }) {
+export default function ProductGrid({ maxCol = 6 }) {
   const [products, setProducts] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -19,9 +20,11 @@ export default function ProductGrid({ maxCol = 6, storeParam = null }) {
 
   const { ref, inView } = useInView();
 
+  const dispatch = useDispatch();
   const searchParams = useSelector((state) => state.searchFilter);
+  const isCompleteSetup = useSelector((state) => state.searchFilter.completeSetup);
+  const favorites = useSelector((state) => state.wishListReducer.wishList);
   const t = useTranslations("Search");
-  const storeId = storeParam;
   const limit = 16;
 
   const gridCols = clsx("grid-cols-2", {
@@ -35,21 +38,18 @@ export default function ProductGrid({ maxCol = 6, storeParam = null }) {
     "xl:grid-cols-6": maxCol >= 6,
   });
 
-  const favorites = useSelector((state) => state.wishListReducer.wishList);
-  const dispatch = useDispatch();
-
   const loadProducts = useCallback(
     async (isInitialLoad = false) => {
-      if (loading || (!hasMore && !isInitialLoad) || page == null) return;
+      if (loading || (!hasMore && !isInitialLoad) || page == null || !isCompleteSetup) return;
       setLoading(true);
       try {
         const res = await searchProducts({
           ...searchParams,
-          ...{ store: storeId },
           page: isInitialLoad ? 1 : page,
           limit: limit,
         });
         const newProducts = res.result.data;
+
         if (newProducts.length === 0) {
           setHasMore(false);
         } else {
@@ -58,8 +58,7 @@ export default function ProductGrid({ maxCol = 6, storeParam = null }) {
           );
           setPage(res.result.nextPage);
         }
-      } catch (error) {
-        console.error("Error loading products:", error);
+      } catch {
       } finally {
         setLoading(false);
       }
@@ -72,13 +71,19 @@ export default function ProductGrid({ maxCol = 6, storeParam = null }) {
     setPage(1);
     setHasMore(true);
     loadProducts(true);
-  }, [searchParams]);
+  }, [searchParams, isCompleteSetup]);
 
   useEffect(() => {
     if (inView && !loading) {
       loadProducts();
     }
-  }, [inView, loading, loadProducts, storeId]);
+  }, [inView, loading, loadProducts]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetFilters());
+    }
+  }, []);
 
   const handleAddToFavorites = async (productId) => {
     try {

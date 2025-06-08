@@ -23,6 +23,7 @@ export default function SearchPage() {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [isCompleteSetup, setIsCompleteSetup] = useState(false);
 
   const searchParam = useSearchParams();
   const dispatch = useDispatch();
@@ -30,6 +31,7 @@ export default function SearchPage() {
   const storeId = searchParam.get("storeId");
   const order = useSelector((state) => state.searchFilter.order);
   const sortBy = useSelector((state) => state.searchFilter.sortBy);
+
 
   const handleOrderChange = () => {
     if (!order) {
@@ -69,7 +71,7 @@ export default function SearchPage() {
         <div
           className={`w-[20%] max-w-[350px] min-w-[200px] min-h-full top-16 z-20 ${isDesktop ? "block" : leftSidebarOpen ? "absolute block" : "hidden"}`}
         >
-          <LeftSideBar t={t} />
+          <LeftSideBar t={t} storeId={storeId} setIsCompleteSetup={setIsCompleteSetup} />
         </div>
 
         <div className="flex-1 flex flex-col items-center border rounded-md">
@@ -132,7 +134,7 @@ export default function SearchPage() {
           </div>
 
           <div className="flex-1 overflow-auto w-full p-4">
-            <ProductGrid maxCol={4} t={t} storeParam={storeId} />
+            <ProductGrid maxCol={4} t={t} isCompleteSetup={isCompleteSetup} />
           </div>
         </div>
 

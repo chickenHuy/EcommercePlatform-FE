@@ -26,13 +26,16 @@ import {
   setBrands as setSelectedBrands,
   setRating as setSelectedRating,
   setCategories as setSelectedCategories,
+  setStore,
+  setCompleteSetup,
 } from "@/store/features/userSearchSlice";
 import { useSearchParams } from "next/navigation";
 
-export default function ModernLeftSideBar({ t }) {
+export default function ModernLeftSideBar({ t, storeId = null }) {
   const [categories, setCategories] = React.useState(null);
   const [brands, setBrands] = React.useState([]);
   const [isLoadingBrands, setIsLoadingBrands] = React.useState(true);
+
   const searchParam = useSearchParams();
   const minPrice = useSelector((state) => state.searchFilter.minPrice);
   const maxPrice = useSelector((state) => state.searchFilter.maxPrice);
@@ -57,10 +60,6 @@ export default function ModernLeftSideBar({ t }) {
   );
 
   React.useEffect(() => {
-    dispatch(resetFilters());
-  }, []);
-
-  React.useEffect(() => {
     if (!categories) return;
 
     const brandIdFromURL = Number(searchParam.get("brandId")) || null;
@@ -71,22 +70,26 @@ export default function ModernLeftSideBar({ t }) {
     }
 
     if (categoryIdFromURL) {
-      const categoryIdNumber = parseInt(categoryIdFromURL, 10);
-      dispatch(setMainCategoryId(categoryIdNumber));
+      dispatch(setMainCategoryId(categoryIdFromURL));
       const childCategoryIds = getChildCategoryIds(
         categories,
-        categoryIdNumber,
+        categoryIdFromURL,
       );
       dispatch(setSelectedCategories(childCategoryIds));
+
     }
-  }, [categories]);
+    if (storeId) {
+      dispatch(setStore(storeId));
+    }
+    dispatch(setCompleteSetup(true));
+  }, [categories, searchParam]);
 
   const handleBrandChange = (brand, checked) => {
     checked
       ? dispatch(setSelectedBrands([...selectedBrands, brand]))
       : dispatch(
-          setSelectedBrands(selectedBrands.filter((item) => item !== brand)),
-        );
+        setSelectedBrands(selectedBrands.filter((item) => item !== brand)),
+      );
   };
 
   const getChildCategoryIds = (categories, categoryId) => {
@@ -133,11 +136,13 @@ export default function ModernLeftSideBar({ t }) {
   };
 
   React.useEffect(() => {
+    dispatch(resetFilters());
+
     getCategoriesWithTreeView()
       .then((response) => {
         setCategories(response.result);
       })
-      .catch((error) => {
+      .catch(() => {
         setCategories([]);
       });
 
@@ -146,7 +151,7 @@ export default function ModernLeftSideBar({ t }) {
       .then((response) => {
         setBrands(response.result);
       })
-      .catch((error) => {
+      .catch(() => {
         setBrands([]);
       });
     setIsLoadingBrands(false);
@@ -274,19 +279,17 @@ export default function ModernLeftSideBar({ t }) {
             <button
               key={rating}
               onClick={() => handleRatingClick(rating)}
-              className={`w-full flex items-center space-x-2 px-2 py-1.5 rounded-md transition-colors hover:bg-blue-primary ${
-                selectedRating === rating ? "bg-blue-primary" : ""
-              }`}
+              className={`w-full flex items-center space-x-2 px-2 py-1.5 rounded-md transition-colors hover:bg-blue-primary ${selectedRating === rating ? "bg-blue-primary" : ""
+                }`}
             >
               <div className="flex">
                 {[...Array(5)].map((_, index) => (
                   <Star
                     key={index}
-                    className={`w-5 h-5 ${
-                      index < rating
-                        ? "text-yellow-primary fill-yellow-primary"
-                        : "text-gray-primary"
-                    }`}
+                    className={`w-5 h-5 ${index < rating
+                      ? "text-yellow-primary fill-yellow-primary"
+                      : "text-gray-primary"
+                      }`}
                   />
                 ))}
               </div>
