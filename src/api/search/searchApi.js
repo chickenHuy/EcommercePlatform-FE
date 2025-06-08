@@ -84,7 +84,6 @@ export const searchProducts = async ({
     }
     queryParams.append("page", page);
     queryParams.append("limit", limit);
-    console.log(queryParams.toString())
 
     const response = await get(`/api/v1/search?${queryParams.toString()}`);
     return response;
