@@ -408,7 +408,7 @@ export default function OrderUser() {
                           key={item.id}
                           className="w-full flex flex-col items-start lg:flex-row lg:items-center justify-between p-3 cursor-pointer rounded-lg"
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex flex-grow-1 items-center gap-3">
                             <Image
                               src={item.productMainImageUrl}
                               height={80}
@@ -440,7 +440,7 @@ export default function OrderUser() {
                               </span>
                             </div>
                           </div>
-                          <div className="w-full flex justify-end gap-2">
+                          <div className="w-fit flex justify-end gap-2">
                             <span className="line-through text-sm text-black-tertiary text-opacity-50">
                               {formatCurrency(item.price)}
                             </span>
@@ -490,7 +490,7 @@ export default function OrderUser() {
                             </Button>
                           ) : null}
 
-                          {order.currentStatus === "ON_HOLD" ? (
+                          {order.currentStatus === "ON_HOLD" || order.currentStatus === "PENDING" || order.currentStatus === "CONFIRMED" || order.currentStatus === "PREPARING" ? (
                             <Button
                               className="bg-black-secondary"
                               onClick={() => {
