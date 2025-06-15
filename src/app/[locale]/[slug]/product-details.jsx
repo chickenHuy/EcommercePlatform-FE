@@ -208,9 +208,8 @@ export default function ProductDetail({ product, t }) {
             <ProductMediaViewer product={product} />
           </div>
           <div
-            className={`w-full h-fit flex flex-col gap-3 animate-fade-in ${
-              product.quantity === 0 ? "opacity-50 pointer-events-none" : ""
-            }`}
+            className={`w-full h-fit flex flex-col gap-3 animate-fade-in ${product.quantity === 0 ? "opacity-50 pointer-events-none" : ""
+              }`}
           >
             <div>
               <h1 className="text-[1.1em] sm:text-[1.3em] lg:text-[1.6em] line-clamp-2">
@@ -224,11 +223,10 @@ export default function ProductDetail({ product, t }) {
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className={`h-4 w-4 ${
-                      star <= (product.rating || 0)
+                    className={`h-4 w-4 ${star <= (product.rating || 0)
                         ? "text-yellow-primary fill-yellow-primary"
                         : "text-gray-secondary"
-                    }`}
+                      }`}
                   />
                 ))}
                 <span className="text-[1em] pl-3 translate-y-[2px]">
@@ -239,13 +237,7 @@ export default function ProductDetail({ product, t }) {
               </div>
             </div>
 
-            <div className="flex flex-row items-center gap-3 rounded-sm p-5 my-3 bg-white-secondary/30">
-              <span className="text-[2em] text-red-primary">
-                {currentPrice.toLocaleString("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                })}
-              </span>
+            <div className="flex flex-row flex-wrap items-center gap-3 rounded-sm p-5 my-3 bg-white-secondary/30">
               {currentOriginalPrice > currentPrice && (
                 <span className="text-[1em] text-black-tertiary line-through">
                   {currentOriginalPrice.toLocaleString("vi-VN", {
@@ -254,6 +246,12 @@ export default function ProductDetail({ product, t }) {
                   })}
                 </span>
               )}
+              <span className="text-[2em] text-red-primary">
+                {currentPrice.toLocaleString("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+              </span>
             </div>
 
             {product.attributes.map((attribute) => (
