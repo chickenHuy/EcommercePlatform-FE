@@ -24,7 +24,7 @@ import StoreEmpty from "@/assets/images/storeEmpty.jpg";
 import { Star, ShoppingCart, Heart, Minus, Plus, Store } from "lucide-react";
 
 import { addToCart } from "@/api/cart/addToCart";
-import { get, post, put } from "@/lib/httpClient";
+import { get, post } from "@/lib/httpClient";
 import Link from "next/link";
 import Reviews from "./reviewPage";
 
@@ -36,6 +36,7 @@ export default function ProductDetail({ product, t }) {
 
   const { toast } = useToast();
 
+  const router = useRouter();
   const currentPrice = selectedVariant?.salePrice || product.salePrice;
   const currentOriginalPrice =
     selectedVariant?.originalPrice || product.originalPrice;
@@ -139,10 +140,13 @@ export default function ProductDetail({ product, t }) {
       });
     } catch (error) {
       toast({
-        title: t("toast_title_error_product_cart"),
+        title: t("toast_title_error_product"),
         description: error.message,
         variant: "destructive",
       });
+      if(error.message === "Uncategorized Error") {
+        router.push("/auth");
+      }
     }
   };
 
@@ -167,10 +171,12 @@ export default function ProductDetail({ product, t }) {
         description: error.message,
         variant: "destructive",
       });
+      if(error.message === "Uncategorized Error") {
+        router.push("/auth");
+      }
     }
   };
 
-  const router = useRouter();
   const handleOnClickViewShop = (storeId) => {
     dispatch(setStore(storeId));
     router.push("/search");
