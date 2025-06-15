@@ -159,6 +159,7 @@ export default function ModernLeftSideBar({ t, storeId = null }) {
 
   const handleDeleteFilter = () => {
     dispatch(resetFilters());
+    dispatch(setCompleteSetup(true));
   };
 
   const BrandsSkeleton = () => (
