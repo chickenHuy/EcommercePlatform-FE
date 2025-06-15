@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useInView } from "react-intersection-observer"
 
 export default function ProductDetailSuggestions({ productId }) {
-  const pageSize = 6
+  const pageSize = 24
   const limitAll = 240
 
   const [currentPage, setCurrentPage] = useState(1)
