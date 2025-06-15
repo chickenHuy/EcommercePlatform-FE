@@ -874,7 +874,7 @@ export default function CartUser() {
               </div>
 
               <Button
-                className="flex-grow min-w-[300px] bg-red-primary hover:bg-red-primary/90 rounded-md text-[1em]"
+                className="flex-grow min-w-[250px] bg-red-primary hover:bg-red-primary/90 rounded-md text-[1em]"
                 onClick={() => handleCheckout()}
               >
                 {t("text_checkout")}
