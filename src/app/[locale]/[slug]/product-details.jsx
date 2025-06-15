@@ -218,7 +218,7 @@ export default function ProductDetail({ product, t }) {
 
               <div className="flex items-center">
                 <span className="text-[1em] pr-1 translate-y-[2px]">
-                  {product.rating.toFixed(1) || 0}
+                  {product.rating?.toFixed(1) || 0}
                 </span>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
