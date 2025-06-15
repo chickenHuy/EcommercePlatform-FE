@@ -111,7 +111,7 @@ export default function ViewOrderDetailUser({
     checkIfAnyOrderReviewed(orderDetail.id);
   }, [orderDetail]);
 
-  const handleCancelButtonClick = (orderDetail) => {
+  const handleClickCancel = (orderDetail) => {
     setOpenDialog(true);
     setOrderToCancel(orderDetail);
     setSelectedOrder(orderDetail);
@@ -699,6 +699,18 @@ c71 -146 313 -144 381 3 18 39 18 39 75 40 49 0 62 4 90 29 l33 29 3 207 3
                       {t("re_purchase")}
                     </Button>
                   ) : null}
+                  {orderDetail?.currentStatus === "ON_HOLD" || orderDetail.currentStatus === "PENDING" || orderDetail.currentStatus === "CONFIRMED" || orderDetail.currentStatus === "PREPARING" ? (
+                    <div className="w-full flex justify-end px-7 py-3 border-t">
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleClickCancel(orderDetail);
+                        }}
+                      >
+                        {t("cancel_order")}
+                      </Button>
+                    </div>
+                  ) : null}
                 </div>
               </CardContent>
             </Card>
@@ -730,18 +742,6 @@ c71 -146 313 -144 381 3 18 39 18 39 75 40 49 0 62 4 90 29 l33 29 3 207 3
                   </div>
                 </div>
               )}
-              {orderDetail?.currentStatus === "ON_HOLD" ? (
-                <div className="w-full flex justify-end px-7 py-3 border-t">
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCancelButtonClick(orderDetail);
-                    }}
-                  >
-                    {t("cancel_order")}
-                  </Button>
-                </div>
-              ) : null}
             </div>
           </div>
         </div>

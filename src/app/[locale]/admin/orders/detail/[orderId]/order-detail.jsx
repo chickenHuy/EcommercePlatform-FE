@@ -158,7 +158,7 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
     };
 
     return statusMap[currentStatus] ? (
-      <Badge variant="outline" className="truncate text-xl">
+      <Badge variant="outline" className="truncate text-xl text-red-primary border-l">
         {statusMap[currentStatus]}
       </Badge>
     ) : null;
@@ -205,7 +205,6 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
           {orderDetail?.currentStatus !== "DELIVERED" &&
             orderDetail?.currentStatus !== "CANCELLED" && (
               <Button
-                variant="outline"
                 onClick={() => {
                   handleClickButtonCancel(orderDetail);
                 }}
@@ -217,16 +216,15 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
           {(orderDetail?.currentStatus === "WAITING_FOR_SHIPPING" ||
             orderDetail?.currentStatus === "PICKED_UP" ||
             orderDetail?.currentStatus === "OUT_FOR_DELIVERY") && (
-            <Button
-              variant="outline"
-              onClick={() => {
-                handleClickButtonUpdate(orderDetail);
-              }}
-            >
-              <Pencil className="h-6 w-6 mr-2" />
-              Cập nhật trạng thái
-            </Button>
-          )}
+              <Button
+                onClick={() => {
+                  handleClickButtonUpdate(orderDetail);
+                }}
+              >
+                <Pencil className="h-6 w-6 mr-2" />
+                Cập nhật trạng thái
+              </Button>
+            )}
           {renderStatusBadge(orderDetail?.currentStatus)}
         </div>
         <Separator></Separator>
@@ -355,11 +353,10 @@ export default function ViewOrderDetailAdmin({ orderDetail, refreshPage }) {
                   <div className="grid grid-cols-3 items-center">
                     <Label className="text-left">Giảm giá vận chuyển</Label>
                     <Label className="text-center">
-                      {`${
-                        (orderDetail?.shippingDiscount /
-                          orderDetail?.shippingFee) *
+                      {`${(orderDetail?.shippingDiscount /
+                        orderDetail?.shippingFee) *
                         100
-                      } %`}
+                        } %`}
                     </Label>
                     <Label className="text-right">
                       {`- ${formatCurrency(orderDetail?.shippingDiscount)}`}
