@@ -68,7 +68,7 @@ const MainFooter = () => {
                             <div className="flex items-start gap-3">
                                 <Mail className="h-4 w-4 text-white-tertiary mt-0.5 flex-shrink-0" />
                                 <span className="text-white-tertiary text-sm">
-                                    support@hkkuptect.com
+                                    support@hkkuptech.com
                                 </span>
                             </div>
                             <div className="flex items-center gap-3">
@@ -157,17 +157,17 @@ const MainFooter = () => {
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                         <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-white-tertiary text-sm text-center sm:text-left">
                             <span>
-                                © 2024 {t("company_name") || "hkkuptech"}. {t("all_rights_reserved") || "All rights reserved."}
+                                © 2025 {"hkkuptech"}. {t("all_rights_reserved") || "All rights reserved."}
                             </span>
                             <div className="flex gap-4">
                                 <Link
-                                    href="/terms"
+                                    href="#"
                                     className="hover:text-white-primary transition-colors duration-200"
                                 >
                                     {t("terms_of_service") || "Terms of Service"}
                                 </Link>
                                 <Link
-                                    href="/privacy"
+                                    href="#"
                                     className="hover:text-white-primary transition-colors duration-200"
                                 >
                                     {t("privacy_policy") || "Privacy Policy"}
