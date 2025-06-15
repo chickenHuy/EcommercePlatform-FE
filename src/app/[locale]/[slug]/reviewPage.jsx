@@ -263,7 +263,7 @@ export default function Reviews({ productId, t }) {
                           {t("text_classification")}
                         </span>
 
-                        <div className="flex flex-wrap gap-4 max-h-[72px] overflow-scroll">
+                        <div className="flex flex-wrap gap-3">
                           {listreview.productValues.map(
                             (productValue, index) => (
                               <span
