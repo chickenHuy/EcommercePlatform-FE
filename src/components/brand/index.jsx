@@ -55,16 +55,13 @@ const ListBrandComponent = ({ isPage = false }) => {
       const step = () => {
         if (!container) return;
 
-        // Tăng scrollLeft
         container.scrollLeft += 0.5;
 
-        // Kiểm tra nếu cuộn đến cuối danh sách ảo
-        const maxScroll = container.scrollWidth / 2; // Vì danh sách đã nhân đôi
+        const maxScroll = container.scrollWidth / 2; 
         if (container.scrollLeft >= maxScroll) {
-          // Tắt smooth scrolling để reset không bị giật
           container.style.scrollBehavior = "auto";
-          container.scrollLeft -= maxScroll; // Quay lại vị trí tương ứng trong danh sách gốc
-          container.style.scrollBehavior = "smooth"; // Bật lại smooth scrolling
+          container.scrollLeft -= maxScroll; 
+          container.style.scrollBehavior = "smooth"; 
         }
 
         animationFrameId = requestAnimationFrame(step);

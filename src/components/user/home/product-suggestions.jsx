@@ -6,7 +6,7 @@ import { useInView } from "react-intersection-observer"
 import { getProductBestInteraction } from "@/api/user/homeRequest"
 
 export default function ProductSuggestions() {
-  const pageSize = 6
+  const pageSize = 24
   const limitAll = 240
   const limitUser = 240
   const limitOne = 240
