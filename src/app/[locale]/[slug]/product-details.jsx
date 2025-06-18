@@ -397,21 +397,21 @@ export default function ProductDetail({ product, t }) {
       <div className="w-full h-fit py-14 lg:px-14 sm:px-7 px-3 shadow-md rounded-md">
         <div className="flex flex-col gap-7">
           <div>
-            <h2 className="text-[1.5em] text-center">
+            <h2 className="text-[1.5em]">
               {t("text_product_description")}
             </h2>
             <div
-              className="text-[1em]"
+              className="text-[1em] whitespace-pre-line leading-relaxed"
               dangerouslySetInnerHTML={{ __html: product.description }}
             />
           </div>
 
           <div>
-            <h2 className="text-[1.5em] text-center">
+            <h2 className="text-[1.5em]">
               {t("text_product_detail")}
             </h2>
             <div
-              className="text-[1em]"
+              className="text-[1em] whitespace-pre-line leading-relaxed"
               dangerouslySetInnerHTML={{ __html: product.details }}
             />
           </div>

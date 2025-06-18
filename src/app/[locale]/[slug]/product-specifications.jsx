@@ -20,7 +20,7 @@ export function ProductSpecifications({ components, t }) {
   return (
     <Card className="border-none shadow-none">
       <CardHeader className="px-0">
-        <CardTitle className="text-[1.5em] text-center">
+        <CardTitle className="text-[1.5em]">
           {t("text_specifications")}
         </CardTitle>
       </CardHeader>
