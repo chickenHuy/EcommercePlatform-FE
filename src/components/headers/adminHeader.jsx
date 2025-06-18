@@ -1,18 +1,9 @@
 "use client";
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Link from "next/link";
-import { CircleUser, Menu, Package2 } from "lucide-react";
+import { Menu, Package2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "../themeToggles/toggle";
 import {
   NavigationMenuContent,
   NavigationMenuItem,
@@ -23,6 +14,9 @@ import {
 } from "@/components/ui/navigation-menu";
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { AdminSearch } from "../searchBars/adminSearch";
+import UserMenuComponent from "../user-menu";
+import { useEffect, useState } from "react";
+import { get } from "@/lib/httpClient";
 
 function AdminHeader() {
   const categories = [
@@ -61,6 +55,22 @@ function AdminHeader() {
       description: "Quản lý thông tin và vai trò của quản trị viên",
     },
   ];
+
+  const [user, setUser] = useState(null);
+  const fetchUser = async () => {
+    try {
+      const userRes = await get("/api/v1/users/info");
+      setUser(userRes.result);
+    } catch {
+      setUser(null);
+    }
+  };
+
+  useEffect(() => {
+    if (!user) {
+      fetchUser();
+    }
+  }, []);
 
   // ListItem component
   const ListItem = ({ className, title, children, href }) => {
@@ -226,8 +236,8 @@ function AdminHeader() {
       </Sheet>
       <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
         <AdminSearch></AdminSearch>
-        <ModeToggle />
-        <DropdownMenu>
+        {user ? <UserMenuComponent user={user} /> : <></>}
+        {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
               <CircleUser className="h-5 w-5" />
@@ -243,7 +253,7 @@ function AdminHeader() {
               <Link href="/auth">Đăng xuất</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
       </div>
     </header>
   );
