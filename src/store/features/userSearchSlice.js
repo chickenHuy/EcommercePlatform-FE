@@ -8,7 +8,7 @@ const initialState = {
   sortBy: "",
   order: "",
   minPrice: 0,
-  maxPrice: 99999999,
+  maxPrice: 999999999,
   rating: 0,
   search: "",
   completeSetup: false,
@@ -21,7 +21,7 @@ const resetState = {
   sortBy: "",
   order: "",
   minPrice: 0,
-  maxPrice: 99999999,
+  maxPrice: 999999999,
   rating: 0,
   completeSetup: false,
 };

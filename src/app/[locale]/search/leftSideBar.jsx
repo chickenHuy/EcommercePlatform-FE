@@ -255,17 +255,17 @@ export default function ModernLeftSideBar({ t, storeId = null }) {
           {t("text_sale_price")}
         </h3>
         <Slider
-          value={[minPrice, maxPrice ? maxPrice : 99999999]}
+          value={[minPrice, maxPrice ? maxPrice : 999999999]}
           onValueChange={(value) => handlePriceChange(value)}
           min={0}
-          max={99999999}
+          max={999999999}
           step={100000}
           className="w-full animate-fade-in"
         />
         <div className="flex justify-between text-[.9em]">
           <span>{formatCurrency(minPrice)}</span>
           <span>-</span>
-          <span>{formatCurrency(maxPrice ? maxPrice : 99999999)}</span>
+          <span>{formatCurrency(maxPrice ? maxPrice : 999999999)}</span>
         </div>
       </div>
 
