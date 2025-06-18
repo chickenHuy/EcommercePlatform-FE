@@ -584,7 +584,8 @@
     "toast_description_select_delete": "Please select a product to delete",
     "toast_description_select_checkout": "Please select a product to purchase",
     "toast_description_delete_one": "{productName} product removed from cart successfully",
-    "toast_description_delete_list": "Removed {productLength} product from cart successfully"
+    "toast_description_delete_list": "Removed {productLength} product from cart successfully",
+    "toast_description_please_split_the_order": "The total amount greater than 1 million VND, please split the order into smaller orders"
   },
   "Checkout": {
     "text_return_cart_to_select": "Return to cart page to select products?",

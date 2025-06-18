@@ -11,7 +11,6 @@ import { useInView } from "react-intersection-observer";
 
 import { useDispatch } from "react-redux";
 import { setCheckout } from "@/store/features/checkoutSlice";
-import { setStore } from "@/store/features/userSearchSlice";
 
 import {
   changeQuantity,
@@ -24,7 +23,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/toaster";
 
 import { useToast } from "@/hooks/use-toast";
@@ -271,15 +269,6 @@ export default function CartUser() {
     }, 0);
   };
 
-  const handleClickViewShop = (storeId) => {
-    dispatch(setStore(storeId));
-    router.push("/search");
-  };
-
-  const handleClickViewProduct = (slug) => {
-    router.push(`/${slug}`);
-  };
-
   const updateSelectedListCartItem = (cartItemId, quantityUpdate) => {
     setSelectedListCartItem((prevItems) =>
       prevItems.map((item) => {
@@ -325,7 +314,7 @@ export default function CartUser() {
     } catch (error) {
       toast({
         title: t("toast_title_update_fail"),
-        description: error.message,
+        description: t("text_insufficient_quantity"),
         variant: "destructive",
       });
     }
@@ -505,6 +494,16 @@ export default function CartUser() {
         variant: "destructive",
       });
     } else {
+      const totalAmount = totalPriceAll(selectedListCartItem);
+
+      if (totalAmount >= 1000000000) {
+        toast({
+          title: t("toast_title_fail"),
+          description: t("toast_description_please_split_the_order"),
+          variant: "destructive",
+        });
+        return;
+      }
       dispatch(setCheckout(selectedCartWithItem));
       router.push("/checkout");
     }
@@ -567,337 +566,345 @@ export default function CartUser() {
   return (
     <>
       <Toaster />
-      {loadPage && <Loading />}
+      {loadPage &&
+        <div className="w-full h-fit min-h-screen">
+          <Loading />
+        </div >
+      }
 
-      {!loadPage && (
-        <div className="w-full h-fit min-h-screen xl:px-28 lg:px-20 sm:px-6 px-4 pt-20 lg:pb-32 pb-48 bg-blue-tertiary">
-          <div className="w-full h-full flex flex-col gap-3 shadow-md rounded-md p-3 bg-white-primary">
-            <div className="flex justify-end items-center py-3">
-              <span className="text-[1em]">{t("text_select_all")}</span>
-              {hasCheckboxAll && (
-                <Checkbox
-                  checked={checkedAll()}
-                  className="mx-3 -translate-y-[2px]"
-                  onCheckedChange={(checked) => handleCheckedAll(checked)}
-                />
-              )}
-            </div>
-
-            <div className="w-full h-full flex flex-col gap-7">
-              {listCartMapped.length > 0 &&
-                listCartMapped.map((cart, index) => (
-                  <Card
-                    key={index}
-                    className="rounded-md shadow-sm animate-fade-in-up"
-                  >
-                    <CardTitle className="w-full h-fit p-3 flex flex-row items-center border-b">
-                      <div className="w-fit pl-2 pr-4 flex items-center">
-                        {hasCheckboxCart(cart) && (
-                          <Checkbox
-                            checked={checkedCart(cart)}
-                            onCheckedChange={(checked) =>
-                              handleCheckedCart(cart, checked)
-                            }
-                          />
-                        )}
-                      </div>
-
-                      <Link
-                        href={`/search?storeId=${cart.storeId}`}
-                        className="flex items-center gap-3 cursor-pointer"
-                      >
-                        <Image
-                          alt={cart.storeName}
-                          src={cart.avatarStore || StoreEmpty}
-                          height={50}
-                          width={50}
-                          className="rounded-full object-cover aspect-square shadow-md"
-                        />
-
-                        <span className="text-[1.2em]">{cart.storeName}</span>
-
-                        <Rating
-                          value={cart.ratingStore}
-                          precision={0.1}
-                          readOnly
-                        />
-                      </Link>
-                    </CardTitle>
-
-                    <CardContent className="flex flex-col p-0">
-                      {cart.items.length > 0 &&
-                        cart.items.map((item) => (
-                          <div
-                            key={item.id}
-                            className="w-full h-fit px-3 flex 2xl:flex-row flex-col items-center border-b"
-                          >
-                            <div className="2xl:w-1/2 w-full 2xl:border-none border-b lg:flex-row flex-col py-3 h-fit flex items-center">
-                              <div className="w-full h-28 py-3 flex-1 flex items-center relative border-b lg:border-none">
-                                <div className="w-fit pl-2 pr-3 flex items-center">
-                                  {hasCheckboxCartItem(item) && (
-                                    <Checkbox
-                                      checked={checkedCartItem(item)}
-                                      onCheckedChange={(checked) =>
-                                        handleCheckedCartItem(item, checked)
-                                      }
-                                    />
-                                  )}
-                                </div>
-
-                                <Link
-                                  href={`/${item.productSlug}`}
-                                  className="lg:w-2/3 w-full h-fit flex items-start gap-3"
-                                >
-                                  <Image
-                                    alt={item.name}
-                                    src={item.image || StoreEmpty}
-                                    height={100}
-                                    width={100}
-                                    className="rounded-md shadow-md object-cover aspect-square"
-                                  />
-
-                                  <div className="flex flex-col gap-3 h-full items-start">
-                                    <span className="text-[1.1em] line-clamp-2">
-                                      {item.name}
-                                    </span>
-                                    <div className="flex items-center gap-2">
-                                      <Image
-                                        alt={item.brand}
-                                        src={item.logoBrand || StoreEmpty}
-                                        height={25}
-                                        width={25}
-                                        className="rounded-md object-cover aspect-square shadow-md"
-                                      />
-                                      <span className="text-[1em] text-muted-foreground">
-                                        {item.brand}
-                                      </span>
-                                    </div>
-                                  </div>
-
-                                  {!hasCheckboxCartItem(item) && (
-                                    <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center rounded-md bg-white-primary bg-opacity-70">
-                                      <span className="text-[1em] text-white-primary bg-black-primary py-3 px-5 rounded-md">
-                                        {t("text_insufficient_quantity")}
-                                      </span>
-                                    </div>
-                                  )}
-                                </Link>
-                              </div>
-
-                              <div className="lg:w-1/3 w-full px-3 h-28 py-3 flex flex-col justify-start gap-3 lg:border-l">
-                                <span className="text-[.9em] text-center w-full text-muted-foreground">
-                                  {t("text_classification")}
-                                </span>
-
-                                <div className="flex items-center justify-between my-auto gap-2">
-                                  <div className="flex flex-row flex-wrap gap-2">
-                                    {item.value ? (
-                                      item.value.map((value, index) => (
-                                        <span
-                                          key={index}
-                                          className="text-[.9em] text-muted-foreground border rounded-sm shadow-sm px-2"
-                                        >
-                                          {value}
-                                        </span>
-                                      ))
-                                    ) : (
-                                      <span className="text-[.9em] text-muted-foreground">
-                                        {t("text_nothing")}
-                                      </span>
-                                    )}
-                                  </div>
-
-                                  {item.value && (
-                                    <CartItemVariantSelector
-                                      cartItemId={item.id}
-                                    />
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="2xl:w-1/2 w-full flex flex-col lg:flex-row items-center">
-                              <div className="lg:w-[60%] w-full h-28 py-3 flex flex-row">
-                                <div className="w-[50%] px-3 h-full flex flex-col justify-start items-center 2xl:border-l">
-                                  <span className="text-[.9em] text-muted-foreground">
-                                    {t("text_unit_price")}
-                                  </span>
-
-                                  <div className="w-full flex flex-col items-center my-auto">
-                                    <span className="w-full text-center text-[1.2em] text-red-primary truncate">
-                                      {formatCurrency(item.salePrice || 0)}
-                                    </span>
-                                    <span className="w-full text-center text-[1em] text-muted-foreground line-through">
-                                      {formatCurrency(item.originalPrice || 0)}
-                                    </span>
-                                  </div>
-                                </div>
-
-                                <div className="w-[50%] h-full px-3 flex flex-col justify-start items-center border-l">
-                                  <span className="text-[.9em]  text-muted-foreground">
-                                    {t("text_quantity")}
-                                  </span>
-
-                                  <div className="flex flex-row items-center justify-center gap-1 my-auto">
-                                    <Button
-                                      variant="outline"
-                                      className="w-11 h-8"
-                                      onClick={() => handleClickMinus(item)}
-                                    >
-                                      <Minus className="h-5 w-5" />
-                                    </Button>
-
-                                    <Input
-                                      value={
-                                        inputValues[item.id] ?? item.quantity
-                                      }
-                                      onChange={(e) =>
-                                        handleOnChangeInput(
-                                          item,
-                                          e.target.value,
-                                        )
-                                      }
-                                      onKeyDown={(e) =>
-                                        handleOnKeyDownInput(item, e)
-                                      }
-                                      onBlur={(e) => handleOnBlurInput(item, e)}
-                                      type="number"
-                                      className="w-[70px] h-8 text-[1em] text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                    />
-
-                                    <Button
-                                      variant="outline"
-                                      className="w-11 h-8"
-                                      onClick={() => handleClickPlus(item)}
-                                    >
-                                      <Plus className="h-5 w-5" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="lg:w-[40%] w-full lg:border-none border-t h-28 py-3 flex flex-row">
-                                <div className="lg:w-[80%] w-1/2 h-full flex flex-col items-center justify-between lg:border-l">
-                                  <span className="text-[.9em] text-muted-foreground">
-                                    {t("text_amount")}
-                                  </span>
-                                  <span className="w-full text-center text-[1.3em] text-red-primary truncate my-auto">
-                                    {formatCurrency(
-                                      item.quantity * item.salePrice || 0,
-                                    )}
-                                  </span>
-                                </div>
-
-                                <div className="lg:w-[20%] w-1/2 h-full pl-3 flex justify-center items-center border-l">
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                      handleClickDeleteOne(item);
-                                    }}
-                                  >
-                                    <Trash className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                    </CardContent>
-
-                    <CardFooter className="w-full bg-re h-fit p-3 flex flex-row items-center justify-end gap-3">
-                      <span className="text-[.9em] text-muted-foreground">
-                        {t("text_savings")}
-                      </span>
-                      <span className="text-[1em]">
-                        {formatCurrency(totalSavingsOneCart(cart.items) || 0)}
-                      </span>
-                    </CardFooter>
-                  </Card>
-                ))}
-
-              {!loadPage && listCartMapped.length === 0 && (
-                <div className="min-h-screen flex items-center justify-center">
-                  <Image
-                    alt="Empty Image"
-                    src={ReviewEmpty}
-                    width={300}
-                    height={300}
+      {
+        !loadPage && (
+          <div className="w-full h-fit min-h-screen xl:px-28 lg:px-20 sm:px-6 px-4 pt-20 lg:pb-32 pb-48 bg-blue-tertiary">
+            <div className="w-full h-full flex flex-col gap-3 shadow-md rounded-md p-3 bg-white-primary">
+              <div className="flex justify-end items-center py-3">
+                <span className="text-[1em]">{t("text_select_all")}</span>
+                {hasCheckboxAll && (
+                  <Checkbox
+                    checked={checkedAll()}
+                    className="mx-3 -translate-y-[2px]"
+                    onCheckedChange={(checked) => handleCheckedAll(checked)}
                   />
-                </div>
-              )}
-
-              {loadListCart && <Loading />}
-
-              {!loadListCart && hasNext && (
-                <div
-                  ref={loadRef}
-                  className="absolute bottom-0 w-full h-16"
-                ></div>
-              )}
-            </div>
-          </div>
-
-          <div className="w-full h-fit xl:px-28 lg:px-20 sm:px-6 px-4 fixed bottom-0 left-0">
-            <div className="w-full h-fit flex flex-row gap-2 flex-wrap justify-between items-center py-4 px-3 rounded-t-md shadow-md bg-black-primary">
-              <div className="w-fit flex flex-row gap-3 items-center">
-                <Button
-                  variant="outline"
-                  onClick={() => handleCheckedAll(!checkedAll())}
-                >
-                  {t("text_select_all")} ({countTotalProduct(listCart)})
-                </Button>
-
-                <Button
-                  variant="outline"
-                  onClick={() => handleClickDeleteAll()}
-                >
-                  {t("text_delete")} ({selectedListCartItem.length})
-                </Button>
-              </div>
-              <div className="flex flex-row flex-wrap items-center text-white-primary">
-                <span className="text-[1em] px-3 border-l">
-                  {t("text_savings")}:{" "}
-                  {formatCurrency(
-                    totalSavingsListCartItem(selectedListCartItem) || 0,
-                  )}
-                </span>
-
-                <div className="flex items-center gap-1 px-3 border-l">
-                  <span className="text-[1em]">
-                    {t("text_total_payment")} ({selectedListCartItem.length}{" "}
-                    {t("text_product_lower")}):
-                  </span>
-                  <span className="text-[1.3em]">
-                    {formatCurrency(totalPriceAll(selectedListCartItem) || 0)}
-                  </span>
-                </div>
+                )}
               </div>
 
-              <Button
-                className="flex-grow min-w-[250px] bg-red-primary hover:bg-red-primary/90 rounded-md text-[1em]"
-                onClick={() => handleCheckout()}
-              >
-                {t("text_checkout")}
-              </Button>
+              <div className="w-full h-full flex flex-col gap-7">
+                {listCartMapped.length > 0 &&
+                  listCartMapped.map((cart, index) => (
+                    <Card
+                      key={index}
+                      className="rounded-md shadow-sm animate-fade-in-up"
+                    >
+                      <CardTitle className="w-full h-fit p-3 flex flex-row items-center border-b">
+                        <div className="w-fit pl-2 pr-4 flex items-center">
+                          {hasCheckboxCart(cart) && (
+                            <Checkbox
+                              checked={checkedCart(cart)}
+                              onCheckedChange={(checked) =>
+                                handleCheckedCart(cart, checked)
+                              }
+                            />
+                          )}
+                        </div>
+
+                        <Link
+                          href={`/search?storeId=${cart.storeId}`}
+                          className="flex items-center gap-3 cursor-pointer"
+                        >
+                          <Image
+                            alt={cart.storeName}
+                            src={cart.avatarStore || StoreEmpty}
+                            height={50}
+                            width={50}
+                            className="rounded-full object-cover aspect-square shadow-md"
+                          />
+
+                          <span className="text-[1.2em]">{cart.storeName}</span>
+
+                          <Rating
+                            value={cart.ratingStore}
+                            precision={0.1}
+                            readOnly
+                          />
+                        </Link>
+                      </CardTitle>
+
+                      <CardContent className="flex flex-col p-0">
+                        {cart.items.length > 0 &&
+                          cart.items.map((item) => (
+                            <div
+                              key={item.id}
+                              className="w-full h-fit px-3 flex 2xl:flex-row flex-col items-center border-b"
+                            >
+                              <div className="2xl:w-1/2 w-full 2xl:border-none border-b lg:flex-row flex-col py-3 h-fit flex items-center">
+                                <div className="w-full h-28 py-3 flex-1 flex items-center relative border-b lg:border-none">
+                                  <div className="w-fit pl-2 pr-3 flex items-center">
+                                    {hasCheckboxCartItem(item) && (
+                                      <Checkbox
+                                        checked={checkedCartItem(item)}
+                                        onCheckedChange={(checked) =>
+                                          handleCheckedCartItem(item, checked)
+                                        }
+                                      />
+                                    )}
+                                  </div>
+
+                                  <Link
+                                    href={`/${item.productSlug}`}
+                                    className="lg:w-2/3 w-full h-fit flex items-start gap-3"
+                                  >
+                                    <Image
+                                      alt={item.name}
+                                      src={item.image || StoreEmpty}
+                                      height={100}
+                                      width={100}
+                                      className="rounded-md shadow-md object-cover aspect-square"
+                                    />
+
+                                    <div className="flex flex-col gap-3 h-full items-start">
+                                      <span className="text-[1.1em] line-clamp-2">
+                                        {item.name}
+                                      </span>
+                                      <div className="flex items-center gap-2">
+                                        <Image
+                                          alt={item.brand}
+                                          src={item.logoBrand || StoreEmpty}
+                                          height={25}
+                                          width={25}
+                                          className="rounded-md object-cover aspect-square shadow-md"
+                                        />
+                                        <span className="text-[1em] text-muted-foreground">
+                                          {item.brand}
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    {!hasCheckboxCartItem(item) && (
+                                      <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center rounded-md bg-white-primary bg-opacity-70">
+                                        <span className="text-[1em] text-white-primary bg-black-primary py-3 px-5 rounded-md">
+                                          {t("text_insufficient_quantity")}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </Link>
+                                </div>
+
+                                <div className="lg:w-1/3 w-full px-3 h-28 py-3 flex flex-col justify-start gap-3 lg:border-l">
+                                  <span className="text-[.9em] text-center w-full text-muted-foreground">
+                                    {t("text_classification")}
+                                  </span>
+
+                                  <div className="flex items-center justify-between my-auto gap-2">
+                                    <div className="flex flex-row flex-wrap gap-2">
+                                      {item.value ? (
+                                        item.value.map((value, index) => (
+                                          <span
+                                            key={index}
+                                            className="text-[.9em] text-muted-foreground border rounded-sm shadow-sm px-2"
+                                          >
+                                            {value}
+                                          </span>
+                                        ))
+                                      ) : (
+                                        <span className="text-[.9em] text-muted-foreground">
+                                          {t("text_nothing")}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    {item.value && (
+                                      <CartItemVariantSelector
+                                        cartItemId={item.id}
+                                      />
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="2xl:w-1/2 w-full flex flex-col lg:flex-row items-center">
+                                <div className="lg:w-[60%] w-full h-28 py-3 flex flex-row">
+                                  <div className="w-[50%] px-3 h-full flex flex-col justify-start items-center 2xl:border-l">
+                                    <span className="text-[.9em] text-muted-foreground">
+                                      {t("text_unit_price")}
+                                    </span>
+
+                                    <div className="w-full flex flex-col items-center my-auto">
+                                      <span className="w-full text-center text-[1.2em] text-red-primary truncate">
+                                        {formatCurrency(item.salePrice || 0)}
+                                      </span>
+                                      <span className="w-full text-center text-[1em] text-muted-foreground line-through">
+                                        {formatCurrency(item.originalPrice || 0)}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <div className="w-[50%] h-full px-3 flex flex-col justify-start items-center border-l">
+                                    <span className="text-[.9em]  text-muted-foreground">
+                                      {t("text_quantity")}
+                                    </span>
+
+                                    <div className="flex flex-row items-center justify-center gap-1 my-auto">
+                                      <Button
+                                        variant="outline"
+                                        className="w-11 h-8"
+                                        onClick={() => handleClickMinus(item)}
+                                      >
+                                        <Minus className="h-5 w-5" />
+                                      </Button>
+
+                                      <Input
+                                        value={
+                                          inputValues[item.id] ?? item.quantity
+                                        }
+                                        onChange={(e) =>
+                                          handleOnChangeInput(
+                                            item,
+                                            e.target.value,
+                                          )
+                                        }
+                                        onKeyDown={(e) =>
+                                          handleOnKeyDownInput(item, e)
+                                        }
+                                        onBlur={(e) => handleOnBlurInput(item, e)}
+                                        type="number"
+                                        className="w-[70px] h-8 text-[1em] text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                      />
+
+                                      <Button
+                                        variant="outline"
+                                        className="w-11 h-8"
+                                        onClick={() => handleClickPlus(item)}
+                                      >
+                                        <Plus className="h-5 w-5" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="lg:w-[40%] w-full lg:border-none border-t h-28 py-3 flex flex-row">
+                                  <div className="lg:w-[80%] w-1/2 h-full flex flex-col items-center justify-between lg:border-l">
+                                    <span className="text-[.9em] text-muted-foreground">
+                                      {t("text_amount")}
+                                    </span>
+                                    <span className="w-full text-center text-[1.3em] text-red-primary truncate my-auto">
+                                      {formatCurrency(
+                                        item.quantity * item.salePrice || 0,
+                                      )}
+                                    </span>
+                                  </div>
+
+                                  <div className="lg:w-[20%] w-1/2 h-full pl-3 flex justify-center items-center border-l">
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => {
+                                        handleClickDeleteOne(item);
+                                      }}
+                                    >
+                                      <Trash className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                      </CardContent>
+
+                      <CardFooter className="w-full bg-re h-fit p-3 flex flex-row items-center justify-end gap-3">
+                        <span className="text-[.9em] text-muted-foreground">
+                          {t("text_savings")}
+                        </span>
+                        <span className="text-[1em]">
+                          {formatCurrency(totalSavingsOneCart(cart.items) || 0)}
+                        </span>
+                      </CardFooter>
+                    </Card>
+                  ))}
+
+                {!loadPage && listCartMapped.length === 0 && (
+                  <div className="min-h-screen flex items-center justify-center">
+                    <Image
+                      alt="Empty Image"
+                      src={ReviewEmpty}
+                      width={300}
+                      height={300}
+                    />
+                  </div>
+                )}
+
+                {loadListCart && <Loading />}
+
+                {!loadListCart && hasNext && (
+                  <div
+                    ref={loadRef}
+                    className="absolute bottom-0 w-full h-16"
+                  ></div>
+                )}
+              </div>
+            </div>
+
+            <div className="w-full h-fit xl:px-28 lg:px-20 sm:px-6 px-4 fixed bottom-0 left-0">
+              <div className="w-full h-fit flex flex-row gap-2 flex-wrap justify-between items-center py-4 px-3 rounded-t-md shadow-md bg-black-primary">
+                <div className="w-fit flex flex-row gap-3 items-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleCheckedAll(!checkedAll())}
+                  >
+                    {t("text_select_all")} ({countTotalProduct(listCart)})
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    onClick={() => handleClickDeleteAll()}
+                  >
+                    {t("text_delete")} ({selectedListCartItem.length})
+                  </Button>
+                </div>
+                <div className="flex flex-row flex-wrap items-center text-white-primary">
+                  <span className="text-[1em] px-3 border-l">
+                    {t("text_savings")}:{" "}
+                    {formatCurrency(
+                      totalSavingsListCartItem(selectedListCartItem) || 0,
+                    )}
+                  </span>
+
+                  <div className="flex items-center gap-1 px-3 border-l">
+                    <span className="text-[1em]">
+                      {t("text_total_payment")} ({selectedListCartItem.length}{" "}
+                      {t("text_product_lower")}):
+                    </span>
+                    <span className="text-[1.3em]">
+                      {formatCurrency(totalPriceAll(selectedListCartItem) || 0)}
+                    </span>
+                  </div>
+                </div>
+
+                <Button
+                  className="flex-grow min-w-[250px] bg-red-primary hover:bg-red-primary/90 rounded-md text-[1em]"
+                  onClick={() => handleCheckout()}
+                >
+                  {t("text_checkout")}
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-      {openDialog && (
-        <>
-          <div className="fixed inset-0 bg-black-primary bg-opacity-85 z-[150]" />
-          <DialogConfirmCart
-            onOpen={openDialog}
-            onClose={() => setOpenDialog(false)}
-            onDeleteOne={confirmDeleteOne}
-            onDeleteList={confirmDeleteList}
-            cartItemToDelete={cartItemToDelete}
-            selectedListCartItem={selectedListCartItem}
-            actionType={actionType}
-          />
-        </>
-      )}
+      {
+        openDialog && (
+          <>
+            <div className="fixed inset-0 bg-black-primary bg-opacity-85 z-[150]" />
+            <DialogConfirmCart
+              onOpen={openDialog}
+              onClose={() => setOpenDialog(false)}
+              onDeleteOne={confirmDeleteOne}
+              onDeleteList={confirmDeleteList}
+              cartItemToDelete={cartItemToDelete}
+              selectedListCartItem={selectedListCartItem}
+              actionType={actionType}
+            />
+          </>
+        )
+      }
     </>
   );
 }

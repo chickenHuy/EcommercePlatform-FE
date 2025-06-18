@@ -593,7 +593,8 @@
     "toast_description_select_delete": "Vui lòng chọn sản phẩm để xóa",
     "toast_description_select_checkout": "Vui lòng chọn sản phẩm để mua hàng",
     "toast_description_delete_one": "Xóa sản phẩm {productName} khỏi giỏ hàng thành công",
-    "toast_description_delete_list": "Xóa {productLength} sản phẩm khỏi giỏ hàng thành công"
+    "toast_description_delete_list": "Xóa {productLength} sản phẩm khỏi giỏ hàng thành công",
+    "toast_description_please_split_the_order": "Tổng giá trị đơn hàng lớn hơn 1 tỷ đồng, vui lòng chia nhỏ đơn hàng"
   },
   "Checkout": {
     "text_return_cart_to_select": "Quay lại giỏ hàng để chọn sản phẩm?",
