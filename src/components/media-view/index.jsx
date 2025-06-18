@@ -33,12 +33,12 @@ export default function MediaViewer({
           )}
         </div>
       </DialogTrigger>
-      <DialogContent className="min-w-[70vw] min-h-[70vh] p-0 bg-black-primary text-white-primary">
-        <div className="relative w-full h-[70vh]">
+      <DialogContent className="min-w-[95vw] min-h-[95vh] p-0 bg-black-primary text-white-primary">
+        <div className="relative w-[95vw] h-[95vh] m-auto">
           {isVideo ? (
             <video
               src={mediaUrl || ImageProductPlaceholder}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
               loop
               muted
               autoPlay
