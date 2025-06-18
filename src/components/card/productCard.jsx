@@ -119,6 +119,7 @@ export default function ProductCard({
             components.length > 0 && (
               <div className="w-full h-fit max-h-[200px] overflow-y-scroll flex flex-col gap-1 bg-blue-tertiary p-2 pl-4 rounded-sm shadow-sm">
                 {components.map((component, index) => (
+                  component.value &&
                   <li
                     key={index}
                     className="text-[.8em]"
