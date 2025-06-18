@@ -144,7 +144,7 @@ export default function ProductDetail({ product, t }) {
         description: error.message,
         variant: "destructive",
       });
-      if(error.message === "Uncategorized Error") {
+      if (error.message === "Uncategorized Error") {
         router.push("/auth");
       }
     }
@@ -171,7 +171,7 @@ export default function ProductDetail({ product, t }) {
         description: error.message,
         variant: "destructive",
       });
-      if(error.message === "Uncategorized Error") {
+      if (error.message === "Uncategorized Error") {
         router.push("/auth");
       }
     }
@@ -230,14 +230,24 @@ export default function ProductDetail({ product, t }) {
                   <Star
                     key={star}
                     className={`h-4 w-4 ${star <= (product.rating || 0)
-                        ? "text-yellow-primary fill-yellow-primary"
-                        : "text-gray-secondary"
+                      ? "text-yellow-primary fill-yellow-primary"
+                      : "text-gray-secondary"
                       }`}
                   />
                 ))}
-                <span className="text-[1em] pl-3 translate-y-[2px]">
-                  {product.reviewCount
-                    ? `(${product.reviewCount} ${t("text_review")})`
+              </div>
+
+              <div className="flex items-center pt-2">
+                <span className="text-[1em] pr-1 translate-y-[2px]">
+                  {t("text_sold")}
+                </span>
+                <span className="text-[1em] translate-y-[2px]">
+                  {product.sold || 0}
+                </span>
+
+                <span className="text-[1em] pl-2 translate-y-[2px]">
+                  {product.ratingCount
+                    ? `(${product.ratingCount} ${t("text_review")})`
                     : `0 ${t("text_review")}`}
                 </span>
               </div>
