@@ -140,7 +140,7 @@ export default function SearchPage() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-auto w-full p-4">
+          <div className="flex-1 overflow-auto w-full px-4">
             <ProductGrid maxCol={4} t={t} isCompleteSetup={isCompleteSetup} />
           </div>
         </div>

@@ -26,11 +26,13 @@ export default function ProductCard({
   sold = 0,
   brandName = null,
   rating,
+  components = [],
   percentDiscount = null,
   showRating = true,
   onAddToFavorites,
   isFavorite,
   link,
+  isMasonry = false,
 }) {
   const t = useTranslations("Search");
   const videoRef = useRef(null);
@@ -50,12 +52,12 @@ export default function ProductCard({
   };
 
   return (
-    <Link href={`/${link}`} passHref className="w-full h-full relative group" onMouseEnter={handleMouseEnter}
+    <Link href={`/${link}`} passHref className="w-full h-fit relative group" onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}>
       {percentDiscount &&
         <div className="w-fit h-fit px-1 rounded-sm bg-red-primary text-[.8em] text-white-primary absolute top-[5px] left-[5px] z-20">{"-" + percentDiscount + "%"}</div>
       }
-      <Card className="w-full h-full bg-white-primary overflow-hidden flex flex-col rounded-md border shadow-sm transition duration-150">
+      <Card className={`w-full h-fit ${isMasonry ? "mb-3" : ""} bg-white-primary overflow-hidden flex flex-col rounded-md border shadow-sm transition duration-150`}>
         <CardHeader className="p-0 relative">
           <div className="relative w-full aspect-square group-hover:-translate-y-[6px] transition duration-150">
             {videoUrl ? (
@@ -113,7 +115,21 @@ export default function ProductCard({
               {brandName}
             </div>
           )}
-          <div className="w-full flex flex-row flex-wrap justify-between items-center gap-1">
+          {
+            components.length > 0 && (
+              <div className="w-full h-fit max-h-[200px] overflow-y-scroll flex flex-col gap-1 bg-blue-tertiary p-2 pl-4 rounded-sm shadow-sm">
+                {components.map((component, index) => (
+                  <li
+                    key={index}
+                    className="text-[.8em]"
+                  >
+                    {component.name}: {component.value}
+                  </li>
+                ))}
+              </div>
+            )
+          }
+          <div className="w-full flex flex-row flex-wrap justify-between items-center gap-1 pt-2">
             {showRating &&
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (

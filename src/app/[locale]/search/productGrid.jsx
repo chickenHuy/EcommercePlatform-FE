@@ -11,6 +11,7 @@ import clsx from "clsx";
 import Empty from "@/assets/images/ReviewEmpty.png";
 import Image from "next/image";
 import { resetFilters, setStore } from "@/store/features/userSearchSlice";
+import Masonry from "react-masonry-css";
 
 export default function ProductGrid({ maxCol = 6 }) {
   const [products, setProducts] = useState([]);
@@ -54,7 +55,8 @@ export default function ProductGrid({ maxCol = 6 }) {
           setHasMore(false);
         } else {
           for (const product of newProducts) {
-
+            const productDetail = await get(`/api/v1/products/slug/${product.slug}`);
+            product.components = productDetail.result.components || [];
           }
           setProducts((prev) => {
             const merged = isInitialLoad ? newProducts : [...prev, ...newProducts];
@@ -126,7 +128,11 @@ export default function ProductGrid({ maxCol = 6 }) {
 
   return (
     <>
-      <div className={`w-full grid gap-3 grid-cols-2 ${gridCols}`}>
+      <Masonry
+        breakpointCols={{ default: 4, 1400: 2 }}
+        className="main_grid_layout gap-3 no-scrollbar"
+        columnClassName="main_grid_item"
+      >
         {products.map((product) => (
           <ProductCard
             key={product.id}
@@ -138,25 +144,27 @@ export default function ProductGrid({ maxCol = 6 }) {
             videoUrl={product.videoUrl}
             brandName={product.brandName}
             sold={product.sold}
+            components={product.components}
             rating={product.rating}
             onViewDetail={() => handleViewDetail(product)}
             onAddToFavorites={() => handleAddToFavorites(product.id)}
             isFavorite={favorites.find((item) => item.productId === product.id)}
             link={product.slug}
+            isMasonry={true}
           />
         ))}
-        {hasMore && (
-          <div ref={ref} className="w-full col-span-full flex justify-center">
-            {loading && (
-              <div className={`w-full grid gap-3 grid-cols-2 ${gridCols}`}>
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <SkeletonItem key={i} />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      </Masonry>
+      {hasMore && (
+        <div ref={ref} className="w-full col-span-full flex justify-center">
+          {loading && (
+            <div className={`w-full grid gap-3 grid-cols-2 ${gridCols}`}>
+              {Array.from({ length: 12 }).map((_, i) => (
+                <SkeletonItem key={i} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {!loading && products.length === 0 && (
         <Image src={Empty} alt="No Products Found" className="w-1/2 mx-auto" />
