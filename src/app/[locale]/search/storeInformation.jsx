@@ -77,7 +77,7 @@ export function StoreInformation({ storeId, t }) {
         </span>
         <div className="flex items-center justify-center gap-1">
           <Star className="text-yellow-primary fill-yellow-primary" size={20} />
-          <span className="text-[1em]">{store.rating || 0}</span>
+          <span className="text-[1em]">{store.rating?.toFixed(1) || 0}</span>
         </div>
       </div>
       <div className="max-h-[200px] p-2 border border-blue-primary rounded-md overflow-auto">

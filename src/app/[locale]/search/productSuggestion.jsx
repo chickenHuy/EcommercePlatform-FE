@@ -58,7 +58,7 @@ export function SuggestedProducts({ storeId, t }) {
                 key={product.id}
                 className="bg-white-primary border rounded-md shadow-md hover:scale-[1.02] transition"
               >
-                <div className="flex items-center gap-3 px-3 py-2">
+                <div className="w-full flex flex-row flex-wrap items-center justify-center gap-3 px-3 py-2">
                   <Image
                     src={
                       product.mainImageUrl
@@ -68,10 +68,10 @@ export function SuggestedProducts({ storeId, t }) {
                     alt={product.name}
                     width={100}
                     height={100}
-                    className="rounded-md aspect-square object-cover border shadow-md"
+                    className="rounded-md flex-1 aspect-square object-cover border shadow-md"
                   />
 
-                  <div className="min-w-0 flex-1">
+                  <div className="flex-1 w-1/2">
                     <h4 className="text-[1em] w-full truncate">
                       {product.name}
                     </h4>
