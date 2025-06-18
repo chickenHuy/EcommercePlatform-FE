@@ -39,7 +39,7 @@ export default function HomePage() {
       url: Slider2,
       description: "Camera chuyên nghiệp - Màn hình sắc nét",
       button: "Phone",
-      redirect: "",
+      redirect: "/search?categoryId=1",
       background: "black",
     },
     {
@@ -60,7 +60,7 @@ export default function HomePage() {
       url: Slider5,
       description: "Sắc nét đến từng điểm ảnh",
       button: "Laptop",
-      redirect: "",
+      redirect: "/search?categoryId=2",
       background: "white",
     },
   ];
@@ -112,10 +112,12 @@ export default function HomePage() {
                   height={300}
                   alt="Home Image"
                 />
-                <Button className="absolute bottom-3 right-3 backdrop-blur-md bg-white-tertiary/50 group-hover:flex hidden animate-fade-in-quick">
-                  Earphone
-                  <ChevronRight className="p-1" />
-                </Button>
+                <Link href="/search?categoryId=8">
+                  <Button className="absolute bottom-3 right-3 backdrop-blur-md bg-white-tertiary/50 group-hover:flex hidden animate-fade-in-quick">
+                    Earphone
+                    <ChevronRight className="p-1" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -127,10 +129,12 @@ export default function HomePage() {
               height={1000}
               alt="Home Image"
             />
-            <Button className="absolute bottom-3 right-3 backdrop-blur-md bg-white-tertiary/50 group-hover:flex hidden animate-fade-in-quick">
-              Phone
-              <ChevronRight className="p-1" />
-            </Button>
+            <Link href="/search?categoryId=1">
+              <Button className="absolute bottom-3 right-3 backdrop-blur-md bg-white-tertiary/50 group-hover:flex hidden animate-fade-in-quick">
+                Phone
+                <ChevronRight className="p-1" />
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
