@@ -49,8 +49,6 @@ export default function ProductCard({
     }
   };
 
-
-
   return (
     <Link href={`/${link}`} passHref className="w-full h-full relative group" onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}>

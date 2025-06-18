@@ -24,6 +24,7 @@ export default function ProductGrid({ maxCol = 6 }) {
   const searchParams = useSelector((state) => state.searchFilter);
   const isCompleteSetup = useSelector((state) => state.searchFilter.completeSetup);
   const favorites = useSelector((state) => state.wishListReducer.wishList);
+  console.log("searchParams", favorites);
   const t = useTranslations("Search");
   const limit = 16;
 
@@ -52,6 +53,9 @@ export default function ProductGrid({ maxCol = 6 }) {
         if (newProducts.length === 0) {
           setHasMore(false);
         } else {
+          for (const product of newProducts) {
+
+          }
           setProducts((prev) => {
             const merged = isInitialLoad ? newProducts : [...prev, ...newProducts];
             const unique = Array.from(new Map(merged.map(p => [p.id, p])).values());
@@ -73,7 +77,7 @@ export default function ProductGrid({ maxCol = 6 }) {
     setProducts([]);
     setPage(1);
     setHasMore(true);
-    setResetTrigger((prev) => prev + 1); 
+    setResetTrigger((prev) => prev + 1);
   }, [searchParams, isCompleteSetup]);
 
   useEffect(() => {
@@ -137,7 +141,7 @@ export default function ProductGrid({ maxCol = 6 }) {
             rating={product.rating}
             onViewDetail={() => handleViewDetail(product)}
             onAddToFavorites={() => handleAddToFavorites(product.id)}
-            isFavorite={favorites.includes(product.id)}
+            isFavorite={favorites.find((item) => item.productId === product.id)}
             link={product.slug}
           />
         ))}
