@@ -30,10 +30,10 @@ export default function RenderCategories(
               {category.children && category.children.length > 0 ? (
                 <Accordion
                   type="multiple"
-                  className="w-full text-black-primary border-none"
+                  className={`w-full text-black-primary border-none ${level > 0 ? "ml-5" : ""}`}
                 >
                   <AccordionItem value={category.id}>
-                    <AccordionTrigger className="w-full h-fit py-1 px-2 rounded-md flex flex-row justify-start items-center gap-3 hover:no-underline hover:bg-blue-primary">
+                    <AccordionTrigger className={`w-full h-fit py-1 px-2 rounded-md flex flex-row justify-start items-center gap-3 hover:no-underline hover:bg-blue-primary  ${level > 0 ? "border-l border-b" : ""}`}>
                       <RadioGroupItem value={category.id} id={category.id} />
                       <span
                         htmlFor={category.id}
@@ -54,7 +54,7 @@ export default function RenderCategories(
                 </Accordion>
               ) : (
                 <div
-                  className={`w-full h-fit py-[2px] px-2 rounded-md flex flex-row justify-start items-center gap-3 hover:bg-blue-primary ${level > 0 ? "ml-5" : ""}`}
+                  className={`w-full h-fit py-[2px] px-2 rounded-md flex flex-row justify-start items-center gap-3 hover:bg-blue-primary border-l border-b ${level > 0 ? "ml-5" : ""}`}
                 >
                   <RadioGroupItem value={category.id} id={category.id} />
                   <span
