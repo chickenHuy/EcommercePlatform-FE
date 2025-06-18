@@ -39,10 +39,15 @@ export default function SearchPage() {
       if (!sortBy) {
         dispatch(setSortBy("createdAt"));
       }
-    } else if (order === "asc") dispatch(setOrder("desc"));
-    else {
-      dispatch(setOrder(null));
-      dispatch(setSortBy(null));
+      return;
+    }
+    if (order === "asc") {
+      dispatch(setOrder("desc"))
+      return;
+    }
+    if (order === "desc") {
+      dispatch(setOrder("asc"))
+      return;
     }
   };
 
