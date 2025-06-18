@@ -18,6 +18,7 @@ import { setOrder, setSortBy } from "@/store/features/userSearchSlice";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import ProductGrid from "./productGrid";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function SearchPage() {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
@@ -70,6 +71,7 @@ export default function SearchPage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col gap-3 xl:px-28 lg:px-20 sm:px-6 px-4 py-20">
+      <Toaster />
       <SearchHeader t={t} />
 
       <div className="flex flex-1 h-full gap-3 relative">

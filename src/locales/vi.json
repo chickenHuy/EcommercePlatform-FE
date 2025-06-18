@@ -296,7 +296,9 @@
     "text_new_products_added": "Sản Phẩm Mới Thêm",
     "text_count": "{count} Thêm Vào Giỏ Hàng",
     "text_view_cart": "Xem Giỏ Hàng",
-    "text_search_products": "Tìm kiếm sản phẩm ..."
+    "text_search_products": "Tìm kiếm sản phẩm ...",
+    "text_notify": "Thông báo",
+    "text_input_too_long": "Từ khóa tìm kiếm quá dài, vui lòng nhập từ khóa ngắn hơn 1000 ký tự"
   },
   "VendorRegister": {
     "register_store": "Đăng ký trở thành người bán",
@@ -534,9 +536,9 @@
       "waiting_for_confirmation": "Chờ xác nhận",
       "confirmed": "Đã xác nhận",
       "preparing": "Chuẩn bị hàng",
-      "waiting_for_shipping":"Chờ giao cho ĐVVC",
+      "waiting_for_shipping": "Chờ giao cho ĐVVC",
       "delivered_to_the_carrier": "Đã giao cho ĐVVC",
-      "on_delivery":"Đang giao hàng",
+      "on_delivery": "Đang giao hàng",
       "completed": "Hoàn thành"
     },
     "confirm_list_order_seller": {

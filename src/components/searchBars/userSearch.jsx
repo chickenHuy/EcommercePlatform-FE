@@ -16,6 +16,7 @@ import { getSuggestions } from "@/api/search/searchApi";
 import { useDispatch } from "react-redux";
 import { setSearch } from "@/store/features/userSearchSlice";
 import { usePathname, useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export function SearchWithSuggestions({ className, t }) {
   const [query, setQuery] = React.useState("");
@@ -30,6 +31,8 @@ export function SearchWithSuggestions({ className, t }) {
   const dispatch = useDispatch();
   const pathname = usePathname();
   const router = useRouter();
+
+  const { toast } = useToast();
 
   React.useEffect(() => {
     if (!debouncedQuery) {
@@ -57,6 +60,14 @@ export function SearchWithSuggestions({ className, t }) {
   }, [selectedIndex]);
 
   const handleInputChange = (e) => {
+    if (e.target.value.length > 1000) {
+      toast({
+        title: t("text_notify"),
+        description: t("text_input_too_long"),
+        variant: "destructive",
+      });
+      return;
+    }
     setQuery(e.target.value);
     setSelectedIndex(-1);
     setIsExpanded(true);

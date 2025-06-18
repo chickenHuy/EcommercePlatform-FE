@@ -296,7 +296,9 @@
     "text_new_products_added": "New Products Added",
     "text_count": "{count} Add To Cart",
     "text_view_cart": "View Cart",
-    "text_search_products": "Search for products ..."
+    "text_search_products": "Search for products ...",
+    "text_notify": "Notify",
+    "text_input_too_long": "Input too long, please enter less than 1000 characters"
   },
   "VendorRegister": {
     "register_store": "Register as a vendor",
