@@ -90,10 +90,12 @@ export default function RevenueStatistics() {
   const [data, setData] = useState(null);
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("vi-VN", {
+    return amount.toLocaleString("vi-VN", {
       style: "currency",
       currency: "VND",
-    }).format(amount);
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
   };
 
   const formatDate = (dateString) => {
@@ -316,18 +318,6 @@ export default function RevenueStatistics() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="productId">ID Sản phẩm</Label>
-              <Input
-                id="productId"
-                placeholder="Nhập ID sản phẩm"
-                value={filters.productId}
-                onChange={(e) =>
-                  handleFilterChange("productId", e.target.value)
-                }
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="storeId">ID Cửa hàng</Label>
               <Input
                 id="storeId"
@@ -480,7 +470,7 @@ export default function RevenueStatistics() {
                         content={
                           <ChartTooltipContent
                             formatter={(value, name) => [
-                              formatCurrency(Number(value) * 1000000),
+                              formatCurrency(Number(value)),
                               "Doanh thu",
                             ]}
                           />
