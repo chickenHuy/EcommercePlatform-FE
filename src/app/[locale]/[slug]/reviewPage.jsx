@@ -112,7 +112,7 @@ export default function Reviews({ productId, t }) {
       const responseCM = await getCommentAndMediaTotalReview(productId);
       setTotalComments(responseCM.result.totalComments);
       setTotalWithMedia(responseCM.result.totalWithMedia);
-    } catch (error) {}
+    } catch (error) { }
   }, [productId]);
 
   useEffect(() => {
@@ -162,13 +162,12 @@ export default function Reviews({ productId, t }) {
               <div className="flex gap-3 flex-wrap">
                 <Button
                   variant="outline"
-                  className={`rounded-sm text-[.9em] ${
-                    starNumber === "" &&
+                  className={`rounded-sm text-[.9em] ${starNumber === "" &&
                     commentString === "" &&
                     mediaString === ""
-                      ? `border-[#ee4d2d] text-[#ee4d2d] hover:text-[#ee4d2d]`
-                      : null
-                  }`}
+                    ? `border-[#ee4d2d] text-[#ee4d2d] hover:text-[#ee4d2d]`
+                    : null
+                    }`}
                   onClick={() => handleRatingFilterClick("")}
                 >
                   {t("text_all")}
@@ -182,11 +181,10 @@ export default function Reviews({ productId, t }) {
                       <Button
                         key={rating}
                         variant="outline"
-                        className={`rounded-sm text-[.9em] ${
-                          starNumber === mappedRating
-                            ? "border-[#ee4d2d] text-[#ee4d2d] hover:text-[#ee4d2d]"
-                            : null
-                        }`}
+                        className={`rounded-sm text-[.9em] ${starNumber === mappedRating
+                          ? "border-[#ee4d2d] text-[#ee4d2d] hover:text-[#ee4d2d]"
+                          : null
+                          }`}
                         onClick={() => handleRatingFilterClick(mappedRating)}
                       >
                         {mappedRating} {t("text_star")} ({count})
@@ -198,11 +196,10 @@ export default function Reviews({ productId, t }) {
               <div className="flex gap-3 flex-wrap">
                 <Button
                   variant="outline"
-                  className={`rounded-sm text-[.9em] ${
-                    commentString === "commentString"
-                      ? "border-[#ee4d2d] text-[#ee4d2d] hover:text-[#ee4d2d]"
-                      : null
-                  }`}
+                  className={`rounded-sm text-[.9em] ${commentString === "commentString"
+                    ? "border-[#ee4d2d] text-[#ee4d2d] hover:text-[#ee4d2d]"
+                    : null
+                    }`}
                   onClick={() => handleCommentFilterClick("commentString")}
                 >
                   {t("text_have_comment")} ({totalComments})
@@ -210,11 +207,10 @@ export default function Reviews({ productId, t }) {
 
                 <Button
                   variant="outline"
-                  className={`rounded-sm text-[.9em] ${
-                    mediaString === "mediaString"
-                      ? "border-[#ee4d2d] text-[#ee4d2d] hover:text-[#ee4d2d]"
-                      : null
-                  }`}
+                  className={`rounded-sm text-[.9em] ${mediaString === "mediaString"
+                    ? "border-[#ee4d2d] text-[#ee4d2d] hover:text-[#ee4d2d]"
+                    : null
+                    }`}
                   onClick={() => handleMediaFilterClick("mediaString")}
                 >
                   {t("text_have_media")} ({totalWithMedia})
@@ -259,13 +255,16 @@ export default function Reviews({ productId, t }) {
 
                       <div className="flex gap-2 items-center flex-wrap">
                         <span className="text-[.9em] text-muted-foreground">
-                          {formatDate(listreview.lastUpdatedAt)} |{" "}
-                          {t("text_classification")}
+                          {listreview.productValues[0].values ?
+                            formatDate(listreview.lastUpdatedAt) + " | " + t("text_classification") : 
+                            formatDate(listreview.lastUpdatedAt)
+                          }
                         </span>
 
                         <div className="flex flex-wrap gap-3">
                           {listreview.productValues.map(
                             (productValue, index) => (
+                              productValue.values &&
                               <span
                                 key={index}
                                 className="text-[.9em] px-2 border rounded-sm"
@@ -282,29 +281,29 @@ export default function Reviews({ productId, t }) {
                       {(listreview.videoUrl ||
                         (listreview.images &&
                           listreview.images.length > 0)) && (
-                        <div className="flex flex-wrap gap-3 w-full h-fit">
-                          {listreview.videoUrl && (
-                            <MediaViewer
-                              thumbnailUrl={getCloudinaryThumbnail(
-                                listreview.videoUrl,
-                              )}
-                              mediaUrl={listreview.videoUrl}
-                              isVideo={true}
-                              thumbnailSize="w-24 h-24 border rounded-sm"
-                            />
-                          )}
+                          <div className="flex flex-wrap gap-3 w-full h-fit">
+                            {listreview.videoUrl && (
+                              <MediaViewer
+                                thumbnailUrl={getCloudinaryThumbnail(
+                                  listreview.videoUrl,
+                                )}
+                                mediaUrl={listreview.videoUrl}
+                                isVideo={true}
+                                thumbnailSize="w-24 h-24 border rounded-sm"
+                              />
+                            )}
 
-                          {listreview.images.map((image, index) => (
-                            <MediaViewer
-                              key={index}
-                              thumbnailUrl={image.url}
-                              mediaUrl={image.url}
-                              isVideo={false}
-                              thumbnailSize="w-24 h-24 border rounded-sm"
-                            />
-                          ))}
-                        </div>
-                      )}
+                            {listreview.images.map((image, index) => (
+                              <MediaViewer
+                                key={index}
+                                thumbnailUrl={image.url}
+                                mediaUrl={image.url}
+                                isVideo={false}
+                                thumbnailSize="w-24 h-24 border rounded-sm"
+                              />
+                            ))}
+                          </div>
+                        )}
                     </div>
                   </div>
                 </div>
