@@ -47,7 +47,7 @@ export function ProductMediaViewer({ product }) {
           <div className="relative h-full w-full">
             <video
               src={mediaItems[selectedIndex].url}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
               loop
               muted
               autoPlay
