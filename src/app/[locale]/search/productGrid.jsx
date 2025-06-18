@@ -10,16 +10,16 @@ import { useTranslations } from "next-intl";
 import clsx from "clsx";
 import Empty from "@/assets/images/ReviewEmpty.png";
 import Image from "next/image";
-import { resetFilters } from "@/store/features/userSearchSlice";
+import { resetFilters, setStore } from "@/store/features/userSearchSlice";
 
 export default function ProductGrid({ maxCol = 6 }) {
-  const [products, setProducts] = useState(null);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
+  const [resetTrigger, setResetTrigger] = useState(0);
 
   const { ref, inView } = useInView();
-
   const dispatch = useDispatch();
   const searchParams = useSelector((state) => state.searchFilter);
   const isCompleteSetup = useSelector((state) => state.searchFilter.completeSetup);
@@ -30,10 +30,8 @@ export default function ProductGrid({ maxCol = 6 }) {
   const gridCols = clsx("grid-cols-2", {
     "sm:grid-cols-2": maxCol === 4,
     "sm:grid-cols-3": maxCol >= 6,
-
     "lg:grid-cols-2": maxCol === 4,
     "lg:grid-cols-4": maxCol >= 6,
-
     "xl:grid-cols-4": maxCol === 4,
     "xl:grid-cols-6": maxCol >= 6,
   });
@@ -48,30 +46,40 @@ export default function ProductGrid({ maxCol = 6 }) {
           page: isInitialLoad ? 1 : page,
           limit: limit,
         });
+
         const newProducts = res.result.data;
 
         if (newProducts.length === 0) {
           setHasMore(false);
         } else {
-          setProducts((prevProducts) =>
-            isInitialLoad ? newProducts : [...prevProducts, ...newProducts],
-          );
+          setProducts((prev) => {
+            const merged = isInitialLoad ? newProducts : [...prev, ...newProducts];
+            const unique = Array.from(new Map(merged.map(p => [p.id, p])).values());
+            return unique;
+          });
           setPage(res.result.nextPage);
         }
-      } catch {
+      } catch (error) {
+        console.error("Failed to load products", error);
       } finally {
         setLoading(false);
       }
     },
-    [searchParams, page, loading, hasMore],
+    [searchParams, page, loading, hasMore, isCompleteSetup],
   );
 
   useEffect(() => {
+    if (!isCompleteSetup) return;
     setProducts([]);
     setPage(1);
     setHasMore(true);
-    loadProducts(true);
+    setResetTrigger((prev) => prev + 1); 
   }, [searchParams, isCompleteSetup]);
+
+  useEffect(() => {
+    if (!isCompleteSetup) return;
+    loadProducts(true);
+  }, [resetTrigger]);
 
   useEffect(() => {
     if (inView && !loading) {
@@ -81,8 +89,9 @@ export default function ProductGrid({ maxCol = 6 }) {
 
   useEffect(() => {
     return () => {
+      dispatch(setStore(null));
       dispatch(resetFilters());
-    }
+    };
   }, []);
 
   const handleAddToFavorites = async (productId) => {
@@ -93,13 +102,8 @@ export default function ProductGrid({ maxCol = 6 }) {
         description: t("toast_description_wishlist_success"),
       });
 
-      get(`/api/v1/users/listFollowedProduct`)
-        .then((res) => {
-          dispatch(setWishList(res.result));
-        })
-        .catch(() => {
-          dispatch(setWishList([]));
-        });
+      const res = await get(`/api/v1/users/listFollowedProduct`);
+      dispatch(setWishList(res.result));
     } catch (error) {
       toast({
         title: t("toast_title_wishlist_fail"),
@@ -119,7 +123,7 @@ export default function ProductGrid({ maxCol = 6 }) {
   return (
     <>
       <div className={`w-full grid gap-3 grid-cols-2 ${gridCols}`}>
-        {products?.map((product) => (
+        {products.map((product) => (
           <ProductCard
             key={product.id}
             productId={product.id}
@@ -141,25 +145,17 @@ export default function ProductGrid({ maxCol = 6 }) {
           <div ref={ref} className="w-full col-span-full flex justify-center">
             {loading && (
               <div className={`w-full grid gap-3 grid-cols-2 ${gridCols}`}>
-                <SkeletonItem />
-                <SkeletonItem />
-                <SkeletonItem />
-                <SkeletonItem />
-                <SkeletonItem />
-                <SkeletonItem />
-                <SkeletonItem />
-                <SkeletonItem />
-                <SkeletonItem />
-                <SkeletonItem />
-                <SkeletonItem />
-                <SkeletonItem />
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <SkeletonItem key={i} />
+                ))}
               </div>
             )}
           </div>
         )}
       </div>
-      {!loading && products && products.length === 0 && (
-        <Image src={Empty} alt="Order Not Found" className="w-1/2 mx-auto" />
+
+      {!loading && products.length === 0 && (
+        <Image src={Empty} alt="No Products Found" className="w-1/2 mx-auto" />
       )}
     </>
   );
