@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import SearchHeader from "./headerSearch";
 import { Button } from "@/components/ui/button";
-import { ArrowDownUp, ArrowUpWideNarrow, Filter, Store, X } from "lucide-react";
+import { ArrowDown, ArrowDownUp, ArrowUp, Filter, Store, X } from "lucide-react";
 import LeftSideBar from "./leftSideBar";
 import RightSideBar from "./rightSidebar";
 import {
@@ -93,9 +93,9 @@ export default function SearchPage() {
                 onClick={handleOrderChange}
               >
                 {order === "desc" ? (
-                  <ArrowDownUp className="w-4" />
+                  <ArrowDown className="w-4" />
                 ) : order === "asc" ? (
-                  <ArrowUpWideNarrow className="w-4" />
+                  <ArrowUp className="w-4" />
                 ) : (
                   <ArrowDownUp className="w-4" />
                 )}
