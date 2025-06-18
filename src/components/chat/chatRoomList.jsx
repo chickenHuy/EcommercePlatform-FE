@@ -69,23 +69,25 @@ export function ChatRoomList({
                     <ShoppingBag className="h-5 w-5" />
                     <span>Store Messages</span>
                 </div>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-white-primary hover:bg-black-secondary"
-                    onClick={onClose}
-                >
-                    <X className="h-5 w-5" />
-                </Button>
+                {!isStore &&
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-white-primary hover:bg-black-secondary"
+                        onClick={onClose}
+                    >
+                        <X className="h-5 w-5" />
+                    </Button>
+                }
             </div>
 
             {/* Search */}
-            <div className="p-3 border-b border-gray-tertiary">
+            <div className="p-3">
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-tertiary" />
                     <Input
-                        placeholder="Search stores..."
-                        className="pl-9 border-gray-tertiary text-black-primary"
+                        placeholder="Search..."
+                        className="pl-9 border text-black-primary"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -93,13 +95,13 @@ export function ChatRoomList({
             </div>
 
             {/* Rooms List */}
-            <div className="flex-1 overflow-y-auto" ref={listRef} onScroll={handleScroll}>
+            <div className="flex-1 gap-3 p-3 overflow-y-auto" ref={listRef} onScroll={handleScroll}>
                 {filteredRooms.length > 0 ? (
                     filteredRooms.map((room) => (
                         <div
                             key={room.id}
                             className={cn(
-                                "flex items-center gap-3 p-3 cursor-pointer hover:bg-blue-primary transition-colors border-b border-gray-tertiary",
+                                "flex items-center gap-3 p-3 cursor-pointer hover:bg-blue-primary transition-colors border rounded-md shadow-sm",
                                 room.unreadCount ? "bg-blue-primary" : "",
                             )}
                             onClick={() => onSelectRoom(room)}
@@ -133,7 +135,7 @@ export function ChatRoomList({
                             <div className="flex-1 min-w-0">
                                 <div className="flex justify-between items-center">
                                     <span
-                                        className={cn("font-medium truncate text-black-primary", room.unreadCount ? "font-semibold" : "")}
+                                        className={cn("truncate text-black-primary", room.unreadCount ? "font-semibold" : "")}
                                     >
                                         {isStore ? room.user_name : room.store_name}
                                     </span>

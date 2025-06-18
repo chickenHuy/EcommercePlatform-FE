@@ -8,8 +8,9 @@ import useWebSocket from "@/utils/websocket/websocket"
 import { Portal } from "./portal"
 import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from "../ui/button"
+import Loading from "../loading"
 
-export default function StoreChatPage({ storeId, userId, websocketUrl, isStore, productId, orderId }) {
+export default function StoreChatPage({ userId, websocketUrl, isStore, productId, orderId }) {
     const [selectedRoom, setSelectedRoom] = useState(null)
     const [chatRooms, setChatRooms] = useState([])
     const [isLoading, setIsLoading] = useState(false)
@@ -63,11 +64,10 @@ export default function StoreChatPage({ storeId, userId, websocketUrl, isStore, 
     }
 
     return (
-        <div className="container mx-auto p-4 mt-20">
-            <h1 className="text-2xl font-bold mb-4">Chat</h1>
-            <div className="border rounded-lg p-4 bg-white shadow overflow-y-auto">
+        <div className="container mx-auto w-full h-full mt-24">
+            <div className="border rounded-lg bg-white shadow overflow-y-auto">
                 {isLoading ? (
-                    <p>Loading chat rooms...</p>
+                    <Loading />
                 ) : error ? (
                     <p className="text-red-500">{error}</p>
                 ) : (
