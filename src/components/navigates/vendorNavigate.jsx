@@ -12,8 +12,8 @@ import {
   ChevronRight,
   ShoppingBag,
   Star,
-  MapPinHouse,
   Store,
+  MessageCircle
 } from "lucide-react";
 
 import {
@@ -144,17 +144,17 @@ export default function VendorNavigate({ vendorContent }) {
         url: "#",
         icon: BookOpen,
         items: [
-          { title: t("revenue"), url: "#", activeKey: "revenue" },
+          { title: t("revenue"), url: "/vendor", activeKey: "revenue" },
           {
             title: t("business_performance"),
-            url: "#",
+            url: "/vendor",
             activeKey: "performance",
           },
         ],
       },
     ],
     projects: [
-      { name: t("review_and_comment"), url: "#", icon: Star },
+      { name: t("chat_management"), url: "/vendor/chat", icon: MessageCircle },
       { name: t("store_profile"), url: "/vendor/store", icon: Store },
     ],
   };
@@ -213,11 +213,10 @@ export default function VendorNavigate({ vendorContent }) {
                                   subItem.url,
                                 )
                               }
-                              className={`w-full text-[1em] text-left px-2 py-1 rounded-sm ${
-                                activeItem === subItem.activeKey
+                              className={`w-full text-[1em] text-left px-2 py-1 rounded-sm ${activeItem === subItem.activeKey
                                   ? "font-[900] bg-white-secondary"
                                   : "hover:bg-white-secondary"
-                              }`}
+                                }`}
                             >
                               {subItem.title}
                             </button>
