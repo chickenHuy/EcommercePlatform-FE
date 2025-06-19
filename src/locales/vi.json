@@ -246,6 +246,7 @@
       "update_info": "Cập nhật {info}",
       "main_product_image": "Hình ảnh chính của sản phẩm",
       "product_image_list": "Danh sách hình ảnh sản phẩm",
+      "main_product_video": "Video chính của sản phẩm",
       "update_success": "Cập nhật {info} thành công",
       "update_fail": "Cập nhật thất bại: {error}"
     }
