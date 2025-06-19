@@ -70,7 +70,7 @@ export default function ProductCard({
       {percentDiscount &&
         <div className="w-fit h-fit px-1 rounded-sm bg-red-primary text-[.8em] text-white-primary absolute top-[5px] left-[5px] z-20">{"-" + percentDiscount + "%"}</div>
       }
-      <Card className={`w-full h-fit ${isMasonry ? "mb-3" : ""} bg-white-primary overflow-hidden flex flex-col rounded-md border shadow-sm transition duration-150`}>
+      <Card className={`w-full h-fit ${isMasonry ? "mb-3" : ""} bg-white-primary overflow-hidden flex flex-col rounded-md border hover:border-white-tertiary/50 shadow-sm transition duration-150`}>
         <CardHeader className="p-0 relative">
           <div className="relative w-full aspect-square group-hover:-translate-y-[6px] transition duration-150">
             {videoUrl ? (
@@ -136,8 +136,10 @@ export default function ProductCard({
                   <li
                     key={index}
                     className="text-[.8em]"
-                  >
-                    {component.name}: {component.value}
+                  ><span className="text-black-primary/80 pr-1">
+                      {component.name}: 
+                    </span>
+                    {component.value}
                   </li>
                 ))}
               </div>
