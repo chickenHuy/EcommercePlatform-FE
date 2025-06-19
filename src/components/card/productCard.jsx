@@ -111,13 +111,13 @@ export default function ProductCard({
             {name}
           </CardTitle>
           {brandName && (
-            <div className="w-fit sm:text-[1em] text-[.8em] rounded-sm px-3 py-1 bg-blue-tertiary">
+            <div className="w-fit sm:text-[1em] text-[.8em] rounded-sm px-3 py-1 bg-blue-tertiary/50">
               {brandName}
             </div>
           )}
           {
             components.length > 0 && (
-              <div className="w-full h-fit max-h-[200px] overflow-y-scroll flex flex-col gap-1 bg-blue-tertiary p-2 pl-4 rounded-sm shadow-sm">
+              <div className="w-full h-fit max-h-[200px] overflow-y-scroll flex flex-col gap-1 bg-blue-tertiary/50 p-2 pl-4 rounded-sm shadow-sm">
                 {components.map((component, index) => (
                   component.value &&
                   <li
