@@ -7,6 +7,7 @@ import { CloudUploadIcon, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 const VideoDropzone = ({
+  currentVideoUrl = null,
   onVideoUpload,
   isPopup = false,
   maxSize = 100 * 1024 * 1024,
@@ -20,7 +21,7 @@ const VideoDropzone = ({
     (acceptedFiles) => {
       const file = acceptedFiles[0];
       if (file.size > maxSize) {
-        setError(t("max_size_video", {size: maxSize / (1024 * 1024)}));
+        setError(t("max_size_video", { size: maxSize / (1024 * 1024) }));
         return;
       }
 
@@ -59,9 +60,8 @@ const VideoDropzone = ({
 
   const renderContent = () => (
     <div
-      className={`h-fit bg-white-primary p-6 rounded-lg shadow-lg ${
-        isPopup ? "w-[40%] min-w-[400px] mx-auto" : "w-full min-w-[400px]"
-      }`}
+      className={`h-fit bg-white-primary p-6 rounded-lg shadow-lg ${isPopup ? "w-[40%] min-w-[400px] mx-auto" : "w-full min-w-[400px]"
+        }`}
     >
       {isPopup && (
         <>
@@ -92,6 +92,20 @@ const VideoDropzone = ({
         </p>
       )}
 
+      {currentVideoUrl && !video &&
+        <div className="mt-4 relative">
+          <video
+            src={currentVideoUrl}
+            controls
+            className="w-full h-40 object-contain"
+          />
+          <X
+            className="absolute top-[2px] right-[2px] scale-[0.65] hover:scale-75 cursor-pointer hover:text-error-dark"
+            onClick={handleRemoveVideo}
+          />
+        </div>
+      }
+
       {video && (
         <div className="mt-4 relative">
           <video
@@ -108,10 +122,10 @@ const VideoDropzone = ({
 
       {/* Note about file size and number of images */}
       <p className="text-sm text-center text-gray-600 mt-4">
-        {t("max_size_video", {size: maxSize / (1024 * 1024)})}
+        {t("max_size_video", { size: maxSize / (1024 * 1024) })}
       </p>
       <p className="text-sm text-center text-gray-600">
-        {t("max_number_video", {number: 1})}
+        {t("max_number_video", { number: 1 })}
       </p>
 
 
