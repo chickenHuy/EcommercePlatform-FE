@@ -1,4 +1,4 @@
-import { del, patch, get, post } from "@/lib/httpClient";
+import { del, patch, get, post, put } from "@/lib/httpClient";
 
 export const getProducts = async (page, sortBy, order, tab, search) => {
   try {
@@ -14,6 +14,16 @@ export const getProducts = async (page, sortBy, order, tab, search) => {
 export const createProduct = (data) => {
   try {
     const response = post(`/api/v1/products`, data);
+    return response;
+  } catch (error) {
+    console.error("Error during authentication:", error);
+    throw error;
+  }
+};
+
+export const updateProductComponentValue = (data, id) => {
+  try {
+    const response = put(`/api/v1/product-component-values/${id}`, data);
     return response;
   } catch (error) {
     console.error("Error during authentication:", error);
@@ -83,6 +93,16 @@ export const uploadListProductImage = async (listFile, productId) => {
 export const getProductById = (id) => {
   try {
     const response = get(`/api/v1/products/${id}`);
+    return response;
+  } catch (error) {
+    console.error("Error during authentication:", error);
+    throw error;
+  }
+};
+
+export const deleteMainProductVideo = (id) => {
+  try {
+    const response = del(`/api/v1/videos/products/${id}`);
     return response;
   } catch (error) {
     console.error("Error during authentication:", error);
