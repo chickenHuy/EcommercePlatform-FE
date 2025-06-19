@@ -54,10 +54,6 @@ export default function ProductGrid({ maxCol = 6 }) {
         if (newProducts.length === 0) {
           setHasMore(false);
         } else {
-          for (const product of newProducts) {
-            const productDetail = await get(`/api/v1/products/slug/${product.slug}`);
-            product.components = productDetail.result.components || [];
-          }
           setProducts((prev) => {
             const merged = isInitialLoad ? newProducts : [...prev, ...newProducts];
             const unique = Array.from(new Map(merged.map(p => [p.id, p])).values());
@@ -144,7 +140,7 @@ export default function ProductGrid({ maxCol = 6 }) {
             videoUrl={product.videoUrl}
             brandName={product.brandName}
             sold={product.sold}
-            components={product.components}
+            hasComponents={true}
             rating={product.rating}
             onViewDetail={() => handleViewDetail(product)}
             onAddToFavorites={() => handleAddToFavorites(product.id)}

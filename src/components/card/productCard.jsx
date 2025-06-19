@@ -8,7 +8,8 @@ import IconNotFound from "../../../public/images/iconNotFound.png";
 import Link from "next/link";
 import { getSomeSecondVideoUrl } from "@/utils";
 import { useTranslations } from "next-intl";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { get } from "@/lib/httpClient";
 
 function formatPrice(price) {
   return new Intl.NumberFormat("vi-VN", {
@@ -26,7 +27,7 @@ export default function ProductCard({
   sold = 0,
   brandName = null,
   rating,
-  components = [],
+  hasComponents = false,
   percentDiscount = null,
   showRating = true,
   onAddToFavorites,
@@ -36,6 +37,7 @@ export default function ProductCard({
 }) {
   const t = useTranslations("Search");
   const videoRef = useRef(null);
+  const [components, setComponents] = useState([]);
 
   const handleMouseEnter = () => {
     if (videoRef.current) {
@@ -50,6 +52,17 @@ export default function ProductCard({
       videoRef.current.currentTime = 0;
     }
   };
+
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      const productDetail = await get(`/api/v1/products/slug/${link}`);
+      setComponents(productDetail.result.components || [])
+    }
+    if (hasComponents) {
+      fetchProductDetails();
+    }
+
+  }, [])
 
   return (
     <Link href={`/${link}`} passHref className="w-full h-fit relative group" onMouseEnter={handleMouseEnter}
@@ -117,7 +130,7 @@ export default function ProductCard({
           )}
           {
             components.length > 0 && (
-              <div className="w-full h-fit max-h-[200px] overflow-y-scroll flex flex-col gap-1 bg-blue-tertiary/50 p-2 pl-4 rounded-sm shadow-sm">
+              <div className="w-full h-fit max-h-[200px] overflow-y-scroll no-scrollbar flex flex-col gap-1 bg-blue-tertiary/50 p-2 pl-4 rounded-sm shadow-sm">
                 {components.map((component, index) => (
                   component.value &&
                   <li
