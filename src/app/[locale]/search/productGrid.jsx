@@ -25,7 +25,6 @@ export default function ProductGrid({ maxCol = 6 }) {
   const searchParams = useSelector((state) => state.searchFilter);
   const isCompleteSetup = useSelector((state) => state.searchFilter.completeSetup);
   const favorites = useSelector((state) => state.wishListReducer.wishList);
-  console.log("searchParams", favorites);
   const t = useTranslations("Search");
   const limit = 16;
 

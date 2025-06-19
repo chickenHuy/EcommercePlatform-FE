@@ -130,7 +130,7 @@ export default function ProductCard({
           )}
           {
             components.length > 0 && (
-              <div className="w-full h-fit max-h-[200px] overflow-y-scroll no-scrollbar flex flex-col gap-1 bg-blue-tertiary/50 p-2 pl-4 rounded-sm shadow-sm">
+              <div className="w-full h-[150px] overflow-y-scroll no-scrollbar flex flex-col gap-1 bg-blue-tertiary/50 p-2 pl-4 rounded-sm shadow-sm">
                 {components.map((component, index) => (
                   component.value &&
                   <li
