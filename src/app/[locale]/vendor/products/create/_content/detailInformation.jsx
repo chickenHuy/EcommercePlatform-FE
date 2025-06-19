@@ -7,16 +7,26 @@ const DetailInformation = ({
   listComponents = [],
   setFormData = null,
   formData = [],
+  isUpdate = false,
 }) => {
   useEffect(() => {
-    const listComponentsValue = listComponents.reduce(
-      (acc, field) => ({ ...acc, [field.id]: "" }),
-      {},
-    );
+    let listComponentsValue = {};
+    if (!isUpdate) {
+      listComponentsValue = listComponents.reduce(
+        (acc, field) => ({ ...acc, [field.id]: "" }),
+        {},
+      );
+    }
+    else {
+      listComponentsValue = listComponents.reduce(
+        (acc, field) => ({ ...acc, [field.valueId]: field.value || "" }),
+        {},
+      );
+    }
+    console.log("listComponentsValue", listComponents);
+    console.log("listComponentsValue", listComponentsValue);
     setFormData(listComponentsValue);
   }, [listComponents]);
-
-  console.log(listComponents);
 
   return (
     <div className="w-full h-fit flex lg:flex-row flex-col justify-center items-start px-5 gap-5 text-[1em]">
@@ -27,7 +37,7 @@ const DetailInformation = ({
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-x-10 gap-y-3 w-full h-fit shadow-md rounded-md border-[0.5px] px-5 py-10">
-          {listComponents.map(({ id, name, required }) => (
+          {!isUpdate ? listComponents.map(({ id, name, required }) => (
             <div key={id}>
               <div className="grid w-full items-center gap-1.5">
                 <div className="flex flex-row justify-start items-center">
@@ -47,7 +57,31 @@ const DetailInformation = ({
                 />
               </div>
             </div>
-          ))}
+          ))
+            :
+            listComponents.map(({ valueId, value, name, required }) => (
+              <div key={valueId}>
+                <div className="grid w-full items-center gap-1.5">
+                  <div className="flex flex-row justify-start items-center">
+                    <span>{name}</span>
+                    {required && (
+                      <span className="px-3 text-error font-[900]">( * )</span>
+                    )}{" "}
+                  </div>
+                  <Input
+                    type="text"
+                    id={valueId}
+                    value={formData[valueId]}
+                    onChange={(e) =>
+                      setFormData({ ...formData, [valueId]: e.target.value })
+                    }
+                    placeholder={value}
+                  />
+                </div>
+              </div>
+            ))
+
+          }
         </div>
       )}
       {listComponents.length > 0 ? (
