@@ -141,6 +141,15 @@ function AdminHeader() {
                 </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link href="/admin/statistics" legacyBehavior passHref>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  <div className="text-muted-foreground transition-colors hover:text-foreground">
+                    Doanh thu
+                  </div>
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 
