@@ -5,11 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import BasicInformation from "../create/_content/basicInformation";
 import {
+  createProduct,
   deleteListProductImage,
   getProductById,
   updateProduct,
+  updateProductComponentValue,
   uploadListProductImage,
   uploadMainProductImage,
+  uploadMainProductVideo,
 } from "@/api/vendor/productRequest";
 import { useToast } from "@/hooks/use-toast";
 import { getListAllBrand } from "@/api/admin/brandRequest";
@@ -17,6 +20,8 @@ import ImageDropzone from "@/components/uploads/imageDropZone";
 import { useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/components/loading";
 import { useTranslations } from "next-intl";
+import VideoDropzone from "@/components/uploads/videoDropZone";
+import DetailInformation from "../create/_content/detailInformation";
 
 export default function ProductUpdatePage() {
   const searchParam = useSearchParams();
@@ -30,6 +35,8 @@ export default function ProductUpdatePage() {
     basicInfo: false,
     mainImage: false,
     listImage: false,
+    video: false,
+    detail: false,
   });
   const [product, setProduct] = useState(null);
 
@@ -41,7 +48,7 @@ export default function ProductUpdatePage() {
   const [productVideo, setProductVideo] = useState(null);
   const [productName, setProductName] = useState("");
   const [productBrand, setProductBrand] = useState("");
-  const [productCategory, setProductCategory] = useState("");
+  const [productComponents, setProductComponents] = useState([]);
   const [productDetails, setProductDetails] = useState("");
   const [productDescription, setProductDescription] = useState("");
 
@@ -212,18 +219,89 @@ export default function ProductUpdatePage() {
   };
 
   const handleUpdateVideo = async () => {
-    toast({
-      title: "Thông báo",
-      description: "Chức năng cập nhật video đang được phát triển.",
-    });
+    if (!productVideo) {
+      toast({
+        variant: "destructive",
+        title: t("notify"),
+        description: t("list_video_empty"),
+      });
+      return;
+    }
+    try {
+      setIsUpdate((prev) => ({
+        ...prev,
+        video: true,
+      }));
+      await uploadMainProductVideo(productVideo, product.id);
+      toast({
+        title: t("notify"),
+        description: t("update_success", { info: t("main_product_video") }),
+      });
+    }
+    catch (error) {
+      toast({
+        title: t("notify"),
+        variant: "destructive",
+        description: t("update_fail", { error: error.message }),
+      });
+    }
+    finally {
+      setIsUpdate((prev) => ({
+        ...prev,
+        video: false,
+      }));
+    }
   };
 
   const handleUpdateDetailInfo = async () => {
-    toast({
-      title: "Thông báo",
-      description:
-        "Chức năng cập nhật thông tin chi tiết đang được phát triển.",
-    });
+
+    const allRequiredFilled = product?.components
+      .filter((component) => component.required)
+      .every((component) => productComponents[component.id]?.trim().length > 0);
+
+    if (!allRequiredFilled) {
+      toast({
+        variant: "destructive",
+        title: t("notify"),
+        description: t("please_complete", {
+          info: t("advance_product_information"),
+        }),
+      });
+      return;
+    }
+
+    try {
+      setIsUpdate((prev) => ({
+        ...prev,
+        detail: true,
+      }));
+
+      await Promise.all(
+        product?.components.map((component) =>
+          updateProductComponentValue(
+            { value: productComponents[component.valueId] },
+            component.valueId,
+          ),
+        ),
+      );
+      toast({
+        title: t("notify"),
+        description: t("update_success", { info: t("advance_product_information") }),
+      });
+    }
+    catch (error) {
+      toast({
+        title: t("notify"),
+        variant: "destructive",
+        description: t("update_fail", { error: error.message }),
+      });
+    }
+    finally {
+      setIsUpdate((prev) => ({
+        ...prev,
+        detail: false,
+      }));
+    }
   };
 
   const handleUpdateSaleInfo = async () => {
@@ -352,20 +430,28 @@ export default function ProductUpdatePage() {
       </Card>
 
       {/* Video Section */}
-      <Card className="mb-6 shadow-sm">
+      <Card className="shadow-sm">
         <CardHeader className="bg-gray-50">
-          <CardTitle className="text-lg">Video sản phẩm</CardTitle>
-          <p className="text-sm text-gray-500">
-            Video sẽ được hiển thị trên danh sách sản phẩm trong trang chủ, danh
-            mục sản phẩm
-          </p>
+          <CardTitle className="text-[1.2em] font-[900]">
+            {t("main_product_video")}
+          </CardTitle>
+          <div>
+            {t("upload_product_video")}
+            <span className="px-3 text-red-primary font-[900]">( * )</span>
+          </div>
         </CardHeader>
         <CardContent className="pt-4">
-          <div className="w-full flex flex-col gap-3">
-            <p className="text-sm italic">Chức năng đang được phát triển</p>
-          </div>
+          <VideoDropzone currentVideoUrl={product?.videoUrl} onVideoUpload={setProductVideo} />
           <div className="flex justify-end mt-4">
-            <Button onClick={handleUpdateVideo}>Lưu video sản phẩm</Button>
+            <Button className="relative" onClick={handleUpdateVideo}>
+              <span className={isUpdate["video"] ? "invisible" : ""}>
+                {t("update_info", { info: t("main_product_video") })}
+              </span>
+
+              {isUpdate["video"] && (
+                <div className="global_loading_icon white"></div>
+              )}
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -373,18 +459,21 @@ export default function ProductUpdatePage() {
       {/* Detail Information Section */}
       <Card className="mb-6 shadow-sm">
         <CardHeader className="bg-gray-50">
-          <CardTitle className="text-lg">Thông tin chi tiết</CardTitle>
-          <p className="text-sm text-gray-500">
-            Thông tin chi tiết bao gồm các thông số kỹ thuật của sản phẩm
-          </p>
+          <CardTitle className="text-[1.2em] font-[900]">
+            {t("advance_product_information")}
+          </CardTitle>
         </CardHeader>
-        <CardContent className="pt-4">
-          <div className="w-full flex flex-col gap-3">
-            <p className="text-sm italic">Chức năng đang được phát triển</p>
-          </div>
-          <div className="flex justify-end mt-4">
-            <Button onClick={handleUpdateDetailInfo}>
-              Lưu thông tin chi tiết
+        <CardContent className="px-0">
+          <DetailInformation listComponents={product?.components} setFormData={setProductComponents} formData={productComponents} isUpdate={true} />
+          <div className="flex justify-end mt-4 px-5">
+            <Button className="relative" onClick={handleUpdateDetailInfo}>
+              <span className={isUpdate["detail"] ? "invisible" : ""}>
+                {t("update_info", { info: t("advance_product_information") })}
+              </span>
+
+              {isUpdate["detail"] && (
+                <div className="global_loading_icon white"></div>
+              )}
             </Button>
           </div>
         </CardContent>
