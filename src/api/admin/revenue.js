@@ -8,7 +8,8 @@ export const getStatistics = (
   groupBy,
   productId,
   storeId,
-  type
+  type,
+  isStore = false
 ) => {
   try {
     const params = {
@@ -31,7 +32,9 @@ export const getStatistics = (
       )
       .join("&");
 
-    const response = get(`/api/v1/reviews/statistics?${queryString}`);
+    const response = get(
+      `/api/v1/reviews/statistics${isStore ? `-store` : ""}?${queryString}`
+    );
 
     return response;
   } catch (error) {

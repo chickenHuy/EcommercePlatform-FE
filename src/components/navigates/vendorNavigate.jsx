@@ -13,7 +13,7 @@ import {
   ShoppingBag,
   Star,
   Store,
-  MessageCircle
+  MessageCircle,
 } from "lucide-react";
 
 import {
@@ -49,7 +49,7 @@ export default function VendorNavigate({ vendorContent }) {
   const tHeader = useTranslations("Header");
   const t = useTranslations("Vendor.navigate");
   const activeItem = useSelector(
-    (state) => state.orderFilterReducer.activeItem,
+    (state) => state.orderFilterReducer.activeItem
   );
 
   const data = {
@@ -144,7 +144,7 @@ export default function VendorNavigate({ vendorContent }) {
         url: "#",
         icon: BookOpen,
         items: [
-          { title: t("revenue"), url: "/vendor", activeKey: "revenue" },
+          { title: t("revenue"), url: "/vendor/revenue", activeKey: "revenue" },
           {
             title: t("business_performance"),
             url: "/vendor",
@@ -184,7 +184,7 @@ export default function VendorNavigate({ vendorContent }) {
         <SidebarContent className="top-0">
           <SidebarGroup>
             <span className="font-[900] px-2 py-1 text-base border-b mb-2">
-              {t('manage')}
+              {t("manage")}
             </span>
             <SidebarMenu className="gap-3">
               {data.navMain.map((section) => (
@@ -210,13 +210,14 @@ export default function VendorNavigate({ vendorContent }) {
                                 handleSetFilter(
                                   subItem.filterKey,
                                   subItem.activeKey,
-                                  subItem.url,
+                                  subItem.url
                                 )
                               }
-                              className={`w-full text-[1em] text-left px-2 py-1 rounded-sm ${activeItem === subItem.activeKey
+                              className={`w-full text-[1em] text-left px-2 py-1 rounded-sm ${
+                                activeItem === subItem.activeKey
                                   ? "font-[900] bg-white-secondary"
                                   : "hover:bg-white-secondary"
-                                }`}
+                              }`}
                             >
                               {subItem.title}
                             </button>
@@ -232,7 +233,7 @@ export default function VendorNavigate({ vendorContent }) {
 
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <span className="font-[900] px-2 py-1 text-base border-b mb-2">
-              {t('my_store')}
+              {t("my_store")}
             </span>
             <SidebarMenu>
               {data.projects.map((item) => (

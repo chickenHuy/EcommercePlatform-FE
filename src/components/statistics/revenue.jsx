@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   CalendarIcon,
   TrendingUp,
@@ -9,7 +9,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { format } from "date-fns";
-import { vi } from "date-fns/locale";
 import {
   LineChart,
   Line,
@@ -37,7 +36,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -60,6 +58,8 @@ import {
 } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 import { getStatistics } from "@/api/admin/revenue";
+import { getAllStore } from "@/api/admin/storeRequest";
+import { Input } from "../ui/input";
 
 const chartConfig = {
   amount: {
@@ -68,7 +68,25 @@ const chartConfig = {
   },
 };
 
-export default function RevenueStatistics() {
+export default function RevenueStatistics(props) {
+  const { isStore } = props;
+  const [stores, setStores] = useState([]);
+  const [keyword, setKeyword] = useState("");
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const response = await getAllStore(1, 20, "all", "", keyword);
+        if (response?.result) {
+          setStores(response.result?.data || []);
+        }
+      } catch (error) {
+        console.error("Error fetching stores:", error);
+      }
+    };
+    fetchStores();
+  }, [keyword]);
+
   const [filters, setFilters] = useState({
     rangeType: "LAST_7_DAYS",
     groupBy: "DAY",
@@ -118,7 +136,8 @@ export default function RevenueStatistics() {
       filters.groupBy,
       filters.productId || undefined,
       filters.storeId || undefined,
-      "REVENUE"
+      "REVENUE",
+      isStore
     );
 
     if (res?.result) {
@@ -239,7 +258,6 @@ export default function RevenueStatistics() {
                 </SelectContent>
               </Select>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="groupBy">Nhóm theo</Label>
               <Select
@@ -256,7 +274,6 @@ export default function RevenueStatistics() {
                 </SelectContent>
               </Select>
             </div>
-
             {filters.rangeType === "CUSTOM" && (
               <>
                 <div className="space-y-2">
@@ -317,15 +334,40 @@ export default function RevenueStatistics() {
               </>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="storeId">ID Cửa hàng</Label>
-              <Input
-                id="storeId"
-                placeholder="Nhập ID cửa hàng"
-                value={filters.storeId}
-                onChange={(e) => handleFilterChange("storeId", e.target.value)}
-              />
-            </div>
+            {!isStore && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="storeSearch">Tìm kiếm cửa hàng</Label>
+                  <Input
+                    id="storeSearch"
+                    placeholder="Nhập tên cửa hàng"
+                    value={keyword}
+                    onChange={(e) => setKeyword(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="storeId">Cửa hàng</Label>
+                  <Select
+                    value={filters.storeId}
+                    onValueChange={(value) =>
+                      handleFilterChange("storeId", value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Chọn cửa hàng" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {stores.map((store) => (
+                        <SelectItem key={store.id} value={store.id}>
+                          {store.name} ({store.id})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="limit">Số bản ghi/trang</Label>
@@ -491,7 +533,7 @@ export default function RevenueStatistics() {
                 <div>
                   <CardTitle>Chi tiết dữ liệu</CardTitle>
                   <CardDescription>
-                    Bảng dữ liệu chi tiết theo từng ngày
+                    Bảng dữ liệu chi tiết theo từng mốc thời gian
                   </CardDescription>
                 </div>
                 <Button onClick={exportToExcel} variant="outline" size="sm">
@@ -507,22 +549,20 @@ export default function RevenueStatistics() {
                     <TableHead className="w-16">STT</TableHead>
                     <TableHead>Ngày</TableHead>
                     <TableHead className="text-right">Doanh thu</TableHead>
-                    <TableHead>Đơn vị</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {data.data.map((item, index) => (
                     <TableRow key={index}>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-center">
                         {filters.offset + index + 1}
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-center">
                         {formatDate(item.groupKey)}
                       </TableCell>
                       <TableCell className="text-right font-medium">
                         {formatCurrency(item.amount)}
                       </TableCell>
-                      <TableCell>{item.unit}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
