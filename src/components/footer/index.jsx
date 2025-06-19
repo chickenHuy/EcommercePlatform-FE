@@ -32,12 +32,12 @@ const MainFooter = () => {
     if (!isHeaderVisible) return null;
 
     const categories = [
-        { href: "/category/electronics", label: t("electronics") || "Electronics" },
-        { href: "/category/fashion", label: t("fashion") || "Fashion" },
-        { href: "/category/home", label: t("home_garden") || "Home & Garden" },
-        { href: "/category/sports", label: t("sports") || "Sports & Outdoors" },
-        { href: "/category/books", label: t("books") || "Books" },
-        { href: "/category/beauty", label: t("beauty") || "Beauty & Health" },
+        { href: "/search?categoryId=1", label: "Phone" },
+        { href: "/search?categoryId=2", label: "Laptop" },
+        { href: "/search?categoryId=6", label: "Smart Watch" },
+        { href: "/search?categoryId=8", label: "Earphone" },
+        { href: "/search?categoryId=7", label: "Headphone" },
+        { href: "/search?categoryId=9", label: "Camera" },
     ];
 
     const socialLinks = [
