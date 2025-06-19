@@ -25,7 +25,8 @@ const MainFooter = () => {
         "/vendor",
         "/auth",
         "/videos",
-        "/user"
+        "/user",
+        "/present",
     ];
 
     const isHeaderVisible = !hiddenPaths.some((path) => pathname.includes(path));
@@ -161,16 +162,10 @@ const MainFooter = () => {
                             </span>
                             <div className="flex gap-4">
                                 <Link
-                                    href="#"
+                                    href="/present"
                                     className="hover:text-white-primary transition-colors duration-200"
                                 >
-                                    {t("terms_of_service") || "Terms of Service"}
-                                </Link>
-                                <Link
-                                    href="#"
-                                    className="hover:text-white-primary transition-colors duration-200"
-                                >
-                                    {t("privacy_policy") || "Privacy Policy"}
+                                    About Us
                                 </Link>
                             </div>
                         </div>
