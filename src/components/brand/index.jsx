@@ -55,7 +55,7 @@ const ListBrandComponent = ({ isPage = false }) => {
       const step = () => {
         if (!container) return;
 
-        container.scrollLeft += 10;
+        container.scrollLeft += 3;
 
         const maxScroll = container.scrollWidth / 2; 
         if (container.scrollLeft >= maxScroll) {
