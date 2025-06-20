@@ -215,7 +215,7 @@ const ProductsTable = ({
           <TableCell className="text-center">
             {formatDate(product.createdAt)}
           </TableCell>
-          <TableCell className="text-center">{product.rating || 0}</TableCell>
+          <TableCell className="text-center">{product.rating?.toFixed(1) || 0}</TableCell>
           <TableCell className="text-center">
             <ProductActionsMenu
               product={product}

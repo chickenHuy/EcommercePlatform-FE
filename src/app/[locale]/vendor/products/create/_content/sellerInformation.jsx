@@ -28,6 +28,7 @@ const SellerInformation = ({
   setSalePrice = null,
   quantity = "",
   setQuantity = null,
+  isUpdate = false,
 }) => {
   const { toast } = useToast();
 
@@ -143,7 +144,7 @@ const SellerInformation = ({
       });
     } else {
       setVariantOfProducts((prevData) => {
-      const newData = [...prevData];
+        const newData = [...prevData];
         newData[index] = {
           ...newData[index],
           [field]: value,
@@ -164,6 +165,8 @@ const SellerInformation = ({
   };
 
   useEffect(() => {
+    if (isUpdate) return;
+
     function cartesianProduct(arrays) {
       return arrays.reduce(
         (acc, array) => acc.flatMap((d) => array.map((e) => [...d, e])),
@@ -192,6 +195,87 @@ const SellerInformation = ({
 
     setVariantOfProducts(variantOfProducts);
   }, [variantData]);
+
+  if (isUpdate && variantData.length > 0) {
+    return (
+      <div className="w-full h-fit grid 2xl:grid-cols-4 lg:grid-cols-2 grid-cols-1 items-center gap-3">
+        {variantData.map((variant, index) => (
+          <div key={index} className="w-full variant-item p-4 border rounded">
+            <h4 className="w-full h-fit text-center font-[900] truncate">
+              {variant.values.map((v) => v.value).join(" | ")}
+            </h4>
+
+
+
+            <div className="w-full h-[1px] bg-white-secondary mt-2"></div>
+            <div className="my-2 w-full h-fit flex flex-row justify-between items-center gap-3">
+              <span className="text-sm">Giá gốc (VND)</span>
+              <Input
+                value={variant.originalPrice}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  handleInputChange(index, "originalPrice", value);
+                }}
+                className="w-1/2 p-2 border border-gray-300 rounded mt-1"
+              />
+            </div>
+
+            <div className="my-2 w-full h-fit flex flex-row justify-between items-center gap-3">
+              <span className="text-sm">Giá bán (VND)</span>
+              <Input
+                value={variant.salePrice}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  handleInputChange(index, "salePrice", value);
+                }}
+                className="w-1/2 p-2 border border-gray-300 rounded mt-1"
+              />
+            </div>
+
+            <div className="my-2 w-full h-fit flex flex-row justify-between items-center gap-3">
+              <span className="text-sm">Số lượng</span>
+              <Input
+                value={variant.quantity}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  handleInputChange(index, "quantity", value);
+                }}
+                className="w-1/2 p-2 border border-gray-300 rounded mt-1"
+              />
+            </div>
+            <div className="my-2 w-full h-fit flex flex-row justify-between items-center gap-3">
+              <label className="text-sm">Có sẵn</label>
+              <Select
+                className="w-fit p-2 border border-gray-300 rounded mt-1"
+                value={variant.available ? "true" : "false"}
+                onValueChange={(newValue) =>
+                  handleInputChange(index, "available", newValue === "true")
+                }
+              >
+                <SelectTrigger className="w-1/2 bg-gray-200 border rounded p-2">
+                  <SelectValue placeholder="Chọn trạng thái" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Có</SelectItem>
+                  <SelectItem value="false">Không</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="w-full h-fit flex justify-end items-center">
+              <CompleteNotify
+                isComplete={
+                  variant.originalPrice !== "" &&
+                  variant.salePrice !== "" &&
+                  variant.quantity !== ""
+                }
+                content="Hoàn thành"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="text-[15px] w-full h-fit flex flex-col justify-center items-start px-5 gap-5">

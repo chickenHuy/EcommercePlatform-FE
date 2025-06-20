@@ -676,6 +676,7 @@
     "toast_title_product_to_cart": "Sản phẩm đã được thêm vào giỏ hàng",
     "toast_description_product_to_cart": "Bạn có thể xem giỏ hàng bằng cách nhấn vào biểu tượng giỏ hàng ở góc trên bên phải",
     "toast_title_error_product_cart": "Thêm sản phẩm thất bại",
+    "toast_title_error_product": "Thêm sản phẩm thất bại",
     "toast_title_product_to_wishlist": "Đã thêm sản phẩm vào danh sách yêu thích",
     "toast_description_product_to_wishlist": "Bạn có thể xem danh sách yêu thích ở thanh menu",
     "toast_title_error_product_wishlist": "Thêm sản phẩm vào danh sách yêu thích thất bại",

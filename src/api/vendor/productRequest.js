@@ -43,6 +43,18 @@ export const updateProductStatus = async (id) => {
   }
 }
 
+export const updateProductVariant = async (data, id) => {
+  try {
+    const response = await patch(
+      `/api/v1/variants/${id}`, data
+    );
+    return response;
+  } catch (error) {
+    console.error("Error during get products:", error);
+    throw error;
+  }
+}
+
 export const deleteProduct = async (id) => {
   try {
     const response = await del(`/api/v1/products/${id}`);

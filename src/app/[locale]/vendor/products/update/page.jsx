@@ -10,6 +10,7 @@ import {
   getProductById,
   updateProduct,
   updateProductComponentValue,
+  updateProductVariant,
   uploadListProductImage,
   uploadMainProductImage,
   uploadMainProductVideo,
@@ -22,6 +23,7 @@ import Loading from "@/components/loading";
 import { useTranslations } from "next-intl";
 import VideoDropzone from "@/components/uploads/videoDropZone";
 import DetailInformation from "../create/_content/detailInformation";
+import SellerInformation from "../create/_content/sellerInformation";
 
 export default function ProductUpdatePage() {
   const searchParam = useSearchParams();
@@ -37,6 +39,7 @@ export default function ProductUpdatePage() {
     listImage: false,
     video: false,
     detail: false,
+    variant: false,
   });
   const [product, setProduct] = useState(null);
 
@@ -49,6 +52,7 @@ export default function ProductUpdatePage() {
   const [productName, setProductName] = useState("");
   const [productBrand, setProductBrand] = useState("");
   const [productComponents, setProductComponents] = useState([]);
+  const [productVariants, setProductVariants] = useState([]);
   const [productDetails, setProductDetails] = useState("");
   const [productDescription, setProductDescription] = useState("");
 
@@ -67,6 +71,7 @@ export default function ProductUpdatePage() {
           setProductBrand(response.result.brand.id);
           setBrandIdSelected(response.result.brand.id);
           setProductDetails(response.result.details);
+          setProductVariants(response.result.variants);
 
           setIsLoading(false);
         });
@@ -304,12 +309,75 @@ export default function ProductUpdatePage() {
     }
   };
 
+  const checkVariantData = () => {
+    console.log("productVariants", productVariants);
+    const hasValidVariantProducts = productVariants.every(
+      (product) =>
+        product.originalPrice?.toString().trim() !== "" &&
+        product.salePrice?.toString().trim() !== "" &&
+        product.quantity?.toString().trim() !== "" &&
+        Array.isArray(product.values)
+    );
+
+    return hasValidVariantProducts;
+  };
+
+  const convertMoneyToNumber = (value) => {
+    if (typeof value === "number") {
+      return value;
+    }
+    return Number(value.replace(/\./g, ""));
+  };
+
   const handleUpdateSaleInfo = async () => {
-    toast({
-      title: "Thông báo",
-      description:
-        "Chức năng cập nhật thông tin bán hàng đang được phát triển.",
-    });
+    if (!checkVariantData()) {
+      toast({
+        variant: "destructive",
+        title: t("notify"),
+        description: t("please_complete", {
+          info: t("sales_information"),
+        }),
+      });
+      return;
+    }
+
+    try {
+      setIsUpdate((prev) => ({
+        ...prev,
+        variant: true,
+      }));
+
+      await Promise.all(
+        productVariants.map((variant) =>
+          updateProductVariant(
+            {
+              originalPrice: convertMoneyToNumber(variant.originalPrice),
+              salePrice: convertMoneyToNumber(variant.salePrice),
+              quantity: parseInt(variant.quantity),
+              available: variant.available,
+            },
+            variant.id,
+          ),
+        ),
+      );
+      toast({
+        title: t("notify"),
+        description: t("update_success", { info: t("sales_information") }),
+      });
+    }
+    catch (error) {
+      toast({
+        title: t("notify"),
+        variant: "destructive",
+        description: t("update_fail", { error: error.message }),
+      });
+    }
+    finally {
+      setIsUpdate((prev) => ({
+        ...prev,
+        variant: false,
+      }));
+    }
   };
 
   const handleUpdateVariantInfo = async () => {
@@ -479,25 +547,32 @@ export default function ProductUpdatePage() {
         </CardContent>
       </Card>
 
-      {/* Sale Information Section */}
-      {/* <Card className="mb-6 shadow-sm">
-        <CardHeader className="bg-gray-50">
-          <CardTitle className="text-lg">Thông tin bán hàng</CardTitle>
-          <p className="text-sm text-gray-500">
-            Thông tin bán hàng bao gồm giá gốc, giá bán và số lượng của sản phẩm
-          </p>
-        </CardHeader>
-        <CardContent className="pt-4">
-          <div className="w-full flex flex-col gap-3">
-            <p className="text-sm italic">Chức năng đang được phát triển</p>
-          </div>
-          <div className="flex justify-end mt-4">
-            <Button onClick={handleUpdateSaleInfo}>
-              Lưu thông tin bán hàng
-            </Button>
-          </div>
-        </CardContent>
-      </Card> */}
+      {
+        product?.variants && product.variants.length > 0 &&
+        <Card className="mb-6 shadow-sm">
+          <CardHeader className="bg-gray-50">
+            <CardTitle className="text-[1.2em] font-[900]">
+              {t("sales_information")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className="w-full flex flex-col gap-3">
+              <SellerInformation isUpdate={true} variantData={productVariants} setVariantOfProducts={setProductVariants} />
+            </div>
+            <div className="flex justify-end mt-4">
+              <Button className="relative" onClick={handleUpdateSaleInfo}>
+                <span className={isUpdate["variant"] ? "invisible" : ""}>
+                  {t("update_info", { info: t("sales_information") })}
+                </span>
+
+                {isUpdate["variant"] && (
+                  <div className="global_loading_icon white"></div>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      }
 
       {/* Variant Information Section */}
       {/* <Card className="mb-6 shadow-sm">
@@ -520,9 +595,6 @@ export default function ProductUpdatePage() {
         </CardContent>
       </Card> */}
 
-      <div className="flex justify-end gap-2 mt-6">
-        <Button variant="ghost">Đóng</Button>
-      </div>
     </div>
   );
 }
