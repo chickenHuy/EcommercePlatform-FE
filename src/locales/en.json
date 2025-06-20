@@ -531,7 +531,14 @@
       "text_cancel_order": "Confirm cancel order",
       "text_action_type_update": "Are you sure you want to update the order status of {orderId}?",
       "text_action_type_cancel": "Are you sure you want to cancel order {orderId}?",
-      "text_cancel": "Cancel"
+      "text_cancel": "Cancel",
+      "waiting_for_confirmation": "Waiting for confirmation",
+      "confirmed": "Confirmed",
+      "preparing": "Preparing",
+      "waiting_for_shipping": "Waiting for carrier",
+      "delivered_to_the_carrier": "Delivered to carrier",
+      "on_delivery": "Delivering",
+      "completed": "Completed"
     },
     "confirm_list_order_seller": {
       "text_update": "Update",
