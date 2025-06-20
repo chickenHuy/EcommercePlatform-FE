@@ -480,7 +480,7 @@ export default function ProductUpdatePage() {
       </Card>
 
       {/* Sale Information Section */}
-      <Card className="mb-6 shadow-sm">
+      {/* <Card className="mb-6 shadow-sm">
         <CardHeader className="bg-gray-50">
           <CardTitle className="text-lg">Thông tin bán hàng</CardTitle>
           <p className="text-sm text-gray-500">
@@ -497,10 +497,10 @@ export default function ProductUpdatePage() {
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Variant Information Section */}
-      <Card className="mb-6 shadow-sm">
+      {/* <Card className="mb-6 shadow-sm">
         <CardHeader className="bg-gray-50">
           <CardTitle className="text-lg">Thông tin biến thể</CardTitle>
           <p className="text-sm text-gray-500">
@@ -518,7 +518,7 @@ export default function ProductUpdatePage() {
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       <div className="flex justify-end gap-2 mt-6">
         <Button variant="ghost">Đóng</Button>
