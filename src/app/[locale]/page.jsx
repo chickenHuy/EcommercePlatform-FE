@@ -32,7 +32,7 @@ export default function HomePage() {
       url: Slider1,
       description: "Đắm chìm trong thế giới âm thanh",
       button: "Headphone",
-      redirect: "",
+      redirect: "/search?categoryId=7",
       background: "black",
     },
     {
@@ -53,7 +53,7 @@ export default function HomePage() {
       url: Slider4,
       description: "Trợ thủ hoàn hảo cho cuộc sống hiện đại",
       button: "Smart Watch",
-      redirect: "",
+      redirect: "/search?categoryId=6",
       background: "white",
     },
     {
